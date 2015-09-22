@@ -52,9 +52,6 @@ public final class PublishingUIResources extends NLS {
 
 	public static String publishWebSiteGroup_text;
 	public static String browsingLayoutGroup_text;
-	public static String wpSlotDpRuleGroup_text;
-	public static String forbiddenURLCharsGroup_text;
-	public static String forbiddenURLCharsText_label;
 
 	public static String titleAndLinksGroup_text;
 
@@ -91,14 +88,6 @@ public final class PublishingUIResources extends NLS {
 	public static String publishLightWeightTreeLabel_text;
 
 	public static String publishExtraDescriptorInfoLabel_text;
-	
-	public static String showLinkedPageForDescriptorLabel_text;
-	
-	public static String ignoreDynamicParentsCheckbox_text;
-	
-	public static String excludeUnusedWPDsCheckbox_text;
-	
-	public static String fulfillDescriptorSlotByContentCheckbox_text;
 
 	public static String publishEmptyCategoriesLabel_text;
 
@@ -187,8 +176,6 @@ public final class PublishingUIResources extends NLS {
 	public static String viewReportError_title;
 
 	public static String missingViewError_msg;
-	
-	public static String missingProcessError_msg;
 
 	public static String cannotPublishError_msg;
 
@@ -215,10 +202,6 @@ public final class PublishingUIResources extends NLS {
 	public static String webAppNameCharsError_msg;
 
 	public static String showRelatedDescriptors_text;
-	
-	public static String showRelatedLinks_text;
-	
-	public static String showRelatedDescriptors_option_text;
 
 	public static String showDescriptorsInNavigationTree_text;
 

@@ -1,0 +1,25 @@
+/DelegateFileManager.java/1.1/Sat Nov 18 03:21:14 2006/-kk/
+/ExtendedResourceSet.java/1.3/Thu Oct 26 22:44:49 2006/-kk/
+/FailSafePersistenceHelper.java/1.2/Wed Jul 25 02:36:07 2007//
+/FileManager.java/1.30/Mon Aug  6 19:47:05 2007//
+/FilePathProvider.java/1.3/Fri Apr 13 22:24:49 2007/-kk/
+/IFileInfo.java/1.2/Wed Apr 11 23:52:49 2007//
+/IURIProvider.java/1.2/Thu Oct 26 22:44:49 2006/-kk/
+/MethodLibraryPersister.java/1.39/Tue Aug 28 23:01:15 2007//
+/MultiFileIOException.java/1.2/Thu Oct 26 22:44:49 2006//
+/MultiFileResourceSetImpl.java/1.66/Thu Sep 27 18:34:18 2007//
+/MultiFileSaveUtil.java/1.42/Thu Jun  7 00:46:59 2007//
+/MultiFileURIConverter.java/1.8/Thu Oct 26 22:44:49 2006//
+/MultiFileXMIHelperImpl.java/1.11/Sat Aug 11 06:23:37 2007//
+/MultiFileXMILoadImpl.java/1.6/Wed Feb  7 23:33:03 2007//
+/MultiFileXMIResourceImpl.java/1.47/Wed Sep 12 20:47:01 2007//
+/MultiFileXMISaveImpl.java/1.19/Tue Apr 24 19:02:33 2007//
+/PersistencePlugin.java/1.3/Thu Aug  3 23:49:41 2006/-kk/
+/TxRecord.java/1.5/Thu Aug  3 23:49:41 2006//
+/UnnormalizedURIException.java/1.3/Thu Oct 26 22:44:49 2006/-kk/
+/XMILibraryPersister.java/1.6/Tue Jul 31 17:05:31 2007/-kk/
+/XMILibraryResourceSetFactory.java/1.1/Sat Nov 18 03:21:14 2006/-kk/
+D/migration////
+/package.html/1.3/Sun Oct 29 18:59:27 2006//
+D/refresh////
+D/util////

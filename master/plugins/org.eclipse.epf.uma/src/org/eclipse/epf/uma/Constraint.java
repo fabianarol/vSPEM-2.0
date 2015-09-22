@@ -42,7 +42,7 @@ public interface Constraint extends MethodElement {
 	 * @return the value of the '<em>Body</em>' attribute.
 	 * @see #setBody(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getConstraint_Body()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getBody();

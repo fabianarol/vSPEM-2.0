@@ -218,6 +218,160 @@ public class ItemProviderAdapterFactory extends UmaItemProviderAdapterFactory
 	 * 
 	 * @see org.eclipse.epf.uma.util.MethodmodelsAdapterFactory#createProcessComponentAdapter()
 	 */
+	public Adapter createCoreProcessPackageAdapter() {
+		Adapter adapter = new CoreProcessPackageItemProvider(this);
+		return adapter;
+	}
+	public Adapter createProcessLineComponentAdapter() {
+		if (processLineComponentItemProvider == null) {
+			processLineComponentItemProvider = new ProcessLineComponentItemProvider(this);
+		}
+
+		return processLineComponentItemProvider;
+	}
+	public Adapter createTailoredCoreProcessPackageAdapter(){
+		Adapter adapter = new TailoredCoreProcessPackageItemProvider(this);
+		return adapter;
+	}
+	
+	public Adapter createTailoredProcessComponentAdapter() {
+		if (tailoredProcessComponentItemProvider == null) {
+			tailoredProcessComponentItemProvider = new TailoredProcessComponentItemProvider(this);
+		}
+
+		return tailoredProcessComponentItemProvider;
+	}
+	public Adapter createProcessLinesPackageAdapter() {
+		Adapter adapter = new ProcessLinesPackageItemProvider(this);
+		return adapter;
+	}
+	public Adapter createLineProcessAdapter() {
+		if (lineProcessItemProvider == null) {
+			lineProcessItemProvider = new LineProcessItemProvider(this);
+		}
+
+		return lineProcessItemProvider;
+	}
+	public Adapter createVariantsPackageAdapter() {
+		Adapter adapter = new VariantsPackageItemProvider(this);
+		// adapters.add(adapter);
+		return adapter;
+	}
+	
+	public Adapter createVariationsPackageAdapter() {
+		Adapter adapter = new VariationsPackageItemProvider(this);
+		// adapters.add(adapter);
+		return adapter;
+	}
+	
+	public Adapter createVariationAdapter() {
+		Adapter adapter = new VariationItemProvider(this);
+		// adapters.add(adapter);
+		return adapter;
+	}
+	
+	public Adapter createOccupationAdapter() {
+		Adapter adapter = new VariationItemProvider(this);
+		// adapters.add(adapter);
+		return adapter;
+	}
+	
+	public Adapter createVarPointsPackageAdapter() {
+		Adapter adapter = new VarPointsPackageItemProvider(this);
+		// adapters.add(adapter);
+		return adapter;
+	}
+	
+	public Adapter createvpActivityAdapter() {
+		Adapter adapter = new vpActivityItemProvider(this);
+		// adapters.add(adapter);
+		return adapter;
+	}
+		
+	
+	public Adapter createVarActivityAdapter() {
+//		return new ActivityItemProvider(this);
+
+		Adapter adapter = new VarActivityItemProvider(this);
+		// adapters.add(adapter);
+		return adapter;
+	}
+	
+	public Adapter createvpPhaseAdapter(){
+		Adapter adapter = new vpPhaseItemProvider(this);
+		return adapter;
+	}
+	
+	public Adapter createVarPhaseAdapter(){
+		Adapter adapter = new VarPhaseItemProvider(this);
+		return adapter;
+	}
+	
+	public Adapter createvpIterationAdapter(){
+		Adapter adapter = new vpIterationItemProvider(this);
+		return adapter;
+	}
+	
+	public Adapter createVarIterationAdapter(){
+		Adapter adapter = new VarIterationItemProvider(this);
+		return adapter;
+	}
+
+	public Adapter createvpRoleDescriptorAdapter(){
+		Adapter adapter = new vpRoleDescriptorItemProvider(this);
+		return adapter;
+	}
+	
+	public Adapter createVarRoleDescriptorAdapter(){
+		Adapter adapter = new VarRoleDescriptorItemProvider(this);
+		return adapter;
+	}
+	
+	public Adapter createvpTaskDescriptorAdapter(){
+		Adapter adapter = new vpTaskDescriptorItemProvider(this);
+		return adapter;
+	}
+	
+	public Adapter createVarTaskDescriptorAdapter(){
+		Adapter adapter = new VarTaskDescriptorItemProvider(this);
+		return adapter;
+	}
+	
+	
+	public Adapter createvpTeamProfileAdapter(){
+		Adapter adapter = new vpTeamProfileItemProvider(this);
+		return adapter;
+	}
+	
+	public Adapter createVarTeamProfileAdapter(){
+		Adapter adapter = new VarTeamProfileItemProvider(this);
+		return adapter;
+	}
+	
+	
+	public Adapter createVarMilestoneAdapter() {
+		return new VarMilestoneItemProvider(this);
+	}
+	
+	public Adapter createvpMilestoneAdapter() {
+		return new vpMilestoneItemProvider(this);
+	}
+	
+	
+	public Adapter createVarWorkProductDescriptorAdapter() {
+		return new VarWorkProductDescriptorItemProvider(this);
+	}
+	
+	public Adapter createvpWorkProductDescriptorAdapter() {
+		return new vpWorkProductDescriptorItemProvider(this);
+	}
+
+	public Adapter createTailoredProcessesPackageAdapter() {
+		Adapter adapter = new TailoredProcessesPackageItemProvider(this);
+		// adapters.add(adapter);
+		return adapter;
+	}
+	
 	public Adapter createProcessComponentAdapter() {
 		if (processComponentItemProvider == null) {
 			processComponentItemProvider = new ProcessComponentItemProvider(
@@ -672,11 +826,18 @@ public class ItemProviderAdapterFactory extends UmaItemProviderAdapterFactory
 		}
 		return milestoneItemProvider;
 	}
+
+	
 	
 	@Override
 	public Adapter createActivityAdapter() {
 		return new ActivityItemProvider(this);
 	}
+	
+	public Adapter createVpActivityAdapter() {
+		return new ActivityItemProvider(this);
+	}
+	
 	@Override
 	public Adapter createPhaseAdapter() {
 		return new ActivityItemProvider(this);

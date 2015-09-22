@@ -10,9 +10,6 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.library.layout.elements;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.emf.ecore.EClass;
@@ -22,7 +19,6 @@ import org.eclipse.epf.library.layout.util.XmlElement;
 import org.eclipse.epf.library.util.LibraryUtil;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.UmaPackage;
-import org.eclipse.epf.uma.ecore.util.OppositeFeature;
 
 
 /**
@@ -56,13 +52,6 @@ public class WorkBreakdownElementLayout extends AbstractProcessElementLayout {
 					}
 				}
 			}
-		}
-		
-		Collection oppositeProperties = new ArrayList(element.getOppositeFeatures());
-		for (Iterator z= oppositeProperties.iterator(); z.hasNext(); )
-		{
-			OppositeFeature ofeature = (OppositeFeature) z.next();
-			loadFeature(ofeature, elementXml, includeReferences);
 		}
 	}
 

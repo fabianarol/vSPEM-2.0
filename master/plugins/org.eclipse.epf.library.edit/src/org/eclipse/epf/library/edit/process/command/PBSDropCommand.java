@@ -19,12 +19,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.util.AbstractTreeIterator;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.epf.library.edit.IConfigurator;
+import org.eclipse.epf.library.edit.LibraryEditPlugin;
 import org.eclipse.epf.library.edit.Providers;
 import org.eclipse.epf.library.edit.command.BatchCommand;
+import org.eclipse.epf.library.edit.command.INestedCommandProvider;
+import org.eclipse.epf.library.edit.command.NestedCommandExcecutor;
 import org.eclipse.epf.library.edit.ui.UserInteractionHelper;
+import org.eclipse.epf.library.edit.util.ExtensionManager;
 import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.edit.validation.UniqueNamePNameHandler;
@@ -57,7 +62,7 @@ public class PBSDropCommand extends BSDropCommand {
 
 	private Map wpDescToDeliverableParts;
 
-	private HashMap<WorkProductDescriptor, WorkProductDescriptor> wpdToDeliverableDescriptorMap;
+	private HashMap wpdToDeliverableDescriptorMap;
 
 	private BatchCommand updateDeliverablePartsCmd;
 
@@ -155,7 +160,7 @@ public class PBSDropCommand extends BSDropCommand {
 		Set descriptorsToRefresh = synchronize ? batchCommand.getDescriptorsToRefresh() : null;
 		
 		List bes = activity.getBreakdownElements();
-		UniqueNamePNameHandler uniqueNamesHandler = new UniqueNamePNameHandler(bes);
+		UniqueNamePNameHandler uniqueNamesHandler = new UniqueNamePNameHandler(bes, bes);
 		
 		for (int i = 0; i < dropElements.size(); i++) {
 			WorkProduct wp = (WorkProduct) dropElements.get(i);			
@@ -165,7 +170,7 @@ public class PBSDropCommand extends BSDropCommand {
 			WorkProductDescriptor wpDesc = null;
 			if (synchronize) {
 				wpDesc = (WorkProductDescriptor) ProcessCommandUtil
-					.getBestDescriptor(wp, activity, config);
+					.getDescriptor(wp, activity, config);
 			}
 			if (wpDesc == null) {
 				wpDesc = ProcessCommandUtil.createWorkProductDescriptor(wp, config,
@@ -220,13 +225,13 @@ public class PBSDropCommand extends BSDropCommand {
 					final List finalSelected = new ArrayList();
 					List selectedTasks = new ArrayList();
 					// show task selections dialog
-					UserInteractionHelper.getUIHelper().runSafely(new Runnable() {
+					UserInteractionHelper.runInUIThread(new Runnable() {
 						public void run() {
 							List selected = UserInteractionHelper.selectTasks(
 									finalTasks, finalWp);						
 							finalSelected.addAll(selected);
 						}
-					}, true);
+					});
 					selectedTasks.addAll(finalSelected);
 					
 					// create task descriptors for this workproduct
@@ -372,8 +377,9 @@ public class PBSDropCommand extends BSDropCommand {
 		// automatically add work product descriptor to deliverable part
 		//
 		if (!wpdToDeliverableDescriptorMap.isEmpty()) {
-			for (Map.Entry<WorkProductDescriptor, WorkProductDescriptor> entry : 
-				wpdToDeliverableDescriptorMap.entrySet()) {
+			for (Iterator iter = wpdToDeliverableDescriptorMap.entrySet()
+					.iterator(); iter.hasNext();) {
+				Map.Entry entry = (Map.Entry) iter.next();
 				WorkProductDescriptor deliverable = (WorkProductDescriptor) entry
 						.getValue();
 				deliverable.getDeliverableParts().add(entry.getKey());

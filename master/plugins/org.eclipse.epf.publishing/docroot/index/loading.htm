@@ -36,13 +36,12 @@
 </p>
 
 <script language="JavaScript">
-var already_using_frames_MSG="The Eclipse Process Framework is already displayed using frames";
-// <!--
+<!--
 function loadTop()
 {
   if(parent.frames.length!=0 && parent.frames[1].name=="ory_toc")
   {
-     alert(already_using_frames_MSG);
+     alert("The Eclipse Process Framework is already displayed using frames");
   }
   else
   {
@@ -79,7 +78,7 @@ function loadTop()
 // -->
 </script>
 <script language="JavaScript">
-// <!--
+<!--
   function getImageUrl(image)
   {
     var new_ory_doc_loc=null;
@@ -96,8 +95,9 @@ function loadTop()
   }
 // -->
 </script>
-<script language="JavaScript">
-// <!--
+<script
+language="JavaScript">
+<!--
 MSFPhover =
 (((navigator.appName == "Netscape") &&
   (parseInt(navigator.appVersion) >= 3 )) ||
@@ -113,7 +113,7 @@ MSFPhover =
 // -->
 </script>
 <script language="JavaScript">
-// <!--
+<!--
     if(MSFPhover)
     {
         RupGray=MSFPpreload(getImageUrl('/images/display_views.gif'));
@@ -122,38 +122,13 @@ MSFPhover =
 // -->
 </script>
 
-<script language="JavaScript">
-   var displayFramesMsg="Display Eclipse Process Framework using frames";
-// <!--
-   function mouseOver()
-   {
-   		if(MSFPhover) 
-   			document['Home'].src=RupBlue.src; 
-   		self.status=displayFramesMsg; 
-   		return true;
-   }
-// -->
-</script>
-
-<script language="JavaScript">
-var clearStatusMsg=" ";
-// <!--
-function mouseOut()
-{
-if(MSFPhover) 
-document['Home'].src=RupGray.src; 
-self.status=clearStatusMsg;
-return true;
-}
-// -->
-</script>
-
-<a href="JavaScript:loadTop();" onmouseover="JavaScript:mouseOver();" onmouseout="JavaScript:mouseOut();">
-
+<a href="JavaScript:loadTop();" onmouseover="if(MSFPhover) document['Home'].src=RupBlue.src; self.status='Display Eclipse Process Framework using frames'; return true" onmouseout="if(MSFPhover) document['Home'].src=RupGray.src; self.status= ' ';return true">
 <p>
 <img src="../images/rup1.gif" border="0" alt="Display Eclipse Process Framework using frames" name="Home" width="20" height="110"></p></a>
 </td></tr></table><table border="0" cellpadding="0" cellspacing="0" width="100%"><tr><td>
-<p align="right"><small><small>Eclipse Process Framework&nbsp;&nbsp;</small></small>
+<p align="right"><small><small>Eclipse Process
+Framework&nbsp;&nbsp;
+</small></small>
 </td></tr></table>
 
 

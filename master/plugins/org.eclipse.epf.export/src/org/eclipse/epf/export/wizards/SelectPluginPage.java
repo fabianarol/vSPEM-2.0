@@ -11,18 +11,13 @@
 package org.eclipse.epf.export.wizards;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
-import org.eclipse.epf.authoring.ui.AuthoringUIResources;
 import org.eclipse.epf.authoring.ui.AuthoringUIText;
 import org.eclipse.epf.export.ExportPlugin;
 import org.eclipse.epf.export.ExportResources;
 import org.eclipse.epf.export.services.PluginExportData;
 import org.eclipse.epf.library.LibraryService;
-import org.eclipse.epf.library.edit.PresentationContext;
 import org.eclipse.epf.library.ui.LibraryUIImages;
 import org.eclipse.epf.library.ui.LibraryUIResources;
 import org.eclipse.epf.ui.wizards.BaseWizardPage;
@@ -39,11 +34,8 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -75,13 +67,9 @@ public class SelectPluginPage extends BaseWizardPage implements
 
 	private int checkedCount = 0;
 
-	private Collection<MethodPlugin> checkedPluginList = new ArrayList<MethodPlugin>();
+	private List<Object> checkedPluginList = new ArrayList<Object>();
 
 	private PluginExportData data;
-	
-	private Button selectAllButton;
-	
-	private Button deselectAllButton;
 
 	/**
 	 * Creates a new instance.
@@ -102,31 +90,16 @@ public class SelectPluginPage extends BaseWizardPage implements
 		Composite container = new Composite(parent, SWT.NONE);
 		container.setLayout(new GridLayout());
 
-		Composite container1 = new Composite(container, SWT.NONE);
-		container1.setLayout(new GridLayout(3, false));
-		createLabel(container1,
+		createLabel(container,
 				ExportResources.selectPluginsPage_pluginsLabel_text);
-
-		selectAllButton = createButton(
-				container1,
-				AuthoringUIResources.AuthoringUIPlugin_SaveAllEditorsPage_SelectAllButtonLabel);
-		deselectAllButton = createButton(
-				container1,
-				AuthoringUIResources.AuthoringUIPlugin_SaveAllEditorsPage_DeselectAllButtonLabel);
 
 		ctrl_chkboxTableViewer = createCheckboxTableViewer(container, 1);
 		table = ctrl_chkboxTableViewer.getTable();
 
 		MethodLibrary library = LibraryService.getInstance()
 				.getCurrentMethodLibrary();
-		List plugins = (library == null) ? new ArrayList() : new ArrayList(library
-				.getMethodPlugins());
-		
-		if (plugins.size() > 1) {
-			Comparator comparator = PresentationContext.INSTANCE.getComparator();
-			Collections.<MethodPlugin>sort(plugins, comparator);
-		}
-		
+		List plugins = (library == null) ? new ArrayList() : library
+				.getMethodPlugins();
 		ILabelProvider labelProvider = new LabelProvider() {
 			public Image getImage(Object element) {
 				return LibraryUIImages.IMG_METHOD_PLUGIN;
@@ -161,54 +134,15 @@ public class SelectPluginPage extends BaseWizardPage implements
 			setDisplayAttributes((MethodPlugin) plugins.get(0));
 		}
 
-		addListeners(plugins);
+		addListeners();
 
 		setControl(container);
 		setPageComplete(false);
 	}
 
-	private void addListeners(final List<MethodPlugin> plugins) {
+	private void addListeners() {
 		ctrl_chkboxTableViewer.addSelectionChangedListener(this);
 		ctrl_chkboxTableViewer.addCheckStateListener(this);
-		
-		final MethodLibrary lib = LibraryService.getInstance()
-						.getCurrentMethodLibrary();
-		selectAllButton.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent e) {
-				ctrl_chkboxTableViewer.setAllChecked(true);
-				if (lib != null) {
-					checkedPluginList.clear();
-					checkedPluginList.addAll(plugins);
-					checkedCount = checkedPluginList.size();
-				}
-				
-				setPageComplete(isPageComplete());
-				getWizard().getContainer().updateButtons();
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-
-		});
-
-		deselectAllButton.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent e) {
-				ctrl_chkboxTableViewer.setAllChecked(false);
-				if (lib != null) {
-					checkedPluginList.clear();
-					checkedCount = 0;
-				}
-				
-				setPageComplete(isPageComplete());
-				getWizard().getContainer().updateButtons();
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-
-		});
 	}
 
 	/**
@@ -217,17 +151,16 @@ public class SelectPluginPage extends BaseWizardPage implements
 	public void checkStateChanged(CheckStateChangedEvent event) {
 		Object obj = event.getElement();
 
-		if (obj instanceof MethodPlugin) {
-			if (event.getChecked()) {
-				checkedCount++;
-				checkedPluginList.add((MethodPlugin)obj);
-			} else {
-				checkedCount--;
-				checkedPluginList.remove(obj);
-			}
-			setPageComplete(isPageComplete());
-			getWizard().getContainer().updateButtons();
+		if (event.getChecked()) {
+			checkedCount++;
+			checkedPluginList.add(obj);
+		} else {
+			checkedCount--;
+			checkedPluginList.remove(obj);
 		}
+
+		setPageComplete(isPageComplete());
+		getWizard().getContainer().updateButtons();
 	}
 
 	/**

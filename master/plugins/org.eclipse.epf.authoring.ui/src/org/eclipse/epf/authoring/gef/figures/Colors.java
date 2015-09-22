@@ -25,6 +25,4 @@ public final class Colors {
 
 	public static final Color SUPRESSED_ELEMENT_LABEL = ColorConstants.gray;
 
-	public static final Color DYNAMIC_ELEMENT_LABEL = ColorConstants.blue;
-	
 }

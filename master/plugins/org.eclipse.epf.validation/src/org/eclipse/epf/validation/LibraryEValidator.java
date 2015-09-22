@@ -40,11 +40,9 @@ import org.eclipse.epf.common.utils.StrUtil;
 import org.eclipse.epf.library.edit.IAdapterFactoryProvider;
 import org.eclipse.epf.library.edit.process.DescribableElementWrapperItemProvider;
 import org.eclipse.epf.library.edit.process.IBSItemProvider;
-import org.eclipse.epf.library.edit.util.LibraryEditUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.edit.validation.DependencyChecker;
 import org.eclipse.epf.library.edit.validation.DependencyValidationMgr;
-import org.eclipse.epf.library.edit.validation.IValidationManager;
 import org.eclipse.epf.library.edit.validation.IValidator;
 import org.eclipse.epf.library.edit.validation.IValidatorFactory;
 import org.eclipse.epf.uma.BreakdownElement;
@@ -82,7 +80,7 @@ public class LibraryEValidator extends EObjectValidator {
 	private static Map createFeatureToAttributeMap() {
 		Map map = new HashMap();
 		map.put(UmaPackage.Literals.NAMED_ELEMENT__NAME, IBSItemProvider.COL_NAME);
-		map.put(UmaPackage.Literals.METHOD_ELEMENT__PRESENTATION_NAME, IBSItemProvider.COL_PRESENTATION_NAME);
+		map.put(UmaPackage.Literals.DESCRIBABLE_ELEMENT__PRESENTATION_NAME, IBSItemProvider.COL_PRESENTATION_NAME);
 		return map;
 	}
 	
@@ -136,11 +134,9 @@ public class LibraryEValidator extends EObjectValidator {
 
 		IStatus status = Status.OK_STATUS;
 
-		IValidationManager validationMgr = LibraryEditUtil.getInstance().getValidationManager();
-		boolean checkCircular = validationMgr == null ? false : validationMgr.isCircularDependancyCheck();
 		boolean circularCheckOk = true;
 		DependencyValidationMgr mgr = (DependencyValidationMgr) context.get(CTX_DEPENDENCY_VALIDATION_MGR);
-		if (checkCircular && DependencyChecker.newCheck && mgr != null && 
+		if (DependencyChecker.newCheck && mgr != null && 
 				(eObject instanceof VariabilityElement || eObject instanceof MethodPlugin)) {
 			status = mgr.checkCircularDependnecy((MethodElement) eObject);
 			if(!status.isOK()) {
@@ -172,11 +168,8 @@ public class LibraryEValidator extends EObjectValidator {
 					batchValidator.addConstraintFilter(filter);
 				}
 				try {
-					boolean checkName = validationMgr == null ? false : validationMgr.isNameCheck();
-					if (checkName) {
-						status = batchValidator.validate(eObject,
+					status = batchValidator.validate(eObject,
 							new NullProgressMonitor());
-					}
 				} finally {
 					if (filter != null) {
 						batchValidator.removeConstraintFilter(filter);
@@ -246,7 +239,7 @@ public class LibraryEValidator extends EObjectValidator {
 							ArrayList features = new ArrayList();
 							features.add(UmaPackage.Literals.NAMED_ELEMENT__NAME);
 							if(child instanceof DescribableElement) {
-								features.add(UmaPackage.Literals.METHOD_ELEMENT__PRESENTATION_NAME);
+								features.add(UmaPackage.Literals.DESCRIBABLE_ELEMENT__PRESENTATION_NAME);
 							}
 							NamedElement e = (NamedElement) child;
 							if (e instanceof BreakdownElement) {
@@ -398,7 +391,7 @@ public class LibraryEValidator extends EObjectValidator {
 	 * @param diagnostics
 	 *            a diagnostic chain to accumulate results on
 	 */
-	public static void appendDiagnostics(IStatus status, DiagnosticChain diagnostics) {
+	private void appendDiagnostics(IStatus status, DiagnosticChain diagnostics) {
 		if (status.isMultiStatus()) {
 			IStatus[] children = status.getChildren();
 

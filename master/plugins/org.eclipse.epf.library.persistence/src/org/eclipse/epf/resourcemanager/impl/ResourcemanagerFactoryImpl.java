@@ -15,7 +15,6 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.impl.EFactoryImpl;
 import org.eclipse.emf.ecore.plugin.EcorePlugin;
-import org.eclipse.epf.resourcemanager.*;
 import org.eclipse.epf.resourcemanager.ResourceDescriptor;
 import org.eclipse.epf.resourcemanager.ResourceManager;
 import org.eclipse.epf.resourcemanager.ResourcemanagerFactory;
@@ -63,11 +62,10 @@ public class ResourcemanagerFactoryImpl extends EFactoryImpl implements Resource
      * <!-- end-user-doc -->
 	 * @generated
 	 */
-    @Override
-				public EObject create(EClass eClass) {
+    public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
-			case ResourcemanagerPackage.RESOURCE_DESCRIPTOR: return createResourceDescriptor();
-			case ResourcemanagerPackage.RESOURCE_MANAGER: return createResourceManager();
+			case ResourcemanagerPackage.RESOURCE_DESCRIPTOR: return (EObject)createResourceDescriptor();
+			case ResourcemanagerPackage.RESOURCE_MANAGER: return (EObject)createResourceManager();
 			default:
 				throw new IllegalArgumentException("The class '" + eClass.getName() + "' is not a valid classifier"); //$NON-NLS-1$ //$NON-NLS-2$
 		}
@@ -108,8 +106,7 @@ public class ResourcemanagerFactoryImpl extends EFactoryImpl implements Resource
 	 * @deprecated
 	 * @generated
 	 */
-    @Deprecated
-				public static ResourcemanagerPackage getPackage() {
+    public static ResourcemanagerPackage getPackage() {
 		return ResourcemanagerPackage.eINSTANCE;
 	}
 

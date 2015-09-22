@@ -13,7 +13,6 @@ package org.eclipse.epf.export.services;
 import java.util.List;
 
 import org.eclipse.epf.authoring.ui.preferences.LibraryLocationData;
-import org.eclipse.epf.uma.MethodConfiguration;
 
 
 /**
@@ -47,18 +46,6 @@ public class ConfigurationExportData {
 		llData.loadFromPreferenceStore();
 	}
 
-	public MethodConfiguration getFirstConfguration() {
-		if (selectedConfigs == null || selectedConfigs.isEmpty()) {
-			return null;
-		}
-		Object obj = selectedConfigs.get(0);
-		if (obj instanceof MethodConfiguration) {
-			return (MethodConfiguration) obj;
-		}
-		
-		return null;
-	}
-	
 	/**
 	 * Validate attribute
 	 */

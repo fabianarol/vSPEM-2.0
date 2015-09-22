@@ -12,11 +12,9 @@
 package org.eclipse.epf.diagram.ad.part;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -30,16 +28,12 @@ import org.eclipse.draw2d.FreeformLayer;
 import org.eclipse.draw2d.LayeredPane;
 import org.eclipse.emf.ecore.EModelElement;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.emf.ecore.util.EcoreUtil.UsageCrossReferencer;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.epf.diagram.ad.edit.parts.ControlFlowEditPart;
 import org.eclipse.epf.diagram.ad.edit.parts.ControlFlowNameEditPart;
 import org.eclipse.epf.diagram.ad.providers.UMLElementTypes;
 import org.eclipse.epf.diagram.add.ADDImages;
 import org.eclipse.epf.diagram.add.part.ActivityDetailDiagramEditorPlugin;
-import org.eclipse.epf.diagram.core.DiagramCorePlugin;
 import org.eclipse.epf.diagram.core.DiagramCoreResources;
 import org.eclipse.epf.diagram.core.bridge.BridgeHelper;
 import org.eclipse.epf.diagram.core.bridge.DiagramAdapter;
@@ -49,7 +43,6 @@ import org.eclipse.epf.diagram.core.part.DiagramEditorInput;
 import org.eclipse.epf.diagram.core.part.DiagramFileEditorInputProxy;
 import org.eclipse.epf.diagram.core.part.util.DiagramEditorUtil;
 import org.eclipse.epf.diagram.core.util.DiagramConstants;
-import org.eclipse.epf.diagram.model.util.TxUtil;
 import org.eclipse.epf.library.edit.process.ActivityWrapperItemProvider;
 import org.eclipse.epf.library.edit.util.IDiagramManager;
 import org.eclipse.epf.library.edit.util.Suppression;
@@ -60,7 +53,6 @@ import org.eclipse.epf.uma.DeliveryProcess;
 import org.eclipse.epf.uma.Iteration;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.Phase;
-import org.eclipse.epf.uma.RoleDescriptor;
 import org.eclipse.epf.uma.TaskDescriptor;
 import org.eclipse.epf.uma.VariabilityElement;
 import org.eclipse.epf.uma.VariabilityType;
@@ -100,15 +92,12 @@ import org.eclipse.ui.dialogs.SaveAsDialog;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.uml2.uml.ActivityEdge;
 import org.eclipse.uml2.uml.ActivityNode;
-import org.eclipse.uml2.uml.ActivityParameterNode;
 import org.eclipse.uml2.uml.ControlFlow;
-import org.eclipse.uml2.uml.StructuredActivityNode;
 import org.eclipse.uml2.uml.UMLPackage;
 
 /**
  * @modified
  * @author skannoor
- * @author Phong Nguyen Le
  */
 public class ActivityDiagramEditor extends AbstractDiagramEditor {
 
@@ -588,7 +577,7 @@ public class ActivityDiagramEditor extends AbstractDiagramEditor {
 			if (activity == null)
 				return false;
 			while (!activity.getVariabilityType().equals(
-					VariabilityType.NA)) {
+					VariabilityType.NA_LITERAL)) {
 
 				VariabilityElement ve = activity.getVariabilityBasedOnElement();
 				list.addAll(activity.getBreakdownElements());
@@ -599,7 +588,7 @@ public class ActivityDiagramEditor extends AbstractDiagramEditor {
 					break;
 				}
 			}
-			//Collect the breakdown elements to verify taskdescriptors are
+			//Collect the breakdown elements to verifty taskdescriptors are
 			// not.
 			list.addAll(activity.getBreakdownElements());
 			Diagram diagram = getDiagram(activity,
@@ -615,22 +604,18 @@ public class ActivityDiagramEditor extends AbstractDiagramEditor {
 				DiagramAdapter diagramAdapter = BridgeHelper
 						.getDiagramAdapter(getDiagram().getElement());
 				Suppression suppression = diagramAdapter.getSuppression();
-				for (Iterator<?> iterator = list.iterator(); iterator.hasNext();) {
+				for (Iterator iterator = list.iterator(); iterator.hasNext();) {
 					Object obj = iterator.next();
 					if (obj instanceof TaskDescriptor) {
 						if (suppression != null) {
 							if (suppression.isSuppressed(obj))
 								return false;
 						}
-						if (diagramAdapter.getSuppression() != null) {
-							List<RoleDescriptor> roleDescList = ((TaskDescriptor) obj)
-									.getPerformedPrimarilyBy();
-							for (RoleDescriptor roleDescriptor : roleDescList) {
-								if (!diagramAdapter.getSuppression()
-										.isSuppressed(roleDescriptor)) {
-									return true;
-								}
-							}
+						Object e = ((TaskDescriptor) obj)
+								.getPerformedPrimarilyBy();
+						if (suppression != null
+								&& diagramAdapter.getSuppression()
+										.isSuppressed(e)) {
 							return false;
 						}
 						return true;
@@ -740,11 +725,5 @@ public class ActivityDiagramEditor extends AbstractDiagramEditor {
 				list, false,
 				ActivityDiagramEditorPlugin.DIAGRAM_PREFERENCES_HINT);
 		return connectionRequest;
-	}
-	
-	@Override
-	protected boolean isOrphan(EObject modelElement) {
-		return (modelElement instanceof StructuredActivityNode || modelElement instanceof ActivityParameterNode)
-				&& BridgeHelper.getMethodElement(modelElement) == null;
 	}
 }

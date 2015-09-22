@@ -57,11 +57,10 @@ public class ReusableAssetLayout extends AbstractElementLayout {
 					layoutManager.getElementRealizer());
 			
 			List activities = ConfigurationHelper.calc0nFeatureValue(super.element,
-					AssociationHelper.ReusableAsset_BreakdownElements, layoutManager
+					AssociationHelper.ReusableAsset_Activities, layoutManager
 							.getElementRealizer());
 
-//			contentElements.addAll(activities);
-			contentElements = addBreakdownElementsToContentElements(contentElements, activities);
+			contentElements.addAll(activities);
 
 			addReferences(AssociationHelper.ReusableAsset_ContentElements, elementXml, "contentElements", contentElements); //$NON-NLS-1$
 

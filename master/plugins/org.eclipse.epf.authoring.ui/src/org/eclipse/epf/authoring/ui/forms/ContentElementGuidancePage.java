@@ -1,13 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
 package org.eclipse.epf.authoring.ui.forms;
 
 import java.util.ArrayList;
@@ -21,11 +11,9 @@ import org.eclipse.epf.authoring.ui.AuthoringUIText;
 import org.eclipse.epf.authoring.ui.filters.GuidanceFilter;
 import org.eclipse.epf.library.edit.IFilter;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
-import org.eclipse.epf.library.edit.command.ChangeUdtCommand;
 import org.eclipse.epf.library.edit.command.IActionManager;
 import org.eclipse.epf.library.edit.itemsfilter.FilterConstants;
 import org.eclipse.epf.library.edit.util.MethodElementUtil;
-import org.eclipse.epf.library.edit.util.PracticePropUtil;
 import org.eclipse.epf.uma.Checklist;
 import org.eclipse.epf.uma.Concept;
 import org.eclipse.epf.uma.CustomCategory;
@@ -96,9 +84,6 @@ public class ContentElementGuidancePage extends AssociationFormPage {
 				TngAdapterFactory.INSTANCE
 						.getNavigatorView_ComposedAdapterFactory()) {
 			public Object[] getElements(Object object) {
-				if (getProviderExtender().useContentProviderAPIs()) {
-					return getProviderExtender().getElements(object, 1);
-				}
 				List list = MethodElementUtil
 						.getSelectedGuidances(contentElement);
 				List local = new ArrayList();
@@ -109,10 +94,6 @@ public class ContentElementGuidancePage extends AssociationFormPage {
 							.equals(contentElement
 									.getVariabilityBasedOnElement()))) {
 						local.add(obj);
-					} else if (obj instanceof Practice) {
-						if (PracticePropUtil.getPracticePropUtil().isUdtType((Practice) obj)) {
-							local.add(obj);
-						}
 					}
 				}
 				return local.toArray();
@@ -127,7 +108,6 @@ public class ContentElementGuidancePage extends AssociationFormPage {
 	protected void addItemsToModel1(ArrayList addItems) {
 		// Update the model.
 		IActionManager actionMgr = editor.getActionManager();
-		List<Practice> utdItems = new ArrayList<Practice>();
 		if (!addItems.isEmpty()) {
 			for (Iterator it = addItems.iterator(); it.hasNext();) {
 				Guidance item = (Guidance) it.next();
@@ -237,10 +217,6 @@ public class ContentElementGuidancePage extends AssociationFormPage {
 							UmaPackage.eINSTANCE.getContentElement_Assets(),
 							(ReusableAsset) item, -1);
 					continue;
-				} else if (item instanceof Practice) {
-					if (PracticePropUtil.getPracticePropUtil().isUdtType((Practice) item)) {
-						utdItems.add((Practice) item);
-					}
 				} else {
 					AuthoringUIPlugin
 							.getDefault()
@@ -255,9 +231,6 @@ public class ContentElementGuidancePage extends AssociationFormPage {
 			}
 			setDirty(true);
 		}
-		if (! utdItems.isEmpty()) {
-			actionMgr.execute(new ChangeUdtCommand(contentElement, utdItems, false));
-		}
 	}
 
 	/**
@@ -266,7 +239,6 @@ public class ContentElementGuidancePage extends AssociationFormPage {
 	protected void removeItemsFromModel1(ArrayList rmItems) {
 		// Update the model.
 		IActionManager actionMgr = editor.getActionManager();
-		List<Practice> utdItems = new ArrayList<Practice>();
 		if (!rmItems.isEmpty()) {
 			for (Iterator it = rmItems.iterator(); it.hasNext();) {
 				Guidance item = (Guidance) it.next();
@@ -376,10 +348,6 @@ public class ContentElementGuidancePage extends AssociationFormPage {
 							UmaPackage.eINSTANCE.getContentElement_Assets(),
 							(ReusableAsset) item, -1);
 					continue;
-				} else if (item instanceof Practice) {
-					if (PracticePropUtil.getPracticePropUtil().isUdtType((Practice) item)) {
-						utdItems.add((Practice) item);
-					}
 				} else {
 					AuthoringUIPlugin
 							.getDefault()
@@ -393,9 +361,6 @@ public class ContentElementGuidancePage extends AssociationFormPage {
 				}
 			}
 			setDirty(true);
-		}
-		if (! utdItems.isEmpty()) {
-			actionMgr.execute(new ChangeUdtCommand(contentElement, utdItems, true));
 		}
 	}
 

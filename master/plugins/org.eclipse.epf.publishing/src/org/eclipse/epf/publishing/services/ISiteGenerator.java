@@ -34,7 +34,6 @@ public interface ISiteGenerator {
 	public PublishOptions getPublishOptions();
 	public String getIndexFilePath();
 	public String getNodeIconPath(); 
-	public String getCustomizedNodeIconPath();
 	public void dispose();
 	
 }

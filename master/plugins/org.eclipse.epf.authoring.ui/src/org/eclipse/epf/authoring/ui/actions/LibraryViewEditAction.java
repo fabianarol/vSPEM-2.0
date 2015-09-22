@@ -19,6 +19,8 @@ import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.ProcessComponent;
 import org.eclipse.epf.uma.ProcessPackage;
+import org.eclipse.epf.uma.VarPoint;
+import org.eclipse.epf.uma.Variant;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.actions.BaseSelectionListenerAction;
 
@@ -52,7 +54,21 @@ public class LibraryViewEditAction extends BaseSelectionListenerAction {
 	public void run() {
 		for (Iterator objects = selected.iterator(); objects.hasNext();) {
 			Object element = objects.next();
-			EditorChooser.getInstance().openEditor(element);
+			
+			////Edicion Vepf
+			//Si variante
+			if(element instanceof Variant){
+				EditorChooser.getInstance().openModifyVariantEditor(element);
+			}
+			//Si punto de variación
+			else if(element instanceof VarPoint){
+				EditorChooser.getInstance().openModifyVarPointEditor(element);
+			}
+			////Epf
+			//Si elemento EPF
+			else{
+				EditorChooser.getInstance().openEditor(element);
+			}
 		}
 	}
 

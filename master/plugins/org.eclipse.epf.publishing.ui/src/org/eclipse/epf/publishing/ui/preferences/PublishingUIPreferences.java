@@ -10,10 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.publishing.ui.preferences;
 
-import java.util.List;
-
 import org.eclipse.epf.common.utils.FileUtil;
-import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.layout.elements.ActivityLayout;
 import org.eclipse.epf.library.ui.preferences.LibraryUIPreferences;
 import org.eclipse.epf.publishing.ui.PublishingUIPlugin;
@@ -29,10 +26,6 @@ import org.eclipse.jface.preference.IPreferenceStore;
 public class PublishingUIPreferences {
 
 	private static final String PUBLISH_ENTIRE_CONFIG = "publishEntireConfig"; //$NON-NLS-1$
-	
-	private static final String PUBLISH_PROCESSES = "publishProcesses"; //$NON-NLS-1$
-	
-	private static final String PUBLISH_INCLUDE_BASE_PROCESS = "publishIncludeBaseProcess"; //$NON-NLS-1$
 
 	private static final String TITLE = "title"; //$NON-NLS-1$
 
@@ -41,8 +34,6 @@ public class PublishingUIPreferences {
 	private static final String ABOUT_HTML = "aboutHTML"; //$NON-NLS-1$
 
 	private static final String FEEDBACK_URL = "feedbackURL"; //$NON-NLS-1$	
-
-	private static final String FORBIDDEN_CHARS = "fobiddenChars"; //$NON-NLS-1$	
 
 	private static final String INCLUDE_GLOSSARY = "includeGlossary"; //$NON-NLS-1$
 
@@ -55,14 +46,6 @@ public class PublishingUIPreferences {
 	private static final String LIGHT_WEIGHT_TREE = "lightWeightTree"; //$NON-NLS-1$
 
 	private static final String EXTRA_DESCRIPTOR_INFO = "extraDescriptorInfo"; //$NON-NLS-1$
-	
-	private static final String SHOW_LINKED_ELEMENT_FOR_DESCRIPTOR = "showLinkedElementForDescriptor"; //$NON-NLS-1$
-	
-	private static final String Ignore_Dynamic_Parents = "ignoreDynamicParents"; //$NON-NLS-1$	
-	
-	private static final String Exclude_Unused_WPDs = "excludeUnusedWPDs"; //$NON-NLS-1$	
-	
-	private static final String FULFILL_DESCRIPTOR_SLOT_BY_CONTENT = "fulfillDescriptorSlotByContent"; //$NON-NLS-1$
 
 	private static final String PUBLISH_UNOPEN_ACTIVITY_DD = "publishUnopenActivityDD"; //$NON-NLS-1$
 
@@ -81,10 +64,6 @@ public class PublishingUIPreferences {
 	private static final String INITIALIZED = "initialized"; //$NON-NLS-1$
 
 	private static final String SHOW_RELATED_DESCRIPTORS = "showRelatedDescriptors"; //$NON-NLS-1$
-	
-	private static final String SHOW_RELATED_LINKS = "showRelatedLinks"; //$NON-NLS-1$
-
-	private static final String SHOW_RELATED_DESCRIPTORS_OPTION = "showRelatedDescriptorsOption"; //$NON-NLS-1$
 
 	private static final String SHOW_DESCRIPTORS_IN_NAVIGATIONTREE = "showDescriptorsInNavigationTree"; //$NON-NLS-1$
 
@@ -114,33 +93,23 @@ public class PublishingUIPreferences {
 		prefStore.setDefault(BANNER_IMAGE, getDefaultBannerImage());
 		prefStore.setDefault(ABOUT_HTML, getDefaultAboutHTML());
 		prefStore.setDefault(FEEDBACK_URL, getDefaultFeedbackURL());
-		prefStore.setDefault(FORBIDDEN_CHARS, getDefaultForbiddenChars());
 		prefStore.setDefault(INCLUDE_GLOSSARY, false);
 		prefStore.setDefault(INCLUDE_INDEX, false);
 		prefStore.setDefault(CHECK_EXTERNAL_LINKS, false);
 		prefStore.setDefault(CONVERT_BROKEN_LINKS, false);
 		prefStore.setDefault(PUBLISH_UNOPEN_ACTIVITY_DD, false);
-		prefStore.setDefault(PUBLISH_AD_FOR_ACTIVITY_EXTENSION, true);
+		prefStore.setDefault(PUBLISH_AD_FOR_ACTIVITY_EXTENSION, false);
 		prefStore.setDefault(LIGHT_WEIGHT_TREE, true);
 		prefStore.setDefault(EXTRA_DESCRIPTOR_INFO,
 				getDefaultExtraDescriptorInfo());
-		prefStore.setDefault(SHOW_LINKED_ELEMENT_FOR_DESCRIPTOR,
-				getDefaultShowLinkedElementForDescriptor());				
-		prefStore.setDefault(Ignore_Dynamic_Parents,
-				getDefaultIgnoreDynamicParents());
-		prefStore.setDefault(Exclude_Unused_WPDs,
-				getDefaultExcludeUnusedWPDs());
-		prefStore.setDefault(FULFILL_DESCRIPTOR_SLOT_BY_CONTENT,
-				getDefaultFulfillDescriptorSlotByContent());
-		
 		prefStore.setDefault(DEFAULT_ACTIVITY_TAB,
 				ActivityLayout.TAB_NAME_ACTIVITY_WBS);
 
 		prefStore.setDefault(PUBLISH_PATH, getDefaultPublishPath());
-		prefStore.setDefault(PUBLISH_STATIC_WEB_SITE, false);
+		prefStore.setDefault(PUBLISH_STATIC_WEB_SITE, true);
 		prefStore.setDefault(INCLUDE_SERVLET_SEARCH, true);
-		prefStore.setDefault(WEBAPP_NAME, "rmcwebsite"); //$NON-NLS-1$			
-		prefStore.setDefault(INCLUDE_SEARCH, true);		
+		prefStore.setDefault(WEBAPP_NAME, ""); //$NON-NLS-1$			
+		prefStore.setDefault(INCLUDE_SEARCH, true);
 	}
 
 	/**
@@ -181,24 +150,6 @@ public class PublishingUIPreferences {
 	public static void removePublishEntireConfig(String configId) {
 		prefStore.setToDefault(getConfigPrefPrefix(configId)
 				+ PUBLISH_ENTIRE_CONFIG);
-	}
-	
-	public static List<String> getProcesses(String configId) {
-		String guidStr = prefStore.getString(configId + PUBLISH_PROCESSES);
-		return TngUtil.convertStringsToList(guidStr);
-	}
-
-	public static void setProcesses(String configId, List<String> guidList) {
-		String guidStr = TngUtil.convertListToString(guidList);
-		prefStore.setValue(configId + PUBLISH_PROCESSES, guidStr);
-	}
-	
-	public static Boolean getIncludeBaseProcesses(String configId) {
-		return prefStore.getBoolean(configId + PUBLISH_INCLUDE_BASE_PROCESS);
-	}
-	
-	public static void setIncludeBaseProcesses(String configId, boolean value) {
-		prefStore.setValue(configId + PUBLISH_INCLUDE_BASE_PROCESS, value);
 	}
 
 	/**
@@ -376,34 +327,6 @@ public class PublishingUIPreferences {
 		return defaultFeedbackURL;
 	}
 
-	/**
-	 * Gets the default forbidden chars string
-	 * 
-	 * @return the default forbidden chars string
-	 */
-	public static String getDefaultForbiddenChars() {
-			return ""; 	//$NON-NLS-1$
-	}
-	
-	/**
-	 * Gets the forbidden chars string
-	 * 
-	 * @return the forbidden chars string
-	 */
-	public static String getForbiddenChars() {
-		return prefStore.getString(FORBIDDEN_CHARS);
-	}
-
-	/**
-	 * Sets the forbidden chars string value.
-	 * 
-	 * @param value
-	 *            the forbidden chars string value
-	 */
-	public static void setForbiddenChars(String value) {
-		prefStore.setValue(FORBIDDEN_CHARS, value);
-	}
-	
 	/**
 	 * Gets the feedback URL preference value.
 	 * 
@@ -753,7 +676,7 @@ public class PublishingUIPreferences {
 	public static boolean getDefaultExtraDescriptorInfo() {
 		return false;
 	}
-	
+
 	/**
 	 * Gets the extra descriptor info preference value.
 	 * 
@@ -764,59 +687,6 @@ public class PublishingUIPreferences {
 	}
 
 	/**
-	 * Gets the default linked element for descriptor preference value.
-	 * 
-	 * @return <code>true</code> if the preference is set
-	 */
-	public static boolean getDefaultShowLinkedElementForDescriptor() {
-		return false;
-	}
-	
-	/**
-	 * Sets linked element for descriptor preference value.
-	 * 
-	 * @param value
-	 *            the preference value
-	 */
-	public static void setShowLinkedElementForDescriptor(boolean value) {
-		prefStore.setValue(SHOW_LINKED_ELEMENT_FOR_DESCRIPTOR, value);
-	}
-	
-	/**
-	 * Gets the linked element for descriptor preference value.
-	 * 
-	 * @return the preference value
-	 */
-	public static boolean getShowLinkedElementForDescriptor() {
-		return prefStore.getBoolean(SHOW_LINKED_ELEMENT_FOR_DESCRIPTOR);
-	}
-
-	
-	public static void setIgnoreDynamicParents(boolean value) {
-		prefStore.setValue(Ignore_Dynamic_Parents, value);
-	}
-	
-	public static boolean getDefaultIgnoreDynamicParents() {
-		return true;
-	}
-	
-	public static boolean getIgnoreDynamicParents() {
-		return prefStore.getBoolean(Ignore_Dynamic_Parents);
-	}
-	
-	public static void setExcludeUnusedWPDs(boolean value) {
-		prefStore.setValue(Exclude_Unused_WPDs, value);
-	}
-	
-	public static boolean getDefaultExcludeUnusedWPDs() {
-		return false;
-	}
-	
-	public static boolean getExcludeUnusedWPDs() {
-		return prefStore.getBoolean(Exclude_Unused_WPDs);
-	}
-	
-	/**
 	 * Sets the default extra descriptor info preference value.
 	 * 
 	 * @param value
@@ -824,34 +694,6 @@ public class PublishingUIPreferences {
 	 */
 	public static void setExtraDescriptorInfo(boolean value) {
 		prefStore.setValue(EXTRA_DESCRIPTOR_INFO, value);
-	}
-	
-	/**
-	 * Gets the default fulfill descriptor slot by content preference value.
-	 * 
-	 * @return <code>true</code> if the preference is set
-	 */
-	public static boolean getDefaultFulfillDescriptorSlotByContent() {
-		return false;
-	}
-	
-	/**
-	 * Gets the fulfill descriptor slot by content preference value.
-	 * 
-	 * @return the preference value
-	 */
-	public static boolean getFulfillDescriptorSlotByContent() {
-		return prefStore.getBoolean(FULFILL_DESCRIPTOR_SLOT_BY_CONTENT);
-	}
-
-	/**
-	 * Sets the fulfill descriptor slot by content preference value.
-	 * 
-	 * @param value
-	 *            the preference value
-	 */
-	public static void setFulfillDescriptorSlotByContent(boolean value) {
-		prefStore.setValue(FULFILL_DESCRIPTOR_SLOT_BY_CONTENT, value);
 	}
 
 	/**
@@ -1199,7 +1041,7 @@ public class PublishingUIPreferences {
 		prefStore.setValue(getConfigPrefPrefix(configId)
 				+ SHOW_RELATED_DESCRIPTORS, value);
 	}
-	
+
 	/**
 	 * Sets the show related descriptors in content page preference to be
 	 * default value.
@@ -1210,80 +1052,6 @@ public class PublishingUIPreferences {
 	public static void removeShowRelatedDescriptors(String configId) {
 		prefStore.setToDefault(getConfigPrefPrefix(configId)
 				+ SHOW_RELATED_DESCRIPTORS);
-	}
-	
-	/**
-	 * Gets the show related links of role, task and work product in navigate page.
-	 * 
-	 * @param configId
-	 *            a method configuration GUID
-	 * @return the preference value
-	 */
-	public static boolean getShowRelatedLinks(String configId) {
-		return prefStore.getBoolean(getConfigPrefPrefix(configId)
-				+ SHOW_RELATED_LINKS);
-	}
-
-	/**
-	 * Sets the show related links of role, task and work product in navigate page.
-	 * 
-	 * @param configId
-	 *            a method configuration GUID
-	 * @param value
-	 *            the preference value
-	 */
-	public static void setShowRelatedLinks(String configId, boolean value) {
-		prefStore.setValue(getConfigPrefPrefix(configId)
-				+ SHOW_RELATED_LINKS, value);
-	}
-	
-	/**
-	 * Sets the show related links in navigate page preference to be
-	 * default value.
-	 * 
-	 * @param configId
-	 *            a method configuration GUID
-	 */
-	public static void removeShowRelatedLinks(String configId) {
-		prefStore.setToDefault(getConfigPrefPrefix(configId)
-				+ SHOW_RELATED_LINKS);
-	}
-
-	/**
-	 * Gets the show related descriptors option in content page preference value.
-	 * 
-	 * @param configId
-	 *            a method configuration GUID
-	 * @return the preference value
-	 */
-	public static boolean getShowRelatedDescriptorsOption(String configId) {
-		return prefStore.getBoolean(getConfigPrefPrefix(configId)
-				+ SHOW_RELATED_DESCRIPTORS_OPTION);
-	}
-
-	/**
-	 * Sets the show related descriptors option in content page preference value.
-	 * 
-	 * @param configId
-	 *            a method configuration GUID
-	 * @param value
-	 *            the preference value
-	 */
-	public static void setShowRelatedDescriptorsOption(String configId, boolean value) {
-		prefStore.setValue(getConfigPrefPrefix(configId)
-				+ SHOW_RELATED_DESCRIPTORS_OPTION, value);
-	}
-
-	/**
-	 * Sets the show related descriptors option in content page preference to be
-	 * default value.
-	 * 
-	 * @param configId
-	 *            a method configuration GUID
-	 */
-	public static void removeShowRelatedDescriptorsOption(String configId) {
-		prefStore.setToDefault(getConfigPrefPrefix(configId)
-				+ SHOW_RELATED_DESCRIPTORS_OPTION);
 	}
 
 	/**
@@ -1352,26 +1120,7 @@ public class PublishingUIPreferences {
 		prefStore.setValue(
 				getConfigPrefPrefix(configId) + DEFAULT_ACTIVITY_TAB, tabName);
 	}
-	
-	public static void setShowLinkedElementForDescriptor(String configId, boolean value) {
-		prefStore.setValue(getConfigPrefPrefix(configId)
-				+ SHOW_LINKED_ELEMENT_FOR_DESCRIPTOR, value);
-	}
-	
-	public static boolean getShowLinkedElementForDescriptor(String configId) {
-		if (getConfigPrefInitialized(configId)) {
-			return prefStore.getBoolean(getConfigPrefPrefix(configId)
-					+ SHOW_LINKED_ELEMENT_FOR_DESCRIPTOR);
-		} else {
-			return prefStore.getBoolean(SHOW_LINKED_ELEMENT_FOR_DESCRIPTOR);
-		}
-	}
-	
-	public static void removeShowLinkedElementForDescriptor(String configId) {
-		prefStore.setToDefault(getConfigPrefPrefix(configId)
-				+ SHOW_LINKED_ELEMENT_FOR_DESCRIPTOR);
-	}
-	
+
 	/**
 	 * Saves all the preferences.
 	 */

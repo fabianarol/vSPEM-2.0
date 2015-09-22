@@ -28,35 +28,30 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.emf.ecore.sdo.EDataObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.xmi.XMLResource;
 import org.eclipse.emf.ecore.xml.type.XMLTypeFactory;
 import org.eclipse.emf.ecore.xml.type.XMLTypePackage;
-import org.eclipse.epf.common.service.versioning.VersionUtil;
+import org.eclipse.epf.common.serviceability.VersionUtil;
 import org.eclipse.epf.dataexchange.util.ContentProcessor;
 import org.eclipse.epf.dataexchange.util.ILogger;
 import org.eclipse.epf.export.xml.ExportXMLResources;
 import org.eclipse.epf.library.ILibraryManager;
+import org.eclipse.epf.library.ILibraryResourceManager;
 import org.eclipse.epf.library.LibraryService;
-import org.eclipse.epf.library.edit.util.MethodElementPropertyHelper;
-import org.eclipse.epf.library.edit.util.MethodLibraryPropUtil;
-import org.eclipse.epf.library.util.LibraryUtil;
+import org.eclipse.epf.library.util.ResourceHelper;
 import org.eclipse.epf.uma.TaskDescriptor;
-import org.eclipse.epf.uma.ecore.IModelObject;
-import org.eclipse.epf.uma.ecore.Type;
 import org.eclipse.epf.xml.uma.BreakdownElement;
 import org.eclipse.epf.xml.uma.ContentCategoryPackage;
-import org.eclipse.epf.xml.uma.ContentElement;
 import org.eclipse.epf.xml.uma.ContentPackage;
 import org.eclipse.epf.xml.uma.DocumentRoot;
-import org.eclipse.epf.xml.uma.MethodConfiguration;
 import org.eclipse.epf.xml.uma.MethodElement;
 import org.eclipse.epf.xml.uma.MethodElementProperty;
 import org.eclipse.epf.xml.uma.MethodLibrary;
 import org.eclipse.epf.xml.uma.MethodPackage;
 import org.eclipse.epf.xml.uma.MethodPlugin;
 import org.eclipse.epf.xml.uma.ProcessComponent;
-import org.eclipse.epf.xml.uma.ProcessElement;
 import org.eclipse.epf.xml.uma.ProcessPackage;
 import org.eclipse.epf.xml.uma.Section;
 import org.eclipse.epf.xml.uma.UmaFactory;
@@ -69,6 +64,7 @@ import org.eclipse.epf.xml.uma.util.UmaResourceFactoryImpl;
 import org.eclipse.osgi.util.NLS;
 
 import com.ibm.icu.text.SimpleDateFormat;
+import commonj.sdo.Type;
 
 /**
  * XmlLibrary represents a method library loaded from a specified xml file The
@@ -80,9 +76,6 @@ import com.ibm.icu.text.SimpleDateFormat;
  */
 public class XMLLibrary {
 
-	public static final String WorkOrderPropStringSep = "\n\n";			//$NON-NLS-1$
-	public static final String WorkOrderPropStringFieldSep = "\n";			//$NON-NLS-1$
-	
 	private String filePath;
 
 	private ILogger logger;
@@ -98,10 +91,6 @@ public class XMLLibrary {
 	private Map elementsMap = new HashMap();
 	
 	private Map<String, String> guidToPlugNameMap;
-	
-	private Map<WorkOrder, org.eclipse.epf.uma.WorkOrder> successOrWorkOrderMap;
-	
-	private int synFreeLibIx = -1; //-1: unset, 0: false, 1: true;
 
 	/**
 	 * Creates a new instance.
@@ -117,7 +106,7 @@ public class XMLLibrary {
 	/**
 	 * @return root object.
 	 */
-	public IModelObject getRoot() {
+	public EDataObject getRoot() {
 		return this.rootObject;
 	}
 
@@ -142,23 +131,13 @@ public class XMLLibrary {
 
 		return ids;
 	}
-	
-	public String[] getConfigIds() {
-		List configs = rootObject.getMethodConfiguration();
-		String[] ids = new String[configs.size()];
-		for (int i = 0; i < configs.size(); i++) {
-			ids[i] = ((MethodConfiguration) configs.get(i)).getId();
-		}
-
-		return ids;
-	}
 
 	/**
 	 * @param id
 	 * @param name
 	 * @return a new XML library.
 	 */
-	public IModelObject createLibrary(String id, String name) {
+	public EDataObject createLibrary(String id, String name) {
 
 		MethodLibrary root = UmaFactory.eINSTANCE.createMethodLibrary();
 		String version = "";								//$NON-NLS-1$	
@@ -272,7 +251,7 @@ public class XMLLibrary {
 	 * @param pluginId
 	 * @return a content catergory package in the plugin given by pluginId.
 	 */
-	public IModelObject getContentCategoryPackage(String pluginId) {
+	public EDataObject getContentCategoryPackage(String pluginId) {
 
 		ContentCategoryPackage pkg = (ContentCategoryPackage) contentCategoryPkgMap
 				.get(pluginId);
@@ -313,7 +292,7 @@ public class XMLLibrary {
 	/**
 	 * @return the root object.
 	 */
-	public IModelObject open() {
+	public EDataObject open() {
 		return rootObject;
 	}
 
@@ -321,15 +300,15 @@ public class XMLLibrary {
 	 * @param guid
 	 * @return the corresponding base library element.
 	 */
-	public IModelObject getElement(String guid) {
-		return (IModelObject) elementsMap.get(guid);
+	public EDataObject getElement(String guid) {
+		return (EDataObject) elementsMap.get(guid);
 	}
 
 	/**
 	 * @param obj
 	 * @return the corresponding base library element.
 	 */
-	public IModelObject getElement(Object obj) {
+	public EDataObject getElement(Object obj) {
 		if (obj instanceof MethodElement) {
 			return getElement(((MethodElement) obj).getId());
 		}
@@ -342,7 +321,7 @@ public class XMLLibrary {
 	 * @param obj
 	 * @return elmenent id string.
 	 */
-	public String getElementId(IModelObject obj) {
+	public String getElementId(EDataObject obj) {
 
 		if (obj instanceof MethodElement) {
 			return ((MethodElement) obj).getId();
@@ -353,7 +332,7 @@ public class XMLLibrary {
 		return null;
 	}
 
-	private void setElement(String guid, IModelObject obj) {
+	private void setElement(String guid, EDataObject obj) {
 		// addElementToContainer(container, obj);
 		if (!elementsMap.containsKey(guid)) {
 
@@ -410,11 +389,11 @@ public class XMLLibrary {
 	 *            guid of the element to be created
 	 * @return EDataObject the Xml uma element
 	 */
-	public IModelObject createElement(IModelObject container,
+	public EDataObject createElement(EDataObject container,
 			String umaFeatureName, String umaEClassName, String umaElementType,
 			String guid) {
 
-		IModelObject obj = getElement(guid);
+		EDataObject obj = getElement(guid);
 		if (obj == null) {
 			if (FeatureManager.INSTANCE.isUnneededRmcFeature(umaFeatureName)) {
 				return null;
@@ -454,7 +433,7 @@ public class XMLLibrary {
 				return null;
 			}
 
-			obj = (IModelObject) EcoreUtil.create(objClass);
+			obj = (EDataObject) EcoreUtil.create(objClass);
 			setElement(guid, obj);
 
 			if (obj instanceof WorkOrder) {
@@ -530,9 +509,9 @@ public class XMLLibrary {
 			return;
 		}
 		if (container instanceof ContentPackage) {
-			((ContentPackage) container).getContentElement().add((ContentElement)obj);
+			((ContentPackage) container).getContentElement().add(obj);
 		} else if (container instanceof ProcessPackage) {
-			((ProcessPackage) container).getProcessElement().add((ProcessElement)obj);
+			((ProcessPackage) container).getProcessElement().add(obj);
 			// } else if ( (obj instanceof Constraint) && (container instanceof
 			// MethodElement) ) {
 			// // the owner rule should be a containment 0..n feature, waiting
@@ -550,13 +529,13 @@ public class XMLLibrary {
 	 * @param value
 	 * @throws Exception
 	 */
-	public void setAtributeFeatureValue(IModelObject obj, String featureName,
+	public void setAtributeFeatureValue(EDataObject obj, String featureName,
 			Object value) throws Exception {
 		if (obj == null || featureName == null || value == null) {
 			return;
 		}
 
-		if (value instanceof List || value instanceof IModelObject) {
+		if (value instanceof List || value instanceof EDataObject) {
 			if (featureName.equals("methodElementProperty")) {		//$NON-NLS-1$
 				setMepFeatureValue(obj, featureName, value);
 				return;
@@ -631,16 +610,11 @@ public class XMLLibrary {
 
 	}
 
-	private void setMepFeatureValue(IModelObject obj, String featureName, Object value) {
+	private void setMepFeatureValue(EDataObject obj, String featureName, Object value) {
 		List srcList = (List) value;
 		if (srcList == null || srcList.isEmpty()) {
 			return;
 		}
-		if (obj instanceof WorkOrder) {
-			setMepFeatureValueForWorkOrder(srcList, (WorkOrder) obj);
-			return;
-		}
-		
 		EStructuralFeature feature = FeatureManager.INSTANCE.getXmlFeature(obj
 				.eClass(), featureName);
 		List tgtList = (List) obj.eGet(feature);
@@ -660,60 +634,6 @@ public class XMLLibrary {
 		//obj.eSet(feature, tgtList);
 	}
 
-	private void setMepFeatureValueForWorkOrder(List srcList, WorkOrder xmlWorkOrder) {
-		Object obj = getSuccessOrWorkOrderMap().get(xmlWorkOrder);
-		org.eclipse.epf.uma.WorkOrder umaWorkOrder = null;
-		org.eclipse.epf.uma.ProcessElement scopeElement = null;
-		if (obj instanceof org.eclipse.epf.uma.WorkOrder) {
-			umaWorkOrder = (org.eclipse.epf.uma.WorkOrder) obj;
-		}
-		
-		
-		
-		String propertiesValue = "";	//$NON-NLS-1$	
-		for (Object srcItem : srcList) {
-			if (srcItem instanceof org.eclipse.epf.uma.MethodElementProperty) {
-				org.eclipse.epf.uma.MethodElementProperty mep = 
-						(org.eclipse.epf.uma.MethodElementProperty) srcItem;
-				String srcName = mep.getName();
-				String srcValue = mep.getValue();
-				if (srcName != null && srcValue != null
-						&& srcName.length() > 0 && srcValue.length() > 0) {
-					if (propertiesValue.length() > 0) {
-						propertiesValue += WorkOrderPropStringSep;				//$NON-NLS-1$
-					}
-					propertiesValue += "name=" + srcName;		//$NON-NLS-1$
-					propertiesValue += WorkOrderPropStringFieldSep + "value=" + srcValue;	//$NON-NLS-1$
-					
-					if (umaWorkOrder != null && srcName.equals(MethodElementPropertyHelper.WORK_ORDER__SUCCESSOR)) {
-						if (scopeElement == null) {
-							Object cont = umaWorkOrder.eContainer();
-							if (cont instanceof org.eclipse.epf.uma.ProcessPackage) {
-								List<org.eclipse.epf.uma.ProcessElement> peList = 
-									((org.eclipse.epf.uma.ProcessPackage) cont).getProcessElements();
-								if (peList != null) {
-									for (org.eclipse.epf.uma.ProcessElement pe : peList) {
-										if (pe instanceof org.eclipse.epf.uma.Activity) {
-											scopeElement = pe;
-											break;
-										}
-									}
-								}
-							}
-						}
-						if (scopeElement != null) {
-							propertiesValue += WorkOrderPropStringFieldSep + "scope=" + scopeElement.getGuid();		//$NON-NLS-1$
-						}
-					}
-					
-				}
-			}
-		}
-		if (propertiesValue.length() > 0) {
-			xmlWorkOrder.setProperties(propertiesValue);
-		}
-	}
-
 	/**
 	 * set the id references for the object
 	 * 
@@ -729,7 +649,7 @@ public class XMLLibrary {
 	 *            unique
 	 * @throws Exception
 	 */
-	public void setReferenceValue(IModelObject obj, String featureName,
+	public void setReferenceValue(EDataObject obj, String featureName,
 			String idValue, Type valueType) throws Exception {
 		if (obj == null || featureName == null || idValue == null) {
 			return;
@@ -764,7 +684,7 @@ public class XMLLibrary {
 			// special handling for breakdown element. In uma, breakdown
 			// elements are under process packages
 			// in xml model, they are owned by the activity
-			IModelObject v = getElement(idValue);
+			EDataObject v = getElement(idValue);
 			if (v instanceof BreakdownElement) {
 				EObject old_container = v.eContainer();
 				List l = (List) obj.eGet(feature);
@@ -788,7 +708,7 @@ public class XMLLibrary {
 			// Jinhua Xi, 08/24/2006
 			Object v = getElement(idValue);
 			if (v instanceof WorkOrder) {
-				((WorkBreakdownElement)obj).getPredecessor().add((WorkOrder)v);
+				((WorkBreakdownElement)obj).getPredecessor().add(v);
 			}
 		} else {
 			// not handled, add warning log
@@ -886,9 +806,7 @@ public class XMLLibrary {
 			for (int i=0; i<steps.size(); i++) {
 				org.eclipse.epf.uma.MethodElement step = (org.eclipse.epf.uma.MethodElement) steps.get(i);
 				Section xmlStep =  (Section) elementsMap.get(step.getGuid());
-				if (xmlStep == null) {	//Bug 300749: this can happen if td's plugin is not in the exported list 
-					xmlStep = buildSection(step);
-				}
+				assert(xmlStep != null);
 				if (xmlStep != null) {
 					xmlStep = (Section) EcoreUtil.copy(xmlStep);
 					xmlTd.getStep().add(xmlStep);
@@ -1028,7 +946,7 @@ public class XMLLibrary {
 	}
 
 	private void fixProcess(org.eclipse.epf.xml.uma.Process proc) {
-		IModelObject container = (IModelObject) proc.eContainer();
+		EDataObject container = (EDataObject) proc.eContainer();
 		ProcessComponent pc = null;
 		if (container instanceof ProcessComponent) {
 			return;
@@ -1171,66 +1089,6 @@ public class XMLLibrary {
 			guidToPlugNameMap = new HashMap<String, String>();
 			e.printStackTrace();
 		}
-	}
-
-	public Map<WorkOrder, org.eclipse.epf.uma.WorkOrder> getSuccessOrWorkOrderMap() {
-		if (successOrWorkOrderMap == null) {
-			successOrWorkOrderMap = new HashMap<WorkOrder, org.eclipse.epf.uma.WorkOrder>();
-		}
-		return successOrWorkOrderMap;
-	}
-	
-	private org.eclipse.epf.xml.uma.Section buildSection(
-			org.eclipse.epf.uma.MethodElement umaStep) {
-		if (! (umaStep instanceof org.eclipse.epf.uma.Section)) {
-			return null;
-		}
-
-		org.eclipse.epf.xml.uma.Section xmlSection = org.eclipse.epf.xml.uma.UmaFactory.eINSTANCE
-				.createSection();
-		
-		List<EStructuralFeature> features = umaStep.eClass()
-				.getEAllStructuralFeatures();
-		
-		for (EStructuralFeature feature : features) {
-			Object value = umaStep.eGet(feature);
-			try {
-				if (value instanceof String) {	//Ignore other type values
-					setAtributeFeatureValue(xmlSection, feature.getName(), value);
-				}
-			} catch (Exception e) {
-				String msg = NLS.bind(
-						ExportXMLResources.exportXMLService_feature_error,
-						LibraryUtil.getTypeName(umaStep), feature.getName());
-				logger.logError(msg, e);
-			}
-		}
-
-		return xmlSection;
-	}
-	
-	public boolean isSynFreeLib() {
-		if (synFreeLibIx == -1) {
-			synFreeLibIx = 0;
-			
-			EStructuralFeature feature = FeatureManager.INSTANCE.getXmlFeature(rootObject
-					.eClass(), "methodElementProperty");		//$NON-NLS-1$
-			
-			List<MethodElementProperty> mepList = (List<MethodElementProperty>) rootObject.eGet(feature);
-			if (mepList == null || mepList.isEmpty()) {
-				return false;
-			}
-			
-			for (MethodElementProperty mep : mepList) {
-				String name = mep.getName();
-				if (name != null && name.equals(MethodLibraryPropUtil.Library_SynFree)) {
-					String value = mep.getValue();
-					synFreeLibIx = Boolean.parseBoolean(value) ? 1 : 0;
-					break;
-				}
-			}
-		}
-		return synFreeLibIx > 0;
 	}
 	
 }

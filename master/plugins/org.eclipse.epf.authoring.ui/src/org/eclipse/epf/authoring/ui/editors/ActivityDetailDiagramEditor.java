@@ -452,7 +452,7 @@ public class ActivityDetailDiagramEditor extends AbstractDiagramEditor {
 		 */
 		public DiagramAdapterFactoryFilter(MethodConfiguration methodConfig,
 				ActivityDetailDiagramEditor.BreakdownAdapterFactory factory) {
-			super(methodConfig);
+			super(methodConfig, null);
 			this.factory = factory;
 		}
 

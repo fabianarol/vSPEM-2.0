@@ -33,6 +33,13 @@ import org.eclipse.epf.uma.UmaPackage;
 public abstract class NamedElementImpl extends ElementImpl implements
 		NamedElement {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -62,7 +69,7 @@ public abstract class NamedElementImpl extends ElementImpl implements
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -70,7 +77,6 @@ public abstract class NamedElementImpl extends ElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.NAMED_ELEMENT;
 	}
@@ -102,7 +108,6 @@ public abstract class NamedElementImpl extends ElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.NAMED_ELEMENT__NAME:
@@ -116,7 +121,6 @@ public abstract class NamedElementImpl extends ElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.NAMED_ELEMENT__NAME:
@@ -131,7 +135,6 @@ public abstract class NamedElementImpl extends ElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.NAMED_ELEMENT__NAME:
@@ -146,7 +149,6 @@ public abstract class NamedElementImpl extends ElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);
@@ -167,7 +169,6 @@ public abstract class NamedElementImpl extends ElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy())
 			return super.toString();

@@ -22,7 +22,6 @@ package org.eclipse.epf.diagram.core.part.util;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -47,7 +46,6 @@ import org.eclipse.epf.diagram.core.bridge.ActivityDiagramAdapter;
 import org.eclipse.epf.diagram.core.bridge.BridgeHelper;
 import org.eclipse.epf.diagram.core.bridge.DiagramAdapter;
 import org.eclipse.epf.diagram.core.bridge.NodeAdapter;
-import org.eclipse.epf.diagram.core.editparts.InternalNodeEditPart;
 import org.eclipse.epf.diagram.core.part.AbstractDiagramEditor;
 import org.eclipse.epf.diagram.core.part.DiagramEditorInput;
 import org.eclipse.epf.diagram.core.part.DiagramEditorInputProxy;
@@ -344,7 +342,6 @@ public class DiagramEditorUtil {
 			if(editor != null && editor.getEditorInput() instanceof DiagramEditorInputProxy) {
 				DiagramEditorInputProxy inputProxy = (DiagramEditorInputProxy) editor.getEditorInput();
 				IProgressMonitor monitor = new NullProgressMonitor();
-				boolean dirty = editor.isDirty();
 				try {
 					if(doInitialize(inputProxy, monitor)) {
 						doRefresh(editPart, monitor, false);
@@ -352,17 +349,6 @@ public class DiagramEditorUtil {
 					}
 				} catch (CoreException e) {
 					DiagramCorePlugin.getDefault().getLogger().logError(e);
-				} finally {
-					if(editor.isDirty() && !dirty) {
-						// initialization made the document dirty
-						// this will clear dirty flag of the editor
-						//
-						IDocumentProvider docProvider = ((DiagramDocumentEditor)editor).getDocumentProvider();
-						if (docProvider instanceof SharedResourceDiagramDocumentProvider) {
-							((SharedResourceDiagramDocumentProvider) docProvider)
-							.markDocumentAsSaved(inputProxy);
-						}			
-					}
 				}
 				
 			}
@@ -849,28 +835,24 @@ public class DiagramEditorUtil {
 	 * https://bugs.eclipse.org/bugs/show_bug.cgi?id=184081
 	 */
 	public static void refreshConnectionEditParts(DiagramEditPart diagramEditPart) {
+
 		GraphicalViewer viewer = (GraphicalViewer)diagramEditPart.getViewer();
 		Diagram act = (Diagram)diagramEditPart.getModel();
-		List<?> edges = act.getEdges();
-		for (Iterator<?> iter = edges.iterator(); iter.hasNext();) {
+		List edges = act.getEdges();
+		for (Iterator iter = edges.iterator(); iter.hasNext();) {
 			Edge edge = (Edge) iter.next();
 			if(edge.isVisible()){
 				ConnectionEditPart part = (ConnectionEditPart)viewer.getEditPartRegistry().get(edge); 
 					
 				if(part != null){
 					if(part.getSource() == null){
-						for (Iterator<?> iter1 = diagramEditPart.getChildren().iterator(); iter1.hasNext();) {
+						for (Iterator iter1 = diagramEditPart.getChildren().iterator(); iter1.hasNext();) {
 							EditPart element = (EditPart) iter1.next();
 							Object model = element.getModel();
 							if(edge.getSource() == model){
 								if(element instanceof GraphicalEditPart){
-									GraphicalEditPart sourceEditPart = ((GraphicalEditPart)element);
-									if(sourceEditPart.getFigure().isVisible()){
+									if(((GraphicalEditPart)element).getFigure().isVisible()){
 										part.setSource(element);
-										if(sourceEditPart instanceof InternalNodeEditPart &&
-												!sourceEditPart.getSourceConnections().contains(part)) {
-											((InternalNodeEditPart) sourceEditPart).primAddSourceConnection(part, 0);
-										}
 									}else{
 										part.setSource(null);
 									}
@@ -879,19 +861,14 @@ public class DiagramEditorUtil {
 						}
 					}
 					if(part.getTarget() == null){
-						for (Iterator<?> iter1 = diagramEditPart.getChildren().iterator(); iter1.hasNext();) {
+						for (Iterator iter1 = diagramEditPart.getChildren().iterator(); iter1.hasNext();) {
 							EditPart element = (EditPart) iter1.next();
 							Object model = element.getModel();
 							if(edge.getTarget() == model){
 								if(element instanceof GraphicalEditPart){
-									GraphicalEditPart targetEditPart = ((GraphicalEditPart)element);
-									if(targetEditPart.getFigure().isVisible()){
-										part.setTarget(element);										
-										if(targetEditPart instanceof InternalNodeEditPart &&
-												!targetEditPart.getTargetConnections().contains(part)) {
-											((InternalNodeEditPart) targetEditPart).primAddTargetConnection(part, 0);
-										}
-									} else {
+									if(((GraphicalEditPart)element).getFigure().isVisible()){
+										part.setTarget(element);
+									}else{
 										part.setTarget(null);
 									}
 								}
@@ -902,19 +879,19 @@ public class DiagramEditorUtil {
 			}
 		}
 		
-		try {
-			for (Iterator<?> iter = edges.iterator(); iter.hasNext();) {
-				Edge edge = (Edge) iter.next();
+		try{
+		for (Iterator iter = edges.iterator(); iter.hasNext();) {
+			Edge edge = (Edge) iter.next();
 				org.eclipse.gmf.runtime.diagram.ui.editparts.ConnectionEditPart part = 
 					(org.eclipse.gmf.runtime.diagram.ui.editparts.ConnectionEditPart)viewer.getEditPartRegistry().get(edge); 
 				if(part != null && (part.getSource() == null || part.getTarget() == null)
 						&& part.getFigure() != null){
 					part.getFigure().setVisible(false);
-					part.getFigure().revalidate();
+				    part.getFigure().revalidate();
 					part.deactivate();
 				}
-			}
-		} catch(Exception e){
+		}
+		}catch(Exception e){
 			if(DiagramCorePlugin.getDefault().isDebugging()){
 				DiagramCorePlugin.getDefault().getLogger().logError("Error occured while refresh the connection: "+ e); //$NON-NLS-1$
 				e.printStackTrace();

@@ -29,12 +29,19 @@ public class ChecklistImpl extends GuidanceImpl implements Checklist {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	protected ChecklistImpl() {
 		super();
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -42,7 +49,6 @@ public class ChecklistImpl extends GuidanceImpl implements Checklist {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.CHECKLIST;
 	}

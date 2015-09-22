@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: ContentPackage.java,v 1.4 2007/05/04 22:46:43 klow Exp $
+ */
 package org.eclipse.epf.xml.uma;
 
 import org.eclipse.emf.common.util.EList;
@@ -47,7 +43,7 @@ public interface ContentPackage extends MethodPackage {
 	 * @return the value of the '<em>Group2</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getContentPackage_Group2()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
-	 *        extendedMetaData="kind='group' name='group:13'"
+	 *        extendedMetaData="kind='group' name='group:12'"
 	 * @generated
 	 */
 	FeatureMap getGroup2();
@@ -63,10 +59,10 @@ public interface ContentPackage extends MethodPackage {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Content Element</em>' containment reference list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getContentPackage_ContentElement()
-	 * @model containment="true" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='ContentElement' group='#group:13'"
+	 * @model type="org.eclipse.epf.xml.uma.ContentElement" containment="true" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='ContentElement' group='#group:12'"
 	 * @generated
 	 */
-	EList<ContentElement> getContentElement();
+	EList getContentElement();
 
 } // ContentPackage

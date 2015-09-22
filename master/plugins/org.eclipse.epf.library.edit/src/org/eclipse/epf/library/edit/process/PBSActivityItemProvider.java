@@ -34,7 +34,6 @@ import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.uma.Activity;
 import org.eclipse.epf.uma.Artifact;
 import org.eclipse.epf.uma.Descriptor;
-import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.Milestone;
 import org.eclipse.epf.uma.UmaFactory;
 import org.eclipse.epf.uma.UmaPackage;
@@ -98,6 +97,54 @@ implements ICachedChildrenItemProvider
 		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
 				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
 				.createMilestone()));
+		
+		
+		/********Variation points********/
+		/*Añadimos puntos de variación*/
+		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
+				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
+				.createvpActivity()));
+		
+		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
+				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
+				.createvpPhase()));
+		
+		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
+				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
+				.createvpIteration()));
+		
+		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
+				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
+				.createvpWorkProductDescriptor()));
+		
+		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
+				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
+				.createvpMilestone()));
+		
+		/***/
+		
+		/*******Variants*******/
+		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
+				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
+				.createVarActivity()));
+		
+		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
+				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
+				.createVarPhase()));
+		
+		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
+				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
+				.createVarIteration()));
+		
+		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
+				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
+				.createVarWorkProductDescriptor()));
+		
+		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
+				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
+				.createVarMilestone()));
+		
+		/***/
 
 	}
 
@@ -352,8 +399,7 @@ implements ICachedChildrenItemProvider
 	}
 
 	protected List removeSubartifactsFromChildren(Collection children, boolean unwrap) {
-		MethodConfiguration config = getConfigurator() == null ? null : getConfigurator().getMethodConfiguration();
-		List<?> list = ProcessUtil.removeSubartifactsFromChildren(config, children, unwrap);
+		List<?> list = ProcessUtil.removeSubartifactsFromChildren(children, unwrap);
 		if(list.size() !=  children.size()) {
 			// parent of descriptors of subartifacts has been set to this activity
 			// iterate the subtree of the artifact descriptors in chidren list to correct this

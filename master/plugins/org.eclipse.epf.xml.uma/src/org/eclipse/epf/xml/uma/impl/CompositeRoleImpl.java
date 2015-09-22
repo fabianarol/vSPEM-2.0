@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: CompositeRoleImpl.java,v 1.4 2007/06/05 21:14:59 klow Exp $
+ */
 package org.eclipse.epf.xml.uma.impl;
 
 import java.util.Collection;
@@ -20,7 +16,6 @@ import org.eclipse.emf.ecore.util.BasicFeatureMap;
 import org.eclipse.emf.ecore.util.FeatureMap;
 import org.eclipse.emf.ecore.util.InternalEList;
 import org.eclipse.epf.xml.uma.CompositeRole;
-import org.eclipse.epf.xml.uma.Role;
 import org.eclipse.epf.xml.uma.UmaPackage;
 
 /**
@@ -30,7 +25,7 @@ import org.eclipse.epf.xml.uma.UmaPackage;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link org.eclipse.epf.xml.uma.impl.CompositeRoleImpl#getGroup2 <em>Group2</em>}</li>
+ *   <li>{@link org.eclipse.epf.xml.uma.impl.CompositeRoleImpl#getGroup1 <em>Group1</em>}</li>
  *   <li>{@link org.eclipse.epf.xml.uma.impl.CompositeRoleImpl#getAggregatedRole <em>Aggregated Role</em>}</li>
  * </ul>
  * </p>
@@ -39,14 +34,15 @@ import org.eclipse.epf.xml.uma.UmaPackage;
  */
 public class CompositeRoleImpl extends RoleDescriptorImpl implements CompositeRole {
 	/**
-	 * The cached value of the '{@link #getGroup2() <em>Group2</em>}' attribute list.
+	 * The cached value of the '{@link #getGroup1() <em>Group1</em>}' attribute list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getGroup2()
+	 * @see #getGroup1()
 	 * @generated
 	 * @ordered
 	 */
-	protected FeatureMap group2;
+	protected FeatureMap group1;
+
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -61,7 +57,6 @@ public class CompositeRoleImpl extends RoleDescriptorImpl implements CompositeRo
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.COMPOSITE_ROLE;
 	}
@@ -71,11 +66,11 @@ public class CompositeRoleImpl extends RoleDescriptorImpl implements CompositeRo
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public FeatureMap getGroup2() {
-		if (group2 == null) {
-			group2 = new BasicFeatureMap(this, UmaPackage.COMPOSITE_ROLE__GROUP2);
+	public FeatureMap getGroup1() {
+		if (group1 == null) {
+			group1 = new BasicFeatureMap(this, UmaPackage.COMPOSITE_ROLE__GROUP1);
 		}
-		return group2;
+		return group1;
 	}
 
 	/**
@@ -83,8 +78,8 @@ public class CompositeRoleImpl extends RoleDescriptorImpl implements CompositeRo
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Role> getAggregatedRole() {
-		return getGroup2().list(UmaPackage.Literals.COMPOSITE_ROLE__AGGREGATED_ROLE);
+	public EList getAggregatedRole() {
+		return getGroup1().list(UmaPackage.Literals.COMPOSITE_ROLE__AGGREGATED_ROLE);
 	}
 
 	/**
@@ -92,13 +87,12 @@ public class CompositeRoleImpl extends RoleDescriptorImpl implements CompositeRo
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case UmaPackage.COMPOSITE_ROLE__GROUP2:
-				return ((InternalEList<?>)getGroup2()).basicRemove(otherEnd, msgs);
+			case UmaPackage.COMPOSITE_ROLE__GROUP1:
+				return ((InternalEList)getGroup1()).basicRemove(otherEnd, msgs);
 			case UmaPackage.COMPOSITE_ROLE__AGGREGATED_ROLE:
-				return ((InternalEList<?>)getAggregatedRole()).basicRemove(otherEnd, msgs);
+				return ((InternalEList)getAggregatedRole()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -108,12 +102,11 @@ public class CompositeRoleImpl extends RoleDescriptorImpl implements CompositeRo
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-			case UmaPackage.COMPOSITE_ROLE__GROUP2:
-				if (coreType) return getGroup2();
-				return ((FeatureMap.Internal)getGroup2()).getWrapper();
+			case UmaPackage.COMPOSITE_ROLE__GROUP1:
+				if (coreType) return getGroup1();
+				return ((FeatureMap.Internal)getGroup1()).getWrapper();
 			case UmaPackage.COMPOSITE_ROLE__AGGREGATED_ROLE:
 				return getAggregatedRole();
 		}
@@ -125,16 +118,14 @@ public class CompositeRoleImpl extends RoleDescriptorImpl implements CompositeRo
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-		@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-			case UmaPackage.COMPOSITE_ROLE__GROUP2:
-				((FeatureMap.Internal)getGroup2()).set(newValue);
+			case UmaPackage.COMPOSITE_ROLE__GROUP1:
+				((FeatureMap.Internal)getGroup1()).set(newValue);
 				return;
 			case UmaPackage.COMPOSITE_ROLE__AGGREGATED_ROLE:
 				getAggregatedRole().clear();
-				getAggregatedRole().addAll((Collection<? extends Role>)newValue);
+				getAggregatedRole().addAll((Collection)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -145,11 +136,10 @@ public class CompositeRoleImpl extends RoleDescriptorImpl implements CompositeRo
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-			case UmaPackage.COMPOSITE_ROLE__GROUP2:
-				getGroup2().clear();
+			case UmaPackage.COMPOSITE_ROLE__GROUP1:
+				getGroup1().clear();
 				return;
 			case UmaPackage.COMPOSITE_ROLE__AGGREGATED_ROLE:
 				getAggregatedRole().clear();
@@ -163,11 +153,10 @@ public class CompositeRoleImpl extends RoleDescriptorImpl implements CompositeRo
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
-			case UmaPackage.COMPOSITE_ROLE__GROUP2:
-				return group2 != null && !group2.isEmpty();
+			case UmaPackage.COMPOSITE_ROLE__GROUP1:
+				return group1 != null && !group1.isEmpty();
 			case UmaPackage.COMPOSITE_ROLE__AGGREGATED_ROLE:
 				return !getAggregatedRole().isEmpty();
 		}
@@ -179,13 +168,12 @@ public class CompositeRoleImpl extends RoleDescriptorImpl implements CompositeRo
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (group2: ");
-		result.append(group2);
+		result.append(" (group1: ");
+		result.append(group1);
 		result.append(')');
 		return result.toString();
 	}

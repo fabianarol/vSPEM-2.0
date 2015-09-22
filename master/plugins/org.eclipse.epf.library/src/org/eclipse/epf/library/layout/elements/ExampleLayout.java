@@ -57,11 +57,10 @@ public class ExampleLayout extends AbstractElementLayout {
 							.getElementRealizer());
 			
 			List activities = ConfigurationHelper.calc0nFeatureValue(super.element,
-					AssociationHelper.Example_BreakdownElements, layoutManager
+					AssociationHelper.Example_Activities, layoutManager
 							.getElementRealizer());
 
-//			contentElements.addAll(activities);			
-			contentElements = addBreakdownElementsToContentElements(contentElements, activities);
+			contentElements.addAll(activities);
 			
 			addReferences(AssociationHelper.Example_ContentElements, elementXml, "contentElements", contentElements); //$NON-NLS-1$
 

@@ -2,13 +2,13 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.epf.authoring.ui; singleton:=true
-Bundle-Version: 1.5.0.qualifier
+Bundle-Version: 1.2.0.qualifier
 Bundle-Activator: org.eclipse.epf.authoring.ui.AuthoringUIPlugin
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.epf.library.xmi,
  org.eclipse.epf.library.ui;visibility:=reexport,
- org.eclipse.epf.richtext;visibility:=reexport,
+ org.eclipse.epf.richtext,
  org.eclipse.core.resources,
  org.eclipse.core.runtime,
  org.eclipse.draw2d,
@@ -27,7 +27,7 @@ Require-Bundle: org.eclipse.epf.library.xmi,
  org.eclipse.search,
  org.eclipse.gmf.runtime.draw2d.ui.render,
  org.eclipse.gmf.runtime.draw2d.ui.render.awt,
- org.eclipse.epf.common.ui
+ org.eclipse.vepf.library.edit
 Eclipse-LazyStart: true
 Export-Package: org.eclipse.epf.authoring.gef.commands,
  org.eclipse.epf.authoring.gef.edit,
@@ -46,10 +46,24 @@ Export-Package: org.eclipse.epf.authoring.gef.commands,
  org.eclipse.epf.authoring.ui.forms,
  org.eclipse.epf.authoring.ui.preferences,
  org.eclipse.epf.authoring.ui.properties,
- org.eclipse.epf.authoring.ui.providers,
  org.eclipse.epf.authoring.ui.richtext,
  org.eclipse.epf.authoring.ui.util,
  org.eclipse.epf.authoring.ui.views,
  org.eclipse.epf.authoring.ui.wizards
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Import-Package: org.eclipse.epf.authoring.ui.wizards
+Bundle-ClassPath: .,
+ lib/commons-beanutils-1.8.0.jar,
+ lib/commons-collections-2.1.1.jar,
+ lib/commons-digester-2.1.jar,
+ lib/commons-javaflow-20060411.jar,
+ lib/commons-logging-1.1.1.jar,
+ lib/groovy-all-1.7.5.jar,
+ lib/iText-2.1.7.jar,
+ lib/jasperreports-4.5.1.jar,
+ lib/jasperreports-applet-4.5.1.jar,
+ lib/jasperreports-fonts-4.5.1.jar,
+ lib/jasperreports-javaflow-4.5.1.jar,
+ lib/png-encoder-1.5.jar,
+ lib/poi-3.7-20101029.jar,
+ lib/jcommon-1.0.15.jar,
+ lib/jfreechart-1.0.12.jar

@@ -19,7 +19,6 @@ import org.eclipse.emf.common.util.ResourceLocator;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.edit.provider.IEditingDomainItemProvider;
 import org.eclipse.emf.edit.provider.IItemLabelProvider;
-import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.IItemPropertySource;
 import org.eclipse.emf.edit.provider.IStructuredItemContentProvider;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
@@ -53,8 +52,7 @@ public class ContentPackageItemProvider extends MethodPackageItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	public List<IItemPropertyDescriptor> getPropertyDescriptors(Object object) {
+	public List getPropertyDescriptors(Object object) {
 		if (itemPropertyDescriptors == null) {
 			super.getPropertyDescriptors(object);
 
@@ -70,9 +68,7 @@ public class ContentPackageItemProvider extends MethodPackageItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	public Collection<? extends EStructuralFeature> getChildrenFeatures(
-			Object object) {
+	public Collection getChildrenFeatures(Object object) {
 		if (childrenFeatures == null) {
 			super.getChildrenFeatures(object);
 			childrenFeatures
@@ -86,7 +82,6 @@ public class ContentPackageItemProvider extends MethodPackageItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EStructuralFeature getChildFeature(Object object, Object child) {
 		// Check the type of the specified child object and return the proper feature to use for
 		// adding (see {@link AddCommand}) it as a child.
@@ -100,7 +95,6 @@ public class ContentPackageItemProvider extends MethodPackageItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object getImage(Object object) {
 		return overlayImage(object, getResourceLocator().getImage(
 				"full/obj16/ContentPackage")); //$NON-NLS-1$
@@ -112,7 +106,6 @@ public class ContentPackageItemProvider extends MethodPackageItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String getText(Object object) {
 		String label = ((ContentPackage) object).getName();
 		return label == null || label.length() == 0 ? getString("_UI_ContentPackage_type") : //$NON-NLS-1$
@@ -126,7 +119,6 @@ public class ContentPackageItemProvider extends MethodPackageItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void notifyChanged(Notification notification) {
 		updateChildren(notification);
 
@@ -146,66 +138,21 @@ public class ContentPackageItemProvider extends MethodPackageItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	protected void collectNewChildDescriptors(
-			Collection<Object> newChildDescriptors, Object object) {
+	protected void collectNewChildDescriptors(Collection newChildDescriptors,
+			Object object) {
 		super.collectNewChildDescriptors(newChildDescriptors, object);
 
 		newChildDescriptors.add(createChildParameter(
 				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
-				UmaFactory.eINSTANCE.createKind()));
+				UmaFactory.eINSTANCE.createRole()));
 
 		newChildDescriptors.add(createChildParameter(
 				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
-				UmaFactory.eINSTANCE.createSupportingMaterial()));
-
-		newChildDescriptors.add(createChildParameter(
-				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
-				UmaFactory.eINSTANCE.createConcept()));
-
-		newChildDescriptors.add(createChildParameter(
-				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
-				UmaFactory.eINSTANCE.createChecklist()));
-
-		newChildDescriptors.add(createChildParameter(
-				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
-				UmaFactory.eINSTANCE.createGuideline()));
-
-		newChildDescriptors.add(createChildParameter(
-				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
-				UmaFactory.eINSTANCE.createExample()));
-
-		newChildDescriptors.add(createChildParameter(
-				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
-				UmaFactory.eINSTANCE.createReusableAsset()));
-
-		newChildDescriptors.add(createChildParameter(
-				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
-				UmaFactory.eINSTANCE.createTermDefinition()));
-
-		newChildDescriptors.add(createChildParameter(
-				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
-				UmaFactory.eINSTANCE.createWorkProduct()));
+				UmaFactory.eINSTANCE.createTask()));
 
 		newChildDescriptors.add(createChildParameter(
 				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
 				UmaFactory.eINSTANCE.createArtifact()));
-
-		newChildDescriptors.add(createChildParameter(
-				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
-				UmaFactory.eINSTANCE.createReport()));
-
-		newChildDescriptors.add(createChildParameter(
-				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
-				UmaFactory.eINSTANCE.createTemplate()));
-
-		newChildDescriptors.add(createChildParameter(
-				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
-				UmaFactory.eINSTANCE.createToolMentor()));
-
-		newChildDescriptors.add(createChildParameter(
-				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
-				UmaFactory.eINSTANCE.createEstimationConsiderations()));
 
 		newChildDescriptors.add(createChildParameter(
 				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
@@ -217,15 +164,59 @@ public class ContentPackageItemProvider extends MethodPackageItemProvider
 
 		newChildDescriptors.add(createChildParameter(
 				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
+				UmaFactory.eINSTANCE.createConcept()));
+
+		newChildDescriptors.add(createChildParameter(
+				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
+				UmaFactory.eINSTANCE.createChecklist()));
+
+		newChildDescriptors.add(createChildParameter(
+				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
+				UmaFactory.eINSTANCE.createExample()));
+
+		newChildDescriptors.add(createChildParameter(
+				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
+				UmaFactory.eINSTANCE.createGuideline()));
+
+		newChildDescriptors.add(createChildParameter(
+				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
+				UmaFactory.eINSTANCE.createReport()));
+
+		newChildDescriptors.add(createChildParameter(
+				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
+				UmaFactory.eINSTANCE.createTemplate()));
+
+		newChildDescriptors.add(createChildParameter(
+				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
+				UmaFactory.eINSTANCE.createSupportingMaterial()));
+
+		newChildDescriptors.add(createChildParameter(
+				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
+				UmaFactory.eINSTANCE.createToolMentor()));
+
+		newChildDescriptors.add(createChildParameter(
+				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
 				UmaFactory.eINSTANCE.createWhitepaper()));
 
 		newChildDescriptors.add(createChildParameter(
 				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
-				UmaFactory.eINSTANCE.createTask()));
+				UmaFactory.eINSTANCE.createTermDefinition()));
 
 		newChildDescriptors.add(createChildParameter(
 				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
-				UmaFactory.eINSTANCE.createRole()));
+				UmaFactory.eINSTANCE.createPractice()));
+
+		newChildDescriptors.add(createChildParameter(
+				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
+				UmaFactory.eINSTANCE.createEstimationConsiderations()));
+
+		newChildDescriptors.add(createChildParameter(
+				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
+				UmaFactory.eINSTANCE.createReusableAsset()));
+
+		newChildDescriptors.add(createChildParameter(
+				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
+				UmaFactory.eINSTANCE.createDiscipline()));
 
 		newChildDescriptors.add(createChildParameter(
 				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
@@ -237,19 +228,15 @@ public class ContentPackageItemProvider extends MethodPackageItemProvider
 
 		newChildDescriptors.add(createChildParameter(
 				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
+				UmaFactory.eINSTANCE.createPruebasLineas()));
+
+		newChildDescriptors.add(createChildParameter(
+				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
 				UmaFactory.eINSTANCE.createWorkProductType()));
 
 		newChildDescriptors.add(createChildParameter(
 				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
 				UmaFactory.eINSTANCE.createDisciplineGrouping()));
-
-		newChildDescriptors.add(createChildParameter(
-				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
-				UmaFactory.eINSTANCE.createDiscipline()));
-
-		newChildDescriptors.add(createChildParameter(
-				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
-				UmaFactory.eINSTANCE.createRoadmap()));
 
 		newChildDescriptors.add(createChildParameter(
 				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
@@ -265,7 +252,11 @@ public class ContentPackageItemProvider extends MethodPackageItemProvider
 
 		newChildDescriptors.add(createChildParameter(
 				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
-				UmaFactory.eINSTANCE.createPractice()));
+				UmaFactory.eINSTANCE.createRoadmap()));
+
+		newChildDescriptors.add(createChildParameter(
+				UmaPackage.Literals.CONTENT_PACKAGE__CONTENT_ELEMENTS,
+				UmaFactory.eINSTANCE.createVariantsListPackage()));
 	}
 
 	/**
@@ -274,7 +265,6 @@ public class ContentPackageItemProvider extends MethodPackageItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public ResourceLocator getResourceLocator() {
 		return UmaEditPlugin.INSTANCE;
 	}

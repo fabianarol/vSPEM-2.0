@@ -14,6 +14,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.epf.authoring.ui.AuthoringUIText;
 import org.eclipse.epf.common.utils.StrUtil;
+import org.eclipse.epf.library.layout.DefaultContentValidator;
+import org.eclipse.epf.publishing.PublishingPlugin;
 import org.eclipse.epf.publishing.ui.PublishingUIPlugin;
 import org.eclipse.epf.publishing.ui.PublishingUIResources;
 import org.eclipse.epf.ui.preferences.BasePreferencePage;
@@ -52,16 +54,6 @@ public class PublishingPreferencePage extends BasePreferencePage {
 	private Button browseButton;
 
 	private Button extraDescriptorInfoCheckbox;
-	
-	private Button showLinkedPageForDescriptorCheckbox;
-	
-	private Button ignoreDynamicParentsCheckbox;
-	
-	private Button excludeUnusedWPDsCheckbox;
-	
-	private Button fulfillDescriptorSlotByContentCheckbox;
-	
-	private Text forbiddenURLChars;
 
 	/**
 	 * Creates and returns the SWT control for the customized body of this
@@ -95,26 +87,7 @@ public class PublishingPreferencePage extends BasePreferencePage {
 		Group browsingGroup = createGridLayoutGroup(composite, PublishingUIResources.browsingLayoutGroup_text, 1);
 		extraDescriptorInfoCheckbox = createCheckbox(browsingGroup,
 				PublishingUIResources.publishExtraDescriptorInfoLabel_text, 1);
-		
-		showLinkedPageForDescriptorCheckbox = createCheckbox(browsingGroup,
-				PublishingUIResources.showLinkedPageForDescriptorLabel_text, 1);
-				
-		ignoreDynamicParentsCheckbox = createCheckbox(browsingGroup,
-				PublishingUIResources.ignoreDynamicParentsCheckbox_text, 1);		
-				
-		excludeUnusedWPDsCheckbox = createCheckbox(browsingGroup,
-				PublishingUIResources.excludeUnusedWPDsCheckbox_text, 1);			
-		
-		// Create the slot fulfillment rule group.
-		Group wpSlotDpRuleGroup = createGridLayoutGroup(composite, PublishingUIResources.wpSlotDpRuleGroup_text, 1);
-		fulfillDescriptorSlotByContentCheckbox = createCheckbox(wpSlotDpRuleGroup,
-				PublishingUIResources.fulfillDescriptorSlotByContentCheckbox_text, 1);
-		
-		// Create the forbidden URL chars group.
-		Group forbiddenURLCharsGroup = createGridLayoutGroup(composite, PublishingUIResources.forbiddenURLCharsGroup_text, 2);
-		forbiddenURLChars = createEditableText(forbiddenURLCharsGroup, 1);
-		createLabel(forbiddenURLCharsGroup, PublishingUIResources.forbiddenURLCharsText_label);
-		
+
 		initControls();
 
 		addListeners();
@@ -129,16 +102,7 @@ public class PublishingPreferencePage extends BasePreferencePage {
 		destinationPathText.setText(PublishingUIPreferences.getPublishPath());
 		feedbackURLText.setText(PublishingUIPreferences.getFeedbackURL());
 		extraDescriptorInfoCheckbox.setSelection(PublishingUIPreferences
-				.getExtraDescriptorInfo());	
-		showLinkedPageForDescriptorCheckbox.setSelection(PublishingUIPreferences
-				.getShowLinkedElementForDescriptor());		
-		ignoreDynamicParentsCheckbox.setSelection(PublishingUIPreferences
-				.getIgnoreDynamicParents());
-		excludeUnusedWPDsCheckbox.setSelection(PublishingUIPreferences
-				.getExcludeUnusedWPDs());
-		fulfillDescriptorSlotByContentCheckbox.setSelection(PublishingUIPreferences
-				.getFulfillDescriptorSlotByContent());
-		forbiddenURLChars.setText(PublishingUIPreferences.getForbiddenChars());
+				.getExtraDescriptorInfo());
 	}
 
 	/**
@@ -194,24 +158,7 @@ public class PublishingPreferencePage extends BasePreferencePage {
 		PublishingUIPreferences
 				.setExtraDescriptorInfo(extraDescriptorInfoCheckbox
 						.getSelection());
-		PublishingUIPreferences
-				.setShowLinkedElementForDescriptor(showLinkedPageForDescriptorCheckbox
-						.getSelection());
 
-		PublishingUIPreferences
-				.setIgnoreDynamicParents(ignoreDynamicParentsCheckbox
-						.getSelection());
-		
-		PublishingUIPreferences.setExcludeUnusedWPDs(excludeUnusedWPDsCheckbox
-				.getSelection());
-		
-		PublishingUIPreferences
-			.setFulfillDescriptorSlotByContent(fulfillDescriptorSlotByContentCheckbox
-				.getSelection());
-		
-		PublishingUIPreferences.setForbiddenChars(forbiddenURLChars.getText()
-				.trim());
-		
 //		// FIXME! Review implementation.
 //		// allow to pass the value to the library browsing
 //		// System.setProperty(EXTRA_DESCRIPTOR_INFO,
@@ -228,29 +175,13 @@ public class PublishingPreferencePage extends BasePreferencePage {
 				.setText(PublishingUIPreferences.getDefaultFeedbackURL());
 		extraDescriptorInfoCheckbox.setSelection(PublishingUIPreferences
 				.getDefaultExtraDescriptorInfo());
-		showLinkedPageForDescriptorCheckbox.setSelection(PublishingUIPreferences
-				.getDefaultShowLinkedElementForDescriptor());		
-		ignoreDynamicParentsCheckbox.setSelection(PublishingUIPreferences
-				.getDefaultIgnoreDynamicParents());
-		PublishingUIPreferences
-			.setIgnoreDynamicParents(ignoreDynamicParentsCheckbox
-				.getSelection());
-		excludeUnusedWPDsCheckbox.setSelection(PublishingUIPreferences
-				.getDefaultExcludeUnusedWPDs());
-		PublishingUIPreferences
-			.setExcludeUnusedWPDs(excludeUnusedWPDsCheckbox
-				.getSelection());
-		fulfillDescriptorSlotByContentCheckbox.setSelection(PublishingUIPreferences
-				.getDefaultFulfillDescriptorSlotByContent());
-		forbiddenURLChars
-			.setText(PublishingUIPreferences.getForbiddenChars());
 	}
 
 	/**
 	 * @see org.eclipse.jface.preference.PreferencePage#doGetPreferenceStore()
 	 */
 	protected IPreferenceStore doGetPreferenceStore() {
-		return PublishingUIPlugin.getDefault().getPreferenceStore();
+		return PublishingPlugin.getDefault().getPreferenceStore();
 	}
 
 	/**

@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.uma;
 
+import org.eclipse.emf.common.util.EList;
 import java.util.List;
 
 /**
@@ -20,7 +21,6 @@ import java.util.List;
  * <!-- begin-model-doc -->
  * Process Package is a special Method Package that contains Process Elements, only.
  * A key separation of concerns in UMA is the distinction between Method Content and Process.  This separation is enforced by special package types, which do not allow the mixing of method content with processes.
- * 
  * <!-- end-model-doc -->
  *
  * <p>
@@ -47,10 +47,10 @@ public interface ProcessPackage extends MethodPackage {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Process Elements</em>' containment reference list.
 	 * @see org.eclipse.epf.uma.UmaPackage#getProcessPackage_ProcessElements()
-	 * @model containment="true" resolveProxies="true" ordered="false"
+	 * @model type="org.eclipse.epf.uma.ProcessElement" containment="true" resolveProxies="true" ordered="false"
 	 * @generated
 	 */
-	List<ProcessElement> getProcessElements();
+	List getProcessElements();
 
 	/**
 	 * Returns the value of the '<em><b>Diagrams</b></em>' containment reference list.
@@ -63,9 +63,9 @@ public interface ProcessPackage extends MethodPackage {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Diagrams</em>' containment reference list.
 	 * @see org.eclipse.epf.uma.UmaPackage#getProcessPackage_Diagrams()
-	 * @model containment="true" resolveProxies="true" ordered="false"
+	 * @model type="org.eclipse.epf.uma.Diagram" containment="true" resolveProxies="true" ordered="false"
 	 * @generated
 	 */
-	List<Diagram> getDiagrams();
+	List getDiagrams();
 
 } // ProcessPackage

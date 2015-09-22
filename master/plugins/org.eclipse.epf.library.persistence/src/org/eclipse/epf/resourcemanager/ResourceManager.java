@@ -13,7 +13,7 @@ package org.eclipse.epf.resourcemanager;
 import java.util.List;
 
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.sdo.EDataObject;
 
 /**
  * <!-- begin-user-doc -->
@@ -32,9 +32,10 @@ import org.eclipse.emf.ecore.EObject;
  *
  * @see org.eclipse.epf.resourcemanager.ResourcemanagerPackage#getResourceManager()
  * @model
+ * @extends EDataObject
  * @generated
  */
-public interface ResourceManager extends EObject {
+public interface ResourceManager extends EDataObject {
 	
 	/**
 	 * Returns the value of the '<em><b>Guid</b></em>' attribute.
@@ -99,7 +100,7 @@ public interface ResourceManager extends EObject {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Sub Managers</em>' containment reference list.
 	 * @see org.eclipse.epf.resourcemanager.ResourcemanagerPackage#getResourceManager_SubManagers()
-	 * @model containment="true" resolveProxies="true"
+	 * @model type="org.eclipse.epf.resourcemanager.ResourceManager" containment="true" resolveProxies="true"
 	 * @generated
 	 */
 	List<ResourceManager> getSubManagers();
@@ -115,7 +116,7 @@ public interface ResourceManager extends EObject {
      * <!-- end-user-doc -->
 	 * @return the value of the '<em>Resource Descriptors</em>' containment reference list.
 	 * @see org.eclipse.epf.resourcemanager.ResourcemanagerPackage#getResourceManager_ResourceDescriptors()
-	 * @model containment="true" resolveProxies="true"
+	 * @model type="org.eclipse.epf.resourcemanager.ResourceDescriptor" containment="true" resolveProxies="true"
 	 * @generated
 	 */
     List<ResourceDescriptor> getResourceDescriptors();

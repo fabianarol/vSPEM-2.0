@@ -15,10 +15,8 @@ import java.util.Collections;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.epf.library.edit.IConfigurator;
 import org.eclipse.epf.library.edit.LibraryEditPlugin;
 import org.eclipse.epf.library.edit.command.NestedCommandExcecutor;
-import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.services.ILibraryPersister;
 import org.eclipse.epf.services.Services;
 import org.eclipse.epf.uma.DeliveryProcess;
@@ -45,20 +43,16 @@ public class ProcessDeepCopyCommand extends ActivityDeepCopyCommand {
 	private String newProcessName;
 	private NestedCommandExcecutor nestedCommandExecutor;
 	
-	public ProcessDeepCopyCommand(org.eclipse.epf.uma.Process process, String newProcessName,
-			CopyHelper copyHelper, MethodConfiguration config, ProcessPackage targetPackage,
-			IProgressMonitor monitor,IConfigurator configurator) {
+	public ProcessDeepCopyCommand(org.eclipse.epf.uma.Process process, String newProcessName, CopyHelper copyHelper, MethodConfiguration config, ProcessPackage targetPackage, IProgressMonitor monitor) {
 
-		super(process, copyHelper, config, null, monitor, configurator);
+		super(process, copyHelper, config, null, monitor);
 
 		this.newProcessName = newProcessName;		
 		this.targetPackage = targetPackage;
 		createtargetProcess();
 		//TODO: disable copying diagrams for now
 		//
-		if (ProcessUtil.isProcessDeepcopyDiagarm()) {
-			nestedCommandExecutor = new NestedCommandExcecutor(this);
-		}
+//		nestedCommandExecutor = new NestedCommandExcecutor(this);
 	}	
 	
 	public MethodConfiguration getMethodConfiguration() {

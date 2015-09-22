@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: UmaAdapterFactory.java,v 1.4 2007/05/04 22:46:43 klow Exp $
+ */
 package org.eclipse.epf.xml.uma.util;
 
 import org.eclipse.emf.common.notify.Adapter;
@@ -16,7 +12,6 @@ import org.eclipse.emf.common.notify.impl.AdapterFactoryImpl;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.epf.xml.uma.Activity;
 import org.eclipse.epf.xml.uma.ActivityDescription;
-import org.eclipse.epf.xml.uma.ApplicableMetaClassInfo;
 import org.eclipse.epf.xml.uma.Artifact;
 import org.eclipse.epf.xml.uma.ArtifactDescription;
 import org.eclipse.epf.xml.uma.BreakdownElement;
@@ -52,7 +47,6 @@ import org.eclipse.epf.xml.uma.Guidance;
 import org.eclipse.epf.xml.uma.GuidanceDescription;
 import org.eclipse.epf.xml.uma.Guideline;
 import org.eclipse.epf.xml.uma.Iteration;
-import org.eclipse.epf.xml.uma.Kind;
 import org.eclipse.epf.xml.uma.MethodConfiguration;
 import org.eclipse.epf.xml.uma.MethodElement;
 import org.eclipse.epf.xml.uma.MethodElementProperty;
@@ -139,7 +133,6 @@ public class UmaAdapterFactory extends AdapterFactoryImpl {
 	 * @return whether this factory is applicable for the type of the object.
 	 * @generated
 	 */
-	@Override
 	public boolean isFactoryForType(Object object) {
 		if (object == modelPackage) {
 			return true;
@@ -156,358 +149,264 @@ public class UmaAdapterFactory extends AdapterFactoryImpl {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected UmaSwitch<Adapter> modelSwitch =
-		new UmaSwitch<Adapter>() {
-			@Override
-			public Adapter caseActivity(Activity object) {
+	protected UmaSwitch modelSwitch =
+		new UmaSwitch() {
+			public Object caseActivity(Activity object) {
 				return createActivityAdapter();
 			}
-			@Override
-			public Adapter caseActivityDescription(ActivityDescription object) {
+			public Object caseActivityDescription(ActivityDescription object) {
 				return createActivityDescriptionAdapter();
 			}
-			@Override
-			public Adapter caseApplicableMetaClassInfo(ApplicableMetaClassInfo object) {
-				return createApplicableMetaClassInfoAdapter();
-			}
-			@Override
-			public Adapter caseArtifact(Artifact object) {
+			public Object caseArtifact(Artifact object) {
 				return createArtifactAdapter();
 			}
-			@Override
-			public Adapter caseArtifactDescription(ArtifactDescription object) {
+			public Object caseArtifactDescription(ArtifactDescription object) {
 				return createArtifactDescriptionAdapter();
 			}
-			@Override
-			public Adapter caseBreakdownElement(BreakdownElement object) {
+			public Object caseBreakdownElement(BreakdownElement object) {
 				return createBreakdownElementAdapter();
 			}
-			@Override
-			public Adapter caseBreakdownElementDescription(BreakdownElementDescription object) {
+			public Object caseBreakdownElementDescription(BreakdownElementDescription object) {
 				return createBreakdownElementDescriptionAdapter();
 			}
-			@Override
-			public Adapter caseCapabilityPattern(CapabilityPattern object) {
+			public Object caseCapabilityPattern(CapabilityPattern object) {
 				return createCapabilityPatternAdapter();
 			}
-			@Override
-			public Adapter caseChecklist(Checklist object) {
+			public Object caseChecklist(Checklist object) {
 				return createChecklistAdapter();
 			}
-			@Override
-			public Adapter caseCompositeRole(CompositeRole object) {
+			public Object caseCompositeRole(CompositeRole object) {
 				return createCompositeRoleAdapter();
 			}
-			@Override
-			public Adapter caseConcept(Concept object) {
+			public Object caseConcept(Concept object) {
 				return createConceptAdapter();
 			}
-			@Override
-			public Adapter caseConstraint(Constraint object) {
+			public Object caseConstraint(Constraint object) {
 				return createConstraintAdapter();
 			}
-			@Override
-			public Adapter caseContentCategory(ContentCategory object) {
+			public Object caseContentCategory(ContentCategory object) {
 				return createContentCategoryAdapter();
 			}
-			@Override
-			public Adapter caseContentCategoryPackage(ContentCategoryPackage object) {
+			public Object caseContentCategoryPackage(ContentCategoryPackage object) {
 				return createContentCategoryPackageAdapter();
 			}
-			@Override
-			public Adapter caseContentDescription(ContentDescription object) {
+			public Object caseContentDescription(ContentDescription object) {
 				return createContentDescriptionAdapter();
 			}
-			@Override
-			public Adapter caseContentElement(ContentElement object) {
+			public Object caseContentElement(ContentElement object) {
 				return createContentElementAdapter();
 			}
-			@Override
-			public Adapter caseContentPackage(ContentPackage object) {
+			public Object caseContentPackage(ContentPackage object) {
 				return createContentPackageAdapter();
 			}
-			@Override
-			public Adapter caseCustomCategory(CustomCategory object) {
+			public Object caseCustomCategory(CustomCategory object) {
 				return createCustomCategoryAdapter();
 			}
-			@Override
-			public Adapter caseDeliverable(Deliverable object) {
+			public Object caseDeliverable(Deliverable object) {
 				return createDeliverableAdapter();
 			}
-			@Override
-			public Adapter caseDeliverableDescription(DeliverableDescription object) {
+			public Object caseDeliverableDescription(DeliverableDescription object) {
 				return createDeliverableDescriptionAdapter();
 			}
-			@Override
-			public Adapter caseDeliveryProcess(DeliveryProcess object) {
+			public Object caseDeliveryProcess(DeliveryProcess object) {
 				return createDeliveryProcessAdapter();
 			}
-			@Override
-			public Adapter caseDeliveryProcessDescription(DeliveryProcessDescription object) {
+			public Object caseDeliveryProcessDescription(DeliveryProcessDescription object) {
 				return createDeliveryProcessDescriptionAdapter();
 			}
-			@Override
-			public Adapter caseDescribableElement(DescribableElement object) {
+			public Object caseDescribableElement(DescribableElement object) {
 				return createDescribableElementAdapter();
 			}
-			@Override
-			public Adapter caseDescriptor(Descriptor object) {
+			public Object caseDescriptor(Descriptor object) {
 				return createDescriptorAdapter();
 			}
-			@Override
-			public Adapter caseDescriptorDescription(DescriptorDescription object) {
+			public Object caseDescriptorDescription(DescriptorDescription object) {
 				return createDescriptorDescriptionAdapter();
 			}
-			@Override
-			public Adapter caseDiscipline(Discipline object) {
+			public Object caseDiscipline(Discipline object) {
 				return createDisciplineAdapter();
 			}
-			@Override
-			public Adapter caseDisciplineGrouping(DisciplineGrouping object) {
+			public Object caseDisciplineGrouping(DisciplineGrouping object) {
 				return createDisciplineGroupingAdapter();
 			}
-			@Override
-			public Adapter caseDocumentRoot(DocumentRoot object) {
+			public Object caseDocumentRoot(DocumentRoot object) {
 				return createDocumentRootAdapter();
 			}
-			@Override
-			public Adapter caseDomain(Domain object) {
+			public Object caseDomain(Domain object) {
 				return createDomainAdapter();
 			}
-			@Override
-			public Adapter caseElement(Element object) {
+			public Object caseElement(Element object) {
 				return createElementAdapter();
 			}
-			@Override
-			public Adapter caseEstimate(Estimate object) {
+			public Object caseEstimate(Estimate object) {
 				return createEstimateAdapter();
 			}
-			@Override
-			public Adapter caseEstimatingMetric(EstimatingMetric object) {
+			public Object caseEstimatingMetric(EstimatingMetric object) {
 				return createEstimatingMetricAdapter();
 			}
-			@Override
-			public Adapter caseEstimationConsiderations(EstimationConsiderations object) {
+			public Object caseEstimationConsiderations(EstimationConsiderations object) {
 				return createEstimationConsiderationsAdapter();
 			}
-			@Override
-			public Adapter caseExample(Example object) {
+			public Object caseExample(Example object) {
 				return createExampleAdapter();
 			}
-			@Override
-			public Adapter caseGuidance(Guidance object) {
+			public Object caseGuidance(Guidance object) {
 				return createGuidanceAdapter();
 			}
-			@Override
-			public Adapter caseGuidanceDescription(GuidanceDescription object) {
+			public Object caseGuidanceDescription(GuidanceDescription object) {
 				return createGuidanceDescriptionAdapter();
 			}
-			@Override
-			public Adapter caseGuideline(Guideline object) {
+			public Object caseGuideline(Guideline object) {
 				return createGuidelineAdapter();
 			}
-			@Override
-			public Adapter caseIteration(Iteration object) {
+			public Object caseIteration(Iteration object) {
 				return createIterationAdapter();
 			}
-			@Override
-			public Adapter caseKind(Kind object) {
-				return createKindAdapter();
-			}
-			@Override
-			public Adapter caseMethodConfiguration(MethodConfiguration object) {
+			public Object caseMethodConfiguration(MethodConfiguration object) {
 				return createMethodConfigurationAdapter();
 			}
-			@Override
-			public Adapter caseMethodElement(MethodElement object) {
+			public Object caseMethodElement(MethodElement object) {
 				return createMethodElementAdapter();
 			}
-			@Override
-			public Adapter caseMethodElementProperty(MethodElementProperty object) {
+			public Object caseMethodElementProperty(MethodElementProperty object) {
 				return createMethodElementPropertyAdapter();
 			}
-			@Override
-			public Adapter caseMethodLibrary(MethodLibrary object) {
+			public Object caseMethodLibrary(MethodLibrary object) {
 				return createMethodLibraryAdapter();
 			}
-			@Override
-			public Adapter caseMethodPackage(MethodPackage object) {
+			public Object caseMethodPackage(MethodPackage object) {
 				return createMethodPackageAdapter();
 			}
-			@Override
-			public Adapter caseMethodPlugin(MethodPlugin object) {
+			public Object caseMethodPlugin(MethodPlugin object) {
 				return createMethodPluginAdapter();
 			}
-			@Override
-			public Adapter caseMethodUnit(MethodUnit object) {
+			public Object caseMethodUnit(MethodUnit object) {
 				return createMethodUnitAdapter();
 			}
-			@Override
-			public Adapter caseMilestone(Milestone object) {
+			public Object caseMilestone(Milestone object) {
 				return createMilestoneAdapter();
 			}
-			@Override
-			public Adapter caseNamedElement(NamedElement object) {
+			public Object caseNamedElement(NamedElement object) {
 				return createNamedElementAdapter();
 			}
-			@Override
-			public Adapter caseOutcome(Outcome object) {
+			public Object caseOutcome(Outcome object) {
 				return createOutcomeAdapter();
 			}
-			@Override
-			public Adapter casePackageableElement(PackageableElement object) {
+			public Object casePackageableElement(PackageableElement object) {
 				return createPackageableElementAdapter();
 			}
-			@Override
-			public Adapter casePhase(Phase object) {
+			public Object casePhase(Phase object) {
 				return createPhaseAdapter();
 			}
-			@Override
-			public Adapter casePlanningData(PlanningData object) {
+			public Object casePlanningData(PlanningData object) {
 				return createPlanningDataAdapter();
 			}
-			@Override
-			public Adapter casePractice(Practice object) {
+			public Object casePractice(Practice object) {
 				return createPracticeAdapter();
 			}
-			@Override
-			public Adapter casePracticeDescription(PracticeDescription object) {
+			public Object casePracticeDescription(PracticeDescription object) {
 				return createPracticeDescriptionAdapter();
 			}
-			@Override
-			public Adapter caseProcess(org.eclipse.epf.xml.uma.Process object) {
+			public Object caseProcess(org.eclipse.epf.xml.uma.Process object) {
 				return createProcessAdapter();
 			}
-			@Override
-			public Adapter caseProcessComponent(ProcessComponent object) {
+			public Object caseProcessComponent(ProcessComponent object) {
 				return createProcessComponentAdapter();
 			}
-			@Override
-			public Adapter caseProcessComponentInterface(ProcessComponentInterface object) {
+			public Object caseProcessComponentInterface(ProcessComponentInterface object) {
 				return createProcessComponentInterfaceAdapter();
 			}
-			@Override
-			public Adapter caseProcessDescription(ProcessDescription object) {
+			public Object caseProcessDescription(ProcessDescription object) {
 				return createProcessDescriptionAdapter();
 			}
-			@Override
-			public Adapter caseProcessElement(ProcessElement object) {
+			public Object caseProcessElement(ProcessElement object) {
 				return createProcessElementAdapter();
 			}
-			@Override
-			public Adapter caseProcessPackage(ProcessPackage object) {
+			public Object caseProcessPackage(ProcessPackage object) {
 				return createProcessPackageAdapter();
 			}
-			@Override
-			public Adapter caseProcessPlanningTemplate(ProcessPlanningTemplate object) {
+			public Object caseProcessPlanningTemplate(ProcessPlanningTemplate object) {
 				return createProcessPlanningTemplateAdapter();
 			}
-			@Override
-			public Adapter caseReport(Report object) {
+			public Object caseReport(Report object) {
 				return createReportAdapter();
 			}
-			@Override
-			public Adapter caseReusableAsset(ReusableAsset object) {
+			public Object caseReusableAsset(ReusableAsset object) {
 				return createReusableAssetAdapter();
 			}
-			@Override
-			public Adapter caseRoadmap(Roadmap object) {
+			public Object caseRoadmap(Roadmap object) {
 				return createRoadmapAdapter();
 			}
-			@Override
-			public Adapter caseRole(Role object) {
+			public Object caseRole(Role object) {
 				return createRoleAdapter();
 			}
-			@Override
-			public Adapter caseRoleDescription(RoleDescription object) {
+			public Object caseRoleDescription(RoleDescription object) {
 				return createRoleDescriptionAdapter();
 			}
-			@Override
-			public Adapter caseRoleDescriptor(RoleDescriptor object) {
+			public Object caseRoleDescriptor(RoleDescriptor object) {
 				return createRoleDescriptorAdapter();
 			}
-			@Override
-			public Adapter caseRoleSet(RoleSet object) {
+			public Object caseRoleSet(RoleSet object) {
 				return createRoleSetAdapter();
 			}
-			@Override
-			public Adapter caseRoleSetGrouping(RoleSetGrouping object) {
+			public Object caseRoleSetGrouping(RoleSetGrouping object) {
 				return createRoleSetGroupingAdapter();
 			}
-			@Override
-			public Adapter caseSection(Section object) {
+			public Object caseSection(Section object) {
 				return createSectionAdapter();
 			}
-			@Override
-			public Adapter caseSupportingMaterial(SupportingMaterial object) {
+			public Object caseSupportingMaterial(SupportingMaterial object) {
 				return createSupportingMaterialAdapter();
 			}
-			@Override
-			public Adapter caseTask(Task object) {
+			public Object caseTask(Task object) {
 				return createTaskAdapter();
 			}
-			@Override
-			public Adapter caseTaskDescription(TaskDescription object) {
+			public Object caseTaskDescription(TaskDescription object) {
 				return createTaskDescriptionAdapter();
 			}
-			@Override
-			public Adapter caseTaskDescriptor(TaskDescriptor object) {
+			public Object caseTaskDescriptor(TaskDescriptor object) {
 				return createTaskDescriptorAdapter();
 			}
-			@Override
-			public Adapter caseTeamProfile(TeamProfile object) {
+			public Object caseTeamProfile(TeamProfile object) {
 				return createTeamProfileAdapter();
 			}
-			@Override
-			public Adapter caseTemplate(Template object) {
+			public Object caseTemplate(Template object) {
 				return createTemplateAdapter();
 			}
-			@Override
-			public Adapter caseTermDefinition(TermDefinition object) {
+			public Object caseTermDefinition(TermDefinition object) {
 				return createTermDefinitionAdapter();
 			}
-			@Override
-			public Adapter caseTool(Tool object) {
+			public Object caseTool(Tool object) {
 				return createToolAdapter();
 			}
-			@Override
-			public Adapter caseToolMentor(ToolMentor object) {
+			public Object caseToolMentor(ToolMentor object) {
 				return createToolMentorAdapter();
 			}
-			@Override
-			public Adapter caseWhitepaper(Whitepaper object) {
+			public Object caseWhitepaper(Whitepaper object) {
 				return createWhitepaperAdapter();
 			}
-			@Override
-			public Adapter caseWorkBreakdownElement(WorkBreakdownElement object) {
+			public Object caseWorkBreakdownElement(WorkBreakdownElement object) {
 				return createWorkBreakdownElementAdapter();
 			}
-			@Override
-			public Adapter caseWorkDefinition(WorkDefinition object) {
+			public Object caseWorkDefinition(WorkDefinition object) {
 				return createWorkDefinitionAdapter();
 			}
-			@Override
-			public Adapter caseWorkOrder(WorkOrder object) {
+			public Object caseWorkOrder(WorkOrder object) {
 				return createWorkOrderAdapter();
 			}
-			@Override
-			public Adapter caseWorkProduct(WorkProduct object) {
+			public Object caseWorkProduct(WorkProduct object) {
 				return createWorkProductAdapter();
 			}
-			@Override
-			public Adapter caseWorkProductDescription(WorkProductDescription object) {
+			public Object caseWorkProductDescription(WorkProductDescription object) {
 				return createWorkProductDescriptionAdapter();
 			}
-			@Override
-			public Adapter caseWorkProductDescriptor(WorkProductDescriptor object) {
+			public Object caseWorkProductDescriptor(WorkProductDescriptor object) {
 				return createWorkProductDescriptorAdapter();
 			}
-			@Override
-			public Adapter caseWorkProductType(WorkProductType object) {
+			public Object caseWorkProductType(WorkProductType object) {
 				return createWorkProductTypeAdapter();
 			}
-			@Override
-			public Adapter defaultCase(EObject object) {
+			public Object defaultCase(EObject object) {
 				return createEObjectAdapter();
 			}
 		};
@@ -520,9 +419,8 @@ public class UmaAdapterFactory extends AdapterFactoryImpl {
 	 * @return the adapter for the <code>target</code>.
 	 * @generated
 	 */
-	@Override
 	public Adapter createAdapter(Notifier target) {
-		return modelSwitch.doSwitch((EObject)target);
+		return (Adapter)modelSwitch.doSwitch((EObject)target);
 	}
 
 
@@ -551,20 +449,6 @@ public class UmaAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createActivityDescriptionAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link org.eclipse.epf.xml.uma.ApplicableMetaClassInfo <em>Applicable Meta Class Info</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see org.eclipse.epf.xml.uma.ApplicableMetaClassInfo
-	 * @generated
-	 */
-	public Adapter createApplicableMetaClassInfoAdapter() {
 		return null;
 	}
 
@@ -1055,20 +939,6 @@ public class UmaAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createIterationAdapter() {
-		return null;
-	}
-
-	/**
-	 * Creates a new adapter for an object of class '{@link org.eclipse.epf.xml.uma.Kind <em>Kind</em>}'.
-	 * <!-- begin-user-doc -->
-	 * This default implementation returns null so that we can easily ignore cases;
-	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
-	 * <!-- end-user-doc -->
-	 * @return the new adapter.
-	 * @see org.eclipse.epf.xml.uma.Kind
-	 * @generated
-	 */
-	public Adapter createKindAdapter() {
 		return null;
 	}
 

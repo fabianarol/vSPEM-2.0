@@ -34,7 +34,6 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 /**
@@ -52,10 +51,6 @@ public class NewPluginMainPage extends BaseWizardPage {
 	 * The wizard page name.
 	 */
 	public static final String PAGE_NAME = NewPluginMainPage.class.getName();
-	
-	protected Composite composite;
-
-	protected Label nameTextLabel;
 
 	protected Text nameText;
 
@@ -63,8 +58,6 @@ public class NewPluginMainPage extends BaseWizardPage {
 
 	protected Text authorsText;
 
-	protected Label referencedPluginsLabel;
-	
 	protected CheckboxTableViewer referencedPluginsViewer;
 
 	protected List<MethodPlugin> plugins;
@@ -91,25 +84,22 @@ public class NewPluginMainPage extends BaseWizardPage {
 	 * @see org.eclipse.jface.dialogs.IDialogPage#createControl(Composite)
 	 */
 	public void createControl(Composite parent) {
-		composite = createGridLayoutComposite(parent, 2);
+		Composite composite = createGridLayoutComposite(parent, 2);
 
-		createNameField(composite);
+		createVerticallyAlignedLabel(composite, AuthoringUIText.NAME_TEXT);
 
-		createBriefDescField(composite);
+		nameText = createEditableText(composite);
 
-		createAuthorsField(composite);
+		createVerticallyAlignedLabel(composite,
+				AuthoringUIText.BRIEF_DESCRIPTION_TEXT);
 
-		createReferencedModelsViewer(composite);
+		briefDescText = createEditableText(composite, 400, 80, 1);
 
-		initControls();
+		createVerticallyAlignedLabel(composite, AuthoringUIText.AUTHORS_TEXT);
 
-		addListeners();
+		authorsText = createEditableText(composite, 400, 40, 1);
 
-		setControl(composite);
-	}
-
-	protected void createReferencedModelsViewer(Composite composite) {
-		referencedPluginsLabel = createVerticallyAlignedLabel(composite,
+		createVerticallyAlignedLabel(composite,
 				AuthoringUIText.REFERENCED_PLUGINS_SECTION_NAME);
 
 		referencedPluginsViewer = CheckboxTableViewer.newCheckList(composite,
@@ -119,46 +109,25 @@ public class NewPluginMainPage extends BaseWizardPage {
 		referencedPluginsGridData.heightHint = 150;
 		referencedPluginsViewer.getTable().setLayoutData(
 				referencedPluginsGridData);
-	}
 
-	protected void createAuthorsField(Composite composite) {
-		createVerticallyAlignedLabel(composite, AuthoringUIText.AUTHORS_TEXT);
+		initControls();
 
-		authorsText = createEditableText(composite, 400, 40, 1);
-	}
+		addListeners();
 
-	protected void createBriefDescField(Composite composite) {
-		createVerticallyAlignedLabel(composite,
-				AuthoringUIText.BRIEF_DESCRIPTION_TEXT);
-
-		briefDescText = createEditableText(composite, 400, 80, 1);
-	}
-
-	protected void createNameField(Composite composite) {
-		nameTextLabel = createVerticallyAlignedLabel(composite, AuthoringUIText.NAME_TEXT);
-
-		nameText = createEditableText(composite);
+		setControl(composite);
 	}
 
 	/**
 	 * Initializes the wizard page controls with data.
 	 */
 	protected void initControls() {
-		initNameField();
-		
-		initReferencedModelsViewer();
-	}
-
-	protected void initNameField() {
 		String name = "new_plug-in"; //$NON-NLS-1$
 		if (LibraryService.getInstance().getCurrentMethodLibrary() != null) {
 			name = TngUtil.getNextAvailableName(LibraryService.getInstance()
 					.getCurrentMethodLibrary().getMethodPlugins(), name);
 		}
 		nameText.setText(name);
-	}
 
-	protected void initReferencedModelsViewer() {
 		ILabelProvider labelProvider = new LabelProvider() {
 			public Image getImage(Object element) {
 				return LibraryUIImages.IMG_METHOD_PLUGIN;
@@ -195,10 +164,6 @@ public class NewPluginMainPage extends BaseWizardPage {
 	 * Adds event listeners to the wizard page controls.
 	 */
 	protected void addListeners() {
-		addNameFieldListeners();
-	}
-
-	protected void addNameFieldListeners() {
 		nameText.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				setPageComplete(isPageComplete());
@@ -222,7 +187,6 @@ public class NewPluginMainPage extends BaseWizardPage {
 	 * @see org.eclipse.jface.wizard.WizardPage#isPageComplete()
 	 */
 	public boolean isPageComplete() {
-		setErrorMessage(null);
 		if (LibraryService.getInstance().getCurrentMethodLibrary() == null) {
 			setErrorMessage(LibraryUIResources.noOpenLibraryWarning_msg);
 			return false;
@@ -240,7 +204,7 @@ public class NewPluginMainPage extends BaseWizardPage {
 	 * @return <code>true</code> if the plug-in name is valid
 	 */
 	protected boolean validatePluginName(String name) {
-		String errmsg = LibraryUtil.checkPluginName(null, name);
+		String errmsg = LibraryUtil.checkPluginName(null, getPluginName());
 		if (errmsg != null) {
 			// Remove newline characters from the message to fit it in the error
 			// message area of the wizard page.

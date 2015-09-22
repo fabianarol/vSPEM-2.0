@@ -94,7 +94,7 @@ public class ResourceDescriptorImpl extends MultiResourceEObject implements Reso
   
  //UMA-->
  		reassignDefaultValues();
- //UMA<--  
+ //UMA<--
 	}
 
 	/**
@@ -102,8 +102,7 @@ public class ResourceDescriptorImpl extends MultiResourceEObject implements Reso
      * <!-- end-user-doc -->
 	 * @generated
 	 */
-    @Override
-				protected EClass eStaticClass() {
+    protected EClass eStaticClass() {
 		return ResourcemanagerPackage.Literals.RESOURCE_DESCRIPTOR;
 	}
 
@@ -156,7 +155,6 @@ public class ResourceDescriptorImpl extends MultiResourceEObject implements Reso
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 			case ResourcemanagerPackage.RESOURCE_DESCRIPTOR__ID:
@@ -172,7 +170,6 @@ public class ResourceDescriptorImpl extends MultiResourceEObject implements Reso
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 			case ResourcemanagerPackage.RESOURCE_DESCRIPTOR__ID:
@@ -190,7 +187,6 @@ public class ResourceDescriptorImpl extends MultiResourceEObject implements Reso
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 			case ResourcemanagerPackage.RESOURCE_DESCRIPTOR__ID:
@@ -208,7 +204,6 @@ public class ResourceDescriptorImpl extends MultiResourceEObject implements Reso
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 //UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);
@@ -230,8 +225,7 @@ public class ResourceDescriptorImpl extends MultiResourceEObject implements Reso
      * <!-- end-user-doc -->
 	 * @generated
 	 */
-    @Override
-				public String toString() {
+    public String toString() {
 		if (eIsProxy()) return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());

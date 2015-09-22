@@ -23,6 +23,7 @@ import org.eclipse.emf.edit.provider.ITableItemLabelProvider;
 import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 import org.eclipse.epf.library.edit.IStatefulItemProvider;
 import org.eclipse.epf.library.edit.util.TngUtil;
+import org.eclipse.epf.uma.vpActivity;
 import org.eclipse.epf.uma.provider.UmaItemProviderAdapterFactory;
 
 
@@ -58,12 +59,29 @@ public class ItemProviderAdapterFactory extends UmaItemProviderAdapterFactory
 		return new ActivityItemProvider(this);
 	}
 
+	
+	public Adapter createvpActivityAdapter() {
+		return createActivityAdapter();
+	}
+	
+	public Adapter createVarActivityAdapter() {
+		return createActivityAdapter();
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.epf.uma.util.BreakdownAdapterFactory#createIterationAdapter()
 	 */
 	public Adapter createIterationAdapter() {
+		return createActivityAdapter();
+	}
+	
+	public Adapter createvpIterationAdapter() {
+		return createActivityAdapter();
+	}
+	
+	public Adapter createVarIterationAdapter() {
 		return createActivityAdapter();
 	}
 
@@ -73,6 +91,14 @@ public class ItemProviderAdapterFactory extends UmaItemProviderAdapterFactory
 	 * @see org.eclipse.epf.uma.util.BreakdownAdapterFactory#createPhaseAdapter()
 	 */
 	public Adapter createPhaseAdapter() {
+		return createActivityAdapter();
+	}
+	
+	public Adapter createvpPhaseAdapter() {
+		return createActivityAdapter();
+	}
+	
+	public Adapter createVarPhaseAdapter() {
 		return createActivityAdapter();
 	}
 
@@ -105,6 +131,16 @@ public class ItemProviderAdapterFactory extends UmaItemProviderAdapterFactory
 		return new RoleDescriptorItemProvider(this, (ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
 				.createRoleDescriptorAdapter());
 	}
+	
+	public Adapter createvpRoleDescriptorAdapter(){
+		return new vpRoleDescriptorItemProvider(this, (ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
+				.createvpRoleDescriptorAdapter());
+	}
+	
+	public Adapter createVarRoleDescriptorAdapter(){
+		return new VarRoleDescriptorItemProvider(this, (ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
+				.createVarRoleDescriptorAdapter());
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -114,6 +150,16 @@ public class ItemProviderAdapterFactory extends UmaItemProviderAdapterFactory
 	public Adapter createTaskDescriptorAdapter() {
 		return new TaskDescriptorItemProvider(this, (ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
 				.createTaskDescriptorAdapter());
+	}
+	
+	public Adapter createvpTaskDescriptorAdapter() {
+		return new vpTaskDescriptorItemProvider(this, (ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
+				.createvpTaskDescriptorAdapter());
+	}
+	
+	public Adapter createVarTaskDescriptorAdapter() {
+		return new VarTaskDescriptorItemProvider(this, (ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
+				.createVarTaskDescriptorAdapter());
 	}
 
 	/*
@@ -125,6 +171,16 @@ public class ItemProviderAdapterFactory extends UmaItemProviderAdapterFactory
 		return new WorkProductDescriptorItemProvider(this,
 				(ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
 						.createWorkProductDescriptorAdapter());
+	}
+	
+	public Adapter createvpWorkProductDescriptorAdapter() {
+		return new vpWorkProductDescriptorItemProvider(this, (ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
+				.createvpWorkProductDescriptorAdapter());
+	}
+	
+	public Adapter createVarWorkProductDescriptorAdapter() {
+		return new VarWorkProductDescriptorItemProvider(this, (ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
+				.createVarWorkProductDescriptorAdapter());
 	}
 
 	/*

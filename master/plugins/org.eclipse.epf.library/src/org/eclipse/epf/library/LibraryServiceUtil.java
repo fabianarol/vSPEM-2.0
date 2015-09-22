@@ -25,11 +25,9 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.epf.common.utils.StrUtil;
-import org.eclipse.epf.library.configuration.ConfigurationHelper;
 import org.eclipse.epf.library.edit.IFilter;
 import org.eclipse.epf.library.edit.configuration.MethodConfigurationElementList;
 import org.eclipse.epf.library.edit.util.ModelStructure;
-import org.eclipse.epf.library.edit.util.ProcessScopeUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.persistence.ILibraryResourceSet;
 import org.eclipse.epf.library.util.LibraryUtil;
@@ -48,7 +46,6 @@ import org.eclipse.epf.uma.ProcessComponent;
 import org.eclipse.epf.uma.ProcessFamily;
 import org.eclipse.epf.uma.ProcessPackage;
 import org.eclipse.epf.uma.UmaFactory;
-import org.eclipse.epf.uma.util.Scope;
 import org.eclipse.epf.uma.util.UmaUtil;
 
 /**
@@ -425,23 +422,11 @@ public class LibraryServiceUtil {
 	public static String[] getContexts(Process process) {
 		List<String> contextNames = new ArrayList<String>();
 		if (process != null) {
-			Scope scope = ProcessScopeUtil.getInstance().loadScope(process);
-
 			List<MethodConfiguration> contexts = process.getValidContext();
 			for (Iterator<MethodConfiguration> it = contexts.iterator(); it.hasNext();) {
 				MethodConfiguration context = it.next();
 				contextNames.add(context.getName());
 			}
-
-			if (scope != null) {
-				MethodPlugin plugin = UmaUtil.getMethodPlugin(process);
-				MethodLibrary lib = UmaUtil.getMethodLibrary(plugin);
-				for (MethodConfiguration config : lib.getPredefinedConfigurations()) {
-					if (ConfigurationHelper.inConfig(process, config)) {
-						contextNames.add(config.getName());
-					}
-				}
-			}			
 		}
 		String[] result = new String[contextNames.size()];
 		contextNames.toArray(result);

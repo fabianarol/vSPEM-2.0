@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: ProcessDescription.java,v 1.3 2007/04/25 22:30:20 klow Exp $
+ */
 package org.eclipse.epf.xml.uma;
 
 
@@ -43,7 +39,7 @@ public interface ProcessDescription extends ActivityDescription {
 	 * @return the value of the '<em>Scope</em>' attribute.
 	 * @see #setScope(String)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getProcessDescription_Scope()
-	 * @model dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="kind='element' name='Scope'"
 	 * @generated
 	 */
@@ -69,7 +65,7 @@ public interface ProcessDescription extends ActivityDescription {
 	 * @return the value of the '<em>Usage Notes</em>' attribute.
 	 * @see #setUsageNotes(String)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getProcessDescription_UsageNotes()
-	 * @model dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="kind='element' name='UsageNotes'"
 	 * @generated
 	 */

@@ -17,11 +17,9 @@ import java.util.List;
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.epf.library.edit.LibraryEditPlugin;
 import org.eclipse.epf.library.edit.util.LibraryEditConstants;
-import org.eclipse.epf.library.edit.util.LibraryEditUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.uma.ContentPackage;
 import org.eclipse.epf.uma.CustomCategory;
-import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.UmaFactory;
 import org.eclipse.epf.uma.UmaPackage;
@@ -80,44 +78,27 @@ public class CustomCategoriesItemProvider extends
 	protected boolean acceptAsChild(Object obj) {
 		if (!super.acceptAsChild(obj))
 			return false;
-		return accept(obj, null);
+		return accept(obj);
 
 	}
-	
-	public static boolean accept(Object obj, MethodConfiguration config) {
+
+	public static boolean accept(Object obj) {
 		if (obj instanceof CustomCategory) {
-			List myCategories = null;
-			if (config == null) {
-				myCategories = AssociationHelper
-						.getCustomCategories((CustomCategory) obj);
-			} else {
-				myCategories = LibraryEditUtil
-						.getInstance()
-						.calc0nFeatureValue(
-								(CustomCategory) obj,
-								AssociationHelper.DescribableElement_CustomCategories,
-								config);
-			}
+			List myCategories = AssociationHelper
+					.getCustomCategories((CustomCategory) obj);
 			if (myCategories.isEmpty()) {
 				return true;
 			}
 
-//			if (myCategories.size() == 1) {
-//				// root custom category is unde the hidden package and will not
-//				// be processed.
-//				// need to show sub categories under it
-//				CustomCategory c = (CustomCategory) myCategories.get(0);
-//				if (TngUtil.isRootCustomCategory(c)) {
-//					return true;
-//				}
-//			}
-			
-			for (CustomCategory c : (List<CustomCategory>) myCategories) {
-				if (! TngUtil.isRootCustomCategory(c)) {
-					return false;
+			if (myCategories.size() == 1) {
+				// root custom category is unde the hidden package and will not
+				// be processed.
+				// need to show sub categories under it
+				CustomCategory c = (CustomCategory) myCategories.get(0);
+				if (TngUtil.isRootCustomCategory(c)) {
+					return true;
 				}
 			}
-			return true;
 		}
 
 		return false;

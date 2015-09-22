@@ -32,7 +32,6 @@ public abstract class AbstractSiteGenerator implements ISiteGenerator {
 
 	private static final String WEB_INF_PATH = "docroot/WEB-INF"; //$NON-NLS-1$
 	private static final String WEB_INF_DIR = "WEB-INF"; //$NON-NLS-1$
-	public static final String customizedName = "customized"; //$NON-NLS-1$
 	
 	protected String pubDir;
 	protected PublishHTMLOptions options;

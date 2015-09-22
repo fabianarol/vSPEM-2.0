@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: MethodPackageImpl.java,v 1.4 2007/06/05 21:14:59 klow Exp $
+ */
 package org.eclipse.epf.xml.uma.impl;
 
 import java.util.Collection;
@@ -94,7 +90,6 @@ public class MethodPackageImpl extends MethodElementImpl implements MethodPackag
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.METHOD_PACKAGE;
 	}
@@ -116,7 +111,7 @@ public class MethodPackageImpl extends MethodElementImpl implements MethodPackag
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<String> getReusedPackage() {
+	public EList getReusedPackage() {
 		return getGroup1().list(UmaPackage.Literals.METHOD_PACKAGE__REUSED_PACKAGE);
 	}
 
@@ -125,7 +120,7 @@ public class MethodPackageImpl extends MethodElementImpl implements MethodPackag
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<MethodPackage> getMethodPackage() {
+	public EList getMethodPackage() {
 		return getGroup1().list(UmaPackage.Literals.METHOD_PACKAGE__METHOD_PACKAGE);
 	}
 
@@ -180,13 +175,12 @@ public class MethodPackageImpl extends MethodElementImpl implements MethodPackag
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 			case UmaPackage.METHOD_PACKAGE__GROUP1:
-				return ((InternalEList<?>)getGroup1()).basicRemove(otherEnd, msgs);
+				return ((InternalEList)getGroup1()).basicRemove(otherEnd, msgs);
 			case UmaPackage.METHOD_PACKAGE__METHOD_PACKAGE:
-				return ((InternalEList<?>)getMethodPackage()).basicRemove(otherEnd, msgs);
+				return ((InternalEList)getMethodPackage()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -196,7 +190,6 @@ public class MethodPackageImpl extends MethodElementImpl implements MethodPackag
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 			case UmaPackage.METHOD_PACKAGE__GROUP1:
@@ -217,8 +210,6 @@ public class MethodPackageImpl extends MethodElementImpl implements MethodPackag
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-		@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 			case UmaPackage.METHOD_PACKAGE__GROUP1:
@@ -226,11 +217,11 @@ public class MethodPackageImpl extends MethodElementImpl implements MethodPackag
 				return;
 			case UmaPackage.METHOD_PACKAGE__REUSED_PACKAGE:
 				getReusedPackage().clear();
-				getReusedPackage().addAll((Collection<? extends String>)newValue);
+				getReusedPackage().addAll((Collection)newValue);
 				return;
 			case UmaPackage.METHOD_PACKAGE__METHOD_PACKAGE:
 				getMethodPackage().clear();
-				getMethodPackage().addAll((Collection<? extends MethodPackage>)newValue);
+				getMethodPackage().addAll((Collection)newValue);
 				return;
 			case UmaPackage.METHOD_PACKAGE__GLOBAL:
 				setGlobal(((Boolean)newValue).booleanValue());
@@ -244,7 +235,6 @@ public class MethodPackageImpl extends MethodElementImpl implements MethodPackag
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 			case UmaPackage.METHOD_PACKAGE__GROUP1:
@@ -268,7 +258,6 @@ public class MethodPackageImpl extends MethodElementImpl implements MethodPackag
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 			case UmaPackage.METHOD_PACKAGE__GROUP1:
@@ -288,7 +277,6 @@ public class MethodPackageImpl extends MethodElementImpl implements MethodPackag
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 

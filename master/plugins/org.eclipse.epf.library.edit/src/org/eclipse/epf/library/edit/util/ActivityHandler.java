@@ -14,11 +14,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -28,7 +26,6 @@ import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.command.CompoundCommand;
 import org.eclipse.emf.common.command.UnexecutableCommand;
 import org.eclipse.emf.common.notify.AdapterFactory;
-import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.edit.command.CommandParameter;
 import org.eclipse.emf.edit.command.CopyCommand;
 import org.eclipse.emf.edit.command.CopyCommand.Helper;
@@ -36,29 +33,21 @@ import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.emf.edit.provider.AdapterFactoryTreeIterator;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
-import org.eclipse.epf.library.edit.IConfigurator;
-import org.eclipse.epf.library.edit.LibraryEditPlugin;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
 import org.eclipse.epf.library.edit.process.IBSItemProvider;
 import org.eclipse.epf.library.edit.process.command.ActivityDeepCopyCommand;
 import org.eclipse.epf.library.edit.process.command.CopyHelper;
 import org.eclipse.epf.uma.Activity;
-import org.eclipse.epf.uma.BreakdownElement;
-import org.eclipse.epf.uma.Constraint;
-import org.eclipse.epf.uma.Descriptor;
 import org.eclipse.epf.uma.MethodConfiguration;
-import org.eclipse.epf.uma.MethodElement;
-import org.eclipse.epf.uma.Milestone;
 import org.eclipse.epf.uma.Process;
 import org.eclipse.epf.uma.ProcessComponent;
 import org.eclipse.epf.uma.ProcessPackage;
-import org.eclipse.epf.uma.TaskDescriptor;
 import org.eclipse.epf.uma.UmaFactory;
 import org.eclipse.epf.uma.VariabilityType;
 import org.eclipse.epf.uma.WorkBreakdownElement;
 import org.eclipse.epf.uma.edit.domain.TraceableAdapterFactoryEditingDomain;
-import org.eclipse.epf.uma.util.Scope;
 import org.eclipse.epf.uma.util.UmaUtil;
+
 
 /**
  * Used to extend/copy activities
@@ -68,7 +57,7 @@ import org.eclipse.epf.uma.util.UmaUtil;
  */
 public class ActivityHandler {
 
-	private ArrayList<ProcessPackage> procPackages;
+	private ArrayList procPackages;
 	
 	/**
 	 * List of activities or activity wrappers to deep copy.
@@ -78,7 +67,7 @@ public class ActivityHandler {
 	private MethodConfiguration deepCopyConfig;	
 	private List deepCopies;
 	private Map deepCopyToOriginalMap;
-	private ArrayList<Activity> activities;
+	private ArrayList activities;
 
 	private Map copyToOriginal;
 	
@@ -91,10 +80,6 @@ public class ActivityHandler {
 	private Process targetProcess;
 	
 	private IProgressMonitor monitor;
-	
-	private IConfigurator activityDeepCopyConfigurator;
-	
-	private boolean copyExternalVariations = true;
 
 	/**
 	 * Constructs a new ActivityHandler
@@ -107,30 +92,6 @@ public class ActivityHandler {
 		copyToOriginal = new HashMap();
 		procPackages = new ArrayList();	
 		copyHelper = new Helper();
-	}
-	
-	public Map<Object, Object> cloneOrignaltoCopyMap() {
-		Map oMap = null;
-		if (deepCopyToOriginalMap != null && !deepCopyToOriginalMap.isEmpty()) {
-			oMap = getDeepCopyHelper().getObjectToCopyMap();
-		} else if (editingDomain instanceof TraceableAdapterFactoryEditingDomain) {
-			TraceableAdapterFactoryEditingDomain td = (TraceableAdapterFactoryEditingDomain) editingDomain;
-			oMap = copy(td.getOriginalToClipboardMap());
-		}
-		return oMap;
-	}
-	
-	public static Map copy(Map map) {
-		if (map == null) {
-			return null;
-		}
-		Map ret = new HashMap();		
-		for (Map.Entry entry: (Set<Map.Entry>) map.entrySet()) {
-			Object key = entry.getKey();
-			Object val = entry.getValue();
-			ret.put(key, val);
-		}
-		return ret;
 	}
 	
 	public void dispose() {
@@ -146,12 +107,8 @@ public class ActivityHandler {
 		deepCopyToOriginalMap.clear();
 	}
 	
-	public void setCopyExternalVariations(boolean copyExternalVariations) {
-		this.copyExternalVariations = copyExternalVariations;
-	}
-	
 	public void copy(Activity activity) {
-		procPackages.add((ProcessPackage) activity.eContainer());
+		procPackages.add(activity.eContainer());
 	}
 	
 	public MethodConfiguration getDeepCopyConfig() {
@@ -187,18 +144,17 @@ public class ActivityHandler {
 	
 	public void extend(Activity act) {
 		Activity extendedAct = ProcessUtil.generalize(act,
-				VariabilityType.EXTENDS);
+				VariabilityType.EXTENDS_LITERAL);
 		activities.add(extendedAct);
 	}
 	
-	public List<Activity> getActivities() {
+	public List getActivities() {
 		if (!procPackages.isEmpty() || !activitiesToDeepCopy.isEmpty()) {
 			editingDomain = new TraceableAdapterFactoryEditingDomain(
 					TngAdapterFactory.INSTANCE.getWBS_ComposedAdapterFactory(),
 					new BasicCommandStack());
 			if(!procPackages.isEmpty()) {
 				activities.addAll(copy(procPackages));
-				fixGuidReferences(copyHelper, false, false, null);
 			}
 			if(!activitiesToDeepCopy.isEmpty()) {
 					if (monitor == null) {
@@ -206,8 +162,7 @@ public class ActivityHandler {
 				}
 				for (Object act : activitiesToDeepCopy) {
 					ActivityDeepCopyCommand cmd = new ActivityDeepCopyCommand(
-							act, getDeepCopyHelper(), deepCopyConfig, targetProcess, monitor,activityDeepCopyConfigurator);
-					cmd.setCopyExternalVariations(copyExternalVariations);
+							act, getDeepCopyHelper(), deepCopyConfig, targetProcess, monitor);
 					try {
 						long time = 0;
 						if (TngUtil.DEBUG) {
@@ -216,9 +171,9 @@ public class ActivityHandler {
 						cmd.execute();
 						if (TngUtil.DEBUG) {
 							System.out
-									.println("ActivityDeepCopyCommand executed: " //$NON-NLS-1$
+									.println("ActivityDeepCopyCommand executed: "
 											+ (System.currentTimeMillis() - time)
-											+ " ms"); //$NON-NLS-1$
+											+ " ms");
 							time = System.currentTimeMillis();
 						}
 						Collection<?> result = cmd.getResult();
@@ -229,27 +184,25 @@ public class ActivityHandler {
 									.fixBreakdonwElementOrderRecursively(deepCopy);
 							if (TngUtil.DEBUG) {
 								System.out
-										.println("ProcessUtil.fixBreakdonwElementOrderRecursively(): " //$NON-NLS-1$
+										.println("ProcessUtil.fixBreakdonwElementOrderRecursively(): "
 												+ (System.currentTimeMillis() - time)
-												+ " ms"); //$NON-NLS-1$
+												+ " ms");
 								time = System.currentTimeMillis();
 							}
 							cmd.copySuppressionStates();
 							if (TngUtil.DEBUG) {
 								System.out
-										.println("ActivityDeepCopyCommand.copySuppressionStates(): " //$NON-NLS-1$
+										.println("ActivityDeepCopyCommand.copySuppressionStates(): "
 												+ (System.currentTimeMillis() - time)
-												+ " ms"); //$NON-NLS-1$
+												+ " ms");
 								time = System.currentTimeMillis();
 							}
-							cmd.fixReferences();
 							deepCopies.add(deepCopy);
 							deepCopyToOriginalMap.put(deepCopy, act);
 						}
 					} finally {
 						cmd.dispose();
 					}
-					fixGuidReferences(deepCopyHelper);
 				}
 
 				activities.addAll(deepCopies);
@@ -257,108 +210,6 @@ public class ActivityHandler {
 		}
 
 		return activities;
-	}
-	
-	public static void fixGuidReferences(Map<? extends Object, ? extends Object> objectToCopyMap) {
-		fixGuidReferences(objectToCopyMap, true, false, null);
-	}
-	
-	public static void fixGuidReferences(Map<? extends Object, ? extends Object> objectToCopyMap,
-			boolean deepCopy, boolean reverseMap, Set<Resource> resouresToSave) {
-		try {
-			fixGuidReferences_(objectToCopyMap, deepCopy, reverseMap, resouresToSave);
-		} catch (Throwable e) {
-			LibraryEditPlugin.getDefault().getLogger().logError(e);
-		}
-	}
-	
-	private static void fixGuidReferences_(Map<? extends Object, ? extends Object> objectToCopyMap,
-			boolean deepCopy, boolean reverseMap, Set<Resource> resouresToSave) {
-		Set<MethodElement> cpySet = new HashSet<MethodElement>();
-		Map<String, String> srcGuidToCpyGuidMap = new HashMap<String, String>();
-
-		for (Map.Entry entry : objectToCopyMap.entrySet()) {
-			Object cpy = reverseMap ?  entry.getKey() : entry.getValue();
-			if (cpy instanceof Process) {
-				Process cpyProcess = (Process) cpy;
-				Scope scope = ProcessScopeUtil.getInstance().getScope(cpyProcess);
-				if (scope != null) {
-					cpyProcess.setDefaultContext(null);
-					cpyProcess.getValidContext().clear();
-				}
-			}
-		}
-		
-		for (Map.Entry entry : objectToCopyMap.entrySet()) {
-//			Object src = entry.getKey();
-//			Object cpy = entry.getValue();
-			Object src = reverseMap ? entry.getValue() : entry.getKey();
-			Object cpy = reverseMap ?  entry.getKey() : entry.getValue();
-//			if (src instanceof Process || src instanceof ProcessComponent) {
-//				System.out.println("LD> src: " + src);
-//				System.out.println("LD> cpy: " + cpy);
-//				System.out.println("");
-//			}
-			if (src == cpy) {
-				continue;
-			}
-			if (src instanceof Descriptor && cpy instanceof Descriptor) {
-				Descriptor srcDes = (Descriptor) src;
-				Descriptor cpyDes = (Descriptor) cpy;
-				srcGuidToCpyGuidMap.put(srcDes.getGuid(), cpyDes.getGuid());
-				if (cpy instanceof TaskDescriptor) {
-					cpySet.add(cpyDes);
-				}
-			} else if (src instanceof Milestone && cpy instanceof Milestone) {
-				cpySet.add((Milestone) cpy);
-			}
-		}
-		
-		boolean isSynFree = ProcessUtil.isSynFree();
-		DescriptorPropUtil propUtil = DescriptorPropUtil.getDesciptorPropUtil();
-		for (MethodElement cpy : cpySet) {
-			if (cpy instanceof TaskDescriptor && isSynFree) {
-				TaskDescriptor cpyDes = (TaskDescriptor) cpy;
-				propUtil.replaceLocalUseGuidStrings(cpyDes, srcGuidToCpyGuidMap);
-				String oldGreenParent = propUtil.getGreenParent(cpyDes);
-				if (oldGreenParent != null) {
-					String newGreenParent = srcGuidToCpyGuidMap.get(oldGreenParent);
-					if (newGreenParent != null && ! newGreenParent.equals(oldGreenParent)) {
-						if (deepCopy) {
-							propUtil.setGreenParent(cpyDes, null);
-							Activity parentAct = cpyDes.getSuperActivities();
-							if (parentAct != null) {
-								for (BreakdownElement be : parentAct.getBreakdownElements()) {
-									if (be.getGuid().equals(newGreenParent)) {
-										parentAct.getBreakdownElements().remove(be);
-										break;
-									}									
-								}
-							}
-						} else {
-							propUtil.setGreenParent(cpyDes, newGreenParent);
-						}
-					}
-				}
-			}
-			if (cpy instanceof TaskDescriptor || cpy instanceof Milestone) {
-				WorkBreakdownElement wbe = (WorkBreakdownElement) cpy;
-				for (Constraint c : ConstraintManager.getWpStates(wbe)) {
-					String oldWpdGuid = c.getBody();
-					String newWpdGuid = srcGuidToCpyGuidMap.get(oldWpdGuid);
-					if (newWpdGuid != null && ! newWpdGuid.equals(oldWpdGuid)) {
-						c.setBody(newWpdGuid);
-					}
-				}
-				
-				if (resouresToSave != null) {
-					ProcessComponent proc = UmaUtil.getProcessComponent(wbe.getSuperActivities());
-					if (proc != null && proc.eResource() != null) {
-						resouresToSave.add(proc.eResource());
-					}
-				}
-			}
-		}		
 	}
 	
 	private void updatePredecessors(List workBreakdownElements) {
@@ -417,7 +268,7 @@ public class ActivityHandler {
 		}
 	}
 	
-	private Collection<?> copyProcessPackages(Collection<ProcessPackage> procPackages) {
+	private Collection copyProcessPackages(Collection procPackages) {
 		Command command = createCopyCommand(editingDomain, procPackages);
 		if(command != null) {
 			try {
@@ -458,10 +309,10 @@ public class ActivityHandler {
 	 * @param procPackages
 	 * @return activities of the copies
 	 */
-	private List<Activity> copy(List<ProcessPackage> procPackages) {
-		Collection<?> copyPackages = copyProcessPackages(procPackages);
-		ArrayList<Activity> activities = new ArrayList<Activity>();
-		for (Iterator<?> iter = copyPackages.iterator(); iter.hasNext();) {
+	private List copy(List procPackages) {
+		Collection copyPackages = copyProcessPackages(procPackages);
+		ArrayList activities = new ArrayList();
+		for (Iterator iter = copyPackages.iterator(); iter.hasNext();) {
 			ProcessPackage copy = (ProcessPackage) iter.next();
 			if (copy instanceof ProcessComponent) {
 				Activity actCopy = ((ProcessComponent) copy)
@@ -500,11 +351,4 @@ public class ActivityHandler {
 		}
 		return deepCopyHelper;
 	}
-
-	public void setActivityDeepCopyConfigurator(
-			IConfigurator activityDeepCopyConfigurator) {
-		this.activityDeepCopyConfigurator = activityDeepCopyConfigurator;
-	}
-	
-	
 }

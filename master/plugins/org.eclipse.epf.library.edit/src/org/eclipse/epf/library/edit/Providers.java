@@ -20,7 +20,8 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.epf.common.preferences.IPreferenceStoreWrapper;
+import org.eclipse.epf.common.plugin.AbstractPlugin;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.osgi.framework.Bundle;
 
 
@@ -34,9 +35,9 @@ public final class Providers {
 
 	private static IConfigurationApplicator configurationApplicator;
 
-	private static IPreferenceStoreWrapper preferenceStore;
+	private static IPreferenceStore preferenceStore;
 
-	private static IPreferenceStoreWrapper authoringPluginPreferenceStore;
+	private static AbstractPlugin authoringPlugin;
 
 	private static Map commandTypeToListenersMap = new HashMap();
 
@@ -62,20 +63,20 @@ public final class Providers {
 		Providers.configurationApplicator = configurationApplicator;
 	}
 
-	public static IPreferenceStoreWrapper getPreferenceStore() {
+	public static IPreferenceStore getPreferenceStore() {
 		return preferenceStore;
 	}
 
-	public static void setPreferenceStore(IPreferenceStoreWrapper preferenceStore) {
+	public static void setPreferenceStore(IPreferenceStore preferenceStore) {
 		Providers.preferenceStore = preferenceStore;
 	}
 
-	public static IPreferenceStoreWrapper getAuthoringPluginPreferenceStore() {
-		return authoringPluginPreferenceStore;
+	public static AbstractPlugin getAuthoringPlugin() {
+		return authoringPlugin;
 	}
 
-	public static void setAuthoringPluginPreferenceStore(IPreferenceStoreWrapper store) {
-		authoringPluginPreferenceStore = store;
+	public static void setAuthoringPlugin(AbstractPlugin plugin) {
+		authoringPlugin = plugin;
 	}
 
 	public static void registerCommandListener(ICommandListener listener) {

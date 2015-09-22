@@ -14,13 +14,10 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.emf.common.notify.AdapterFactory;
-import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
 import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 import org.eclipse.epf.authoring.ui.AuthoringUIPlugin;
@@ -31,25 +28,20 @@ import org.eclipse.epf.library.LibraryService;
 import org.eclipse.epf.library.configuration.ProcessAuthoringConfigurator;
 import org.eclipse.epf.library.edit.process.BreakdownElementWrapperItemProvider;
 import org.eclipse.epf.library.edit.process.IBSItemProvider;
-import org.eclipse.epf.library.edit.util.ProcessScopeUtil;
-import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.events.ILibraryChangeListener;
 import org.eclipse.epf.library.util.LibraryUtil;
 import org.eclipse.epf.uma.BreakdownElement;
-import org.eclipse.epf.uma.Descriptor;
 import org.eclipse.epf.uma.MethodConfiguration;
-import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.RoleDescriptor;
-import org.eclipse.epf.uma.util.Scope;
 import org.eclipse.jface.util.Assert;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.internal.views.properties.tabbed.view.Tab;
 import org.eclipse.ui.views.properties.tabbed.AbstractPropertySection;
 import org.eclipse.ui.views.properties.tabbed.ISection;
-import org.eclipse.ui.views.properties.tabbed.TabContents;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 /**
@@ -61,14 +53,15 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 public class AbstractSection extends AbstractPropertySection implements
 		PropertyChangeListener {
 
-	protected BreakdownElement element;
+	private BreakdownElement element;
 
 	protected boolean editable = false;
 
 	protected TabbedPropertySheetPage page;
 
 	protected ProcessAuthoringConfigurator configurator = new ProcessAuthoringConfigurator(
-			LibraryService.getInstance().getCurrentMethodConfiguration());
+			LibraryService.getInstance().getCurrentMethodConfiguration(),
+			null);
 
 	protected Logger logger;
 
@@ -113,7 +106,7 @@ public class AbstractSection extends AbstractPropertySection implements
 	 */
 	private void sectionRefresh() {
 		if (page != null) {
-			TabContents tab = page.getCurrentTab();
+			Tab tab = page.getCurrentTab();
 			if (tab != null) {
 				ISection section = tab.getSectionAtIndex(0);
 
@@ -284,29 +277,11 @@ public class AbstractSection extends AbstractPropertySection implements
 	 */
 	public List getFilteredList(List list) {
 		List newList = new ArrayList();
-		
-		if (configurator != null) {
-			boolean toSetConfig = true; 
-		
-			if (getEditor() != null || getEditor().getSelectedProcess() != null) {
-				Scope scope = ProcessScopeUtil.getInstance().getScope(getEditor().getSelectedProcess());
-				if (scope != null) {
-					configurator.setMethodConfiguration(scope);
-					toSetConfig = false;
-				}
-			}
-				
-			if (toSetConfig) {
-				configurator.setMethodConfiguration(LibraryService
-				.getInstance().getCurrentMethodConfiguration());
-			}
-		}
-		
 		for (Iterator itor = list.iterator(); itor.hasNext();) {
 			if (configurator != null) {
 				Object obj = (Object) itor.next();
-//				configurator.setMethodConfiguration(LibraryService
-//						.getInstance().getCurrentMethodConfiguration());
+				configurator.setMethodConfiguration(LibraryService
+						.getInstance().getCurrentMethodConfiguration());
 				if (configurator.accept(obj)) {
 					newList.add(obj);
 				}
@@ -343,32 +318,7 @@ public class AbstractSection extends AbstractPropertySection implements
 	 * @return
 	 * 			current method configuration
 	 */
-	public MethodConfiguration getConfiguration() {
-		if (getEditor() != null) {
-			Scope scope = ProcessScopeUtil.getInstance().getScope(
-					getEditor().getSelectedProcess());
-			if (scope != null) {
-				int scopeType = ProcessScopeUtil.getInstance().getElemementSelectionScopeType();
-				if (scopeType == ProcessScopeUtil.ScopeType_Config) {
-					MethodConfiguration config = LibraryService.getInstance()
-					.getCurrentMethodConfiguration();
-//					if (config == null) {
-//						return scope;
-//					}
-					return config;
-				} 
-				if (scopeType == ProcessScopeUtil.ScopeType_Process) {
-					return scope;
-				}
-				if (scopeType == ProcessScopeUtil.ScopeType_Library) {
-					return ProcessScopeUtil.getInstance().getLibraryScope();
-				}
-				if (scopeType == ProcessScopeUtil.ScopeType_Plugins) {
-					return ProcessScopeUtil.getInstance().getPluginScope();
-				}
-			}
-		}
-
+	protected MethodConfiguration getConfiguration() {
 		MethodConfiguration config = LibraryService.getInstance()
 				.getCurrentMethodConfiguration();
 		if (config == null) {
@@ -401,37 +351,4 @@ public class AbstractSection extends AbstractPropertySection implements
 	public String getNamePrefix() {
 		return "ProcessElement: "; //$NON-NLS-1$
 	}
-	
-	protected AbstractSection getSection() {
-		return this;
-	}
-	
-	protected boolean isSyncFree() {
-		return false;
-	}
-	
-	protected void removeOutdatedReferences(MethodElement element, EReference eRef, Set validValueSet) {
-		if (! (element instanceof Descriptor) || ProcessUtil.getAssociatedElement((Descriptor) element) == null) {
-			return;
-		}
-		Object value = element.eGet(eRef);
-		if (! (value instanceof List)) {
-			return;
-		}
-		List list = (List) value;
-		if (list.isEmpty()) {
-			return;
-		}
-		Set toRemoveSet = new HashSet();
-		for (Object obj : list) {
-			if (! validValueSet.contains(obj)) {
-				toRemoveSet.add(obj);
-			}
-		}
-		if (toRemoveSet.isEmpty()) {
-			return;
-		}
-		list.removeAll(toRemoveSet);
-	}
-	
 }

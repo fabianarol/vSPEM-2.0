@@ -1,13 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
- *******************************************************************************/
 //------------------------------------------------------------------------------
 // Copyright (c) 2005, 2006 IBM Corporation and others.
 // All rights reserved. This program and the accompanying materials
@@ -82,11 +72,11 @@ public class FindReplaceAction extends RichTextAction {
 	public static final int CASE_SENSITIVE_MATCH = 4;
 
 	// Encoded single quote.
-	protected static final String ENCODED_SINGLE_QUOTE = "%sq%"; //$NON-NLS-1$
+	private static final String ENCODED_SINGLE_QUOTE = "%sq%"; //$NON-NLS-1$
 
-	protected IRichText richText;
+	private IRichText richText;
 
-	protected StyledText styledText;
+	private StyledText styledText;
 
 	protected boolean foundMatch = false;
 	
@@ -215,7 +205,7 @@ public class FindReplaceAction extends RichTextAction {
 	 * @param text
 	 *            text to be escaped
 	 */
-	protected static String escape(String text) {
+	private static String escape(String text) {
 		if (text == null || text.length() == 0)
 			return ""; //$NON-NLS-1$
 		StringBuffer sb = new StringBuffer();
@@ -240,7 +230,7 @@ public class FindReplaceAction extends RichTextAction {
 		return sb.toString();
 	}
 
-	protected int findText(String findText, int matchDir, int matchOptions) {
+	private int findText(String findText, int matchDir, int matchOptions) {
 		int status = 0;
 		if (styledText != null) {
 			status = styledTextFindTextAndSelect(findText, matchDir,
@@ -253,7 +243,7 @@ public class FindReplaceAction extends RichTextAction {
 		return status;
 	}
 
-	protected int replaceText(String replaceText, int matchDir, int matchOptions) {
+	private int replaceText(String replaceText, int matchDir, int matchOptions) {
 		int status = 0;
 		if (styledText != null) {
 			status = styledTextReplaceTextAndSelect(replaceText);
@@ -265,7 +255,7 @@ public class FindReplaceAction extends RichTextAction {
 		return status;
 	}
 
-	protected int replaceFindText(String findText, String replaceText,
+	private int replaceFindText(String findText, String replaceText,
 			int matchDir, int matchOptions) {
 		int status = 0;
 		if (styledText != null) {
@@ -282,7 +272,7 @@ public class FindReplaceAction extends RichTextAction {
 		return status;
 	}
 
-	protected void replaceAll(String findText, String replaceText,
+	private void replaceAll(String findText, String replaceText,
 			int matchOptions) {
 		if (styledText != null) {
 			styledTextReplaceAll(findText, replaceText, matchOptions);
@@ -293,7 +283,7 @@ public class FindReplaceAction extends RichTextAction {
 		}
 	}
 
-	protected int styledTextFindTextAndSelect(String findText, int matchDir,
+	private int styledTextFindTextAndSelect(String findText, int matchDir,
 			int matchOptions) {
 		Point selectionOffset = styledText.getSelectionRange();
 		int firstSelectedOffset = selectionOffset.x;
@@ -336,7 +326,7 @@ public class FindReplaceAction extends RichTextAction {
 
 	}
 
-	protected int styledTextReplaceTextAndSelect(String replaceText) {
+	private int styledTextReplaceTextAndSelect(String replaceText) {
 		Point selectionOffset = styledText.getSelectionRange();
 		styledText.replaceTextRange(selectionOffset.x, selectionOffset.y,
 				replaceText);
@@ -345,7 +335,7 @@ public class FindReplaceAction extends RichTextAction {
 		return 1;
 	}
 
-	protected void styledTextReplaceAll(String findText, String replaceText,
+	private void styledTextReplaceAll(String findText, String replaceText,
 			int matchOptions) {
 		styledText.setSelectionRange(0, 0);
 		while (styledTextFindTextAndSelect(findText, FORWARD_MATCH,
@@ -354,13 +344,13 @@ public class FindReplaceAction extends RichTextAction {
 		}
 	}
 
-	protected boolean isWordChar(char c) {
+	private boolean isWordChar(char c) {
 		if (Character.isLetterOrDigit(c))
 			return true;
 		return false;
 	}
 
-	protected boolean isPartOfWord(String text, int index, int length) {
+	private boolean isPartOfWord(String text, int index, int length) {
 		if (index > 0)
 			if (isWordChar(text.charAt(index - 1)))
 				return true;

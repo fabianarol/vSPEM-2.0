@@ -14,6 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -30,8 +31,7 @@ import org.eclipse.emf.edit.ui.action.CommandActionHandler;
 import org.eclipse.epf.authoring.ui.AuthoringUIPlugin;
 import org.eclipse.epf.authoring.ui.AuthoringUIResources;
 import org.eclipse.epf.authoring.ui.editors.EditorChooser;
-import org.eclipse.epf.common.ui.util.MsgBox;
-import org.eclipse.epf.common.utils.FileUtil;
+import org.eclipse.epf.common.serviceability.MsgBox;
 import org.eclipse.epf.common.utils.StrUtil;
 import org.eclipse.epf.diagram.core.services.DiagramManager;
 import org.eclipse.epf.library.LibraryService;
@@ -43,15 +43,18 @@ import org.eclipse.epf.library.edit.validation.IValidatorFactory;
 import org.eclipse.epf.library.ui.actions.LibraryLockingOperationRunner;
 import org.eclipse.epf.services.ILibraryPersister;
 import org.eclipse.epf.services.ILibraryPersister.FailSafeMethodLibraryPersister;
-import org.eclipse.epf.uma.ContentDescription;
 import org.eclipse.epf.uma.ContentElement;
-import org.eclipse.epf.uma.DescribableElement;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.MethodPlugin;
 import org.eclipse.epf.uma.NamedElement;
 import org.eclipse.epf.uma.Process;
 import org.eclipse.epf.uma.ProcessComponent;
+import org.eclipse.epf.uma.ProcessLineComponent;
+import org.eclipse.epf.uma.ProcessLinesPackage;
+import org.eclipse.epf.uma.TailoredProcessComponent;
+import org.eclipse.epf.uma.TailoredProcessesPackage;
+import org.eclipse.epf.uma.VarElement;
 import org.eclipse.epf.uma.util.ContentDescriptionFactory;
 import org.eclipse.epf.uma.util.MessageException;
 import org.eclipse.jface.dialogs.IInputValidator;
@@ -104,6 +107,53 @@ public class RenameAction extends
 		if (!(domain instanceof AdapterFactoryEditingDomain) || selection.size() > 1)
 			return false;
 		Object element = TngUtil.unwrap(selection.getFirstElement());
+		
+		/**vEPFC, se desactiva el rename si un processline tiene ya procesos adaptados**/
+		if(element instanceof ProcessLineComponent){
+			ProcessLineComponent processLine = (ProcessLineComponent) element;
+			for(Iterator iterator = processLine.getChildPackages().iterator(); iterator.hasNext();){
+				Object pkgObj = iterator.next();
+				if(pkgObj instanceof TailoredProcessesPackage){
+					TailoredProcessesPackage tailoredPkg = (TailoredProcessesPackage) pkgObj;
+					if(tailoredPkg.getChildPackages().isEmpty()){
+						return true;
+					}
+					else{
+						return false;
+					}
+				}
+			}
+		}
+		else if( (element instanceof MethodPlugin) && !(element instanceof ProcessLineComponent) && !(element instanceof TailoredProcessComponent)){
+			MethodPlugin methodPlugin = (MethodPlugin) element;
+			
+			for(Iterator iter = methodPlugin.getMethodPackages().iterator();iter.hasNext();){
+				Object objPkg = iter.next();
+				if(objPkg instanceof ProcessLinesPackage){
+					ProcessLinesPackage processLinpkg = (ProcessLinesPackage) objPkg;
+					for(Iterator iterator = processLinpkg.getChildPackages().iterator(); iterator.hasNext();){
+						Object processLineComponent = iterator.next();
+						if(processLineComponent instanceof ProcessLineComponent){
+							ProcessLineComponent processLine = (ProcessLineComponent) processLineComponent;
+							for(Iterator iterAux = processLine.getChildPackages().iterator(); iterator.hasNext();){
+								Object pkgObj = iterAux.next();
+								if(pkgObj instanceof TailoredProcessesPackage){
+									TailoredProcessesPackage tailoredPkg = (TailoredProcessesPackage) pkgObj;
+									if(tailoredPkg.getChildPackages().isEmpty()){
+										return true;
+									}
+									else{
+										return false;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		/***/
+		
 		if (element instanceof NamedElement
 				&& !TngUtil.isPredefined((MethodElement) element)) {
 			return true;
@@ -182,10 +232,6 @@ public class RenameAction extends
 				return;
 			}
 		}
-		
-		if (! FileUtil.getValidateEdit().renamePrecheck(e, shell)) {
-			return;
-		}
 
 		final IValidator validator = IValidatorFactory.INSTANCE
 		.createNameValidator(e, ((AdapterFactoryEditingDomain)domain).getAdapterFactory());
@@ -242,7 +288,7 @@ public class RenameAction extends
 								.getName(), inputValidator);
 						continue;
 					}
-
+		
 					if (e instanceof MethodPlugin) {
 						String msg = AuthoringUIResources.bind(AuthoringUIResources.methodPluginDescriptionPage_confirmRename, (new Object[] { e.getName(), newName })); 
 						String title = AuthoringUIResources.methodPluginDescriptionPage_confirmRename_title; 
@@ -251,8 +297,14 @@ public class RenameAction extends
 						}
 
 						EditorChooser.getInstance().closeMethodEditorsForPluginElements((MethodPlugin)e);
+					}	
+					/**vEPFC #Bug 009 - Renombramiento en vpName**/
+					if (e instanceof VarElement){
+						VarElement varElementE = (VarElement) e;
+						varElementE.setVpName(newName);
+						
 					}
-					
+					/***/	
 					RenameCommand renameCmd = (RenameCommand) command;
 					renameCmd.setNewName(newName);
 					renameCmd.setShell(shell);
@@ -400,22 +452,6 @@ public class RenameAction extends
 			oldName = e.getName();			
 			setName(newName);
 			
-			//Do check at this early point
-			IStatus status = UserInteractionHelper.checkModify(e, 
-					shell == null ? MsgBox.getDefaultShell() : shell);
-			if (status.isOK() && e instanceof DescribableElement) {
-				ContentDescription presentation = ((DescribableElement) e).getPresentation();
-				status = UserInteractionHelper.checkModify(presentation, 
-						shell == null ? MsgBox.getDefaultShell() : shell);
-			}
-			if (!status.isOK()) {
-				AuthoringUIPlugin.getDefault().getMsgDialog().displayError(
-						AuthoringUIResources.renameDialog_title,
-						AuthoringUIResources.renameDialog_renameError,
-						status);
-				return;
-			}
-			
 			renamedResources = new ArrayList<Resource>();
 
 			// rename file(s)
@@ -440,7 +476,7 @@ public class RenameAction extends
 				return;
 			}
 			
-			status = UserInteractionHelper.checkModify(e, 
+			IStatus status = UserInteractionHelper.checkModify(e, 
 					shell == null ? MsgBox.getDefaultShell() : shell);
 			if (!status.isOK()) {
 				AuthoringUIPlugin.getDefault().getMsgDialog().displayError(
@@ -510,7 +546,7 @@ public class RenameAction extends
 		
 			};
 			UserInteractionHelper.runWithProgress(runnable,
-					AuthoringUIResources.ElementsView_renaming_text);
+					AuthoringUIResources.modify_Variant_element);
 		}
 
 		public void redo() {

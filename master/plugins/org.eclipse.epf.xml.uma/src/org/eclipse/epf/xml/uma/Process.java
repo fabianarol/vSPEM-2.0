@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: Process.java,v 1.3 2007/04/05 20:50:18 klow Exp $
+ */
 package org.eclipse.epf.xml.uma;
 
 import org.eclipse.emf.common.util.EList;
@@ -48,11 +44,11 @@ public interface Process extends Activity {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Includes Pattern</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getProcess_IncludesPattern()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="kind='element' name='IncludesPattern'"
 	 * @generated
 	 */
-	EList<String> getIncludesPattern();
+	EList getIncludesPattern();
 
 	/**
 	 * Returns the value of the '<em><b>Default Context</b></em>' attribute.
@@ -65,7 +61,7 @@ public interface Process extends Activity {
 	 * @return the value of the '<em>Default Context</em>' attribute.
 	 * @see #setDefaultContext(String)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getProcess_DefaultContext()
-	 * @model dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="kind='element' name='DefaultContext'"
 	 * @generated
 	 */
@@ -92,11 +88,11 @@ public interface Process extends Activity {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Valid Context</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getProcess_ValidContext()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="kind='element' name='ValidContext'"
 	 * @generated
 	 */
-	EList<String> getValidContext();
+	EList getValidContext();
 
 	/**
 	 * Returns the value of the '<em><b>Diagram URI</b></em>' attribute.
@@ -108,7 +104,7 @@ public interface Process extends Activity {
 	 * @return the value of the '<em>Diagram URI</em>' attribute.
 	 * @see #setDiagramURI(String)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getProcess_DiagramURI()
-	 * @model dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="kind='attribute' name='diagramURI'"
 	 * @generated
 	 */

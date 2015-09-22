@@ -21,16 +21,12 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.edit.provider.ComposedAdapterFactory;
-import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
-import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryContentProvider;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.epf.authoring.ui.AuthoringUIPlugin;
 import org.eclipse.epf.authoring.ui.AuthoringUIResources;
-import org.eclipse.epf.authoring.ui.filters.AllFilter;
 import org.eclipse.epf.authoring.ui.filters.DescriptorConfigurationFilter;
 import org.eclipse.epf.authoring.ui.filters.ExProcessAuthoringConfigurator;
-import org.eclipse.epf.authoring.ui.properties.AbstractSection;
 import org.eclipse.epf.authoring.ui.util.AuthoringAccessibleListener;
 import org.eclipse.epf.library.LibraryService;
 import org.eclipse.epf.library.configuration.ConfigurationFilter;
@@ -40,28 +36,21 @@ import org.eclipse.epf.library.edit.itemsfilter.FilterConstants;
 import org.eclipse.epf.library.edit.itemsfilter.FilterHelper;
 import org.eclipse.epf.library.edit.itemsfilter.ICategoryFilter;
 import org.eclipse.epf.library.edit.itemsfilter.IProcessFilter;
-import org.eclipse.epf.library.edit.meta.TypeDefUtil;
 import org.eclipse.epf.library.edit.navigator.MethodPluginItemProvider;
 import org.eclipse.epf.library.edit.process.BreakdownElementItemProvider;
 import org.eclipse.epf.library.edit.process.BreakdownElementWrapperItemProvider;
-import org.eclipse.epf.library.edit.util.LibraryEditUtil;
 import org.eclipse.epf.library.edit.util.MethodElementUtil;
-import org.eclipse.epf.library.edit.util.ProcessScopeUtil;
-import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.util.LibraryUtil;
 import org.eclipse.epf.uma.BreakdownElement;
 import org.eclipse.epf.uma.ContentElement;
 import org.eclipse.epf.uma.MethodElement;
-import org.eclipse.epf.uma.MethodLibrary;
 import org.eclipse.epf.uma.MethodPlugin;
 import org.eclipse.epf.uma.NamedElement;
 import org.eclipse.epf.uma.Process;
 import org.eclipse.epf.uma.ProcessComponent;
 import org.eclipse.epf.uma.ProcessPackage;
 import org.eclipse.epf.uma.VariabilityElement;
-import org.eclipse.epf.uma.util.ModifiedTypeMeta;
-import org.eclipse.epf.uma.util.Scope;
 import org.eclipse.epf.uma.util.UmaUtil;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.DialogSettings;
@@ -103,7 +92,7 @@ import org.eclipse.ui.PlatformUI;
  * @author Lokanath Jagga
  * @author Shashidhar Kannoori
  */
-public class ItemsFilterDialog extends BaseItemsFilterDialog implements
+public class ItemsFilterDialog extends Dialog implements
 		ISelectionChangedListener, IDoubleClickListener {
 
 	protected Button okButton, cancelButton;
@@ -121,33 +110,7 @@ public class ItemsFilterDialog extends BaseItemsFilterDialog implements
 	private ArrayList selectedList = new ArrayList();
 
 	private boolean viewerSelectionSingle = false;
-	
 	private String viewerLabel = null;
-	
-	private ProcessScopeUtil processUtil = ProcessScopeUtil.getInstance();
-	
-	private Combo selectCombo;
-	
-	private final String[] selectComboItems = {
-			AuthoringUIResources.FilterDialog_Process_Scope_Grp_referencedPluginsBtn,
-			AuthoringUIResources.FilterDialog_Process_Scope_Grp_selectedPluginsBtn,
-			AuthoringUIResources.FilterDialog_Process_Scope_Grp_libBtn,
-			AuthoringUIResources.FilterDialog_Process_Scope_Grp_configBtn
-			};
-
-	private Button viewBtn;
-	
-	private boolean enableProcessScope = false;
-	
-	private AbstractSection section;
-	
-	private Process configFreeProcess;
-	
-	private List selectedMethodPlugins = new ArrayList();
-	
-	private String PLUGIN_LIST_SECTION = ".Plugin_List_Section"; //$NON-NLS-1$
-	
-	private String PLUGIN_LIST_KEY = "Plugin_List_Key"; //$NON-NLS-1$
 	
 	/*
 	 * Treeviewer for ContentElements to display.
@@ -390,21 +353,19 @@ public class ItemsFilterDialog extends BaseItemsFilterDialog implements
 		}
 		filterType = new Combo(composite, SWT.SINGLE | SWT.READ_ONLY);
 		{
-			GridData gD1 = new GridData(GridData.FILL_HORIZONTAL);
+			GridData gD1 = new GridData(GridData.BEGINNING);
 			gD1.horizontalSpan = 2;
+			gD1.widthHint = 390;
 			filterType.setLayoutData(gD1);
 		}
 
 		if (types == null) {
 			fillFilterTypeCombo();
-			if(helper != null) {
-				helper.setFilterTypeStr(filterTypeStr);
-			}
 		} else {
 			filterType.setItems(types);
 			if (helper != null) {
 				filterTypeStr = filterType.getItem(0);
-				helper.setFilterTypeStr(filterTypeStr);
+				helper.setFilterTypeStr(filterType.getItem(0));
 				if (tabStr == null) {
 					tabStr = filterTypeStr;
 					helper.setTabStr(tabStr);
@@ -412,12 +373,7 @@ public class ItemsFilterDialog extends BaseItemsFilterDialog implements
 			}
 		}
 		filterType.select(0);
-		
-		//for config free process
-		if (supportProcessScope(contentElement)) {
-			createSelectionScope(composite);
-		}
-		
+
 		Label ctrl_patternLabel = new Label(composite, SWT.NONE);
 		{
 			ctrl_patternLabel.setText(AuthoringUIResources.FilterDialog_Pattern_text); 
@@ -440,7 +396,7 @@ public class ItemsFilterDialog extends BaseItemsFilterDialog implements
 		{
 			ctrl_patternLabel1.setText(AuthoringUIResources.FilterDialog_Pattern_description); 
 			GridData gD = new GridData(SWT.DEFAULT, SWT.DEFAULT, false, false, 3, 1);
-			gD.widthHint = 500;
+			gD.widthHint = 550;
 			ctrl_patternLabel1.setLayoutData(gD);
 		}
 		
@@ -448,7 +404,7 @@ public class ItemsFilterDialog extends BaseItemsFilterDialog implements
 		
 		GridData gd2 = new GridData(GridData.FILL_HORIZONTAL
 			| GridData.HORIZONTAL_ALIGN_END);
-		gd2.horizontalSpan = 3;
+		gd2.horizontalSpan = 2;
 		buttonsComposite.setLayoutData(gd2);
 		GridLayout buttonsLayout = new GridLayout();
 		buttonsLayout.numColumns = 2;
@@ -464,10 +420,10 @@ public class ItemsFilterDialog extends BaseItemsFilterDialog implements
 		expandButton.getAccessible().addAccessibleListener(new AuthoringAccessibleListener(
 						AuthoringUIResources.FilterDialog_ExpandAll));		
 
-//		gd2 = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING
-//				| GridData.GRAB_HORIZONTAL);
+		gd2 = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING
+				| GridData.GRAB_HORIZONTAL);
 
-//		expandButton.setLayoutData(gd2);
+		expandButton.setLayoutData(gd2);
 
 		collapseButton = new Button(buttonsComposite, SWT.PUSH);
 		collapseButton.setImage(AuthoringUIPlugin.getDefault().getSharedImage(
@@ -477,9 +433,9 @@ public class ItemsFilterDialog extends BaseItemsFilterDialog implements
 		collapseButton.getAccessible().addAccessibleListener(new AuthoringAccessibleListener(
 				AuthoringUIResources.FilterDialog_CollapseAll));
 		
-//		gd2 = new GridData(GridData.HORIZONTAL_ALIGN_END);
+		gd2 = new GridData(GridData.HORIZONTAL_ALIGN_END);
 
-//		collapseButton.setLayoutData(gd2);
+		collapseButton.setLayoutData(gd2);
 		
 		createLine(composite, 3);
 		createViewerLabel(composite);
@@ -502,14 +458,6 @@ public class ItemsFilterDialog extends BaseItemsFilterDialog implements
 
 		// Return results.
 		addListener();
-		
-		//initialize for process scope
-		if (supportProcessScope(contentElement)) {
-			selectCombo.select(0);
-			updateBtnStatus();
-			updateFilterDialog();
-		}
-		
 		return composite;
 	}
 
@@ -546,6 +494,7 @@ public class ItemsFilterDialog extends BaseItemsFilterDialog implements
 
 		GridData spec = new GridData(GridData.FILL_BOTH);
 		{
+			spec.widthHint = 300;
 			spec.heightHint = 300;
 			spec.horizontalSpan = 3;
 			treeViewer.getControl().setLayoutData(spec);
@@ -641,15 +590,7 @@ public class ItemsFilterDialog extends BaseItemsFilterDialog implements
 		DIALOG_NAME = tabStr;
 		DialogSettings dialogSettings = (DialogSettings) getDialogSettings();
 		String temp = dialogSettings.get(DIALOG_NAME + PATTERN_ID); 
-		
-		//clean filter for UDT element -Defect 46129
-		ModifiedTypeMeta mdtMeta = null;
-		if (helper != null){
-			Object ce = helper.getContentElement();
-			mdtMeta = TypeDefUtil.getMdtMeta((MethodElement)ce);
-		}
-		
-		if (temp != null && temp.length() > 0 && mdtMeta == null) { 
+		if (temp != null && temp.length() > 0) { 
 			pattern = dialogSettings.get(DIALOG_NAME + PATTERN_ID); 
 			filterTypeStr = dialogSettings.get(DIALOG_NAME + TYPE_ID); 
 			filterType.setText(filterTypeStr);
@@ -803,53 +744,6 @@ public class ItemsFilterDialog extends BaseItemsFilterDialog implements
 			str[0] = (String) tabStr;
 			filterType.setItems(str);
 			filterTypeStr = str[0];
-		} else if (FilterConstants.ONLY_CONTENT_ELEMENTS.equals(tabStr)) {
-			String space = "-"; //$NON-NLS-1$
-			String[] str = new String[27];
-			int i = 0;
-			str[i++] = FilterConstants.ALL_ELEMENTS;
-			str[i++] = FilterConstants.CONTENT_PACKAGES;
-			str[i++] = space + FilterConstants.ROLES;
-			str[i++] = space + FilterConstants.TASKS;
-			str[i++] = space + FilterConstants.WORKPRODUCTS;
-			str[i++] = space + FilterConstants.UDTs;
-			str[i++] = space + FilterConstants.GUIDANCE;
-			str[i++] = FilterConstants.space + FilterConstants.space
-					+ FilterConstants.CHECKLISTS;
-			str[i++] = FilterConstants.space + FilterConstants.space
-					+ FilterConstants.CONCEPTS;
-			str[i++] = FilterConstants.space + FilterConstants.space
-					+ FilterConstants.ESTIMATE_CONSIDERATIONS;
-			str[i++] = FilterConstants.space + FilterConstants.space
-					+ FilterConstants.EXAMPLES;
-			str[i++] = FilterConstants.space + FilterConstants.space
-					+ FilterConstants.GUIDELINES;
-			str[i++] = FilterConstants.space + FilterConstants.space
-					+ FilterConstants.PRACTICES;
-			str[i++] = FilterConstants.space + FilterConstants.space
-					+ FilterConstants.REPORTS;
-			str[i++] = FilterConstants.space + FilterConstants.space
-					+ FilterConstants.REUSABLE_ASSETS;
-			str[i++] = FilterConstants.space + FilterConstants.space
-					+ FilterConstants.ROADMAP;
-			str[i++] = FilterConstants.space + FilterConstants.space
-					+ FilterConstants.SUPPORTING_MATERIALS;
-			str[i++] = FilterConstants.space + FilterConstants.space
-					+ FilterConstants.TEMPLATES;
-			str[i++] = FilterConstants.space + FilterConstants.space
-					+ FilterConstants.TERM_DEFINITIONS;
-			str[i++] = FilterConstants.space + FilterConstants.space
-					+ FilterConstants.TOOL_MENTORS;
-			str[i++] = FilterConstants.space + FilterConstants.space
-					+ FilterConstants.WHITE_PAPERS;
-			str[i++] = FilterConstants.DISCIPLINES;
-			str[i++] = FilterConstants.ROLESETS;
-			str[i++] = FilterConstants.WORKPRODUCTTYPES;
-			str[i++] = FilterConstants.DOMAINS;
-			str[i++] = FilterConstants.TOOLS;
-			str[i++] = FilterConstants.CUSTOM_CATEGORIES;
-			filterType.setItems(str);
-			filterTypeStr = str[0];
 		} else if (FilterConstants.categoryStrs.contains(tabStr)) {
 			String[] str = new String[2];
 			str[0] = (String) tabStr;
@@ -876,56 +770,38 @@ public class ItemsFilterDialog extends BaseItemsFilterDialog implements
 			filterTypeStr = str[0];
 		} else if (FilterConstants.ALL_ELEMENTS.equals(tabStr)) { // 172956
 			String space = "-"; //$NON-NLS-1$
-			String[] str = new String[29];
+			String[] str = new String[26];
 			int i = 0;
-			if (filter instanceof AllFilter) {
-				AllFilter allFilter = (AllFilter) filter;
-				int sz = allFilter.getSelectedTypeStrings() == null ? 0 : allFilter.getSelectedTypeStrings().size();
-				if (sz != 0) {
-					str = new String[sz];
-					for (String typeString : allFilter.getSelectedTypeStrings()) {
-						str[i++] = typeString;
-					}
-					filterType.setItems(str);
-					filterTypeStr = str[0];
-					return;
-				}
-			}
 			str[i++] = FilterConstants.ALL_ELEMENTS;
 			str[i++] = FilterConstants.CONTENT_PACKAGES;
 			str[i++] = space + FilterConstants.ROLES;
 			str[i++] = space + FilterConstants.TASKS;
 			str[i++] = space + FilterConstants.WORKPRODUCTS;
-			str[i++] = space + FilterConstants.UDTs;
 			str[i++] = space + FilterConstants.GUIDANCE;
 			str[i++] = FilterConstants.space + FilterConstants.space
 					+ FilterConstants.CHECKLISTS;
 			str[i++] = FilterConstants.space + FilterConstants.space
 					+ FilterConstants.CONCEPTS;
 			str[i++] = FilterConstants.space + FilterConstants.space
-					+ FilterConstants.ESTIMATE_CONSIDERATIONS;
-			str[i++] = FilterConstants.space + FilterConstants.space
 					+ FilterConstants.EXAMPLES;
 			str[i++] = FilterConstants.space + FilterConstants.space
 					+ FilterConstants.GUIDELINES;
 			str[i++] = FilterConstants.space + FilterConstants.space
-					+ FilterConstants.PRACTICES;
-			str[i++] = FilterConstants.space + FilterConstants.space
-					+ FilterConstants.REPORTS;
-			str[i++] = FilterConstants.space + FilterConstants.space
 					+ FilterConstants.REUSABLE_ASSETS;
-			str[i++] = FilterConstants.space + FilterConstants.space
-					+ FilterConstants.ROADMAP;
 			str[i++] = FilterConstants.space + FilterConstants.space
 					+ FilterConstants.SUPPORTING_MATERIALS;
 			str[i++] = FilterConstants.space + FilterConstants.space
-					+ FilterConstants.TEMPLATES;
+					+ FilterConstants.TOOL_MENTORS;
 			str[i++] = FilterConstants.space + FilterConstants.space
-					+ FilterConstants.TERM_DEFINITIONS;
+					+ FilterConstants.ESTIMATE_CONSIDERATIONS;
+			str[i++] = FilterConstants.space + FilterConstants.space
+					+ FilterConstants.REPORTS;
+			str[i++] = FilterConstants.space + FilterConstants.space
+					+ FilterConstants.TEMPLATES;
 			str[i++] = FilterConstants.space + FilterConstants.space
 					+ FilterConstants.TOOL_MENTORS;
 			str[i++] = FilterConstants.space + FilterConstants.space
-					+ FilterConstants.WHITE_PAPERS;
+					+ FilterConstants.ESTIMATE_CONSIDERATIONS;
 			str[i++] = FilterConstants.DISCIPLINES;
 			str[i++] = FilterConstants.ROLESETS;
 			str[i++] = FilterConstants.WORKPRODUCTTYPES;
@@ -1049,31 +925,9 @@ public class ItemsFilterDialog extends BaseItemsFilterDialog implements
 				expandOrCollapse(false);
 			}
 		});
-		
-		if (supportProcessScope(contentElement)) {			
-			selectCombo.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent e) {
-					updateBtnStatus();
-					updateFilterDialog();
-				}
-			});
-						
-			viewBtn.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent e) {
-					int index = selectCombo.getSelectionIndex();
-					
-					if (index == 0) {					
-						showPluginListDialog(true);
-					} 
-					
-					if (index == 1) {
-						showPluginListDialog(false);
-					}
-				}
-			});
-		}
+
 	}
-	
+
 	public ArrayList getSelectedItems() {
 		return selectedList;
 	}
@@ -1232,178 +1086,4 @@ public class ItemsFilterDialog extends BaseItemsFilterDialog implements
 			return PatternConstructor.createPattern(FilterConstants.ANY_STRING, false, false); 
 		}
 	}
-	
-	private void createSelectionScope(Composite parent) {
-		Label selectLabel = new Label(parent, SWT.NONE);
-		selectLabel.setText(AuthoringUIResources.FilterDialog_Process_Scope_Grp);
-		
-		selectCombo = new Combo(parent, SWT.READ_ONLY);		
-		selectCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		selectCombo.setItems(selectComboItems);
-		
-		viewBtn = new Button(parent, SWT.PUSH);
-		viewBtn.setText(AuthoringUIResources.FilterDialog_Process_Scope_Grp_viewBtn);
-		viewBtn.setEnabled(false);
-	}
-		
-	private boolean supportProcessScope(Object inputElement) {
-		boolean result = false;
-		
-		if (enableProcessScope) {
-			if (inputElement instanceof BreakdownElement) {
-				Process process = getProcess((BreakdownElement)inputElement);
-				result = processUtil.isConfigFree(process);
-				if (result) {
-					configFreeProcess = process;
-				}
-			}	
-		}
-
-		return result;
-	}
-	
-	private Process getProcess(BreakdownElement element) {
-		AdapterFactory aFactory = TngAdapterFactory.INSTANCE
-				.getWBS_ComposedAdapterFactory();
-		ItemProviderAdapter adapter = (ItemProviderAdapter) aFactory.adapt(
-				element, ITreeItemContentProvider.class);
-		Object obj = ProcessUtil.getRootProcess(aFactory, adapter, element);
-		
-		return (Process) obj;
-	}
-	
-	private void updateBtnStatus() {
-		int index = selectCombo.getSelectionIndex();
-		
-		if ((index == 0) || (index == 1)) {
-			viewBtn.setEnabled(true);
-		} else {
-			viewBtn.setEnabled(false);
-		}
-	}
-	
-	private void updateFilterDialog() {
-		int index = selectCombo.getSelectionIndex();
-		
-		if (index == 0) {
-			processUtil.setElemementSelectionScopeType(ProcessScopeUtil.ScopeType_Process);				
-		}
-		
-		if (index == 1) {
-			processUtil.setElemementSelectionScopeType(ProcessScopeUtil.ScopeType_Plugins);
-			restoreDialogSettingsForPluginList();
-			Scope pluginScope = processUtil.getPluginScope();
-			pluginScope.clearAll();
-			for (Object plugin : selectedMethodPlugins) {
-				pluginScope.addPlugin((MethodPlugin)plugin);
-			}			
-		}
-		
-		if (index == 2) {
-			processUtil.setElemementSelectionScopeType(ProcessScopeUtil.ScopeType_Library);
-		}
-		
-		if (index == 3) {
-			processUtil.setElemementSelectionScopeType(ProcessScopeUtil.ScopeType_Config);
-		}
-		
-		updateFilter();
-		
-		initProviderForTabs();
-		refreshTreeViewer();
-	}
-	
-	/**
-	 * Methods setEnableProcessScope() and setSection() must be used together, client should
-	 * call those two methods together when want to support process scope selection under
-	 * config-free process situation.
-	 * 
-	 * Example: please see /org.eclipse.epf.authoring.ui/src/org/eclipse/epf/authoring/ui/properties/RelationSection.java
-	 * 
-	 */	
-	public void setEnableProcessScope(boolean enableProcessScope) {
-		this.enableProcessScope = enableProcessScope;
-	}
-	
-	public void setSection(AbstractSection section) {
-		this.section = section;
-	}
-	
-	private void updateFilter() {
-		if (section != null) {
-			if (filter instanceof DescriptorConfigurationFilter) {
-				((DescriptorConfigurationFilter)filter).setMethodConfiguration(section.getConfiguration());
-			}
-		}	
-	}
-	
-	private void showPluginListDialog(boolean readOnly) {
-		List referencedMethodPlugins = processUtil.getScope(configFreeProcess).getMethodPluginSelection();
-		PluginListDialog dialog = null;
-		
-		if (readOnly) {
-			dialog = new PluginListDialog(this.getShell(), true, referencedMethodPlugins);
-			dialog.open();
-		} else {
-			dialog = new PluginListDialog(this.getShell(), false, selectedMethodPlugins);
-			if (dialog.open() == Dialog.OK) {
-				List plugins = dialog.getResults();
-				Scope pluginScope = processUtil.getPluginScope();
-				pluginScope.clearAll();
-				selectedMethodPlugins.clear();
-				for (Object obj : plugins) {
-					if (obj instanceof MethodPlugin) {
-						pluginScope.addPlugin((MethodPlugin)obj);
-						selectedMethodPlugins.add(obj);
-					}
-				}				
-				refreshTreeViewer();
-				saveDialogSettingsForPluginList();
-			}
-		}
-	}
-	
-	private IDialogSettings getDialogSettingsForPluginList() {
-		IDialogSettings dialogSettings = AuthoringUIPlugin.getDefault().getDialogSettings();
-		String processId = configFreeProcess.getGuid();
-		IDialogSettings section = dialogSettings.getSection(processId + PLUGIN_LIST_SECTION);
-		if (section == null) {
-			section = dialogSettings.addNewSection(processId + PLUGIN_LIST_SECTION);
-		}
-		
-		return section;
-	}
-	
-	private void saveDialogSettingsForPluginList() {
-		IDialogSettings settings = getDialogSettingsForPluginList();
-		String[] pluginId = new String[selectedMethodPlugins.size()];
-		
-		for (int i = 0; i < selectedMethodPlugins.size(); i++) {
-			pluginId[i] = ((MethodPlugin)selectedMethodPlugins.get(i)).getGuid();			
-		}
-		
-		settings.put(PLUGIN_LIST_KEY, pluginId);
-	}
-	
-	private void restoreDialogSettingsForPluginList() {
-		IDialogSettings settings = getDialogSettingsForPluginList();
-		String[] pluginId = settings.getArray(PLUGIN_LIST_KEY);
-		MethodLibrary lib = LibraryEditUtil.getInstance().getCurrentMethodLibrary();
-		if (lib != null) {
-			List allMethodPluginsInLibrary = lib.getMethodPlugins();		
-			if (pluginId != null) {
-				selectedMethodPlugins.clear();
-				for (Object plugin : allMethodPluginsInLibrary) {
-					String tempId = ((MethodPlugin)plugin).getGuid();
-					for (String id : pluginId) {
-						if (tempId.equals(id)) {
-							selectedMethodPlugins.add(plugin);
-							break;
-						}
-					}
-				}		
-			}
-		}
-	}
-	
 }

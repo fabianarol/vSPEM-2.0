@@ -47,20 +47,9 @@ public interface IEditorKeeper {
 	void openEditor(Object object);
 
 	/**
-	 * Closes all open editors of the specified (deleted) element and
-	 * all of its children and grand children.
-	 * 
-	 * @param element
+	 * Closes an open editor if element is deleted
+	 * @param object
 	 */
-	void closeEditorsOnDeletion(Object element);
-	
-	/**
-	 * Closes all open editors of the specified element and all of its children
-	 * and grand children.
-	 * 
-	 * @param element
-	 * @param promptSave
-	 *            if true and the editor is dirty, will prompt user to save
-	 */
-	void closeEditors(Object element, boolean promptSave);
+	void closeEditorsOnDeletion(Object object);
+
 }

@@ -86,8 +86,7 @@ public class DescriptorUpdateBatchCommand extends BatchCommand {
 			refreshDescriptorsCommand = new CompoundCommand();
 			for (Iterator iter = descriptorsToRefresh.iterator(); iter.hasNext();) {
 				Descriptor desc = (Descriptor) iter.next();
-				refreshDescriptorsCommand.append(new BasicSynchronizeDescriptorCommand(desc, synchFeatures, config));
-				refreshDescriptorsCommand.append(new RemoveDuplicateReferenceCommand(desc, ProcessCommandUtil.CONTENT_ELEMENT_GUIDANCE_REFERENCES, config));
+				refreshDescriptorsCommand.append(new BasicSynchronizeDescriptorCommand(desc, synchFeatures, config));				
 			}
 		}
 

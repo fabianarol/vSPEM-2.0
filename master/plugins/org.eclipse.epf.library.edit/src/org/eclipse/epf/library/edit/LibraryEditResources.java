@@ -23,16 +23,20 @@ public final class LibraryEditResources extends NLS {
 	private static String BUNDLE_NAME = LibraryEditResources.class.getPackage()
 			.getName()
 			+ ".Resources"; //$NON-NLS-1$
-
-	public static String activity_deep_copy_variability_prompt;
+	
+	
+	//Externalización vEPF - Flycas
+	public static String newVarPointDialog_title;
+	public static String CreateVarPointCommand_Message;
+	public static String descriptionLabel_text;
+	public static String dependenciesLabel_text;
+	//
 
 	public static String activity_variability_error_msg;
 
 	public static String activity_variability_error_msg1;
 
 	public static String activity_variability_error_msg2;
-
-	public static String add_to_default_config_dlg_title;
 
 	public static String cannot_copy_or_extend_delivery_process;
 
@@ -69,13 +73,7 @@ public final class LibraryEditResources extends NLS {
 	public static String deepCopy_title;
 
 	public static String moveDialog_title;
-	
-	public static String moveDialog_addRefPluginsText;
 
-	public static String moveDialog_addRefPluginsWarningText;
-	
-	public static String moveDialog_addRefPluginsWarningText1;
-	
 	public static String deleteDialog_title;
 
 	public static String errorDialog_title;
@@ -95,6 +93,10 @@ public final class LibraryEditResources extends NLS {
 	public static String selectDeliverablesDialog_text;
 
 	public static String newProcessComponentDialog_title;
+	
+	public static String newProcessLineComponentDialog_title;
+	
+	public static String newTailoredProcessComponentDialog_title;
 
 	public static String nameLabel_text;
 
@@ -192,6 +194,8 @@ public final class LibraryEditResources extends NLS {
 	public static String ActivityDropCommand_deepCopy_promptConfigurationMsg;
 
 	public static String creatingProcessComponentTask_name;
+	
+	public static String creatingProcessLineComponentTask_name;
 
 	public static String processingReferencesTask_name;
 
@@ -343,8 +347,6 @@ public final class LibraryEditResources extends NLS {
 
 	public static String FilterConstants_practices_text;
 
-	public static String FilterConstants_UDTs_text;
-	
 	public static String FilterConstants_templates_text;
 
 	public static String FilterConstants_workproducts_text;
@@ -411,10 +413,10 @@ public final class LibraryEditResources extends NLS {
 	
 	public static String CreateProcessComponentCommand_Message;
 	
-	public static String DeliveryProcessLabel;
+	public static String CreateProcessLineComponentCommand_Message;
 	
-	public static String CapabilityPatternLabel;
-	
+	public static String CreateTailoredProcessComponentCommand_Message;
+
 	public static String SortType_Label;
 
 	public static String SortType_Manual;
@@ -426,10 +428,6 @@ public final class LibraryEditResources extends NLS {
 	public static String SortType_MethodType;
 	
 	public static String SpecifyNameText;
-	
-	public static String scope_defualtName;
-	
-	public static String scope_PluginsName;
 	
 	public static String WorkOrderTypeAbbreviation_FINISH_TO_START;
 	public static String WorkOrderTypeAbbreviation_FINISH_TO_FINISH;

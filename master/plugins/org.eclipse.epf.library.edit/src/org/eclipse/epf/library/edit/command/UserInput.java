@@ -12,8 +12,8 @@ package org.eclipse.epf.library.edit.command;
 
 import java.util.List;
 
-import org.eclipse.emf.edit.provider.IItemLabelProvider;
 import org.eclipse.epf.library.edit.validation.IValidator;
+import org.eclipse.jface.viewers.ILabelProvider;
 
 /**
  * Class that keeps the information about the input request and reference to the
@@ -37,14 +37,14 @@ public class UserInput {
 
 	private Object input;
 
-	private IItemLabelProvider labelProvider;
+	private ILabelProvider labelProvider;
 
 	private Object context;
 
 	private IValidator validator;
 
 	public UserInput(String label, int type, boolean multiple, List choices,
-			IItemLabelProvider labelProvider, Object context) {
+			ILabelProvider labelProvider, Object context) {
 		this(label, type, multiple, choices, labelProvider, null, context);
 	}
 
@@ -64,7 +64,7 @@ public class UserInput {
 	 *            contain addional information about the user input.
 	 */
 	public UserInput(String label, int type, boolean multiple, List choices,
-			IItemLabelProvider labelProvider, IValidator validator, Object context) {
+			ILabelProvider labelProvider, IValidator validator, Object context) {
 		super();
 		this.label = label;
 		this.type = type;
@@ -104,7 +104,7 @@ public class UserInput {
 	 * 
 	 * @return the label provider
 	 */
-	public IItemLabelProvider getLabelProvider() {
+	public ILabelProvider getLabelProvider() {
 		return labelProvider;
 	}
 	

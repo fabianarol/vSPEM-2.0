@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Ui Plug-in
+Bundle-SymbolicName: org.eclipse.vepf.library.edit;singleton:=true
+Bundle-Version: 1.0.0
+Require-Bundle: org.eclipse.epf.uma,
+ org.eclipse.epf.uma.ecore,
+ org.eclipse.epf.uma.edit

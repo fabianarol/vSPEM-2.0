@@ -10,7 +10,6 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.authoring.ui.forms;
 
-import org.eclipse.epf.authoring.ui.AuthoringUIPlugin;
 import org.eclipse.epf.authoring.ui.AuthoringUIResources;
 import org.eclipse.epf.authoring.ui.AuthoringUIText;
 import org.eclipse.epf.authoring.ui.editors.MethodElementEditor;
@@ -20,7 +19,6 @@ import org.eclipse.epf.library.edit.IFilter;
 import org.eclipse.epf.library.edit.command.IActionManager;
 import org.eclipse.epf.library.edit.itemsfilter.FilterConstants;
 import org.eclipse.epf.library.edit.itemsfilter.VariabilityBaseElementFilter;
-import org.eclipse.epf.library.edit.util.PracticePropUtil;
 import org.eclipse.epf.library.ui.LibraryUIText;
 import org.eclipse.epf.uma.Checklist;
 import org.eclipse.epf.uma.Concept;
@@ -39,8 +37,6 @@ import org.eclipse.epf.uma.TermDefinition;
 import org.eclipse.epf.uma.ToolMentor;
 import org.eclipse.epf.uma.UmaPackage;
 import org.eclipse.epf.uma.Whitepaper;
-import org.eclipse.epf.uma.util.UserDefinedTypeMeta;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -66,7 +62,6 @@ public class GuidanceDescriptionPage extends DescriptionFormPage {
 	private String elementLabel;
 
 	private IMethodRichText ctrl_content;
-	protected boolean contentOn = true;
 
 	private int contentFieldHeight = 400;
 
@@ -90,7 +85,6 @@ public class GuidanceDescriptionPage extends DescriptionFormPage {
 		setFullDescOn(false);
 		setKeyConsiderationOn(false);
 		setIconSectionOn(true);
-		setExternalIDOn(true);
 	}
 
 	/**
@@ -109,11 +103,9 @@ public class GuidanceDescriptionPage extends DescriptionFormPage {
 	 */
 	protected void createEditorContent(FormToolkit toolkit) {
 		super.createEditorContent(toolkit);
-		if (contentOn) {
-			ctrl_content = createRichTextEditWithLinkForSection(toolkit,
-					detailComposite, AuthoringUIText.MAIN_DESCRIPTION_TEXT,
-					contentFieldHeight, 400, DETAIL_SECTION_ID);
-		}
+		ctrl_content = createRichTextEditWithLinkForSection(toolkit,
+				detailComposite, AuthoringUIText.MAIN_DESCRIPTION_TEXT,
+				contentFieldHeight, 400, DETAIL_SECTION_ID);
 	}
 
 	/**
@@ -121,42 +113,40 @@ public class GuidanceDescriptionPage extends DescriptionFormPage {
 	 */
 	protected void addListeners() {
 		super.addListeners();
-		if (contentOn) {
-	
-			final MethodElementEditor editor = (MethodElementEditor) getEditor();
-	
-			ctrl_content.setModalObject(contentElement.getPresentation());
-			ctrl_content.setModalObjectFeature(UmaPackage.eINSTANCE
-					.getContentDescription_MainDescription());
-			ctrl_content.addModifyListener(contentModifyListener);
-			ctrl_content.addListener(SWT.Deactivate, new Listener() {
-				public void handleEvent(Event e) {
-					IMethodRichText control = descExpandFlag ? ctrl_expanded
-							: ctrl_content;
-					if (!control.getModified()) {
-						return;
-					}
-					String oldContent = guidance.getPresentation()
-							.getMainDescription();
-					if (((MethodElementEditor) getEditor()).mustRestoreValue(
-							control, oldContent)) {
-						return;
-					}
-					String newContent = control.getText();
-					if (!newContent.equals(oldContent)) {
-						boolean success = editor.getActionManager().doAction(
-								IActionManager.SET,
-								contentElement.getPresentation(),
-								UmaPackage.eINSTANCE
-										.getContentDescription_MainDescription(),
-								newContent, -1);
-						if (success && isVersionSectionOn()) {
-							updateChangeDate();
-						}
+
+		final MethodElementEditor editor = (MethodElementEditor) getEditor();
+
+		ctrl_content.setModalObject(contentElement.getPresentation());
+		ctrl_content.setModalObjectFeature(UmaPackage.eINSTANCE
+				.getContentDescription_MainDescription());
+		ctrl_content.addModifyListener(contentModifyListener);
+		ctrl_content.addListener(SWT.Deactivate, new Listener() {
+			public void handleEvent(Event e) {
+				IMethodRichText control = descExpandFlag ? ctrl_expanded
+						: ctrl_content;
+				if (!control.getModified()) {
+					return;
+				}
+				String oldContent = guidance.getPresentation()
+						.getMainDescription();
+				if (((MethodElementEditor) getEditor()).mustRestoreValue(
+						control, oldContent)) {
+					return;
+				}
+				String newContent = control.getText();
+				if (!newContent.equals(oldContent)) {
+					boolean success = editor.getActionManager().doAction(
+							IActionManager.SET,
+							contentElement.getPresentation(),
+							UmaPackage.eINSTANCE
+									.getContentDescription_MainDescription(),
+							newContent, -1);
+					if (success && isVersionSectionOn()) {
+						updateChangeDate();
 					}
 				}
-			});
-		}
+			}
+		});
 	}
 
 	/**
@@ -164,9 +154,7 @@ public class GuidanceDescriptionPage extends DescriptionFormPage {
 	 */
 	protected void refresh(boolean editable) {
 		super.refresh(editable);
-		if (contentOn) {
-			ctrl_content.setEditable(editable);
-		}
+		ctrl_content.setEditable(editable);
 	}
 
 	/**
@@ -174,14 +162,12 @@ public class GuidanceDescriptionPage extends DescriptionFormPage {
 	 */
 	protected void loadData() {
 		super.loadData();
-		if (contentOn) {
-			if (guidance != null) {
-				String content = null;
-				if (guidance.getPresentation() != null) {
-					content = guidance.getPresentation().getMainDescription();
-				}
-				ctrl_content.setText(content == null ? "" : content); //$NON-NLS-1$
+		if (guidance != null) {
+			String content = null;
+			if (guidance.getPresentation() != null) {
+				content = guidance.getPresentation().getMainDescription();
 			}
+			ctrl_content.setText(content == null ? "" : content); //$NON-NLS-1$
 		}
 	}
 
@@ -281,26 +267,11 @@ public class GuidanceDescriptionPage extends DescriptionFormPage {
 			this.iconSectionDescription = AuthoringUIResources.estimationconsideration_iconSection_desc;
 		}
 		else if(contentElement instanceof Practice){
-			if (PracticePropUtil.getPracticePropUtil().isUdtType(contentElement)) {
-				try {
-					String typeName = PracticePropUtil.getPracticePropUtil()
-						.getUtdData((Practice)contentElement)
-						.getRteNameMap().get(UserDefinedTypeMeta._typeName).toLowerCase();
-					this.generalSectionDescription = NLS.bind(AuthoringUIResources.generalInfoSection_desc, typeName);
-					this.detailSectionDescription = NLS.bind(AuthoringUIResources.detailSection_desc, typeName);
-					this.variabilitySectionDescription = NLS.bind(AuthoringUIResources.variabilitySection_desc, typeName);
-					this.versionSectionDescription = NLS.bind(AuthoringUIResources.versionInfoSection_desc, typeName);
-					this.iconSectionDescription = NLS.bind(AuthoringUIResources.iconSection_desc, typeName);
-				} catch (Exception e) {
-					AuthoringUIPlugin.getDefault().getLogger().logError(e);
-				}				
-			} else {			
-				this.generalSectionDescription = AuthoringUIResources.practice_generalInfoSection_desc;
-				this.detailSectionDescription = AuthoringUIResources.practice_detailSection_desc;
-				this.variabilitySectionDescription = AuthoringUIResources.practice_variabilitySection_desc;
-				this.versionSectionDescription = AuthoringUIResources.practice_versionInfoSection_desc;
-				this.iconSectionDescription = AuthoringUIResources.practice_iconSection_desc;
-			}
+			this.generalSectionDescription = AuthoringUIResources.practice_generalInfoSection_desc;
+			this.detailSectionDescription = AuthoringUIResources.practice_detailSection_desc;
+			this.variabilitySectionDescription = AuthoringUIResources.practice_variabilitySection_desc;
+			this.versionSectionDescription = AuthoringUIResources.practice_versionInfoSection_desc;
+			this.iconSectionDescription = AuthoringUIResources.practice_iconSection_desc;
 		}
 		else if(contentElement instanceof SupportingMaterial){
 			this.generalSectionDescription = AuthoringUIResources.supportingmaterial_generalInfoSection_desc;

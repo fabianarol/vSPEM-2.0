@@ -10,40 +10,24 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.library.configuration;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.epf.library.LibraryPlugin;
 import org.eclipse.epf.library.edit.IFilter;
-import org.eclipse.epf.library.edit.PresentationContext;
 import org.eclipse.epf.library.layout.BrowsingLayoutSettings;
 import org.eclipse.epf.library.util.LibraryUtil;
-import org.eclipse.epf.uma.CustomCategory;
-import org.eclipse.epf.uma.DescribableElement;
-import org.eclipse.epf.uma.FulfillableElement;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.RoleDescriptor;
 import org.eclipse.epf.uma.TaskDescriptor;
-import org.eclipse.epf.uma.UmaPackage;
 import org.eclipse.epf.uma.VariabilityElement;
-import org.eclipse.epf.uma.VariabilityType;
 import org.eclipse.epf.uma.WorkProductDescriptor;
-import org.eclipse.epf.uma.util.AssociationHelper;
-import org.eclipse.epf.uma.util.Scope;
 
 /**
  * Realizes the element based on the configuration and realize options.
  * 
  * @author Jinhua Xi
- * @author Weiping Lu
  * @since 1.0
  */
 public abstract class ElementRealizer {
@@ -176,38 +160,7 @@ public abstract class ElementRealizer {
 	 * @param element MethodElement
 	 * @return MethodElement
 	 */
-	
 	public MethodElement realize(MethodElement element) {
-		MethodElement result = realize_(element);
-		if (result == null && element instanceof VariabilityElement) {
-			VariabilityElement ve = (VariabilityElement) element;
-			if (ve.getVariabilityType() == VariabilityType.REPLACES) {
-				if (ve.getVariabilityBasedOnElement() != null) {
-					return realize(ve.getVariabilityBasedOnElement());
-				}
-			}
-		}		
-		return result;
-	}
-	
-	private MethodElement realize_(MethodElement element) {
-		if (getConfiguration() instanceof Scope) {			
-			if (element instanceof VariabilityElement) {
-				VariabilityElement ve = (VariabilityElement) element;
-				while(ve.getVariabilityType() == VariabilityType.CONTRIBUTES) {
-					VariabilityElement base = ve.getVariabilityBasedOnElement();
-					if (base == null) {
-						break;
-					}
-					ve = base;
-				}
-				element = ve;
-			}
-			if (element == null || !inConfig(element)) {
-				return null;
-			}
-			return element;
-		}
 		
 		if (element == null || !inConfig(element)) {
 			return null;
@@ -274,8 +227,7 @@ public abstract class ElementRealizer {
 			// need to resolve the element to the base if resolveContributor is true
 			// 152230 - Browsing: Role<-->WP relationship shows inconsistancy
 			e = ve;
-			while ((e != null) && (ConfigurationHelper.isReplacer(e)
-					|| ConfigurationHelper.isExtendReplacer(e))) {
+			while ((e != null) && ConfigurationHelper.isReplacer(e)) {
 				e = (VariabilityElement) e.getVariabilityBasedOnElement();
 				if (ConfigurationHelper.isContributor(e)) {
 					return realize(e);
@@ -332,104 +284,4 @@ public abstract class ElementRealizer {
 	public void dispose() {
 		this.filter = null;
 	}
-	
-	protected void addExtraFeatureValues(MethodElement element, EStructuralFeature feature,
-			FeatureValue values) {
-		if (!ElementRealizer.toAddExtraFeatureValues(element, feature, values,
-				getConfiguration())) {
-			return;
-		}
-		
-		CustomCategory cc = (CustomCategory) element;
-
-		Collection<?> result = LibraryUtil.getIncludedElements(cc, getConfiguration());
-
-		if (result == null || result.isEmpty()) {
-			return;
-		}
-
-		ToManyFeatureValue manyValues = values instanceof ToManyFeatureValue ?
-				(ToManyFeatureValue) values : null;
-				
-		List oldValues = manyValues == null ? null : (List) manyValues.getValue();
-
-		HashSet<DescribableElement> seenSet = manyValues == null ?
-				new HashSet<DescribableElement>() : new HashSet<DescribableElement>(oldValues);	
-		seenSet.add(cc);
-		List ccList = AssociationHelper.getCustomCategories(cc);
-		seenSet.addAll(ccList);					
-				
-		List<DescribableElement> list = calculateList(result, seenSet);
-		values.add(cc, list);
-		
-	}
-
-	public List<DescribableElement> calculateList(Collection<?> result,
-			Set<DescribableElement> seenSet) {
-		Set resultSet = null;
-		List<DescribableElement> list = new ArrayList<DescribableElement>();
-		for (Iterator<?> iter = result.iterator(); iter.hasNext();) {
-			Object o = iter.next();
-			if (o instanceof DescribableElement) {
-				DescribableElement contElem0 = (DescribableElement) o;
-				DescribableElement contElem = (DescribableElement) ConfigurationHelper
-						.getCalculatedElement(contElem0, this);
-				if (contElem != null) {
-					if (seenSet.add(contElem)) {
-						boolean toAdd = true;
-						if (contElem0 instanceof VariabilityElement) {
-							VariabilityElement ve = (VariabilityElement) contElem0;
-							VariabilityElement base = ve.getVariabilityBasedOnElement();
-							if (base != null && ve.getVariabilityType() == VariabilityType.CONTRIBUTES) {
-								if (resultSet == null) {
-									resultSet = new HashSet<Object>(result);
-								}
-								if (! resultSet.contains(contElem)) {
-									toAdd = false;
-								}									
-							}
-						}
-						if (toAdd) {
-							list.add(contElem);
-						}
-					}
-				}
-			}
-		}
-		
-		if (list.size() > 1) {
-			Comparator comparator = PresentationContext.INSTANCE.getPresNameComparator();
-			Collections.<DescribableElement>sort(list, comparator);
-		}
-		
-		return list;
-	}
-	
-	protected boolean slotMatching(FulfillableElement slot, FulfillableElement element) {		
-		return true;
-	}
-
-	protected static boolean toAddExtraFeatureValues(MethodElement element,
-			EStructuralFeature feature, FeatureValue values,
-			MethodConfiguration config) {
-		if (config == null) {
-			return false;
-		}
-
-		if (!(values instanceof ToManyFeatureValue)) {
-			return false;
-		}
-
-		if (!(element instanceof CustomCategory)) {
-			return false;
-		}
-
-		if (feature != UmaPackage.eINSTANCE
-				.getCustomCategory_CategorizedElements()) {
-			return false;
-		}
-
-		return true;
-	}
-	
 }

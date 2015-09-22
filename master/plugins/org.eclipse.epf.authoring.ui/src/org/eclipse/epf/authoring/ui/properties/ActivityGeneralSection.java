@@ -11,16 +11,17 @@
 package org.eclipse.epf.authoring.ui.properties;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryContentProvider;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.epf.authoring.ui.AuthoringUIPlugin;
 import org.eclipse.epf.authoring.ui.AuthoringUIResources;
 import org.eclipse.epf.authoring.ui.AuthoringUIText;
 import org.eclipse.epf.authoring.ui.dialogs.ItemsFilterDialog;
+import org.eclipse.epf.authoring.ui.editors.BreakdownElementEditorInput;
 import org.eclipse.epf.authoring.ui.editors.ProcessEditor;
 import org.eclipse.epf.authoring.ui.filters.ActivityVariabilityFilter;
 import org.eclipse.epf.authoring.ui.forms.ProcessBreakdownStructureFormPage;
@@ -30,18 +31,16 @@ import org.eclipse.epf.diagram.core.part.AbstractDiagramEditor;
 import org.eclipse.epf.diagram.core.part.DiagramEditorInput;
 import org.eclipse.epf.diagram.core.part.DiagramEditorInputProxy;
 import org.eclipse.epf.diagram.core.providers.SharedResourceDiagramDocumentProvider;
-import org.eclipse.epf.library.LibraryService;
 import org.eclipse.epf.library.configuration.ProcessVariabilityConfigurator;
 import org.eclipse.epf.library.edit.IConfigurator;
 import org.eclipse.epf.library.edit.IFilter;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
 import org.eclipse.epf.library.edit.command.IActionManager;
 import org.eclipse.epf.library.edit.itemsfilter.FilterConstants;
+import org.eclipse.epf.library.edit.process.BreakdownElementWrapperItemProvider;
 import org.eclipse.epf.library.edit.process.IBSItemProvider;
 import org.eclipse.epf.library.edit.process.command.ActivityVariabilityCommand;
-import org.eclipse.epf.library.edit.util.PropUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
-import org.eclipse.epf.library.edit.util.WbePropUtil;
 import org.eclipse.epf.library.edit.validation.DependencyChecker;
 import org.eclipse.epf.library.ui.LibraryUIText;
 import org.eclipse.epf.library.ui.dialogs.ConvertActivityDialog;
@@ -56,7 +55,6 @@ import org.eclipse.epf.uma.Phase;
 import org.eclipse.epf.uma.UmaPackage;
 import org.eclipse.epf.uma.VariabilityElement;
 import org.eclipse.epf.uma.VariabilityType;
-import org.eclipse.epf.uma.util.Scope;
 import org.eclipse.gmf.runtime.diagram.ui.resources.editor.document.IDocumentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IContentProvider;
@@ -64,8 +62,6 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -116,21 +112,19 @@ public class ActivityGeneralSection extends WorkBreakdownElementGeneralSection {
 	private Text baseText;
 
 	private Button selectButton;
-	
-	private Text orderText;
 
 	protected ILabelProvider variabilityLabelProvider = new AdapterFactoryLabelProvider(
 			TngAdapterFactory.INSTANCE
 					.getNavigatorView_ComposedAdapterFactory()) {
 		public String getText(Object object) {
 			VariabilityType varObject = (VariabilityType) object;
-			if (varObject == VariabilityType.NA)
+			if (varObject == VariabilityType.NA_LITERAL)
 				return NOT_APPLICABLE_TEXT;
-			if (varObject == VariabilityType.CONTRIBUTES)
+			if (varObject == VariabilityType.CONTRIBUTES_LITERAL)
 				return CONTRIBUTES_TEXT;
-			if (varObject == VariabilityType.EXTENDS)
+			if (varObject == VariabilityType.EXTENDS_LITERAL)
 				return EXTENDS_TEXT;
-			if (varObject == VariabilityType.REPLACES)
+			if (varObject == VariabilityType.REPLACES_LITERAL)
 				return REPLACES_TEXT;
 			return null;
 		}
@@ -141,10 +135,10 @@ public class ActivityGeneralSection extends WorkBreakdownElementGeneralSection {
 					.getNavigatorView_ComposedAdapterFactory()) {
 		public Object[] getElements(Object object) {
 			List variabilityTypesList = new ArrayList();
-			variabilityTypesList.add(VariabilityType.NA);
-			variabilityTypesList.add(VariabilityType.CONTRIBUTES);
-			variabilityTypesList.add(VariabilityType.EXTENDS);
-			variabilityTypesList.add(VariabilityType.REPLACES);
+			variabilityTypesList.add(VariabilityType.NA_LITERAL);
+			variabilityTypesList.add(VariabilityType.CONTRIBUTES_LITERAL);
+			variabilityTypesList.add(VariabilityType.EXTENDS_LITERAL);
+			variabilityTypesList.add(VariabilityType.REPLACES_LITERAL);
 			return variabilityTypesList.toArray();
 		}
 	};
@@ -170,10 +164,8 @@ public class ActivityGeneralSection extends WorkBreakdownElementGeneralSection {
 
 		modelInfoText = FormUI.createText(toolkit, generalComposite,
 				SWT.DEFAULT, horizontalSpan);
-//		modelInfoText.setEnabled(false);
-		modelInfoText.setEditable(false);
+		modelInfoText.setEnabled(false);
 		modelInfoText.setText(getModelInfo());
-		modelInfoText.setForeground(ColorConstants.gray);
 
 		// Type of an Activity
 		activityTypeLabel = FormUI.createLabel(toolkit, generalComposite,
@@ -238,47 +230,6 @@ public class ActivityGeneralSection extends WorkBreakdownElementGeneralSection {
 		// Button to select
 		selectButton = FormUI.createButton(toolkit, generalComposite,
 				AuthoringUIText.SELECT_BUTTON_TEXT);
-		
-		// Variability Type
-		FormUI.createLabel(toolkit, generalComposite,
-				AuthoringUIResources.contribution_order_text);
-
-
-		orderText = FormUI.createText(toolkit, generalComposite);
-		if (getElement() instanceof Activity) {
-			String text = PropUtil.getPropUtil().getContributionOrder((Activity) getElement());
-			if (text == null) {
-				text = "";  //$NON-NLS-1$
-			}
-			orderText.setText(text);
-		}		
-		orderText.addModifyListener(getOrderTextModifyListener());			
-		Label blankLabel1 = FormUI.createLabel(toolkit, generalComposite, ""); //$NON-NLS-1$
-		{
-			GridData gridData = new GridData(GridData.BEGINNING);
-			gridData.horizontalSpan = 1;
-			blankLabel1.setLayoutData(gridData);
-		}
-		
-	}
-	
-	private ModifyListener getOrderTextModifyListener() {
-		final PropUtil propUtil = PropUtil.getPropUtil(actionMgr);
-		ModifyListener orderTextModifyListener = new ModifyListener() {
-			public void modifyText(ModifyEvent e) {
-				String newText = orderText.getText().trim();
-				String oldText = propUtil
-						.getContributionOrder(getElement());
-				if (oldText == null) {
-					oldText = "";//$NON-NLS-1$
-				}
-				if (!newText.equals(oldText)) {
-					propUtil.setContributionOrder((Activity) getElement(),
-							newText);
-				}
-			}
-		};
-		return orderTextModifyListener;
 	}
 	
 	private List<AbstractDiagramEditor> getDirtyDiagramEditors() {
@@ -422,7 +373,7 @@ public class ActivityGeneralSection extends WorkBreakdownElementGeneralSection {
 //						return;
 //					}
 					
-					if(type != VariabilityType.NA) {
+					if(type != VariabilityType.NA_LITERAL) {
 						IStatus state = DependencyChecker.checkCircularDependencyAfterFilterSelection(element, (Activity) ve, type);
 						if(!state.isOK()) {
 							String title = AuthoringUIResources.activity_variability_error_title;
@@ -443,21 +394,21 @@ public class ActivityGeneralSection extends WorkBreakdownElementGeneralSection {
 					if (!status) {
 						if (element.getPresentationName() == null
 								|| element.getPresentationName().equals("")) { //$NON-NLS-1$
-							if (type.equals(VariabilityType.NA))
+							if (type.equals(VariabilityType.NA_LITERAL))
 								element.setPresentationName(element.getName());
 						}
 						return;
 					}
 					if (element.getPresentationName() == null
 							|| element.getPresentationName().equals("")) { //$NON-NLS-1$
-						if (type.equals(VariabilityType.CONTRIBUTES)
-								|| type.equals(VariabilityType.REPLACES)
-								|| type.equals(VariabilityType.NA))
+						if (type.equals(VariabilityType.CONTRIBUTES_LITERAL)
+								|| type.equals(VariabilityType.REPLACES_LITERAL)
+								|| type.equals(VariabilityType.NA_LITERAL))
 							element.setPresentationName(element.getName());
 					}
 				}
 
-				if (type == VariabilityType.NA) {
+				if (type == VariabilityType.NA_LITERAL) {
 					if (ve != null) {
 						boolean status = actionMgr
 								.doAction(
@@ -488,9 +439,6 @@ public class ActivityGeneralSection extends WorkBreakdownElementGeneralSection {
 		selectButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				MethodConfiguration config = getConfiguration();
-				if (config instanceof Scope) {
-					config = LibraryService.getInstance().getCurrentMethodConfiguration();
-				}
 				String tabName = FilterConstants.ACTIVITIES;
 
 				VariabilityType type = (VariabilityType) ((IStructuredSelection) viewer_variability
@@ -569,7 +517,7 @@ public class ActivityGeneralSection extends WorkBreakdownElementGeneralSection {
 						VariabilityElement ve = (VariabilityElement) o;
 
 						IConfigurator configurator = new ProcessVariabilityConfigurator(
-								getDefaultConfiguration());
+								getDefaultConfiguration(), null);
 						ActivityVariabilityCommand cmd = new ActivityVariabilityCommand(
 								element, ve, type, configurator);
 						boolean status = actionMgr.execute(cmd);
@@ -623,7 +571,7 @@ public class ActivityGeneralSection extends WorkBreakdownElementGeneralSection {
 
 		ctrl_variability.setEnabled(editable);
 		if (((IStructuredSelection) viewer_variability.getSelection())
-				.getFirstElement() == VariabilityType.NA) {
+				.getFirstElement() == VariabilityType.NA_LITERAL) {
 			selectButton.setEnabled(false);
 		}
 	}
@@ -639,15 +587,6 @@ public class ActivityGeneralSection extends WorkBreakdownElementGeneralSection {
 
 				element = (Activity) getElement();
 
-				String text = PropUtil.getPropUtil()
-						.getContributionOrder(element);
-				if (text == null) {
-					text = ""; //$NON-NLS-1$
-				}
-				if (! text.equals(orderText.getText())) {
-					orderText.setText(text);
-				}
-				
 				modelInfoText.setText(getModelInfo());
 
 				ctrl_type_text.setText(PropertiesUtil.getType(element));
@@ -678,11 +617,11 @@ public class ActivityGeneralSection extends WorkBreakdownElementGeneralSection {
 				
 				// make variability type combo disabled incase type is either local contributes or local replaces.
 				if (variabilityType
-						.equals(VariabilityType.LOCAL_CONTRIBUTION)
+						.equals(VariabilityType.LOCAL_CONTRIBUTION_LITERAL)
 						|| (variabilityType
-								.equals(VariabilityType.LOCAL_REPLACEMENT))) {
+								.equals(VariabilityType.LOCAL_REPLACEMENT_LITERAL))) {
 					IStructuredSelection selection = new StructuredSelection(
-							VariabilityType.NA);
+							VariabilityType.NA_LITERAL);
 					viewer_variability.setSelection(selection);
 					ctrl_variability.setEnabled(false);
 				} else

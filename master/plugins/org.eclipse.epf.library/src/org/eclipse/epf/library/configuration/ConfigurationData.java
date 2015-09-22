@@ -25,26 +25,15 @@ import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.epf.common.utils.ExtensionHelper;
-import org.eclipse.epf.library.ConfigHelperDelegate;
 import org.eclipse.epf.library.ILibraryManager;
 import org.eclipse.epf.library.LibraryService;
 import org.eclipse.epf.library.LibraryServiceUtil;
-import org.eclipse.epf.library.configuration.closure.ConfigurationClosure;
-import org.eclipse.epf.library.edit.command.IActionManager;
-import org.eclipse.epf.library.edit.navigator.ConfigContentPackageItemProvider;
-import org.eclipse.epf.library.edit.realization.IRealizationManager;
 import org.eclipse.epf.library.edit.util.DebugUtil;
-import org.eclipse.epf.library.edit.util.MethodConfigurationPropUtil;
-import org.eclipse.epf.library.edit.util.PropUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.events.ILibraryChangeListener;
-import org.eclipse.epf.library.layout.BrowsingLayoutSettings;
 import org.eclipse.epf.library.util.LibraryUtil;
 import org.eclipse.epf.uma.Activity;
 import org.eclipse.epf.uma.ContentCategory;
-import org.eclipse.epf.uma.ContentElement;
-import org.eclipse.epf.uma.ContentPackage;
 import org.eclipse.epf.uma.CustomCategory;
 import org.eclipse.epf.uma.Discipline;
 import org.eclipse.epf.uma.DisciplineGrouping;
@@ -61,12 +50,10 @@ import org.eclipse.epf.uma.RoleSetGrouping;
 import org.eclipse.epf.uma.Tool;
 import org.eclipse.epf.uma.VariabilityElement;
 import org.eclipse.epf.uma.VariabilityType;
-import org.eclipse.epf.uma.WorkProductDescriptor;
 import org.eclipse.epf.uma.WorkProductType;
-import org.eclipse.epf.uma.util.UmaUtil;
 
 /**
- *  Class managing configuration add/subtracted data calculation and cache
+ *  Class managing configuration data calculation and cache
  * 
  * @author Weiping Lu - Mar 20, 2007
  * @author Jinhua Xi
@@ -74,18 +61,11 @@ import org.eclipse.epf.uma.util.UmaUtil;
  */
 public class ConfigurationData {
 
-	//Flag to toggle off supporting plugin feature
-	public static boolean ignoreSupportingPlugin = false;
-	
 	private static boolean localDebug = false;
 	private static boolean profiling = false;
 	
 	private MethodConfiguration config;
 	
-	public MethodConfiguration getConfig() {
-		return config;
-	}
-
 	// make sure the map is created.
 	private Map<String, MethodElement> substractedElemMap = new HashMap<String, MethodElement>();
 	private Map<String, MethodElement> addedElemMap = new HashMap<String, MethodElement>();
@@ -97,21 +77,9 @@ public class ConfigurationData {
 	private Adapter configListener;
 	private ILibraryChangeListener libListener;
 	private boolean enableUpdate = true;
-	private SupportingElementData supportingElementData;
-	
-	private Set<MethodPackage> elementsUnslectedPkgs;
-	
-	public static ConfigurationData newConfigurationData(MethodConfiguration config) {
-		Object obj = ExtensionHelper.create(ConfigurationData.class, config);
-		if (obj instanceof ConfigurationData) {
-			return (ConfigurationData) obj;
-		}		
-		return new ConfigurationData(config);
-	}
 	
 	public ConfigurationData(MethodConfiguration config) {
 		this.config = config;
-		elementsUnslectedPkgs = MethodConfigurationPropUtil.getMethodConfigurationPropUtil().getElementsUnslectedPkgs(config);
 		
 		configListener = new AdapterImpl() {
 			public void notifyChanged(Notification msg) {
@@ -133,8 +101,18 @@ public class ConfigurationData {
 			public void libraryChanged(int option, Collection changedItems) {
 				if (localDebug) {
 					//System.out.println("LD> libraryChanged, option: " + option + ", " + changedItems);//$NON-NLS-1$//$NON-NLS-2$
-				}				
-				handleLibraryChange(option, changedItems);
+				}
+				
+				if (isNeedUpdateChanges()) {
+					return;
+				}
+				for (Iterator it = changedItems.iterator(); it.hasNext();) {
+					Object item = it.next();
+					if (item instanceof ContentCategory) {
+						setNeedUpdateChanges(true);
+						return;
+					}
+				}
 			}
 		};
 		
@@ -143,22 +121,9 @@ public class ConfigurationData {
 		if(libraryManager != null) {
 			libraryManager.addListener(libListener);
 		}
-	}
+	} 
 	
-	protected void handleLibraryChange(int option, Collection changedItems) {
-		if (isNeedUpdateChanges()) {
-			return;
-		}
-		for (Iterator it = changedItems.iterator(); it.hasNext();) {
-			Object item = it.next();
-			if (item instanceof ContentCategory) {
-				setNeedUpdateChanges(true);
-				return;
-			}
-		}
-	}
-	
-	protected boolean getUpdatingChanges() {
+	private boolean getUpdatingChanges() {
 		return originalSubstracted != null && orignalAdded != null;
 	}
 	
@@ -188,7 +153,6 @@ public class ConfigurationData {
 	}
 	
 	private void updateChanges_() {
-		ConfigurationHelper.getDelegate().fixupLoadCheckPackages(getConfig());		
 		substractedElemMap.clear();
 		addedElemMap.clear();
 		
@@ -223,11 +187,7 @@ public class ConfigurationData {
 		if (changed && localDebug) {
 			DebugUtil.print("calSubstracted after handleContributors: ", null, calSubstracted.values(), 2);//$NON-NLS-1$
 		}		
-		changed = handleContributors(calAdded, false);
-		if (changed && localDebug) {
-			DebugUtil.print("calAdded after handleContributors: ", null, calAdded.values(), 2);//$NON-NLS-1$
-		}
-				
+		
 		calSubstracted = handleReplacers(calSubstracted, true);
 		calAdded = handleReplacers(calAdded, false);
 		
@@ -278,8 +238,7 @@ public class ConfigurationData {
 		
 	//return true if any change
 	private boolean handleContributors(Map<String, ContentCategory> map,  boolean substracted) {
-//		if (map == null || ! substracted) {
-		if (map == null) {
+		if (map == null || ! substracted) {
 			return false;
 		}
 		List<ContentCategory> addedList = new ArrayList<ContentCategory>();
@@ -348,7 +307,7 @@ public class ConfigurationData {
 		}
 	}	
 	
-	private Collection<? extends ContentCategory> getChildCC(ContentCategory cc) {
+	private Collection<ContentCategory> getChildCC(ContentCategory cc) {
 		if (cc instanceof CustomCategory) {
 			return ((CustomCategory) cc).getSubCategories();
 		}
@@ -365,6 +324,9 @@ public class ConfigurationData {
 		}
 		if (cc instanceof RoleSetGrouping) {
 			return ((RoleSetGrouping) cc).getRoleSets();
+		}
+		if (cc instanceof Tool) {
+			return ((Tool) cc).getToolMentors();
 		}
 		if (cc instanceof WorkProductType) {
 		}
@@ -441,18 +403,8 @@ public class ConfigurationData {
 		return ret;
 	}	
 	
-	public boolean isOwnerSelected(MethodElement element, boolean checkSubtracted) {			
+	public boolean isOwnerSelected(MethodElement element, boolean checkSubtracted) {
 		boolean ret = isOwnerSelected_(element, checkSubtracted);
-		if (BrowsingLayoutSettings.INSTANCE.isExcludeUnusedWPDs() && ret && element instanceof WorkProductDescriptor) {
-			ConfigHelperDelegate delegate = ConfigurationHelper.getDelegate();
-			IRealizationManager mgr = delegate.getRealizationManager(getConfig());
-			//mgr == null => not auto synchronized -> skip this check
-			if (mgr != null && delegate.browseOrPublishMode()) {
-				if (PropUtil.getPropUtil().isExcludedFromPublish(element)) {
-					ret = false;
-				}
-			}
-		}
 		if (localDebug) {
 			System.out.println("LD> isOwnerSelected: " + ret + ", " +  //$NON-NLS-1$ //$NON-NLS-2$
 					DebugUtil.toString(element, 2));	
@@ -460,7 +412,7 @@ public class ConfigurationData {
 		return ret;
 	}
 	
-	protected boolean isOwnerSelected_(MethodElement element, boolean checkSubtracted) {
+	private boolean isOwnerSelected_(MethodElement element, boolean checkSubtracted) {
 		if (element == null) {
 			return false;
 		}
@@ -468,17 +420,6 @@ public class ConfigurationData {
 		if (ConfigurationHelper.isDescriptionElement(element)) {
 			return true;
 		}
-		
-		ConfigurationClosure.ProcessNodeLock lock = ConfigurationClosure.processNodeLock;
-		//Synchronized check only on thread different from the locking thread 
-		if (lock.getLockingThread() != null && lock.getLockingThread() != Thread.currentThread()) {
-			synchronized (lock) {
-				Thread tread = lock.getLockingThread();
-				if (true) {
-					System.out.println("LD> updated locking thread: " + tread);//$NON-NLS-1$ 
-				}
-			}
-		}	
 		
 		if (getUpdatingChanges()) {
 			if (originalSubstracted.containsKey(element.getGuid()) || 
@@ -502,7 +443,7 @@ public class ConfigurationData {
 			// 2. any element in the added categories should be included
 			// 3. any element not in the selected package or plugin should be excluded.		
 			if ( checkSubtracted) {
-				if (isElementSubtracted(element)) {
+				if (substractedElemMap.containsKey(element.getGuid())) {
 					return false;
 				} else if (element instanceof VariabilityElement){
 					if (contributedBaseInSubstracted((VariabilityElement) element)) {
@@ -511,54 +452,10 @@ public class ConfigurationData {
 				}
 			}
 			
-			if (isElementAdded(element)) {
-				if (element instanceof Activity) {
-					VariabilityElement base = ((Activity) element).getVariabilityBasedOnElement();
-					if (base != null
-							&& base != element
-							&& !ConfigurationHelper.inConfig(base, config,
-									checkSubtracted)) {
-						return false;
-					}
-				}
+			if (addedElemMap.containsKey(element.getGuid())) {
 				return true;
 			}
-			
-/*			if (! ignoreSupportingPlugin) {
-				MethodPlugin plugin = UmaUtil.getMethodPlugin(element);
-				if (plugin != null && plugin.isSupporting()) {
-					SupportingElementData seData = getSupportingElementData();
-					if (seData != null && seData.isEnabled()) {
-						if (seData.isUpdatingChanges()) {
-							return false;
-						}
-						return seData.isSupportingElement(element);
-					}
-				}
-			}*/
-			
-			boolean isLibOrPluginOrConfig = element instanceof MethodLibrary ||
-			element instanceof MethodConfiguration || element instanceof MethodPlugin;
-			
-			SupportingElementData seData = getSupportingElementData();
-			if (!isLibOrPluginOrConfig && seData != null && !seData.bypassLogic()) {
-				if (seData.isNeedUpdateChanges()) {
-					seData.updateChanges();
-				}
-				if (seData.isEnabled()) {
-					MethodPlugin plugin = UmaUtil.getMethodPlugin(element);
-					if (plugin != null && plugin.isSupporting() || seData.inSupportingPackage(element)) {
-						if (! config.getMethodPluginSelection().contains(plugin)) {
-							return false;
-						}
-						int ix = seData.checkInConfigIndex(element);
-						//ix: 0 = unknown, 1 = yes, 2 = no
-						if (ix == 1 || ix == 2) {
-							return ix == 1;
-						}
-					}
-				}
-			}				
+
 		} 
 		
 		// elements beyond configuration scope should be always visible
@@ -612,7 +509,7 @@ public class ConfigurationData {
 			}
 
 			// if package not selected, return false
-			if ((pkg == null) || !pkgs.contains(pkg) || (pkg instanceof MethodPackage && elementsUnslected((MethodPackage) pkg))) {
+			if ((pkg == null) || !pkgs.contains(pkg)) {
 				return false;
 			}
 
@@ -621,7 +518,7 @@ public class ConfigurationData {
 	}
 
 	private boolean contributedBaseInSubstracted(VariabilityElement ve) {
-		if (ve.getVariabilityType() != VariabilityType.CONTRIBUTES) {
+		if (ve.getVariabilityType() != VariabilityType.CONTRIBUTES_LITERAL) {
 			return false;
 		}
 		
@@ -650,17 +547,11 @@ public class ConfigurationData {
 	}
 	
 	public void dispose() {
-		if (elementsUnslectedPkgs != null) {
-			elementsUnslectedPkgs.clear();
-			elementsUnslectedPkgs = null;
-		}
 		config.eAdapters().remove(configListener);
-		if (libraryManager != null) {
-			libraryManager.removeListener(libListener);
-		}
+		libraryManager.removeListener(libListener);		
 	}
 
-	protected boolean isNeedUpdateChanges() {
+	private boolean isNeedUpdateChanges() {
 		return needUpdateChanges;
 	}
 
@@ -690,150 +581,11 @@ public class ConfigurationData {
 		return substractedElemMap.values();
 	}
 	
-	public boolean isElementSubtracted(MethodElement element) {
+	public boolean isElementInSubtractedCategory(MethodElement element) {
 		return substractedElemMap.containsKey(element.getGuid());
 	}
 	
-	public boolean isElementAdded(MethodElement element) {
+	public boolean isElementInAddedCategory(MethodElement element) {
 		return addedElemMap.containsKey(element.getGuid());
 	}
-
-	private SupportingElementData getSupportingElementData() {
-		if (supportingElementData == null) {
-			supportingElementData = LibraryService.getInstance()
-			.getConfigurationManager(config).getSupportingElementData();
-		}
-		return supportingElementData;
-	}
-	
-	
-	public boolean isSubstracted(MethodElement element) {
-		if (getUpdatingChanges()) {
-			throw new UnsupportedOperationException();
-		}
-		updateChanges();
-
-		if (isElementSubtracted(element)) {
-			return true;
-		} else if (element instanceof VariabilityElement) {
-			if (contributedBaseInSubstracted((VariabilityElement) element)) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	//Handle leaf elements node APIs
-	public boolean elementsUnslected(MethodPackage pkg) {
-		if (ConfigContentPackageItemProvider.oldCode) {
-			return false;
-		}
-		return elementsUnslectedPkgs == null ? false : elementsUnslectedPkgs.contains(pkg);
-	}
-	
-	protected boolean hasAddedElements() {
-		return addedElemMap != null && !addedElemMap.isEmpty();
-	}
-	
-	protected boolean hasSubstractedElements() {
-		return substractedElemMap != null && !substractedElemMap.isEmpty();
-	}
-	
-	public boolean hasAddedElements(MethodPackage pkg) {
-		if (! hasAddedElements()) {
-			return false;
-		}
-		if ( !(pkg instanceof ContentPackage)) {
-			return false;
-		}
-		for (ContentElement element : ((ContentPackage) pkg).getContentElements()) {
-			if (isElementAdded(element)) {
-				return true;
-			}
-		}		
-		return false;
-	}
-	
-	public boolean hasSubstractedElements(MethodPackage pkg) {
-		if (! hasSubstractedElements()) {
-			return false;
-		}
-		if ( !(pkg instanceof ContentPackage)) {
-			return false;
-		}
-		for (ContentElement element : ((ContentPackage) pkg).getContentElements()) {
-			if (isElementSubtracted(element)) {
-				return true;
-			}
-		}		
-		return false;
-	}
-	
-	private boolean elementsUnslectedPkgsModified(Set<MethodPackage> updatedElementsUnslectedPkgs) {
-		boolean updatedIsEmpty = updatedElementsUnslectedPkgs == null || updatedElementsUnslectedPkgs.isEmpty();
-		if (elementsUnslectedPkgs == null || elementsUnslectedPkgs.isEmpty()) {
-			return ! updatedIsEmpty;
-		}
-		if (updatedIsEmpty) {
-			return true;
-		}
-		if (elementsUnslectedPkgs.size() != updatedElementsUnslectedPkgs.size()) {
-			return true;
-		}
-		for (MethodPackage pkg : updatedElementsUnslectedPkgs) {
-			if (! (elementsUnslected(pkg))) {
-				return true;
-			}
-		}		
-		return false;
-	}
-	
-	protected boolean storeElementsUnslectedPkgsProp(IActionManager actionManager, Set<MethodPackage> updatedElementsUnslectedPkgs) {
-		if (ConfigContentPackageItemProvider.oldCode) {
-			return false;
-		}
-		if (! elementsUnslectedPkgsModified(updatedElementsUnslectedPkgs)) {
-			return false;
-		}
-		elementsUnslectedPkgs = updatedElementsUnslectedPkgs;
-		MethodConfigurationPropUtil propUtil = MethodConfigurationPropUtil.getMethodConfigurationPropUtil(actionManager);
-		propUtil.setElementsUnslectedPkgsProp(config, elementsUnslectedPkgs);
-		return true;
-	}
-	
-	public String getSelectionInfo(Object selectedElement) {
-		if (selectedElement instanceof MethodElement) {
-			return ((MethodElement) selectedElement).getBriefDescription();
-		}
-		
-		return "";	//$NON-NLS-1
-	}
-	
-	public String debugSelString() {
-		return "";		//$NON-NLS-1
-	}
-	
-	public SupportingElementData newSupportingElementData() {
-		return new SupportingElementData(getConfig());
-	}
-	
-	public void setBeingEdit(boolean b) {
-		setBeingEdit(b, false);
-	}
-	
-	public void setBeingEdit(boolean b, boolean editorDirty) {		
-	}
-	
-	public void updatePackageSelections(IActionManager actionManager, 
-			Set<MethodPackage> elementsUnslectedPkgs,
-			Collection<MethodPackage> toggleToUncheckPkgs,
-			Collection<MethodPackage> toggleToCheckPkgs) {
-		storeElementsUnslectedPkgsProp(actionManager, elementsUnslectedPkgs);
-	}
-	
-	public boolean isSuppressed(MethodElement element) {
-		return false;
-	}
-
-	
 }

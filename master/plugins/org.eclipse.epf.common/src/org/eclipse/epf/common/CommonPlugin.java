@@ -10,13 +10,13 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.common;
 
-import org.eclipse.epf.common.preferences.IPreferenceStoreWrapper;
+import org.eclipse.epf.common.plugin.AbstractPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
  * The Common plug-in activator.
  */
-public final class CommonPlugin extends AbstractActivator {
+public class CommonPlugin extends AbstractPlugin {
 
 	// The shared plug-in instance.
 	private static CommonPlugin plugin;
@@ -30,14 +30,14 @@ public final class CommonPlugin extends AbstractActivator {
 	}
 
 	/**
-	 * @see org.eclipse.epf.common.ui.AbstractPlugin#start(org.osgi.framework.BundleContext)
+	 * @see org.eclipse.epf.common.plugin.AbstractPlugin#start(org.osgi.framework.BundleContext)
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 	}
 
 	/**
-	 * @see org.eclipse.epf.common.ui.AbstractPlugin#stop(org.osgi.framework.BundleContext)
+	 * @see org.eclipse.epf.common.plugin.AbstractPlugin#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
@@ -53,30 +53,4 @@ public final class CommonPlugin extends AbstractActivator {
 		return plugin;
 	}
 
-//	/**
-//	 * set the store wrapper before it's being used.
-//	 * @param storeWrapper
-//	 */
-	private IPreferenceStoreWrapper storeWrapper = null;
-	
-	public void setCommonPreferenceStore(IPreferenceStoreWrapper storeWrapper) {
-		this.storeWrapper = storeWrapper;
-	}
-	
-	public IPreferenceStoreWrapper getCommonPreferenceStore() {
-		return storeWrapper;
-	}
-	
-	// this is the context for message callback
-	// for eclipse client, this is the Shell object
-	IContextProvider contextProvider = null;
-
-	public void setContextProvider(IContextProvider contextProvider) {
-		this.contextProvider = contextProvider;
-	}
-
-	IMessageCallback msgCallback = null;
-	public void setMsgCallback(IMessageCallback msgCallback) {
-		this.msgCallback = msgCallback;
-	}
 }

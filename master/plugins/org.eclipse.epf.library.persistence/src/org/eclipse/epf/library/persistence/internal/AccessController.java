@@ -20,6 +20,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.epf.library.persistence.ILibraryResourceSet;
 import org.eclipse.epf.persistence.FileManager;
+import org.eclipse.epf.persistence.util.PersistenceUtil;
 import org.eclipse.epf.services.IAccessController;
 
 /**
@@ -65,11 +66,9 @@ public class AccessController implements IAccessController {
 		ArrayList<String> paths = new ArrayList<String>();
 		for (int i = 0; i < resources.length; i++) {
 			Resource resource = resources[i];
-			if (resource != null) {
-				String path = FileManager.toFileString(resource.getURI());
-				if(path != null) {
-					paths.add(path);
-				}
+			String path = FileManager.toFileString(resource.getURI());
+			if(path != null) {
+				paths.add(path);
 			}
 		}
 		if(!paths.isEmpty()) {

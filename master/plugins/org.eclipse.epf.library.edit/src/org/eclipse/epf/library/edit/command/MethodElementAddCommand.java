@@ -23,9 +23,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.Stack;
+import java.util.Map.Entry;
+
+import javax.swing.JFrame;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -38,6 +39,8 @@ import org.eclipse.emf.common.command.CommandWrapper;
 import org.eclipse.emf.common.util.AbstractTreeIterator;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.epf.library.edit.navigator.VariantsPackageItemProvider;
+import org.eclipse.epf.library.edit.navigator.ItemProviderAdapterFactory;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
@@ -46,19 +49,20 @@ import org.eclipse.emf.ecore.util.EContentsEList;
 import org.eclipse.emf.ecore.xml.type.XMLTypePackage.Literals;
 import org.eclipse.emf.edit.command.AddCommand;
 import org.eclipse.emf.edit.domain.EditingDomain;
+import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
+import org.eclipse.epf.common.serviceability.MsgBox;
 import org.eclipse.epf.common.utils.StrUtil;
 import org.eclipse.epf.library.edit.LibraryEditPlugin;
 import org.eclipse.epf.library.edit.LibraryEditResources;
 import org.eclipse.epf.library.edit.ui.UserInteractionHelper;
+import org.eclipse.epf.library.edit.ui.vepf.dialogs.VarPointDialog;
+import org.eclipse.epf.library.edit.ui.vepf.dialogs.VariantDialog;
 import org.eclipse.epf.library.edit.util.ExtensionManager;
-import org.eclipse.epf.library.edit.util.IRunnableWithProgress;
 import org.eclipse.epf.library.edit.util.ITextReferenceReplacer;
-import org.eclipse.epf.library.edit.util.LibraryEditUtil;
 import org.eclipse.epf.library.edit.util.Messenger;
 import org.eclipse.epf.library.edit.util.Misc;
-import org.eclipse.epf.library.edit.util.PropUtil;
+import org.eclipse.epf.library.edit.util.ModelStructure;
 import org.eclipse.epf.library.edit.util.TngUtil;
-import org.eclipse.epf.library.edit.validation.AbstractStringValidator;
 import org.eclipse.epf.library.edit.validation.IValidator;
 import org.eclipse.epf.library.edit.validation.IValidatorFactory;
 import org.eclipse.epf.library.edit.validation.NameChecker;
@@ -68,27 +72,66 @@ import org.eclipse.epf.library.edit.validation.internal.ValidatorFactory;
 import org.eclipse.epf.services.IFileBasedLibraryPersister;
 import org.eclipse.epf.services.ILibraryPersister;
 import org.eclipse.epf.services.Services;
+import org.eclipse.epf.uma.Activity;
+import org.eclipse.epf.uma.BreakdownElement;
+import org.eclipse.epf.uma.ContentDescription;
 import org.eclipse.epf.uma.ContentElement;
 import org.eclipse.epf.uma.ContentPackage;
-import org.eclipse.epf.uma.CustomCategory;
+import org.eclipse.epf.uma.Descriptor;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.MethodLibrary;
-import org.eclipse.epf.uma.MethodPackage;
 import org.eclipse.epf.uma.MethodPlugin;
 import org.eclipse.epf.uma.MethodUnit;
 import org.eclipse.epf.uma.NamedElement;
 import org.eclipse.epf.uma.ProcessComponent;
 import org.eclipse.epf.uma.ProcessElement;
 import org.eclipse.epf.uma.ProcessPackage;
+import org.eclipse.epf.uma.ProcessPlanningTemplate;
+import org.eclipse.epf.uma.UmaFactory;
 import org.eclipse.epf.uma.UmaPackage;
+import org.eclipse.epf.uma.VarActivity;
+import org.eclipse.epf.uma.VarElement;
+import org.eclipse.epf.uma.VarIteration;
+import org.eclipse.epf.uma.VarMilestone;
+import org.eclipse.epf.uma.VarPhase;
+import org.eclipse.epf.uma.VarPoint;
+import org.eclipse.epf.uma.VarPointsPackage;
+import org.eclipse.epf.uma.VarRoleDescriptor;
+import org.eclipse.epf.uma.VarTaskDescriptor;
+import org.eclipse.epf.uma.VarTeamProfile;
+import org.eclipse.epf.uma.VarWorkProductDescriptor;
 import org.eclipse.epf.uma.VariabilityType;
+import org.eclipse.epf.uma.Variant;
+import org.eclipse.epf.uma.VariantsPackage;
+import org.eclipse.epf.uma.varP2varP;
+import org.eclipse.epf.uma.variant2varP;
+import org.eclipse.epf.uma.variant2variant;
+import org.eclipse.epf.uma.varp2variant;
+import org.eclipse.epf.uma.vpActivity;
+import org.eclipse.epf.uma.vpIteration;
+import org.eclipse.epf.uma.vpMilestone;
+import org.eclipse.epf.uma.vpPhase;
+import org.eclipse.epf.uma.vpRoleDescriptor;
+import org.eclipse.epf.uma.vpTaskDescriptor;
+import org.eclipse.epf.uma.vpTeamProfile;
+import org.eclipse.epf.uma.vpWorkProductDescriptor;
 import org.eclipse.epf.uma.edit.domain.TraceableAdapterFactoryEditingDomain;
+import org.eclipse.epf.uma.impl.variant2variantImpl;
 import org.eclipse.epf.uma.util.AssociationHelper;
 import org.eclipse.epf.uma.util.ContentDescriptionFactory;
 import org.eclipse.epf.uma.util.MessageException;
 import org.eclipse.epf.uma.util.UmaUtil;
+import org.eclipse.jface.dialogs.IInputValidator;
+import org.eclipse.jface.dialogs.InputDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.operation.ModalContext;
+import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 
 /**
  * This command is used to add a method element to a containing method element.
@@ -129,7 +172,7 @@ public class MethodElementAddCommand extends CommandWrapper implements
 
 	protected ArrayList<EStructuralFeature> featuresToCheck;
 
-	protected ArrayList nestedCommands;
+	private ArrayList nestedCommands;
 
 	private HashSet modifiedResources;
 
@@ -189,7 +232,7 @@ public class MethodElementAddCommand extends CommandWrapper implements
 	
 	
 	public void execute() {
-		Object shell = LibraryEditPlugin.getDefault().getContext();
+		Shell shell = MsgBox.getDefaultShell();
 		// Check whether the owner resource can be modified.
 		//
 		Collection resourcesToChange = getModifiedResources();
@@ -254,7 +297,7 @@ public class MethodElementAddCommand extends CommandWrapper implements
 	/**
 	 * @return
 	 */
-	private boolean checkFolder(Object shell) {
+	private boolean checkFolder(Shell shell) {
 		// if any of the elements to be added will be saved in its own file
 		// check if the folder to save the file to can be modified
 		//
@@ -328,7 +371,6 @@ public class MethodElementAddCommand extends CommandWrapper implements
 	 */
 	public static Collection<Reference> getIllegalOutgoingReferences(
 			MethodPlugin ownerPlugin, EObject e, Collection<Reference> illegalReferences) {
-		Map<String, Boolean> map = new HashMap<String, Boolean>(); 
 		if (illegalReferences == null) {
 			illegalReferences = new ArrayList<Reference>();
 		}
@@ -339,7 +381,7 @@ public class MethodElementAddCommand extends CommandWrapper implements
 			if (!feature.isDerived()) {
 				MethodPlugin plugin = UmaUtil.getMethodPlugin(eObject);
 				if (plugin != null && plugin != ownerPlugin
-						&& !Misc.isBaseOf(plugin, ownerPlugin, map)) {
+						&& !Misc.isBaseOf(plugin, ownerPlugin)) {
 					// illegal reference to be removed
 					//
 					illegalReferences
@@ -393,7 +435,6 @@ public class MethodElementAddCommand extends CommandWrapper implements
 
 	public static boolean hasIllegalReference(MethodPlugin ownerPlugin,
 			EObject e, Collection moveList) {
-		Map<String, Boolean> map = new HashMap<String, Boolean>(); 
 		for (EContentsEList.FeatureIterator featureIterator = (EContentsEList.FeatureIterator) e
 				.eCrossReferences().iterator(); hasNext(featureIterator);) {
 			EObject eObject = (EObject) featureIterator.next();
@@ -403,7 +444,7 @@ public class MethodElementAddCommand extends CommandWrapper implements
 			if (!moveList.contains(eObject)) {
 				MethodPlugin plugin = UmaUtil.getMethodPlugin(eObject);
 				if (plugin != null && plugin != ownerPlugin
-						&& !Misc.isBaseOf(plugin, ownerPlugin, map)) {
+						&& !Misc.isBaseOf(plugin, ownerPlugin)) {
 					return true;
 				}
 			}
@@ -421,7 +462,6 @@ public class MethodElementAddCommand extends CommandWrapper implements
 	 */
 	public static boolean isReferencedIllegally(MethodPlugin ownerPlugin,
 			MethodElement e, Collection moveList) {
-		Map<String, Boolean> map = new HashMap<String, Boolean>(); 
 		Collection references = AssociationHelper.getReferences(e);
 		for (Iterator iter = references.iterator(); iter.hasNext();) {
 			MethodElement element = (MethodElement) iter.next();
@@ -433,7 +473,7 @@ public class MethodElementAddCommand extends CommandWrapper implements
 			if (!moveList.contains(element)) {
 				MethodPlugin plugin = UmaUtil.getMethodPlugin(element);
 				if (plugin != null && plugin != ownerPlugin
-						&& !Misc.isBaseOf(ownerPlugin, plugin, map)) {
+						&& !Misc.isBaseOf(ownerPlugin, plugin)) {
 					return true;
 				}
 			}
@@ -450,7 +490,6 @@ public class MethodElementAddCommand extends CommandWrapper implements
 
 	public static Collection removeIllegalReferencesTo(
 			MethodPlugin ownerPlugin, MethodElement e, Collection moveList) {
-		Map<String, Boolean> map = new HashMap<String, Boolean>(); 
 		ArrayList affectedReferencers = new ArrayList();
 		Collection references = AssociationHelper.getReferences(e);
 		for (Iterator iter = references.iterator(); iter.hasNext();) {
@@ -458,7 +497,7 @@ public class MethodElementAddCommand extends CommandWrapper implements
 			if (!moveList.contains(element)) {
 				MethodPlugin plugin = UmaUtil.getMethodPlugin(element);
 				if (plugin != null && plugin != ownerPlugin
-						&& !Misc.isBaseOf(ownerPlugin, plugin, map)) {
+						&& !Misc.isBaseOf(ownerPlugin, plugin)) {
 					checkModify(element);
 					removeReferences(element, e);
 					affectedReferencers.add(element);
@@ -610,7 +649,7 @@ public class MethodElementAddCommand extends CommandWrapper implements
 		}
 	}
 
-	protected boolean checkStringValue(NamedElement e,
+	private boolean checkStringValue(NamedElement e,
 			EStructuralFeature feature, Collection objectsToAdd) {
 		Collection excludedFeaturesToCheck = typeToExcludedFeaturesFromCheck.get(e.eClass()); 
 		if(excludedFeaturesToCheck != null && excludedFeaturesToCheck.contains(feature)) {
@@ -745,7 +784,8 @@ public class MethodElementAddCommand extends CommandWrapper implements
 			if (newName != null) {
 				// new name required, check if the element can be modified
 				//
-				IStatus status = UserInteractionHelper.checkModify(e, LibraryEditPlugin.getDefault().getContext());
+				IStatus status = UserInteractionHelper.checkModify(e, MsgBox
+						.getDefaultShell());
 				String title = LibraryEditResources.errorDialog_title; 
 				String msg = MessageFormat.format(
 						LibraryEditResources.errorDialog_cannotRename,
@@ -807,8 +847,7 @@ public class MethodElementAddCommand extends CommandWrapper implements
 						StrUtil.toLower(featureTxt), e.getName());
 				String currentValue = (String) e.eGet(feature);
 
-				IValidator inputValidator = new AbstractStringValidator() {
-
+				IInputValidator inputValidator = new IInputValidator() {
 					public String isValid(String newText) {
 						if (strValidator != null) {
 							return UserInteractionHelper
@@ -817,20 +856,15 @@ public class MethodElementAddCommand extends CommandWrapper implements
 						}
 						return null;
 					}
-
 				};
-				IUserInteractionHandler uiHandler = ExtensionManager.getDefaultUserInteractionHandler();
-				if(uiHandler != null) {
-					UserInput input = new UserInput("", UserInput.TEXT, false, null, null, inputValidator, null); //$NON-NLS-1$
-					input.setInput(currentValue);
-					List<UserInput> userInputs = Collections.singletonList(input);
-					if(uiHandler.requestInput(title, dlgMsg, userInputs)) {
-						return (String) userInputs.get(0).getInput();
-					}
-					else {
-						throw new OperationCanceledException();
-					}
+				// TODO: replace with org.eclipse.epf.library.edit.command.IUserInteractionHandler.requestInput(String, String, List)
+				InputDialog inputDlg = new InputDialog(
+						MsgBox.getDefaultShell(), title, dlgMsg, currentValue,
+						inputValidator);
+				if (inputDlg.open() == Window.CANCEL) {
+					throw new OperationCanceledException();
 				}
+				return inputDlg.getValue();
 			}
 		}
 
@@ -882,21 +916,19 @@ public class MethodElementAddCommand extends CommandWrapper implements
 		//		
 		ownerPlugin = UmaUtil.getMethodPlugin(addCommand.getOwner());
 		removeXRefRequired = false;
-		if (ownerPlugin != null) {
-			find_xPluginRef: for (Iterator iter = addCommand.getCollection()
-					.iterator(); iter.hasNext();) {
-				Object element = iter.next();
-	
-				if (isExcludedFromOutgoingReferenceCheck(element)) {
-					continue find_xPluginRef;
-				}
-	
-				if (element instanceof MethodElement) {
-					if (hasIllegalReferenceIncludingAllChildren(ownerPlugin,
-							(MethodElement) element, addList)) {
-						removeXRefRequired = true;
-						break find_xPluginRef;
-					}
+		find_xPluginRef: for (Iterator iter = addCommand.getCollection()
+				.iterator(); iter.hasNext();) {
+			Object element = iter.next();
+
+			if (isExcludedFromOutgoingReferenceCheck(element)) {
+				continue find_xPluginRef;
+			}
+
+			if (element instanceof MethodElement) {
+				if (hasIllegalReferenceIncludingAllChildren(ownerPlugin,
+						(MethodElement) element, addList)) {
+					removeXRefRequired = true;
+					break find_xPluginRef;
 				}
 			}
 		}
@@ -1193,15 +1225,10 @@ public class MethodElementAddCommand extends CommandWrapper implements
 					throw new RuntimeException(e.toString());
 				}
 			}
-			if (msgBuff.length() > 0) {
-				IUserInteractionHandler uiHandler = ExtensionManager.getDefaultUserInteractionHandler();
-				if(uiHandler  != null) {
-					int ret = uiHandler.selectOne(new int[] {IUserInteractionHandler.ACTION_YES, IUserInteractionHandler.ACTION_NO }, 
-							getLabel(), msgBuff.toString(), null);
-					if(ret == IUserInteractionHandler.ACTION_NO) {
-						return;
-					}
-				}
+			if (msgBuff.length() > 0
+					&& MsgBox.prompt(Display.getCurrent().getActiveShell(),
+							msgBuff.toString(), SWT.YES | SWT.NO) == SWT.NO) {
+				return;
 			}
 
 			status = new MultiStatus(
@@ -1222,60 +1249,645 @@ public class MethodElementAddCommand extends CommandWrapper implements
 							}
 						}
 					}
-
-					// add the elements
+					//Variables semi-globales para las comprobaciones
 					//
-					superExecute();
+					Boolean canExecute = true;
 					
-					//Note: no need to undo this prop change if fails since the added pkgs instances would be removed
-					PropUtil propUtil = PropUtil.getPropUtil();
-					for (Object addedItem : addList) {
-						if (addedItem instanceof MethodPackage) {
-							MethodPackage pkg = (MethodPackage) addedItem;
-							Boolean b = propUtil.getBooleanValue(pkg, PropUtil.Pkg_loadCheck);
-							if (b == null || !b.booleanValue() ) {
-								propUtil.setBooleanValue(pkg, PropUtil.Pkg_loadCheck, true);
-							}
-						}						
-					}
-
-					executeNestedCommands();
-
-					if (willSaveModifiedResources()) {
-						IStatus result = saveNewElementsWithOwnResource();
-						if (result.isOK()) {
-							monitor
-									.subTask(LibraryEditResources.savingModifiedFilesTask_name); 
-							saveModifiedResources();
-						} else {
-							status.add(result);
-						}
-					}
-
-					if (!status.isOK()) {
-						// FIXME: this causes dead-lock at
-						// LibraryProcessor.notifyListeners(). The method
-						// is synchronized, this might be the cause of the
-						// dead-lock
-						//
-						undo();
+					ModelStructure aux = new ModelStructure();
+					ModelStructure modelStruct = aux.DEFAULT;//extraigo el modelStructure por defecto definido
+					
+					// Lanzamos la ventana si el elemento que nos viene es instancia de vpActivity
+					//
+					for (Iterator iter = addList.iterator(); iter.hasNext();) {
+						EObject element = (EObject) iter.next();
 						
-						if(CommandStatusChecker.hasRollbackError(status)) {
-							Collection<?> createdElements = command.getResult();
-							ILibraryPersister persister = Services.getDefaultLibraryPersister();
-							for (Object object : createdElements) {
-								if(object instanceof MethodElement) {
-									try {
-										persister.delete((MethodElement) object);
-									}
-									catch(Exception e) {
-										LibraryEditPlugin.getDefault().getLogger().logError(e);
+						/*************Comprobamos Presentación*******************/
+						if(element instanceof VarElement){
+							changePresentation(element);
+						}
+						
+						
+						/******Comprobación de Puntos de Variación******/
+						if ((element instanceof VarPoint) && (element instanceof BreakdownElement)) { //Si es instancia de punto de variacion & actividad
+									
+							canExecute = false;//Cerramos la sentencia si es un punto de variación
+							String auxName = "";
+							String auxElement = "";
+							String auxIcon = "";
+							Image imgIcon = LibraryEditPlugin.INSTANCE.getImage("full/vSPEM70x70/desconocido");//Lo inicializamos con el icono desconocido
+							//Los 2 padres generales de los que cualquier elemento VP hereda
+							VarPoint varPoint = (VarPoint) element;
+							BreakdownElement activity = (BreakdownElement) element;
+							
+							///***Obtencion de dependencias***///
+							
+							//Obtenemos el nombre de la linea perteneciente desde donde se ejecuta el comando
+							//
+							Object objFather = addCommand.getOwner();
+							
+							Collection auxVariants = new ArrayList();
+							Collection auxVarPoints = new ArrayList();
+							
+							if (objFather instanceof ProcessElement){
+								ProcessElement auxFather = (ProcessElement) addCommand.getOwner();
+								String processLineNameOwner = auxFather.getProcessLineName();
+								
+								//Obtenemos lista de puntos de variación de esa linea
+								//
+								VarPointsPackage varPointsPkg = (VarPointsPackage) UmaUtil.findVarPointsPackage(ownerPlugin, modelStruct.varPointsPath, processLineNameOwner);
+								if(varPointsPkg != null){
+									auxVarPoints = varPointsPkg.getVarPoints();
+								}
+								//Obtenemos la lista de variantes de esa linea para el mismo tipo
+								//
+								VariantsPackage variantsPkg = (VariantsPackage) UmaUtil.findVariantsPackage(ownerPlugin, modelStruct.variantsPath, processLineNameOwner);
+								
+								////VPActividad
+								if(element instanceof vpActivity){//Instancia de VarActivity
+									auxName="vpActivity";
+									auxElement="Activity";
+									imgIcon = LibraryEditPlugin.INSTANCE.getImage("full/vSPEM70x70/vpactivity");
+									
+									for(Iterator iterator = variantsPkg.getVariant().iterator(); iterator.hasNext();){
+										EObject varElement = (EObject) iterator.next();
+										if(varElement instanceof VarActivity){
+											auxVariants.add(varElement);
+										}
 									}
 								}
-							}								
-						}						
+								////VPPhase
+								if(element instanceof vpPhase){//Instancia de VarActivity
+									auxName="vpPhase";
+									auxElement="Phase";
+									imgIcon = LibraryEditPlugin.INSTANCE.getImage("full/vSPEM70x70/vpphase");
+									
+									for(Iterator iterator = variantsPkg.getVariant().iterator(); iterator.hasNext();){
+										EObject varElement = (EObject) iterator.next();
+										if(varElement instanceof VarPhase){
+											auxVariants.add(varElement);
+										}
+									}
+								}
+								////VPIteration
+								if(element instanceof vpIteration){//Instancia de VarActivity
+									auxName="vpIteration";
+									auxElement="Iteration";
+									imgIcon = LibraryEditPlugin.INSTANCE.getImage("full/vSPEM70x70/vpiteration");
+									
+									for(Iterator iterator = variantsPkg.getVariant().iterator(); iterator.hasNext();){
+										EObject varElement = (EObject) iterator.next();
+										if(varElement instanceof VarIteration){
+											auxVariants.add(varElement);
+										}
+									}
+								}
+								////VPRoleDescriptor
+								if(element instanceof vpRoleDescriptor){
+									auxName="vpRole Descriptor";
+									auxElement="Role Descriptor";
+									imgIcon = LibraryEditPlugin.INSTANCE.getImage("full/vSPEM70x70/vproledescriptor");
+									
+									for(Iterator iterator = variantsPkg.getVariant().iterator(); iterator.hasNext();){
+										EObject varElement = (EObject) iterator.next();
+										if(varElement instanceof VarRoleDescriptor){
+											auxVariants.add(varElement);
+										}
+									}
+								}
+								////VPTaskDescriptor
+								if(element instanceof vpTaskDescriptor){
+									auxName="vpTask Descriptor";
+									auxElement="Task Descriptor";
+									imgIcon = LibraryEditPlugin.INSTANCE.getImage("full/vSPEM70x70/vptaskdescriptor");
+									
+									for(Iterator iterator = variantsPkg.getVariant().iterator(); iterator.hasNext();){
+										EObject varElement = (EObject) iterator.next();
+										if(varElement instanceof VarTaskDescriptor){
+											auxVariants.add(varElement);
+										}
+									}
+								}
+								////VPWorkProductDescriptor
+								if(element instanceof vpWorkProductDescriptor){
+									auxName="vpWorkProduct Descriptor";
+									auxElement="WorkProduct Descriptor";
+									imgIcon = LibraryEditPlugin.INSTANCE.getImage("full/vSPEM70x70/vpworkproductdescriptor");
+									
+									for(Iterator iterator = variantsPkg.getVariant().iterator(); iterator.hasNext();){
+										EObject varElement = (EObject) iterator.next();
+										if(varElement instanceof VarWorkProductDescriptor){
+											auxVariants.add(varElement);
+										}
+									}
+								}
+								////VPTeamProfile
+								if(element instanceof vpTeamProfile){
+									auxName="vpTeamProfile";
+									auxElement="TeamProfile";
+									imgIcon = LibraryEditPlugin.INSTANCE.getImage("full/vSPEM70x70/vpteamprofile");
+									
+									for(Iterator iterator = variantsPkg.getVariant().iterator(); iterator.hasNext();){
+										EObject varElement = (EObject) iterator.next();
+										if(varElement instanceof VarTeamProfile){
+											auxVariants.add(varElement);
+										}
+									}
+								}
+								////VPMilestone
+								if(element instanceof vpMilestone){
+									auxName="vpMilestone";
+									auxElement="Milestone";
+									imgIcon = LibraryEditPlugin.INSTANCE.getImage("full/vSPEM70x70/vpmilestone");
+									
+									for(Iterator iterator = variantsPkg.getVariant().iterator(); iterator.hasNext();){
+										EObject varElement = (EObject) iterator.next();
+										if(varElement instanceof VarMilestone){
+											auxVariants.add(varElement);
+										}
+									}
+								}
+								
+								
+								
+							}
+							///***********///
+		
+							///Ventana - Composicion SWT
+							Display display = Display.getDefault();
+							Shell shell = new Shell(display);
+							VarPointDialog varPointDialog = new VarPointDialog(shell, SWT.NULL, auxName, auxElement, imgIcon, varPoint, auxVariants, auxVarPoints, false, false);
+							varPointDialog.open();
+							
+							//Si todo se ejecuto de forma correcta entonces procedemos a guardar el elemento FIXME! Hay datos que no se tratan bien
+							if(varPointDialog.execute == true){
+								canExecute = true;
+								//Recogo datos, varPoint es una referencia a element
+								varPoint.setIsImplicit(varPointDialog.isImplicit);
+								varPoint.setIsOpen(varPointDialog.isOpen);
+								varPoint.setMin(varPointDialog.cardMin);//
+								varPoint.setMax(varPointDialog.cardMax);//
+								varPoint.setVId(varPointDialog.vpId);
+								varPoint.setVpName(varPointDialog.nombre);
+								varPoint.setPathIcon(varPointDialog.icono);
+								varPoint.setDescription(varPointDialog.descripcion);
+								
+								activity.setName(varPoint.getVpName());
+								activity.setPresentationName(varPoint.getVpName());
+								
+								
+								//Dependenias - Nos las generamos dependiendo de las listas llenadas en la interfaz
+								//
+								
+								//varPoint2varPoint (Inclusive)
+								if(varPointDialog.inclusiveVarPoint2VarPointPersistence.size() > 0){
+									
+									Collection auxListClient = new ArrayList();
+									
+									
+									for(Iterator iterator = varPointDialog.inclusiveVarPoint2VarPointPersistence.iterator(); iterator.hasNext();){
+										Collection auxListSupplier = new ArrayList();
+										
+										EObject varPointSupplier = (EObject) iterator.next();
+										
+										varP2varP varP2varPI = UmaFactory.eINSTANCE.createvarP2varP();
+										varP2varP varP2varPIForSupplier = UmaFactory.eINSTANCE.createvarP2varP();
+										
+										if(varPointSupplier instanceof VarPoint){
+											VarPoint varPointAuxSupplier = (VarPoint) varPointSupplier;
+											//Client
+											varP2varPI.setClient(varPoint);//Cliente
+											varP2varPI.setSupplier(varPointAuxSupplier);//Supplier
+											varP2varPI.setIsInclusive(true);//Inclusivo
+											//Supplier
+											varP2varPIForSupplier.setClient(varPoint);//Cliente
+											varP2varPIForSupplier.setSupplier(varPointAuxSupplier);//Supplier
+											varP2varPIForSupplier.setIsInclusive(true);//Inclusivo
+											
+											auxListClient.add(varP2varPI);
+											auxListSupplier.add(varP2varPIForSupplier);
+											
+											varPointAuxSupplier.getSupplier().addAll(auxListSupplier);
+										}
+									}
+									varPoint.getClient().addAll(auxListClient);
+								}
+								//varPoint2variant (Inclusive)
+								if(varPointDialog.inclusiveVarPoint2VariantPersistence.size() > 0){
+									
+									Collection auxListClient = new ArrayList();
+									
+									
+									for(Iterator iterator = varPointDialog.inclusiveVarPoint2VariantPersistence.iterator(); iterator.hasNext();){
+										Collection auxListSupplier = new ArrayList();
+										
+										EObject variantSupplier = (EObject) iterator.next();
+										
+										varp2variant varP2variantI = UmaFactory.eINSTANCE.createvarp2variant();
+										varp2variant varP2variantIForSupplier = UmaFactory.eINSTANCE.createvarp2variant();
+										
+										if(variantSupplier instanceof Variant){
+											Variant variantAuxSupplier = (Variant) variantSupplier;
+											//Client
+											varP2variantI.setClient(varPoint);//Cliente
+											varP2variantI.setSupplier(variantAuxSupplier);//Supplier
+											varP2variantI.setIsInclusive(true);//Inclusivo
+											//Supplier
+											varP2variantIForSupplier.setClient(varPoint);//Cliente
+											varP2variantIForSupplier.setSupplier(variantAuxSupplier);//Supplier
+											varP2variantIForSupplier.setIsInclusive(true);//Inclusivo
+																						
+											auxListClient.add(varP2variantI);
+											auxListSupplier.add(varP2variantIForSupplier);
+											
+											variantAuxSupplier.getSupplier().addAll(auxListSupplier);
+											
+										}
+									}
+									varPoint.getClient().addAll(auxListClient);
+								}
+								//varP2varP (Exclusive)
+								if(varPointDialog.exclusiveVarPoint2VarPointPersistence.size() > 0){
+									
+									Collection auxListClient = new ArrayList();
+									
+									
+									for(Iterator iterator = varPointDialog.exclusiveVarPoint2VarPointPersistence.iterator(); iterator.hasNext();){
+										
+										Collection auxListSupplier = new ArrayList();
+										
+										EObject varPointSupplier = (EObject) iterator.next();
+										varP2varP varP2varPE = UmaFactory.eINSTANCE.createvarP2varP();
+										varP2varP varP2varPEForSupplier = UmaFactory.eINSTANCE.createvarP2varP();
+										
+										if(varPointSupplier instanceof VarPoint){
+											VarPoint varPointAuxSupplier = (VarPoint) varPointSupplier;
+											//Client
+											varP2varPE.setClient(varPoint);//Cliente
+											varP2varPE.setSupplier(varPointAuxSupplier);//Supplier
+											varP2varPE.setIsInclusive(false);//Exclusivo
+											//Supplier
+											varP2varPEForSupplier.setClient(varPoint);//Cliente
+											varP2varPEForSupplier.setSupplier(varPointAuxSupplier);//Supplier
+											varP2varPEForSupplier.setIsInclusive(false);//Exclusivo
+											
+											auxListClient.add(varP2varPE);
+											auxListSupplier.add(varP2varPEForSupplier);
+											
+											varPointAuxSupplier.getSupplier().addAll(auxListSupplier);
+									
+										}
+									}
+									varPoint.getClient().addAll(auxListClient);
+								}
+
+							}
+							else{
+								//Ninguna acción
+							}
+						}
+						
+						/******Comprobacion de Variantes******/
+						if((element instanceof Variant) && (element instanceof BreakdownElement)){//Si es una instancia de variante y de actividad
+							//Variables
+							canExecute = false;//Cerramos la sentencia si es un punto de variación
+							String auxName = "";
+							String auxElement = "";
+							String auxIcon = "";
+							Image imgIcon = LibraryEditPlugin.INSTANCE.getImage("full/vSPEM70x70/desconocido");//Lo inicializamos con el icono desconocido
+							//Los 2 padres generales de los que cualquier elemento Variante hereda
+							Variant variant = (Variant) element;
+							BreakdownElement activity = (BreakdownElement) element;
+							
+							///***Obtencion de dependencias***///
+							
+							//Obtenemos el nombre de la linea perteneciente desde donde se ejecuta el comando
+							//
+							Object objFather = addCommand.getOwner();
+							
+							Collection auxVariants = new ArrayList();
+							Collection auxVarPoints = new ArrayList();
+							
+							if (objFather instanceof ProcessElement){
+								ProcessElement auxFather = (ProcessElement) addCommand.getOwner();
+								String processLineNameOwner = auxFather.getProcessLineName();
+								
+								//Obtenemos lista de variantes de esa linea
+								//
+								VariantsPackage variantsPkg = (VariantsPackage) UmaUtil.findVariantsPackage(ownerPlugin, modelStruct.variantsPath, processLineNameOwner);
+								if (variantsPkg != null){
+									auxVariants = variantsPkg.getVariant();
+								}
+								
+								//Obtenemos lista de puntos de variacion de esa linea para el mismo tipo
+								//
+								VarPointsPackage varPointsPkg = (VarPointsPackage) UmaUtil.findVarPointsPackage(ownerPlugin, modelStruct.varPointsPath, processLineNameOwner);
+								
+								////VarActivity
+								if(element instanceof VarActivity){
+									auxName="VarActivity";
+									auxElement="Activity";
+									imgIcon = LibraryEditPlugin.INSTANCE.getImage("full/vSPEM70x70/vactivity");//Icon
+									
+									for(Iterator iterator = varPointsPkg.getVarPoints().iterator(); iterator.hasNext();){
+										EObject vpElement = (EObject) iterator.next();
+										if(vpElement instanceof vpActivity){
+											auxVarPoints.add(vpElement);
+										}
+									}
+								}
+								
+								////VarPhase
+								if(element instanceof VarPhase){
+									auxName="VarPhase";
+									auxElement="Phase";
+									imgIcon = LibraryEditPlugin.INSTANCE.getImage("full/vSPEM70x70/varphase");//Icon
+									
+									for(Iterator iterator = varPointsPkg.getVarPoints().iterator(); iterator.hasNext();){
+										EObject vpElement = (EObject) iterator.next();
+										if(vpElement instanceof vpPhase){
+											auxVarPoints.add(vpElement);
+										}
+									}
+								}
+								
+								////VarIteration
+								if(element instanceof VarIteration){
+									auxName="VarIteration";
+									auxElement="Iteration";
+									imgIcon = LibraryEditPlugin.INSTANCE.getImage("full/vSPEM70x70/variteration");//Icon
+									
+									for(Iterator iterator = varPointsPkg.getVarPoints().iterator(); iterator.hasNext();){
+										EObject vpElement = (EObject) iterator.next();
+										if(vpElement instanceof vpIteration){
+											auxVarPoints.add(vpElement);
+										}
+									}
+								}
+								
+								////VarRoleDescriptor
+								if(element instanceof VarRoleDescriptor){
+									auxName="VarRoleDescriptor";
+									auxElement="Role Descriptor";
+									imgIcon = LibraryEditPlugin.INSTANCE.getImage("full/vSPEM70x70/varroledescriptor");//Icon
+									
+									for(Iterator iterator = varPointsPkg.getVarPoints().iterator(); iterator.hasNext();){
+										EObject vpElement = (EObject) iterator.next();
+										if(vpElement instanceof vpRoleDescriptor){
+											auxVarPoints.add(vpElement);
+										}
+									}
+								}
+								
+								////VarTaskDescriptor
+								if(element instanceof VarTaskDescriptor){
+									auxName="VarTaskDescriptor";
+									auxElement="Task Descriptor";
+									imgIcon = LibraryEditPlugin.INSTANCE.getImage("full/vSPEM70x70/vartaskdescriptor");//Icon
+									
+									for(Iterator iterator = varPointsPkg.getVarPoints().iterator(); iterator.hasNext();){
+										EObject vpElement = (EObject) iterator.next();
+										if(vpElement instanceof vpTaskDescriptor){
+											auxVarPoints.add(vpElement);
+										}
+									}
+								}
+								
+								////VarWorkProductDescriptor
+								if(element instanceof VarWorkProductDescriptor){
+									auxName="VarWorkProductDescriptor";
+									auxElement="WorkProduct Descriptor";
+									imgIcon = LibraryEditPlugin.INSTANCE.getImage("full/vSPEM70x70/vworkproductdescriptor");//Icon
+									
+									for(Iterator iterator = varPointsPkg.getVarPoints().iterator(); iterator.hasNext();){
+										EObject vpElement = (EObject) iterator.next();
+										if(vpElement instanceof vpWorkProductDescriptor){
+											auxVarPoints.add(vpElement);
+										}
+									}
+								}
+								
+								////VarTeamProfile
+								if(element instanceof VarTeamProfile){
+									auxName="VarTeamProfile";
+									auxElement="Team Profile";
+									imgIcon = LibraryEditPlugin.INSTANCE.getImage("full/vSPEM70x70/vteamprofile");//Icon
+									
+									for(Iterator iterator = varPointsPkg.getVarPoints().iterator(); iterator.hasNext();){
+										EObject vpElement = (EObject) iterator.next();
+										if(vpElement instanceof vpTeamProfile){
+											auxVarPoints.add(vpElement);
+										}
+									}
+								}
+								
+								////VarMilestone
+								if(element instanceof VarMilestone){
+									auxName="VarMilestone";
+									auxElement="Milestone";
+									imgIcon = LibraryEditPlugin.INSTANCE.getImage("full/vSPEM70x70/vmilestone");//Icon
+									
+									for(Iterator iterator = varPointsPkg.getVarPoints().iterator(); iterator.hasNext();){
+										EObject vpElement = (EObject) iterator.next();
+										if(vpElement instanceof vpMilestone){
+											auxVarPoints.add(vpElement);
+										}
+									}
+								}
+							}
+							///***********///
+							
+
+							
+							///Ventana - Composicion SWT
+							Display display = Display.getDefault();
+							Shell shell = new Shell(display);
+							
+							/**
+							 * @param Nombre
+							 * @param Imagen Icono
+							 */
+							VariantDialog variantDialog = new VariantDialog(shell, SWT.NULL, auxName, auxElement, imgIcon, variant, auxVariants, auxVarPoints, false, false);
+							variantDialog.open();
+							
+							//Si todo se ejecuto de forma correcta entonces procedemos a guardar el elemento FIXME! Hay datos que no se tratan bien
+							if(variantDialog.execute == true){
+								canExecute = true;
+								//variant es una referencia a element - Datos
+								//
+								variant.setDescription(variantDialog.descripcion);//Descripcion
+								variant.setVId(variantDialog.vpId);//Identificador
+								variant.setVpName(variantDialog.nombre);//Nombre
+								activity.setName(variantDialog.nombre);//Nombre
+								activity.setPresentationName(variantDialog.nombre);//Nombre
+								
+								//Dependenias - Nos las generamos dependiendo de las listas llenadas en la interfaz
+								//
+								
+								//variant2variant (Inclusive)
+								if(variantDialog.inclusiveVariant2VariantPersistence.size() > 0){
+									
+									Collection auxListClient = new ArrayList();
+									
+									
+									for(Iterator iterator = variantDialog.inclusiveVariant2VariantPersistence.iterator(); iterator.hasNext();){				
+										Collection auxListSupplier = new ArrayList();
+										
+										EObject variantSupplier = (EObject) iterator.next();
+										variant2variant variant2variantI = UmaFactory.eINSTANCE.createvariant2variant();
+										variant2variant variant2variantIForSupplier = UmaFactory.eINSTANCE.createvariant2variant();
+										
+										if(variantSupplier instanceof Variant){
+											Variant varAuxSupplier = (Variant) variantSupplier;
+											//Client
+											variant2variantI.setClient(variant);//Cliente
+											variant2variantI.setSupplier(varAuxSupplier);//Supplier
+											variant2variantI.setIsInclusive(true);//Inclusivo
+											//Supplier
+											variant2variantIForSupplier.setClient(variant);//Cliente
+											variant2variantIForSupplier.setSupplier(varAuxSupplier);//Supplier
+											variant2variantIForSupplier.setIsInclusive(true);//Inclusivo
+											
+											auxListClient.add(variant2variantI);
+											auxListSupplier.add(variant2variantIForSupplier);
+											
+											varAuxSupplier.getSupplier().addAll(auxListSupplier);
+										}
+									}
+									variant.getClient().addAll(auxListClient);
+								}
+								
+								//variant2varPoint (Inclusive)
+								if(variantDialog.inclusiveVariant2VarPointPersistence.size() > 0){
+									
+									Collection auxListClient = new ArrayList();
+									
+									
+									for(Iterator iterator = variantDialog.inclusiveVariant2VarPointPersistence.iterator(); iterator.hasNext();){
+										Collection auxListSupplier = new ArrayList();
+										
+										EObject varPointSupplier = (EObject) iterator.next();
+										variant2varP variant2varPointI = UmaFactory.eINSTANCE.createvariant2varP();
+										variant2varP variant2varPointIForSupplier = UmaFactory.eINSTANCE.createvariant2varP();
+										
+										if(varPointSupplier instanceof VarPoint){
+											VarPoint varPointAuxSupplier = (VarPoint) varPointSupplier;
+											//Client
+											variant2varPointI.setClient(variant);//Cliente
+											variant2varPointI.setSupplier(varPointAuxSupplier);//Supplier
+											variant2varPointI.setIsInclusive(true);//Inclusivo
+											//Supplier
+											variant2varPointIForSupplier.setClient(variant);//Cliente
+											variant2varPointIForSupplier.setSupplier(varPointAuxSupplier);//Supplier
+											variant2varPointIForSupplier.setIsInclusive(true);//Inclusivo
+											
+											auxListClient.add(variant2varPointI);
+											auxListSupplier.add(variant2varPointIForSupplier);
+											
+											varPointAuxSupplier.getSupplier().addAll(auxListSupplier);
+										}
+										
+										
+									}
+									variant.getClient().addAll(auxListClient);
+								}
+								//variant2variant (Exclusive)
+								if(variantDialog.exclusiveVariant2VariantPersistence.size() > 0){
+									
+									Collection auxListClient = new ArrayList();
+									
+									
+									for(Iterator iterator = variantDialog.exclusiveVariant2VariantPersistence.iterator(); iterator.hasNext();){
+										Collection auxListSupplier = new ArrayList();
+										
+										EObject variantSupplier = (EObject) iterator.next();
+										variant2variant variant2variantE = UmaFactory.eINSTANCE.createvariant2variant();
+										variant2variant variant2variantEForSupplier = UmaFactory.eINSTANCE.createvariant2variant();
+										
+										if(variantSupplier instanceof Variant){
+											Variant varAuxSupplier = (Variant) variantSupplier;
+											
+											//Client
+											variant2variantE.setClient(variant);//Cliente
+											variant2variantE.setSupplier(varAuxSupplier);//Supplier
+											variant2variantE.setIsInclusive(false);//Exclusivo
+											//Supplier
+											variant2variantEForSupplier.setClient(variant);
+											variant2variantEForSupplier.setSupplier(varAuxSupplier);
+											variant2variantEForSupplier.setIsInclusive(false);
+
+											
+											auxListClient.add(variant2variantE);
+											auxListSupplier.add(variant2variantEForSupplier);
+											
+											varAuxSupplier.getSupplier().addAll(auxListSupplier);
+											
+										}
+										
+										
+									}
+									variant.getClient().addAll(auxListClient);
+									ownerPlugin.getMethodPackages();
+								}
+							}
+							else{
+								//Ninguna acción
+							}
+						}
+						/**Fin comprobacion**/
+					}
+					
+					/****/
+					
+					
+					
+					
+					if(canExecute){
+						
+					
+						// add the elements
+						//
+						superExecute();
+	
+						executeNestedCommands();
+	
+						if (willSaveModifiedResources()) {
+							IStatus result = saveNewElementsWithOwnResource();
+							if (result.isOK()) {
+								monitor
+										.subTask(LibraryEditResources.savingModifiedFilesTask_name); 
+								saveModifiedResources();
+							} else {
+								status.add(result);
+							}
+						}
+	
+						if (!status.isOK()) {
+							// FIXME: this causes dead-lock at
+							// LibraryProcessor.notifyListeners(). The method
+							// is synchronized, this might be the cause of the
+							// dead-lock
+							//
+							undo();
+							
+							if(CommandStatusChecker.hasRollbackError(status)) {
+								Collection<?> createdElements = command.getResult();
+								ILibraryPersister persister = Services.getDefaultLibraryPersister();
+								for (Object object : createdElements) {
+									if(object instanceof MethodElement) {
+										try {
+											persister.delete((MethodElement) object);
+										}
+										catch(Exception e) {
+											LibraryEditPlugin.getDefault().getLogger().logError(e);
+										}
+									}
+								}								
+							}						
+						}
 					}
 				}
+
+
 
 			};
 			if (runWithProgress) {
@@ -1299,6 +1911,33 @@ public class MethodElementAddCommand extends CommandWrapper implements
 		} catch (RuntimeException e) {
 			Messenger.INSTANCE.showError(getLabel(), LibraryEditResources.error_msg, null, e);
 		}
+	}
+
+	
+	/**
+	 * Metodo que se encarga de setear la presentación correcta en nuestros elementos VarElement
+	 * @param element
+	 */
+	protected void changePresentation(EObject element){
+		//ActivityDescription (Activity, Phase, Iteration)
+		if(element instanceof Activity){
+			Activity act = (Activity) element;
+			act.setPresentation(UmaFactory.eINSTANCE.createActivityDescription());
+			act.getPresentation();
+		}
+		//DescriptorDescription (RoleDescriptor, WorkProductDescriptor, TaskDescriptor)
+		else if(element instanceof Descriptor){
+			Descriptor desc = (Descriptor) element;
+			desc.setPresentation(UmaFactory.eINSTANCE.createDescriptorDescription());
+			desc.getPresentation();
+		}
+		//BreakdownDescriptor (TeamProfile, Milestone)
+		else if(element instanceof BreakdownElement){
+			BreakdownElement br = (BreakdownElement) element;
+			br.setPresentation(UmaFactory.eINSTANCE.createBreakdownElementDescription());
+			br.getPresentation();
+		}
+		
 	}
 
 	private boolean addFeatureIsContainment() {
@@ -1461,7 +2100,33 @@ public class MethodElementAddCommand extends CommandWrapper implements
 						// get incoming references
 						//
 						if (searchIncomingRefs) {
-							getIllegalIncomingReferences(e);
+							Collection references = AssociationHelper
+									.getReferences(e);
+							for (Iterator iter = references.iterator(); iter
+									.hasNext();) {
+								MethodElement element = (MethodElement) iter
+										.next();
+								if (!elementsToMove.contains(element)) {
+									MethodPlugin plugin = UmaUtil
+											.getMethodPlugin(element);
+									if (plugin != null
+											&& plugin != targetPlugin
+											&& !Misc.isBaseOf(targetPlugin,
+													plugin)) {
+										Collection xRefs = getXReferences(
+												element, e, null);
+										for (Iterator iter1 = xRefs.iterator(); iter1
+												.hasNext();) {
+											EStructuralFeature f = (EStructuralFeature) iter1
+													.next();
+											illegalReferences
+													.add(new Reference(element,
+															f, e));
+										}
+
+									}
+								}
+							}
 						}
 					}
 				}
@@ -1476,36 +2141,6 @@ public class MethodElementAddCommand extends CommandWrapper implements
 				}
 			}
 			return affectedResources;
-		}
-
-		private void getIllegalIncomingReferences(MethodElement e) {
-			Collection references = AssociationHelper
-					.getReferences(e);
-			for (Iterator iter = references.iterator(); iter
-					.hasNext();) {
-				MethodElement element = (MethodElement) iter
-						.next();
-				if (!elementsToMove.contains(element)) {
-					MethodPlugin plugin = UmaUtil
-							.getMethodPlugin(element);
-					if (plugin != null
-							&& plugin != targetPlugin
-							&& !Misc.isBaseOf(targetPlugin,
-									plugin, new HashMap<String, Boolean>())) {
-						Collection xRefs = getXReferences(
-								element, e, null);
-						for (Iterator iter1 = xRefs.iterator(); iter1
-								.hasNext();) {
-							EStructuralFeature f = (EStructuralFeature) iter1
-									.next();
-							illegalReferences
-									.add(new Reference(element,
-											f, e));
-						}
-
-					}
-				}
-			}
 		}
 
 		public void removeIllegalReferences() {
@@ -1531,14 +2166,9 @@ public class MethodElementAddCommand extends CommandWrapper implements
 					if (ref.feature == UmaPackage.eINSTANCE
 							.getVariabilityElement_VariabilityType()) {
 						//Should query the default value if extended for any attribute feature
-						ref.owner.eSet(ref.feature, VariabilityType.NA);
+						ref.owner.eSet(ref.feature, VariabilityType.NA_LITERAL);
 					} else {
 						ref.owner.eSet(ref.feature, null);
-						if (ref.feature == UmaPackage.eINSTANCE
-							.getVariabilityElement_VariabilityBasedOnElement()) {
-							ref.owner.eSet(UmaPackage.eINSTANCE
-									.getVariabilityElement_VariabilityType(), VariabilityType.NA);
-						}
 					}
 				}
 				removedReferences.add(ref);
@@ -1578,7 +2208,7 @@ public class MethodElementAddCommand extends CommandWrapper implements
 		}
 	}
 
-	public static class MoveOperation extends CommandWrapper {
+	public static class MoveOperation {
 		/** Constants for state of the move operation */
 		private static final int STATE_START = 0;
 
@@ -1607,11 +2237,11 @@ public class MethodElementAddCommand extends CommandWrapper implements
 
 		private IProgressMonitor monitor;
 
-		private Object shell;
+		private Shell shell;
 
 		private HashSet movedResources;
 
-		protected MultiStatus status;
+		private MultiStatus status;
 
 		/**
 		 * Current state of the move operation, it can be one of the state
@@ -1625,20 +2255,12 @@ public class MethodElementAddCommand extends CommandWrapper implements
 
 		private HashMap elementToOldContainerMap;
 
-		private RefPluginsInfo refPluginsInfo;
-		
-		private MethodPlugin pluginForAddingTagetAsBase;
-
 		public MoveOperation(Command command, IProgressMonitor monitor,
-				Object shell) {
-			super(command);
+				Shell shell) {
+			// this.command = command;
 			addCommand = (AddCommand) TngUtil.unwrap(command);
 			this.monitor = monitor;
 			this.shell = shell;
-		}
-		
-		public Map getElementToOldPluginMap() {
-			return elementToOldPluginMap;
 		}
 
 		/**
@@ -1659,7 +2281,7 @@ public class MethodElementAddCommand extends CommandWrapper implements
 					&& CommandStatusChecker.hasRollbackError(status);
 		}
 
-		public void undo() {
+		private void undo() {
 			// undo name change
 			//
 			if (elementToNewNameMap != null) {
@@ -1691,28 +2313,8 @@ public class MethodElementAddCommand extends CommandWrapper implements
 			if (illegalReferenceRemover != null) {
 				illegalReferenceRemover.restoreRemovedReferences();
 			}
-			
-			if (refPluginsInfo != null && !refPluginsInfo.refPluginsToAdd.isEmpty()) {
-				ownerPlugin.getBases().removeAll(refPluginsInfo.refPluginsToAdd);
-			}
-			
-			if (pluginForAddingTagetAsBase != null) {
-				pluginForAddingTagetAsBase.getBases().remove(ownerPlugin);
-			}
-			
-			if (pkgsMarkedByLoadCheck != null) {
-				PropUtil propUtil = PropUtil.getPropUtil();
-				for (MethodPackage pkg : pkgsMarkedByLoadCheck) {
-					propUtil.setBooleanValue(pkg, PropUtil.Pkg_loadCheck, false);
-				}
-			}
 		}
-		
-		@Override
-		public void execute() {
-			run();
-		}
-		
+
 		public void run() {
 			state = STATE_START;
 
@@ -1724,7 +2326,7 @@ public class MethodElementAddCommand extends CommandWrapper implements
 				// check if the configurations that will be updated after this
 				// command can be modified
 				//
-				IStatus execStatus = movingCC() ? Status.OK_STATUS : UserInteractionHelper
+				IStatus execStatus = UserInteractionHelper
 						.checkConfigurationsToUpdate(addCommand, shell);
 				if (!execStatus.isOK()) {
 					Messenger.INSTANCE.showError(LibraryEditResources.moveDialog_title, null, execStatus);
@@ -1747,16 +2349,29 @@ public class MethodElementAddCommand extends CommandWrapper implements
 
 				};
 
-				IStatus stat = UserInteractionHelper.getUIHelper().runInModalContext(runnable, true, monitor, shell);
-				if(!stat.isOK()) {
-					status.add(stat);
+				try {
+					ModalContext.run(runnable, true, monitor, shell
+							.getDisplay());
+				} catch (Exception e) {
+					LibraryEditPlugin.INSTANCE.log(e);
+					Throwable ex;
+					if (e instanceof InvocationTargetException) {
+						ex = ((InvocationTargetException) e)
+								.getTargetException();
+					} else {
+						ex = e;
+					}
+					String msg = TngUtil.toStackTraceString(ex);
+					status.add(new Status(IStatus.ERROR,
+							LibraryEditPlugin.INSTANCE.getSymbolicName(), 0,
+							msg, ex));
 					return;
 				}
 
-				if (msgBuffer.length() > 0) {
-					if (! addRefPlugins()) {
-						return;
-					}
+				if (msgBuffer.length() > 0
+						&& MsgBox.prompt(shell, msgBuffer.toString(), SWT.YES
+								| SWT.NO) == SWT.NO) {
+					return;
 				}
 
 				// save reference to old resource of all elements in the
@@ -1773,11 +2388,66 @@ public class MethodElementAddCommand extends CommandWrapper implements
 					}
 				}
 
-				//Never remove references with new code, but keep the old code here for easy reference
-				if (false) {
-					removeReferences();
+				if (removeXRefRequired || isRefenrecedIllegally) {
+					// get set of resources that will be modified during this
+					// move
+					//
+					illegalReferenceRemover = new IllegalReferenceRemover(
+							ownerPlugin, moveList, removeXRefRequired,
+							isRefenrecedIllegally);
+					runnable = new IRunnableWithProgress() {
+
+						public void run(IProgressMonitor monitor)
+								throws InvocationTargetException,
+								InterruptedException {
+							monitor
+									.subTask(LibraryEditResources.checkAffectedResourcesTask_name); 
+							modifiedResources = illegalReferenceRemover
+									.getAffectedResources();
+						}
+
+					};
+					try {
+						ModalContext.run(runnable, true, monitor, shell
+								.getDisplay());
+					} catch (Exception e) {
+						LibraryEditPlugin.INSTANCE.log(e);
+						Throwable ex;
+						if (e instanceof InvocationTargetException) {
+							ex = ((InvocationTargetException) e)
+									.getTargetException();
+						} else {
+							ex = e;
+						}
+						String msg = TngUtil.toStackTraceString(ex);
+						status.add(new Status(IStatus.ERROR,
+								LibraryEditPlugin.INSTANCE.getSymbolicName(),
+								0, msg, ex));
+						return;
+					}
+
+					// check affected resources for unmodifiable
+					execStatus = UserInteractionHelper.checkModify(
+							modifiedResources, shell);
+					if (!execStatus.isOK()) {
+						Messenger.INSTANCE.showError(LibraryEditResources.moveDialog_title, null, execStatus);
+						return;
+					}
+
+					try {
+						monitor
+								.subTask(LibraryEditResources.removingReferencestask_name); 
+						illegalReferenceRemover.removeIllegalReferences();
+					} catch (Exception e) {
+						undo();
+						String msg = TngUtil.toStackTraceString(e);
+						status.add(new Status(IStatus.ERROR,
+								LibraryEditPlugin.INSTANCE.getSymbolicName(),
+								0, msg, e));
+					}
 				} else {
 					modifiedResources = new HashSet();
+					monitor.subTask(""); //$NON-NLS-1$
 				}
 
 				// set new name if there is any
@@ -1813,13 +2483,24 @@ public class MethodElementAddCommand extends CommandWrapper implements
 					}
 
 				};
-				stat = UserInteractionHelper.getUIHelper().runInModalContext(runnable, true, monitor, shell);
-				if(!stat.isOK()) {
+				try {
+					ModalContext.run(runnable, true, monitor, shell
+							.getDisplay());
+				} catch (Exception e) {
 					undo();
-					status.add(stat);
+					Throwable ex;
+					if (e instanceof InvocationTargetException) {
+						ex = ((InvocationTargetException) e)
+								.getTargetException();
+					} else {
+						ex = e;
+					}
+					String msg = TngUtil.toStackTraceString(ex);
+					status.add(new Status(IStatus.ERROR,
+							LibraryEditPlugin.INSTANCE.getSymbolicName(), 0,
+							msg, ex));
 					return;
 				}
-
 
 				// check moved resources that are not in modifiable resources
 				// for unmodifiable
@@ -1854,282 +2535,27 @@ public class MethodElementAddCommand extends CommandWrapper implements
 					}
 
 				};
-				stat = UserInteractionHelper.getUIHelper().runInModalContext(runnable, true, monitor, shell);
-				if(!stat.isOK()) {
-					status.add(stat);
+				try {
+					ModalContext.run(runnable, true, monitor, shell
+							.getDisplay());
+				} catch (Exception e) {
+					Throwable ex;
+					if (e instanceof InvocationTargetException) {
+						ex = ((InvocationTargetException) e)
+								.getTargetException();
+					} else {
+						ex = e;
+					}
+					String msg = TngUtil.toStackTraceString(ex);
+					status.add(new Status(IStatus.ERROR,
+							LibraryEditPlugin.INSTANCE.getSymbolicName(), 0,
+							msg, ex));
 					return;
 				}
 
-				// run nested commands
-				//
-				NestedCommandExcecutor nestedCommandExcecutor = new NestedCommandExcecutor(this);
-				try {
-					nestedCommandExcecutor.executeNestedCommands();
-				}
-				finally {
-					nestedCommandExcecutor.dispose();
-				}
 			}
 
 			state = STATE_END;
-		}
-
-		@Deprecated
-		private void removeReferences() {
-			IStatus execStatus;
-			IRunnableWithProgress runnable;
-			IStatus stat;
-			if (removeXRefRequired || isRefenrecedIllegally) {
-				// get set of resources that will be modified during this
-				// move
-				//
-				illegalReferenceRemover = new IllegalReferenceRemover(
-						ownerPlugin, moveList, removeXRefRequired,
-						isRefenrecedIllegally);
-				runnable = new IRunnableWithProgress() {
-
-					public void run(IProgressMonitor monitor)
-							throws InvocationTargetException,
-							InterruptedException {
-						monitor
-								.subTask(LibraryEditResources.checkAffectedResourcesTask_name); 
-						modifiedResources = illegalReferenceRemover
-								.getAffectedResources();
-					}
-
-				};
-				stat = UserInteractionHelper.getUIHelper().runInModalContext(runnable, true, monitor, shell);
-				if(!stat.isOK()) {
-					status.add(stat);
-//						return;
-				}
-
-				// check affected resources for unmodifiable
-				execStatus = UserInteractionHelper.checkModify(
-						modifiedResources, shell);
-				if (!execStatus.isOK()) {
-					Messenger.INSTANCE.showError(LibraryEditResources.moveDialog_title, null, execStatus);
-//						return;
-				}
-
-				try {
-					monitor
-							.subTask(LibraryEditResources.removingReferencestask_name); 
-					illegalReferenceRemover.removeIllegalReferences();
-				} catch (Exception e) {
-					undo();
-					String msg = TngUtil.toStackTraceString(e);
-					status.add(new Status(IStatus.ERROR,
-							LibraryEditPlugin.INSTANCE.getSymbolicName(),
-							0, msg, e));
-				}
-			} else {
-				modifiedResources = new HashSet();
-				monitor.subTask(""); //$NON-NLS-1$
-			}
-		}
-		
-		private boolean addRefPlugins() {
-			IUserInteractionHandler uiHandler = ExtensionManager.getDefaultUserInteractionHandler();
-			if (uiHandler == null) {
-				return false;
-			}
-				
-//					Old code: ask confirmation to remove illegal references						
-//						int ret = uiHandler.selectOne(new int[] {IUserInteractionHandler.ACTION_YES, IUserInteractionHandler.ACTION_NO }, 
-//								LibraryEditResources.moveDialog_title, msgBuffer.toString(), null);
-//						if(ret == IUserInteractionHandler.ACTION_NO) {
-//							return;
-//						}
-//					New code: ask confirmation to add required plug-ins	
-			refPluginsInfo = calRefPluginsInfo(ownerPlugin);
-			List<String> pluginsToAdd = new ArrayList<String>();
-			for (MethodPlugin p : refPluginsInfo.refPluginsToAdd) {
-				pluginsToAdd.add(p.getName());
-			}
-			if (pluginsToAdd.size() > 1) {
-				Collections.sort(pluginsToAdd);
-			}
-			
-			if (! pluginsToAdd.isEmpty()) {
-				String str = " " + this.ownerPlugin.getName() + ":";//$NON-NLS-1$ //$NON-NLS-2$
-				for (String p : pluginsToAdd) {
-					str += "\n" + p;//$NON-NLS-1$
-				}						
-				int ret = uiHandler.selectOne(new int[] {
-						IUserInteractionHandler.ACTION_YES,
-						IUserInteractionHandler.ACTION_NO,
-						IUserInteractionHandler.ACTION_CANCEL,
-						},
-						LibraryEditResources.moveDialog_title,
-						LibraryEditResources.moveDialog_addRefPluginsWarningText + "\n\n" + //$NON-NLS-1$ 
-						LibraryEditResources.moveDialog_addRefPluginsText + str, null);
-			 
-				if (ret == IUserInteractionHandler.ACTION_CANCEL) {
-					refPluginsInfo.refPluginsToAdd.clear();
-					return false;
-					
-				} else if (ret == IUserInteractionHandler.ACTION_NO) {
-					refPluginsInfo.refPluginsToAdd.clear();
-					
-				} else {
-//					ownerPlugin.getBases().addAll(refPluginsInfo.refPluginsToAdd);
-					//Double check
-					Map<String, Boolean> map = new HashMap<String, Boolean>();
-					for (MethodPlugin baseToAdd : refPluginsInfo.refPluginsToAdd) {
-						if (baseToAdd != ownerPlugin && !Misc.isBaseOf(ownerPlugin, baseToAdd, map) && !Misc.isBaseOf(baseToAdd, ownerPlugin, map)) {
-							ownerPlugin.getBases().add(baseToAdd);
-						}
-					}					
-				}
-							
-				return true;
-			}
-			
-			pluginForAddingTagetAsBase = getPluginForAddingTagetAsBase(true);
-			if (pluginForAddingTagetAsBase != null) {
-				String str = " " + pluginForAddingTagetAsBase.getName() + ":";//$NON-NLS-1$ //$NON-NLS-2$
-				str += "\n" + ownerPlugin.getName();//$NON-NLS-1$					
-				int ret = uiHandler.selectOne(new int[] {
-						IUserInteractionHandler.ACTION_YES,
-						IUserInteractionHandler.ACTION_NO,
-						IUserInteractionHandler.ACTION_CANCEL,
-						},
-						LibraryEditResources.moveDialog_title,
-						LibraryEditResources.moveDialog_addRefPluginsWarningText + "\n\n" + //$NON-NLS-1$ 
-						LibraryEditResources.moveDialog_addRefPluginsText + str, null);
-				if (ret == IUserInteractionHandler.ACTION_CANCEL) {
-					pluginForAddingTagetAsBase = null;
-					if (! refPluginsInfo.refPluginsToAdd.isEmpty()) {
-						ownerPlugin.getBases().removeAll(refPluginsInfo.refPluginsToAdd);
-						refPluginsInfo.refPluginsToAdd.clear();
-					}
-					return false;
-					
-				} else if (ret == IUserInteractionHandler.ACTION_NO) {
-						pluginForAddingTagetAsBase = null;						
-					
-				} else {
-//					pluginForAddingTagetAsBase.getBases().add(ownerPlugin);	
-					//Double check
-					Map<String, Boolean> map = new HashMap<String, Boolean>();
-					if (pluginForAddingTagetAsBase != ownerPlugin
-							&& !Misc.isBaseOf(ownerPlugin,
-									pluginForAddingTagetAsBase, map)
-							&& !Misc.isBaseOf(pluginForAddingTagetAsBase,
-									ownerPlugin, map)) {
-						pluginForAddingTagetAsBase.getBases().add(ownerPlugin);
-					}
-				}
-				
-				return true;
-			}						
-			
-			if (! refPluginsInfo.refPluginsCircular.isEmpty() || getPluginForAddingTagetAsBase(false) != null) {
-				int ret = uiHandler.selectOne(new int[] {
-						IUserInteractionHandler.ACTION_YES,
-						IUserInteractionHandler.ACTION_CANCEL,
-						},
-						LibraryEditResources.moveDialog_title,
-						LibraryEditResources.moveDialog_addRefPluginsWarningText1, null);
-				if (ret == IUserInteractionHandler.ACTION_CANCEL) {
-					return false;					
-				} 
-			}
-			
-			return true;
-		}
-
-		private MethodPlugin getPluginForAddingTagetAsBase(boolean testCircular) {
-			MethodPlugin srcPlugin = null;
-			Set<MethodElement> moveSet = new HashSet<MethodElement>();
-			for (Object obj : moveList) {
-				if (obj instanceof MethodElement) {
-					if (srcPlugin == null) {
-						srcPlugin = UmaUtil
-								.getMethodPlugin((MethodElement) obj);
-					}
-					moveSet.add((MethodElement) obj);
-				}
-			}
-			if (srcPlugin == null) {
-				return null;
-			}
-
-			Map<String, Boolean> map = new HashMap<String, Boolean>();
-			if (Misc.isBaseOf(ownerPlugin, srcPlugin, map) || testCircular && (Misc.isBaseOf(srcPlugin, ownerPlugin, map))) {
-				return null;
-			}
-			
-			CustomCategory srcRoot = TngUtil.getRootCustomCategory(srcPlugin);
-			
-			for (MethodElement element : moveSet) {
-				for (MethodElement referencing : (Collection<MethodElement>) AssociationHelper
-						.getReferences(element)) {
-					if (!moveSet.contains(referencing)
-							&& srcPlugin == UmaUtil
-									.getMethodPlugin(referencing) && referencing != srcRoot) {
-						return srcPlugin;
-					}
-				}
-
-			}
-
-			return null;
-		}
-
-
-		static class RefPluginsInfo {
-			Set<MethodPlugin > refPluginsToAdd = new HashSet<MethodPlugin>();
-			Set<MethodPlugin> refPluginsCircular = new HashSet<MethodPlugin>();
-			Set<MethodPlugin> refPluginsToAddBase = new HashSet<MethodPlugin>(); 
-		}
-
-		private RefPluginsInfo calRefPluginsInfo(MethodPlugin ownerPlugin) {
-			RefPluginsInfo info = new RefPluginsInfo();
-			Set<MethodPlugin> refPluginsToAdd = info.refPluginsToAdd;
-			Set<MethodPlugin> refPluginsCircular = info.refPluginsCircular;
-			Set<MethodPlugin> refPluginsToAddBase = info.refPluginsToAddBase;
-
-			List<MethodPlugin> referencedPlugnList = new ArrayList<MethodPlugin>();
-			for (EObject element : (Collection<EObject>) moveList) {
-				if (element instanceof MethodElement) {
-					Collection<Reference> iReferences = getIllegalOutgoingReferences(
-							ownerPlugin, element, null);
-					for (Reference ref : iReferences) {
-						Object value = ref.getValue();
-						if (value instanceof MethodElement) {
-							MethodPlugin p = UmaUtil
-									.getMethodPlugin((MethodElement) value);
-							if (p != null) {
-								if (refPluginsToAdd.add(p)) {
-									referencedPlugnList.add(p);
-								}
-							}
-						}
-					}
-				}
-			}
-
-			Map<String, Boolean> map = new HashMap<String, Boolean>();
-			for (MethodPlugin plugin : referencedPlugnList) {
-				if (Misc.isBaseOf(ownerPlugin, plugin, map)) {
-					refPluginsCircular.add(plugin);
-					refPluginsToAdd.remove(plugin);
-
-				} else if (refPluginsToAdd.contains(plugin)) {
-					List<MethodPlugin> toRmoveList = new ArrayList<MethodPlugin>();
-					for (MethodPlugin testBasePlugin : refPluginsToAdd) {
-						if (Misc.isBaseOf(testBasePlugin, plugin, map)) {
-							refPluginsToAddBase.add(testBasePlugin);
-							toRmoveList.add(testBasePlugin);
-						}
-					}
-					refPluginsToAdd.removeAll(toRmoveList);
-				}
-			}
-
-			return info;
 		}
 
 		/**
@@ -2142,16 +2568,12 @@ public class MethodElementAddCommand extends CommandWrapper implements
 			return elementToNewNameMap != null;
 		}
 
-		private boolean movingCC() {
-			return this instanceof MoveOperationExt;
-		}
-		
 		/**
 		 * Long running method
 		 * 
 		 * @return
 		 */
-		private String checkForIllegalReferences() {			
+		private String checkForIllegalReferences() {
 			elementToOldPluginMap = new HashMap();
 
 			moveList = new ArrayList(addCommand.getCollection());
@@ -2189,7 +2611,7 @@ public class MethodElementAddCommand extends CommandWrapper implements
 
 			// check if there is any illegal reference in the moved objects
 			//			
-			ownerPlugin = UmaUtil.getMethodPlugin(addCommand.getOwner());			
+			ownerPlugin = UmaUtil.getMethodPlugin(addCommand.getOwner());
 			find_xPluginRef: for (Iterator iter = addCommand.getCollection()
 					.iterator(); iter.hasNext();) {
 				Object element = iter.next();
@@ -2211,7 +2633,7 @@ public class MethodElementAddCommand extends CommandWrapper implements
 					.hasNext();) {
 				Object element = iter.next();
 				if (element instanceof MethodElement) {
-					if (referencedIllegally(ownerPlugin,
+					if (isReferencedIllegally(ownerPlugin,
 							(MethodElement) element, moveList)) {
 						isRefenrecedIllegally = true;
 						break find_illegalReferencer;
@@ -2224,25 +2646,16 @@ public class MethodElementAddCommand extends CommandWrapper implements
 			return null;
 		}
 
-		protected boolean referencedIllegally(MethodPlugin ownerPlugin,
-				MethodElement e, Collection moveList) {			
-			return isReferencedIllegally(ownerPlugin, e, moveList);	
-		}
-		
-		private Set<MethodPackage> pkgsMarkedByLoadCheck;
-		
 		/**
 		 * Long running method
 		 * 
 		 * @return
 		 */
-		protected void doMove(IProgressMonitor monitor,
+		private void doMove(IProgressMonitor monitor,
 				Map elementToOldResourceMap, Set modifiedResources) {
 			monitor.subTask(""); //$NON-NLS-1$
 
-			PropUtil propUtil = PropUtil.getPropUtil();
 			elementToOldContainerMap = new HashMap();
-			pkgsMarkedByLoadCheck = new HashSet<MethodPackage>();
 			for (Iterator iter = addCommand.getCollection().iterator(); iter
 					.hasNext();) {
 				EObject element = (EObject) iter.next();
@@ -2258,15 +2671,6 @@ public class MethodElementAddCommand extends CommandWrapper implements
 					}
 					elementToOldContainerMap.put(element, new ContainmentInfo(
 							container, index));
-					
-					if (element instanceof MethodPackage) {
-						MethodPackage pkg = (MethodPackage) element;
-						Boolean b = propUtil.getBooleanValue(pkg, PropUtil.Pkg_loadCheck);
-						if (b == null || !b.booleanValue()) {
-							propUtil.setBooleanValue(pkg, PropUtil.Pkg_loadCheck, true);
-							pkgsMarkedByLoadCheck.add(pkg);
-						}
-					}
 				}
 			}
 
@@ -2492,7 +2896,7 @@ public class MethodElementAddCommand extends CommandWrapper implements
 		MethodElementAddCommand.resMgr = resMgr;
 	}
 
-	protected static StringValidator getStringValidator() {
+	private static StringValidator getStringValidator() {
 		if (stringValidator == null) {
 			stringValidator = new StringValidator();
 		}
@@ -2503,7 +2907,7 @@ public class MethodElementAddCommand extends CommandWrapper implements
 
 	private static StringValidator stringValidator = null;
 
-	protected static class StringValidator extends AbstractStringValidator {
+	private static class StringValidator implements IInputValidator {
 
 		private Collection elements;
 
@@ -2571,148 +2975,7 @@ public class MethodElementAddCommand extends CommandWrapper implements
 			return validator.isValid(newText);
 		}
 
-	}	
 
-	//MoveOperation for moving custom category
-	public static class MoveOperationExt extends MoveOperation {
-		private List<CustomCategory> movingCCs;
-		private List<CustomCategory> movingCCsrcParents;
-		private CustomCategory tgtParent;
-		private Map<CustomCategory, CustomCategory> movingCCtoParentsMap = new HashMap<CustomCategory, CustomCategory>();
-		private boolean samePluginMove = false;
-		private MethodPlugin srcPlugin;
-		
-		public MoveOperationExt(Command command, IProgressMonitor monitor,
-				Object shell, List<CustomCategory> movingCCs, List<CustomCategory> movingCCsrcParents, CustomCategory tgtParent) {
-			super(command, monitor, shell);
-			this.movingCCs = movingCCs;
-			this.movingCCsrcParents = movingCCsrcParents;
-			this.tgtParent = tgtParent;
-			for (int i = 0; i < movingCCs.size(); i++) {
-				movingCCtoParentsMap.put(movingCCs.get(i), movingCCsrcParents.get(i));
-			}
-			srcPlugin = UmaUtil.getMethodPlugin(movingCCs.get(0));
-			samePluginMove = srcPlugin == UmaUtil.getMethodPlugin(tgtParent);
-		}
-				
-		@Override
-		public void run() {
-			if (samePluginMove) {
-				reassign();
-				MethodPlugin plugin = UmaUtil.getMethodPlugin(tgtParent);
-				modifiedResources = new HashSet();
-				modifiedResources.add(plugin.eResource());
-				LibraryEditUtil.getInstance().save(modifiedResources);
-				status = new MultiStatus(LibraryEditPlugin.INSTANCE
-						.getSymbolicName(), IStatus.OK,
-						LibraryEditResources.error_reason, null); 
-				return;
-			}
-			super.run();
-		}
-		
-		@Override
-		protected void doMove(IProgressMonitor monitor,
-				Map elementToOldResourceMap, Set modifiedResources) {
-			super.doMove(monitor, elementToOldResourceMap, modifiedResources);
-			reassign();
-			LibraryEditUtil.getInstance().fixUpDanglingCustomCategories(srcPlugin);
-		}
-
-		private void reassign() {
-			
-			Set<CustomCategory> notToReassignSet = new HashSet<CustomCategory>();
-			for (int i = 0; i < movingCCs.size(); i++) {
-				CustomCategory cc = movingCCs.get(i);
-				boolean toReassign = true;
-				
-				if (!samePluginMove && movingCCs.size() > 1) {
-					
-					//Build ancestorSet
-					Set ancestorSet = new HashSet();
-					Stack<List> stack = new Stack<List>();
-					List<CustomCategory> parents = AssociationHelper.getCustomCategories(cc);
-					if (parents != null && !parents.isEmpty()) {
-						stack.push(parents);	
-					}					
-					while (! stack.isEmpty()) {
-						parents = stack.pop();
-						for (CustomCategory p : parents) {
-							if (! ancestorSet.contains(p)) {
-								List<CustomCategory> moreParents = AssociationHelper.getCustomCategories(p);
-								if (moreParents != null && !moreParents.isEmpty()) {
-									stack.push(moreParents);	
-								}
-							}
-						}						
-						ancestorSet.addAll(parents);
-					}
-					
-					//Test if any other moving cc1 is an ancestor, and not to assign if there is any
-					for (CustomCategory cc1 : movingCCs) {
-						if (cc1 != cc && ancestorSet.contains(cc1)) {
-							notToReassignSet.add(cc);
-							toReassign = false;
-							break;
-						}
-					}
-				}
-				
-				if (toReassign) {
-					movingCCsrcParents.get(i).getCategorizedElements().remove(cc);
-				}
-			}
-			
-			
-			Set set = new HashSet();
-			set.addAll(tgtParent.getCategorizedElements());
-			for (CustomCategory cc : movingCCs) {
-				if (set.contains(cc) || notToReassignSet.contains(cc)) {
-					continue;
-				}
-				set.add(cc);
-				tgtParent.getCategorizedElements().add(cc);
-			}
-		}
-		
-		@Override
-		protected boolean referencedIllegally(MethodPlugin ownerPlugin,
-				MethodElement e, Collection moveList) {	
-			if (e instanceof CustomCategory) {
-				CustomCategory referencedCC = (CustomCategory) e;
-				
-				Map<String, Boolean> map = new HashMap<String, Boolean>();
-				Collection references = AssociationHelper.getReferences(referencedCC);
-				
-				for (Iterator iter = references.iterator(); iter.hasNext();) {
-					MethodElement element = (MethodElement) iter.next();
-					if (movingCCtoParentsMap.containsKey(element)) {
-						continue;
-					}
-					if (element instanceof CustomCategory) {
-						if (movingCCtoParentsMap.get(referencedCC) == element) {
-							continue;
-						}
-					} 
-					MethodPlugin plugin = UmaUtil.getMethodPlugin(element);
-					if (plugin != null && plugin != ownerPlugin
-							&& !Misc.isBaseOf(ownerPlugin, plugin, map)) {
-						return true;
-					}
-				}
-				
-				return false;
-			}
-
-			return super.referencedIllegally(ownerPlugin, e, moveList);	
-		}
-		
-		@Override
-		public void undo() {
-			super.undo();
-		}
 	}
-
-	
 
 }

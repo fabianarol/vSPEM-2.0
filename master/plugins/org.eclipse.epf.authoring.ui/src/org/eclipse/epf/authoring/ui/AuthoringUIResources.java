@@ -29,18 +29,13 @@ public final class AuthoringUIResources extends NLS {
 		// Do not instantiate.
 	}
 	
-	public static String ActivityDiagramPrefPage_allowCreateConnectionToReadOnlyElements;
-
-	public static String assignAction_text;
-
-	public static String CustomCategoryAssignPage_includeElementsOfType;
+	/**vEPF**/
+	public static String modify_Variant_element;
 	
-	public static String unassignAction_text;
+	public static String modify_VarPoint_element;
 	
-	public static String reassignAction_text;
-		
-	public static String deepCopyAction_text;
-
+	public static String saving_TailoredProcess_element;
+	/***/
 	public static String ConfigurationOrderDialog_description;
 
 	public static String ConfigurationOrderDialog_NavigationViews;
@@ -64,10 +59,6 @@ public final class AuthoringUIResources extends NLS {
 	public static String guidancePage_title;
 
 	public static String ItemsFilterDialog_UpdateTreeJob_name;
-
-	public static String Configuration_Problem_Refresh;
-	
-	public static String ProblemExplanationText;
 
 	public static String NewDiagramFile_title;
 
@@ -94,8 +85,6 @@ public final class AuthoringUIResources extends NLS {
 	public static String toolMentorsPage_title;
 
 	public static String workProductsPage_title;
-	
-	public static String workProductStatesPage_title;
 
 	public static String checkItemsSection_name;
 
@@ -148,9 +137,14 @@ public final class AuthoringUIResources extends NLS {
 	public static String additionalInfo_text;
 
 	public static String application_text;
-	public static String practice_application_text;
 
 	public static String actionLabel_edit;
+	
+	public static String actionLabel_adapt;
+	
+	public static String actionLabel_seeVariation;
+	
+	public static String actionLabel_generateReport;
 
 	public static String actionLabel_findElementInLibNav;
 
@@ -219,8 +213,6 @@ public final class AuthoringUIResources extends NLS {
 	public static String packagingGuidance_text;
 
 	public static String presentationName_text;
-	
-	public static String long_presentationName_text;
 
 	public static String promptforlibary_text;
 
@@ -267,6 +259,8 @@ public final class AuthoringUIResources extends NLS {
 	public static String new_plugin;
 
 	public static String move;
+
+	public static String uniqueId_text;
 
 	public static String variabilityType_text;
 
@@ -417,10 +411,6 @@ public final class AuthoringUIResources extends NLS {
 	public static String taskCategoriesPage_selectedLabel2;
 
 	public static String MarkerResolutionGenerator_removeUnresolvedReference;
-	
-	public static String LpmResolutionGenerator_removeUnresolvedBasePlugins;
-	
-	public static String LpmResolutionGenerator_removeMultipleRepacers;
 
 	public static String MarkerResolutionGenerator_showOwnerInLibraryView;
 
@@ -491,26 +481,12 @@ public final class AuthoringUIResources extends NLS {
 	public static String practiceReferencesPage_sectionName;
 
 	public static String practiceReferencesPage_sectionDescription;
-	
-	public static String practiceReferencesPage_sectionDescription_udt;
 
 	public static String practiceReferencesPage_availableLabel;
 
 	public static String practiceReferencesPage_selectedLabel;
 
 	public static String practiceReferencesPage_multipleSelectDescription;
-	
-	public static String practiceReferencesPage_sortOrderButton_text;
-	
-	public static String practiceReferencesPage_sortTypeButton_text;
-	
-	public static String practiceReferencesPage_assignQualifierButton_text;
-	
-	public static String practiceReferencesPage_unassignQualifierButton_text;
-	
-	public static String practiceReferencesPage_selectQualifierDialog_title;
-	
-	public static String practiceReferencesPage_selectQualifierDialog_msg;
 
 	public static String categoryGuidancesPage_sectionName;
 
@@ -636,57 +612,6 @@ public final class AuthoringUIResources extends NLS {
 	
 	public static String enableLibraryValidationCheckbox_text;
 	
-	public static String editorGroup_text;
-	
-	public static String rteGroup_text;
-	
-	public static String rteGroupAddDialog_title;
-	
-	public static String rteGroupAddDialog_msg;
-	
-	public static String rteAddOneButtonGroup_title;
-	
-	public static String rteAddOneButton_text;
-	
-	public static String rteAddButton_text;
-	
-	
-	public static String hex_24;
-	public static String hex_26;
-	public static String hex_2B;
-	public static String hex_2C;
-	public static String hex_2F;
-	public static String hex_3A;
-	public static String hex_3B;
-	public static String hex_3D;
-	public static String hex_3F;	
-	public static String hex_40;
-	public static String hex_20;
-	public static String hex_22;
-	public static String hex_3C;
-	public static String hex_3E;
-	public static String hex_23;
-	public static String hex_25;
-	public static String hex_7B;
-	public static String hex_7D;
-	public static String hex_7C;
-	public static String hex_5C;	
-	public static String hex_5E;
-	public static String hex_7E;
-	public static String hex_5B;
-	public static String hex_5D;
-	public static String hex_60;
-	
-	public static String enableUIFieldsCheckbox_text;
-		
-	public static String enableAutoNameGenCheckbox_text;
-	
-	public static String skipAllCheckbox_text;
-	
-	public static String skipSelectedChebox_text;
-	
-	public static String enableUIFieldsChange_message;
-	
 	public static String invalidPreferenceHistorySizeError_msg;
 
 	public static String createDialog_title;
@@ -806,8 +731,6 @@ public final class AuthoringUIResources extends NLS {
 	public static String dialogs_MoveDialog_errorTitle;
 
 	public static String dialogs_MoveDialog_errorMessage;
-	
-	public static String dialogs_AssignDialog_errorMessage;
 
 	public static String processFormEditorSaveDialog_title;
 
@@ -864,8 +787,6 @@ public final class AuthoringUIResources extends NLS {
 	public static String methodPluginDescriptionPage_cannotRenamePluginFolder;
 
 	public static String methodPluginDescriptionPage_lockPluginLabel;
-	public static String methodPluginDescriptionPage_supportingPluginLabel;
-	public static String contentPackageDescriptionPage_supportingPackageLabel;
 
 	public static String methodPluginDescriptionPage_lockPlugin_message;
 
@@ -988,8 +909,6 @@ public final class AuthoringUIResources extends NLS {
 	public static String AuthoringUIPlugin_OpenConfigurationMainPage_pageDescription;
 
 	public static String AuthoringUIPlugin_SaveAllEditorsPage_DeselectAllButtonLabel;
-
-	public static String ElementHTMLViewer_0;
 
 	public static String ElementsView_migration_dir_dlg_description_text;
 
@@ -1132,8 +1051,6 @@ public final class AuthoringUIResources extends NLS {
 	public static String addLinkDialog_linkType;
 
 	public static String openLinkCheckbox_text;
-	
-	public static String keepRawURLCheckbox_text;
 
 	public static String heightLabel_text;
 
@@ -1173,12 +1090,6 @@ public final class AuthoringUIResources extends NLS {
 	public static String ProcessEditor_Prefix;
 
 	public static String MoveDialog_move_text;
-	
-	public static String AssignDialog_assign_text;
-	
-	public static String AssignDialog_reassign_text;
-	
-//	public static String AssignDialog_deepcoppy_text;
 
 	public static String ChecklistOrder_title;
 
@@ -1346,8 +1257,6 @@ public final class AuthoringUIResources extends NLS {
 	public static String UserDefinedDiagramDialog_useWPDImage;
 
 	public static String ProcessEditor_Action_Contribute;
-	
-	public static String ProcessEditor_Action_Customize;
 
 	public static String ProcessEditor_Action_Replace;
 
@@ -1364,28 +1273,6 @@ public final class AuthoringUIResources extends NLS {
 	public static String ProcessEditor_Action_SuppressAll;
 
 	public static String FilterDialog_Pattern_description;
-	
-	public static String FilterDialog_Process_Scope_Grp;
-	
-	public static String FilterDialog_Process_Scope_Grp_referencedPluginsBtn;
-	
-	public static String FilterDialog_Process_Scope_Grp_selectedPluginsBtn;
-	
-	public static String FilterDialog_Process_Scope_Grp_libBtn;
-	
-	public static String FilterDialog_Process_Scope_Grp_configBtn;
-	
-	public static String FilterDialog_Process_Scope_Grp_viewBtn;
-	
-	public static String PluginListDialog_title;
-	
-	public static String PluginListDialog_button_add;
-	
-	public static String PluginListDialog_button_remove;
-	
-	public static String PluginListDialog_addDialogMsg;
-	
-	public static String PluginListDialog_addDialogTitle;
 
 	public static String ConfigurationPage_TreeTitleLabel;
 
@@ -1395,11 +1282,6 @@ public final class AuthoringUIResources extends NLS {
 
 	public static String ConfigurationPage_LoadingMessage;
 
-	public static String ConfigurationPage_updateOnClick;
-	public static String ConfigurationPage_updateOnClickToolTip;
-	public static String ConfigurationPage_noUpdateOnClick;
-	public static String ConfigurationPage_noUpdateOnClickToolTip;
-	
 	public static String MoveDialog_validdestination_text;
 
 	public static String MoveDialog_cannotModifyDestination;
@@ -1427,18 +1309,6 @@ public final class AuthoringUIResources extends NLS {
 	public static String ProcessEditorPreferencePage_suppressionGroupTitle;
 
 	public static String ProcessEditorPreferencePage_inheritSuppressionState;
-	
-	public static String ProcessEditorPreferencePage_synchronizationGroupTitle;
-
-	public static String ProcessEditorPreferencePage_synchronizationFree;
-	
-	public static String ProcessEditorPreferencePage_conversionDialogTitle;
-	
-	public static String ProcessEditorPreferencePage_conversionDialogText;
-	
-	public static String ProcessEditorPreferencePage_conversionProgressText;
-	
-	public static String ProcessEditorPreferencePage_conversionProgressFailText;
 
 	public static String ProcessEditor_Action_OpenWorkProductDependencyDiagram;
 
@@ -1596,14 +1466,6 @@ public final class AuthoringUIResources extends NLS {
 
 	public static String AuthoringUIPlugin_AbstractNewLibraryPage_DirectoryLabel;
 
-	public static String AuthoringValidationPrefPage_0;
-
-	public static String AuthoringValidationPrefPage_1;
-
-	public static String AuthoringValidationPrefPage_2;
-
-	public static String AuthoringValidationPrefPage_3;
-
 	public static String RootPrefPage_enableprocesscontribution_text;
 
 	public static String ConfigurationDescriptionDescription_text;
@@ -1631,8 +1493,6 @@ public final class AuthoringUIResources extends NLS {
 	public static String WPCompartmentFigure_0;
 
 	public static String promptfor_publish_unopen_activitydd_text;
-	
-	public static String use_state_on_workproduct_text;
 
 	public static String prompt_for_publish_extend_activity_diagram;
 
@@ -1727,8 +1587,6 @@ public final class AuthoringUIResources extends NLS {
 	public static String synchronizationWizard_selectDetailsPage_dilvedParts_label;
 
 	public static String synchronizationWizard_selectDetailsPage_selSteps_label;
-	
-	public static String synchronizationWizard_selectDetailsPage_selGuidance_label;
 
 	public static String synchronizationWizard_selectDetailsPage_text;
 
@@ -2066,10 +1924,6 @@ public final class AuthoringUIResources extends NLS {
 	public static String editor_title_colon_with_spaces;
 
 	public static String publish_categories_text;
-	
-	public static String publish_practices_text;
-	
-	public static String publish_practices_for_udt_text;
 
 	public static String default_list_length_label;
 
@@ -2098,10 +1952,6 @@ public final class AuthoringUIResources extends NLS {
 	public static String preference_Activity_Diagram;
 
 	public static String preference_Activity_Detail_Diagram;
-	
-	public static String preference_Descriptors;
-	
-	public static String preference_includeDescriptorButton_text;
 
 	public static String configurationPage_QuickfixError_reason1;
 
@@ -2114,115 +1964,19 @@ public final class AuthoringUIResources extends NLS {
 	public static String AttachmentDialogattachUrl_text;
 	
 	public static String Validate_method_library;
-
-	public static String ValidationMarkerResolutionGenerator_0;
-
-	public static String ValidationMarkerResolutionGenerator_1;
 	
 	public static String roleCategoriesPage_multipleSelectDescription;
 
 	public static String taskCategoriesPage_multipleSelectDescription;
 	
 	public static String workProductCategoriesPage_multipleSelectDescription;
-	
-	public static String plugin_generalInfoSection_desc;
 
-	public static String plugin_versionInfoSection_desc;
-	
-	public static String workproductDescriptionPage_slot_text;
-	
-	public static String slotSection_name;
-	
-	public static String slotSection_desc;
-	
-	public static String slotsLabel_text;
-	
-	public static String artifact_slotSection_desc;
+	public static String newProcessLineWizard_title;
 
-	public static String deliverable_slotSection_desc;
-	
-	public static String outcome_slotSection_desc;
-	
-	public static String slotConfirmDialog_title;
-	
-	public static String wpFulFillsConfirmDialog_message;
-	
-	public static String wpSlotFulFillsConfirmDialog_message;
-	
-	public static String configProblemViewOptionsText;
-	
-	public static String hideErrosText;
-	
-	public static String hideWarningsText;
-	
-	public static String hideInfosText;
-	
-	public static String add_TasksperRow;
-	
-	public static String invalidTaskperRow_msg;
-	
-	public static String statesSection_name;
-	
-	public static String statesSection_desc;
-	
-	public static String states_name_text;
-	
-	public static String states_add_text;
-	
-	public static String states_delete_text;
-	
-	public static String states_manage_text;
-	
-	public static String ManageStateDialog_title;
-	
-	public static String ManageStateDialog_label_state;
-	
-	public static String ManageStateDialog_label_des;
-	
-	public static String ManageStateDialog_addBtn_label;
-	
-	public static String ManageStateDialog_deleteBtn_label;
-	
-	public static String ManageStateDialog_modifyBtn_label;
-	
-	public static String ManageStateDialog_closeBtn_label;
-	
-	public static String ManageStateDialog_warn_msg;
-	
-	public static String ManageStateDialog_warn_title;
-	
-	public static String StateEditDialog_title;
-	
-	public static String StateEditDialog_label_name;
-	
-	public static String StateEditDialog_label_des;
-	
-	public static String states_assign_text;
-	
-	public static String states_unassign_text;
-	
-	public static String states_wp_state_text;
-	
-	public static String states_global_state_text;
-	
-	public static String states_global_notes_text;
-	
-	public static String states_des_text;
-	
-	public static String ProcessEditor_Action_delete_AD_text;
-	
-	public static String ProcessEditor_Action_delete_ADD_text;
-	
-	public static String ProcessEditor_Action_delete_WPDD_text;
-	
-	public static String LeafElementsNode_text;
-	
-	public static String ConfigurationPage_RunQuery_label;
-	
-	public static String ConfigurationPage_RunQuery_ToolTip; 
-	
-	public static String contribution_order_text;
-	
+	public static String newProcessLineWizardMainPage_title;
+
+	public static String newProcessLineWizardMainPage_description;
+
 	static {
 		NLS.initializeMessages(BUNDLE_NAME, AuthoringUIResources.class);
 	}

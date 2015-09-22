@@ -2,8 +2,8 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.epf.library; singleton:=true
-Bundle-Version: 1.5.0.qualifier
-Bundle-ClassPath: .
+Bundle-Version: 1.2.0.qualifier
+Bundle-ClassPath: library.jar
 Bundle-Activator: org.eclipse.epf.library.LibraryPlugin
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
@@ -11,7 +11,6 @@ Eclipse-LazyStart: true
 Export-Package: org.eclipse.epf.library,
  org.eclipse.epf.library.configuration,
  org.eclipse.epf.library.configuration.closure,
- org.eclipse.epf.library.diagram.providers,
  org.eclipse.epf.library.events,
  org.eclipse.epf.library.layout,
  org.eclipse.epf.library.layout.diagram,
@@ -20,10 +19,8 @@ Export-Package: org.eclipse.epf.library,
  org.eclipse.epf.library.preferences,
  org.eclipse.epf.library.prefs,
  org.eclipse.epf.library.project,
- org.eclipse.epf.library.realization,
  org.eclipse.epf.library.services,
- org.eclipse.epf.library.util,
- org.eclipse.epf.library.validation
+ org.eclipse.epf.library.util
 Require-Bundle: org.eclipse.epf.diagram.model;visibility:=reexport,
  org.eclipse.epf.library.edit;visibility:=reexport,
  org.eclipse.epf.library.persistence;visibility:=reexport,
@@ -31,7 +28,6 @@ Require-Bundle: org.eclipse.epf.diagram.model;visibility:=reexport,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
  org.eclipse.emf.ecore.xmi;visibility:=reexport,
- org.eclipse.emf.edit.ui,
- org.eclipse.epf.publish.layout
+ org.eclipse.emf.edit.ui;visibility:=reexport,
+ org.eclipse.epf.ui
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Import-Package: org.eclipse.epf.validation

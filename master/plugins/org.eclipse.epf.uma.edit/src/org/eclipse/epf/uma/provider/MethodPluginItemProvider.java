@@ -20,7 +20,6 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.edit.provider.ComposeableAdapterFactory;
 import org.eclipse.emf.edit.provider.IEditingDomainItemProvider;
 import org.eclipse.emf.edit.provider.IItemLabelProvider;
-import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.IItemPropertySource;
 import org.eclipse.emf.edit.provider.IStructuredItemContentProvider;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
@@ -55,14 +54,12 @@ public class MethodPluginItemProvider extends MethodUnitItemProvider implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	public List<IItemPropertyDescriptor> getPropertyDescriptors(Object object) {
+	public List getPropertyDescriptors(Object object) {
 		if (itemPropertyDescriptors == null) {
 			super.getPropertyDescriptors(object);
 
 			addUserChangeablePropertyDescriptor(object);
 			addBasesPropertyDescriptor(object);
-			addSupportingPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
@@ -107,26 +104,6 @@ public class MethodPluginItemProvider extends MethodUnitItemProvider implements
 	}
 
 	/**
-	 * This adds a property descriptor for the Supporting feature.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected void addSupportingPropertyDescriptor(Object object) {
-		itemPropertyDescriptors
-				.add(createItemPropertyDescriptor(
-						((ComposeableAdapterFactory) adapterFactory)
-								.getRootAdapterFactory(),
-						getResourceLocator(),
-						getString("_UI_MethodPlugin_supporting_feature"), //$NON-NLS-1$
-						getString(
-								"_UI_PropertyDescriptor_description", "_UI_MethodPlugin_supporting_feature", "_UI_MethodPlugin_type"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						UmaPackage.Literals.METHOD_PLUGIN__SUPPORTING, true,
-						false, false,
-						ItemPropertyDescriptor.BOOLEAN_VALUE_IMAGE, null, null));
-	}
-
-	/**
 	 * This specifies how to implement {@link #getChildren} and is used to deduce an appropriate feature for an
 	 * {@link org.eclipse.emf.edit.command.AddCommand}, {@link org.eclipse.emf.edit.command.RemoveCommand} or
 	 * {@link org.eclipse.emf.edit.command.MoveCommand} in {@link #createCommand}.
@@ -134,9 +111,7 @@ public class MethodPluginItemProvider extends MethodUnitItemProvider implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	public Collection<? extends EStructuralFeature> getChildrenFeatures(
-			Object object) {
+	public Collection getChildrenFeatures(Object object) {
 		if (childrenFeatures == null) {
 			super.getChildrenFeatures(object);
 			childrenFeatures
@@ -150,7 +125,6 @@ public class MethodPluginItemProvider extends MethodUnitItemProvider implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EStructuralFeature getChildFeature(Object object, Object child) {
 		// Check the type of the specified child object and return the proper feature to use for
 		// adding (see {@link AddCommand}) it as a child.
@@ -164,7 +138,6 @@ public class MethodPluginItemProvider extends MethodUnitItemProvider implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object getImage(Object object) {
 		return overlayImage(object, getResourceLocator().getImage(
 				"full/obj16/MethodPlugin")); //$NON-NLS-1$
@@ -176,7 +149,6 @@ public class MethodPluginItemProvider extends MethodUnitItemProvider implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String getText(Object object) {
 		String label = ((MethodPlugin) object).getName();
 		return label == null || label.length() == 0 ? getString("_UI_MethodPlugin_type") : //$NON-NLS-1$
@@ -190,13 +162,11 @@ public class MethodPluginItemProvider extends MethodUnitItemProvider implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void notifyChanged(Notification notification) {
 		updateChildren(notification);
 
 		switch (notification.getFeatureID(MethodPlugin.class)) {
 		case UmaPackage.METHOD_PLUGIN__USER_CHANGEABLE:
-		case UmaPackage.METHOD_PLUGIN__SUPPORTING:
 			fireNotifyChanged(new ViewerNotification(notification, notification
 					.getNotifier(), false, true));
 			return;
@@ -215,9 +185,8 @@ public class MethodPluginItemProvider extends MethodUnitItemProvider implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	protected void collectNewChildDescriptors(
-			Collection<Object> newChildDescriptors, Object object) {
+	protected void collectNewChildDescriptors(Collection newChildDescriptors,
+			Object object) {
 		super.collectNewChildDescriptors(newChildDescriptors, object);
 
 		newChildDescriptors.add(createChildParameter(
@@ -231,6 +200,50 @@ public class MethodPluginItemProvider extends MethodUnitItemProvider implements
 		newChildDescriptors.add(createChildParameter(
 				UmaPackage.Literals.METHOD_PLUGIN__METHOD_PACKAGES,
 				UmaFactory.eINSTANCE.createProcessComponent()));
+
+		newChildDescriptors.add(createChildParameter(
+				UmaPackage.Literals.METHOD_PLUGIN__METHOD_PACKAGES,
+				UmaFactory.eINSTANCE.createProcessLinesPackage()));
+
+		newChildDescriptors.add(createChildParameter(
+				UmaPackage.Literals.METHOD_PLUGIN__METHOD_PACKAGES,
+				UmaFactory.eINSTANCE.createProcessLineComponent()));
+
+		newChildDescriptors.add(createChildParameter(
+				UmaPackage.Literals.METHOD_PLUGIN__METHOD_PACKAGES,
+				UmaFactory.eINSTANCE.createProcessLineComponentPackage()));
+
+		newChildDescriptors.add(createChildParameter(
+				UmaPackage.Literals.METHOD_PLUGIN__METHOD_PACKAGES,
+				UmaFactory.eINSTANCE.createCoreProcessPackage()));
+
+		newChildDescriptors.add(createChildParameter(
+				UmaPackage.Literals.METHOD_PLUGIN__METHOD_PACKAGES,
+				UmaFactory.eINSTANCE.createTailoredProcessesPackage()));
+
+		newChildDescriptors.add(createChildParameter(
+				UmaPackage.Literals.METHOD_PLUGIN__METHOD_PACKAGES,
+				UmaFactory.eINSTANCE.createTailoredProcessComponent()));
+
+		newChildDescriptors.add(createChildParameter(
+				UmaPackage.Literals.METHOD_PLUGIN__METHOD_PACKAGES,
+				UmaFactory.eINSTANCE.createTailoredCoreProcessPackage()));
+
+		newChildDescriptors.add(createChildParameter(
+				UmaPackage.Literals.METHOD_PLUGIN__METHOD_PACKAGES,
+				UmaFactory.eINSTANCE.createVariantsPackage()));
+
+		newChildDescriptors.add(createChildParameter(
+				UmaPackage.Literals.METHOD_PLUGIN__METHOD_PACKAGES,
+				UmaFactory.eINSTANCE.createVarPointsPackage()));
+
+		newChildDescriptors.add(createChildParameter(
+				UmaPackage.Literals.METHOD_PLUGIN__METHOD_PACKAGES,
+				UmaFactory.eINSTANCE.createVariationsPackage()));
+
+		newChildDescriptors.add(createChildParameter(
+				UmaPackage.Literals.METHOD_PLUGIN__METHOD_PACKAGES,
+				UmaFactory.eINSTANCE.createProcessLine()));
 	}
 
 	/**
@@ -239,7 +252,6 @@ public class MethodPluginItemProvider extends MethodUnitItemProvider implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public ResourceLocator getResourceLocator() {
 		return UmaEditPlugin.INSTANCE;
 	}

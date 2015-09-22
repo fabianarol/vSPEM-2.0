@@ -40,7 +40,7 @@ public interface WorkProductDescription extends ContentDescription {
 	 * @return the value of the '<em>Purpose</em>' attribute.
 	 * @see #setPurpose(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getWorkProductDescription_Purpose()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getPurpose();
@@ -66,7 +66,7 @@ public interface WorkProductDescription extends ContentDescription {
 	 * @return the value of the '<em>Impact Of Not Having</em>' attribute.
 	 * @see #setImpactOfNotHaving(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getWorkProductDescription_ImpactOfNotHaving()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getImpactOfNotHaving();
@@ -92,7 +92,7 @@ public interface WorkProductDescription extends ContentDescription {
 	 * @return the value of the '<em>Reasons For Not Needing</em>' attribute.
 	 * @see #setReasonsForNotNeeding(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getWorkProductDescription_ReasonsForNotNeeding()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getReasonsForNotNeeding();

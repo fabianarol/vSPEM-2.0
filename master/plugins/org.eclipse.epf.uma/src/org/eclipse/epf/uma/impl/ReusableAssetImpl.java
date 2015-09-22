@@ -29,12 +29,19 @@ public class ReusableAssetImpl extends GuidanceImpl implements ReusableAsset {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	protected ReusableAssetImpl() {
 		super();
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -42,7 +49,6 @@ public class ReusableAssetImpl extends GuidanceImpl implements ReusableAsset {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.REUSABLE_ASSET;
 	}

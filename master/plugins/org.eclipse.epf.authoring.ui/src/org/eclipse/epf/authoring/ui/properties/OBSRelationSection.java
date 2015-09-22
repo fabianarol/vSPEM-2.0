@@ -14,7 +14,6 @@ import java.util.ArrayList;
 
 import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
-import org.eclipse.epf.authoring.ui.filters.DescriptorConfigurationFilter;
 import org.eclipse.epf.authoring.ui.filters.ProcessRoleFilter;
 import org.eclipse.epf.library.edit.IFilter;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
@@ -86,8 +85,6 @@ public class OBSRelationSection extends AbstractSection {
 		if (filter == null) {
 			filter = new ProcessRoleFilter(getConfiguration(), null,
 					FilterConstants.ROLES);
-		} else if (filter instanceof DescriptorConfigurationFilter) {
-			((DescriptorConfigurationFilter) filter).setMethodConfiguration(getConfiguration());
 		}
 		return filter;
 	}

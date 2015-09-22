@@ -41,7 +41,7 @@ public interface Image extends LeafElement {
 	 * @return the value of the '<em>Uri</em>' attribute.
 	 * @see #setUri(URI)
 	 * @see org.eclipse.epf.uma.UmaPackage#getImage_Uri()
-	 * @model dataType="org.eclipse.epf.uma.Uri" ordered="false"
+	 * @model dataType="org.eclipse.epf.uma.Uri"
 	 * @generated
 	 */
 	URI getUri();
@@ -68,7 +68,7 @@ public interface Image extends LeafElement {
 	 * @return the value of the '<em>Mime Type</em>' attribute.
 	 * @see #setMimeType(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getImage_MimeType()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getMimeType();

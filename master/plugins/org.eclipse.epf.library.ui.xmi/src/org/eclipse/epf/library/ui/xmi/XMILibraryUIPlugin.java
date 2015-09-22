@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.library.ui.xmi;
 
-import org.eclipse.epf.common.ui.AbstractPlugin;
+import org.eclipse.epf.common.plugin.AbstractPlugin;
 import org.osgi.framework.BundleContext;
 
 /**

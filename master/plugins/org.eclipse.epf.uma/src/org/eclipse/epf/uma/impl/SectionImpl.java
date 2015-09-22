@@ -44,6 +44,13 @@ import org.eclipse.epf.uma.UmaPackage;
  */
 public class SectionImpl extends VariabilityElementImpl implements Section {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The default value of the '{@link #getSectionName() <em>Section Name</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -91,7 +98,7 @@ public class SectionImpl extends VariabilityElementImpl implements Section {
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Section> subSections;
+	protected EList subSections = null;
 
 	/**
 	 * The cached value of the '{@link #getPredecessor() <em>Predecessor</em>}' reference.
@@ -101,7 +108,7 @@ public class SectionImpl extends VariabilityElementImpl implements Section {
 	 * @generated
 	 * @ordered
 	 */
-	protected Section predecessor;
+	protected Section predecessor = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -113,7 +120,7 @@ public class SectionImpl extends VariabilityElementImpl implements Section {
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -121,7 +128,6 @@ public class SectionImpl extends VariabilityElementImpl implements Section {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.SECTION;
 	}
@@ -177,10 +183,10 @@ public class SectionImpl extends VariabilityElementImpl implements Section {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<Section> getSubSections() {
+	public List getSubSections() {
 		if (subSections == null) {
-			subSections = new EObjectContainmentEList.Resolving<Section>(
-					Section.class, this, UmaPackage.SECTION__SUB_SECTIONS);
+			subSections = new EObjectContainmentEList.Resolving(Section.class,
+					this, UmaPackage.SECTION__SUB_SECTIONS);
 		}
 		return subSections;
 	}
@@ -232,12 +238,11 @@ public class SectionImpl extends VariabilityElementImpl implements Section {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case UmaPackage.SECTION__SUB_SECTIONS:
-			return ((InternalEList<?>) getSubSections()).basicRemove(otherEnd,
+			return ((InternalEList) getSubSections()).basicRemove(otherEnd,
 					msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
@@ -248,7 +253,6 @@ public class SectionImpl extends VariabilityElementImpl implements Section {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.SECTION__SECTION_NAME:
@@ -270,8 +274,6 @@ public class SectionImpl extends VariabilityElementImpl implements Section {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.SECTION__SECTION_NAME:
@@ -282,7 +284,7 @@ public class SectionImpl extends VariabilityElementImpl implements Section {
 			return;
 		case UmaPackage.SECTION__SUB_SECTIONS:
 			getSubSections().clear();
-			getSubSections().addAll((Collection<? extends Section>) newValue);
+			getSubSections().addAll((Collection) newValue);
 			return;
 		case UmaPackage.SECTION__PREDECESSOR:
 			setPredecessor((Section) newValue);
@@ -296,7 +298,6 @@ public class SectionImpl extends VariabilityElementImpl implements Section {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.SECTION__SECTION_NAME:
@@ -320,7 +321,6 @@ public class SectionImpl extends VariabilityElementImpl implements Section {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);
@@ -348,7 +348,6 @@ public class SectionImpl extends VariabilityElementImpl implements Section {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy())
 			return super.toString();

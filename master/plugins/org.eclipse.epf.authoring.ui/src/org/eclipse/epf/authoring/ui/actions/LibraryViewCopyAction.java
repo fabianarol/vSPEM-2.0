@@ -12,24 +12,14 @@ package org.eclipse.epf.authoring.ui.actions;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 
-import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.edit.command.CopyToClipboardCommand;
 import org.eclipse.emf.edit.ui.action.CopyAction;
-import org.eclipse.epf.common.ui.util.ClipboardUtil;
+import org.eclipse.epf.common.utils.ClipboardUtil;
 import org.eclipse.epf.common.utils.StrUtil;
-import org.eclipse.epf.library.LibraryServiceUtil;
-import org.eclipse.epf.library.edit.util.ActivityHandler;
-import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.util.ResourceHelper;
-import org.eclipse.epf.persistence.MultiFileXMIResourceImpl;
-import org.eclipse.epf.services.ILibraryPersister;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.MethodPlugin;
 import org.eclipse.epf.uma.edit.domain.TraceableAdapterFactoryEditingDomain;
@@ -51,11 +41,8 @@ public class LibraryViewCopyAction extends CopyAction {
 		if (command == null)
 			return;
 		else {
-			TraceableAdapterFactoryEditingDomain tDomain = null;
 			if (domain instanceof TraceableAdapterFactoryEditingDomain) {
 				((TraceableAdapterFactoryEditingDomain) domain).resetCopyMaps();
-				tDomain = (TraceableAdapterFactoryEditingDomain) domain;
-				tDomain.setExtenalMaintainedCopyMap(new HashMap<Object, Object>());
 			}
 			if (command instanceof CopyToClipboardCommand) {
 				String links = ""; //$NON-NLS-1$
@@ -73,30 +60,11 @@ public class LibraryViewCopyAction extends CopyAction {
 					}
 				}
 				if (links.length() > 0) {
-					handleCopyTextHTMLToClipboard(links);
+					ClipboardUtil.copyTextHTMLToClipboard(links);
 				}
 			}
 			super.run();
-			
-			if (tDomain != null) {
-				Set<Resource> resouresToSave = new HashSet<Resource>();
-				Map map = tDomain.getExtenalMaintainedCopyMap();
-				ActivityHandler.fixGuidReferences(map, false, true, null);
-			}
-			
-			if (tDomain != null) {
-				tDomain.setExtenalMaintainedCopyMap(null);
-			}
-			
 		}
-	}
-
-	/**
-	 * Handles copying the links to the clipboard as Text and HTML
-	 * @param links
-	 */
-	protected void handleCopyTextHTMLToClipboard(String links) {
-		ClipboardUtil.copyTextHTMLToClipboard(links);
 	}
 
 	

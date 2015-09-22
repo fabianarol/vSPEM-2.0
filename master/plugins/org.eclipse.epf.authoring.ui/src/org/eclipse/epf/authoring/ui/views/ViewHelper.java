@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -37,11 +36,9 @@ import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
 import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 import org.eclipse.epf.authoring.ui.AuthoringUIPlugin;
 import org.eclipse.epf.authoring.ui.AuthoringUIResources;
-import org.eclipse.epf.authoring.ui.preferences.AuthoringUIPreferences;
-import org.eclipse.epf.common.service.utils.CommandLineRunUtil;
-import org.eclipse.epf.common.ui.util.MsgBox;
-import org.eclipse.epf.common.ui.util.MsgDialog;
-import org.eclipse.epf.common.ui.util.PerspectiveUtil;
+import org.eclipse.epf.common.serviceability.MsgBox;
+import org.eclipse.epf.common.serviceability.MsgDialog;
+import org.eclipse.epf.common.utils.PerspectiveUtil;
 import org.eclipse.epf.library.ILibraryManager;
 import org.eclipse.epf.library.LibraryService;
 import org.eclipse.epf.library.LibraryServiceUtil;
@@ -62,6 +59,7 @@ import org.eclipse.epf.uma.MethodPlugin;
 import org.eclipse.epf.uma.NamedElement;
 import org.eclipse.epf.uma.ProcessComponent;
 import org.eclipse.epf.uma.util.UmaUtil;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -455,7 +453,7 @@ public final class ViewHelper {
 		if (lib == null)
 			return;
 
-		org.eclipse.epf.library.edit.util.IRunnableWithProgress runnable = new org.eclipse.epf.library.edit.util.IRunnableWithProgress() {
+		IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor)
 					throws InvocationTargetException, InterruptedException {
 				HashSet modifiedResources = new HashSet();
@@ -541,27 +539,13 @@ public final class ViewHelper {
 	 * Library health check
 	 *
 	 */
-	public static void checkLibraryHealth(Object context) {
-		if (! AuthoringUIPreferences.getEnableLibraryValidation()) {
+	public static void checkLibraryHealth() {
+		final MethodLibrary lib = LibraryService.getInstance()
+				.getCurrentMethodLibrary();
+		if (lib == null)
 			return;
-		}
-		
-		final MethodLibrary lib = context instanceof MethodLibrary ? (MethodLibrary) context : null;
-		
-		final List<MethodPlugin> pluginList = new ArrayList<MethodPlugin>();
-		if (context instanceof  List) {
-			for (Object obj : (List) context) {
-				if (obj instanceof MethodPlugin) {
-					pluginList.add((MethodPlugin) obj);
-				}
-			}
-		}
-		
-		if (lib == null && pluginList.isEmpty()) {
-			return;
-		}
 
-		org.eclipse.epf.library.edit.util.IRunnableWithProgress runnable = new org.eclipse.epf.library.edit.util.IRunnableWithProgress() {
+		IRunnableWithProgress runnable = new IRunnableWithProgress() {
 
 			public void run(IProgressMonitor monitor)
 					throws InvocationTargetException, InterruptedException {
@@ -574,20 +558,7 @@ public final class ViewHelper {
 						.println("UNRESOLVED/INVALID PROXIES IN X-REFERENCES"); //$NON-NLS-1$
 				printWriter
 						.println("------------------------------------------"); //$NON-NLS-1$
-				
-				Iterator iter = null;
-				if (! pluginList.isEmpty()) {
-					List list = new ArrayList();					
-					for (MethodPlugin plugin :  pluginList) {
-						for (Iterator it = plugin.eAllContents(); it.hasNext();) {
-							list.add(it.next());
-						}
-					}
-					iter = list.iterator();
-				} else {
-					iter = lib.eAllContents();
-				}
-				for ( ; iter.hasNext();) {
+				for (Iterator iter = lib.eAllContents(); iter.hasNext();) {
 					InternalEObject element = (InternalEObject) iter.next();
 					if (element.eProxyURI() == null) {
 						if (element instanceof ContentDescription) {
@@ -707,7 +678,7 @@ public final class ViewHelper {
 		if (lib == null)
 			return;
 
-		org.eclipse.epf.library.edit.util.IRunnableWithProgress runnable = new org.eclipse.epf.library.edit.util.IRunnableWithProgress() {
+		IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor)
 					throws InvocationTargetException, InterruptedException {
 				HashSet modifiedResources = new HashSet();
@@ -870,7 +841,7 @@ public final class ViewHelper {
 	 * 			View
 	 */
 	public static IViewPart findView(String viewId, boolean show) {
-		try {			
+		try {
 			IWorkbenchPage activePage = PlatformUI.getWorkbench()
 					.getActiveWorkbenchWindow().getActivePage();
 			if (activePage != null) {
@@ -888,29 +859,6 @@ public final class ViewHelper {
 				return view;
 			}
 		} catch (Exception e) {
-			if (CommandLineRunUtil.getInstance().isNeedToRun()) {
-				return null;
-			}
-			AuthoringUIPlugin.getDefault().getMsgDialog().displayError(
-					AuthoringUIResources.errorDialog_title, 
-					AuthoringUIResources.internalError_msg, 
-					e);
-		}
-		return null;
-
-	}
-	
-	public static IViewPart findView(String viewId) {
-		try {			
-			IWorkbenchPage activePage = PlatformUI.getWorkbench()
-					.getActiveWorkbenchWindow().getActivePage();
-			if (activePage != null) {
-				return activePage.findView(viewId);
-			}
-		} catch (Exception e) {
-			if (CommandLineRunUtil.getInstance().isNeedToRun()) {
-				return null;
-			}
 			AuthoringUIPlugin.getDefault().getMsgDialog().displayError(
 					AuthoringUIResources.errorDialog_title, 
 					AuthoringUIResources.internalError_msg, 

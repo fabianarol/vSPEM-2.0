@@ -11,7 +11,6 @@
 package org.eclipse.epf.library.edit.process.command;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,12 +24,10 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.emf.common.command.BasicCommandStack;
 import org.eclipse.emf.common.command.Command;
-import org.eclipse.emf.common.command.CompoundCommand;
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.xml.type.XMLTypePackage.Literals;
@@ -45,17 +42,13 @@ import org.eclipse.epf.library.edit.IFilter;
 import org.eclipse.epf.library.edit.LibraryEditResources;
 import org.eclipse.epf.library.edit.Providers;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
-import org.eclipse.epf.library.edit.VariabilityInfo;
 import org.eclipse.epf.library.edit.process.BreakdownElementWrapperItemProvider;
-import org.eclipse.epf.library.edit.process.IBSItemProvider;
 import org.eclipse.epf.library.edit.util.ConfigurationSetter;
 import org.eclipse.epf.library.edit.util.ConstraintManager;
 import org.eclipse.epf.library.edit.util.DepthLevelAdapterFactoryTreeIterator;
 import org.eclipse.epf.library.edit.util.ExtensionManager;
 import org.eclipse.epf.library.edit.util.IDiagramManager;
 import org.eclipse.epf.library.edit.util.ITextReferenceReplacer;
-import org.eclipse.epf.library.edit.util.MethodElementPropertyHelper;
-import org.eclipse.epf.library.edit.util.PredecessorList;
 import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.library.edit.util.Suppression;
 import org.eclipse.epf.library.edit.util.TngUtil;
@@ -65,17 +58,12 @@ import org.eclipse.epf.uma.Constraint;
 import org.eclipse.epf.uma.ContentDescription;
 import org.eclipse.epf.uma.Diagram;
 import org.eclipse.epf.uma.MethodConfiguration;
-import org.eclipse.epf.uma.MethodElementProperty;
 import org.eclipse.epf.uma.Process;
 import org.eclipse.epf.uma.ProcessComponent;
-import org.eclipse.epf.uma.ProcessElement;
 import org.eclipse.epf.uma.ProcessPackage;
 import org.eclipse.epf.uma.UmaFactory;
-import org.eclipse.epf.uma.UmaPackage;
 import org.eclipse.epf.uma.VariabilityElement;
 import org.eclipse.epf.uma.VariabilityType;
-import org.eclipse.epf.uma.WorkBreakdownElement;
-import org.eclipse.epf.uma.WorkOrder;
 import org.eclipse.epf.uma.edit.command.MethodElementInitializeCopyCommand;
 import org.eclipse.osgi.util.NLS;
 
@@ -126,123 +114,6 @@ public class ActivityDeepCopyCommand extends CopyCommand {
 		}
 	}
 	
-	@Override
-	protected void addCreateCopyCommands(CompoundCommand compoundCommand,
-			EObject object) {
-
-		// Operation to handle copy replacers of the child activities
-		// 
-		if (copyExternalVariations && object instanceof ProcessPackage && object != this.activity.eContainer()) {			
-			ProcessPackage pkg = (ProcessPackage)object;
-			boolean isReplaced = false;
-			Activity replacer = null;
-			Activity orignalActivity = null;
-			for(Object procesElement : pkg.getProcessElements()){
-				if (procesElement instanceof Activity) {
-					Activity childAct = (Activity) procesElement;
-					if(childAct.getSuperActivities() == this.activity) {
-						replacer = getReplacer( (Activity)procesElement );
-						if (replacer != null ) {
-							isReplaced = true;
-							orignalActivity = (Activity)procesElement;
-						}
-						break;
-					}
-				}
-			}
-			if (isReplaced) {				
-				// reset the deferredInitializationCount so
-				// InitializeCopyCommand can be created for the following
-				// ActivityDeepCopyCommand. See
-				// org.eclipse.emf.edit.command.CopyCommand.prepare() for more
-				// details.
-				//
-				copyHelper.decrementDeferredInitializationCount();
-				ActivityDeepCopyCommand cmd = new ActivityDeepCopyCommand(replacer, (CopyHelper)copyHelper, config, 
-						targetProcess, monitor, false,activityDeepCopyConfigurator);
-				cmd.guidList = new LinkedList<String>(ActivityDeepCopyCommand.this.guidList);
-				cmd.guidList.addAll(ProcessUtil.getGuidList(ActivityDeepCopyCommand.this.activity, orignalActivity));
-				try {
-					cmd.execute();
-					ProcessPackage pkgCopy = cmd.pkgCopy;					
-					//basic put: original prc pkg to copied pkg based on replaced package.
-					((CopyHelper)copyHelper).basicPut(object, pkgCopy);			
-					//basic put original activity to the copy of replacer activity.
-					((CopyHelper)copyHelper).basicPut(orignalActivity, copyHelper.get(replacer));
-				}finally{
-					cmd.dispose();
-				}	
-				// restore the deferredInitializationCount so
-				// InitializeCopyCommand can be created for this
-				// ActivityDeepCopyCommand
-				copyHelper.incrementDeferredInitializationCount();				
-				return;
-			}
-		}
-		
-		super.addCreateCopyCommands(compoundCommand, object);
-	
-	}
-	
-	/**
-	 * Checks for the replacer of activity in the copy based configuration.
-	 *  
-	 * @param activity target activity
-	 * @return replcacer or null if it doesn't have one
-	 */
-	protected Activity getReplacer(Activity activity){		
-		ConfigurationSetter configSetter = new ConfigurationSetter(getAdapterFactory());
-		try {
-			if (activityDeepCopyConfigurator != null ) {
-				MethodConfiguration currentConfig = configSetter.getOldConfiguration(); 
-				MethodConfiguration copyConfig = config == null ? (currentConfig != null ? currentConfig
-						: targetProcess.getDefaultContext())
-						: config;
-				activityDeepCopyConfigurator.setMethodConfiguration(copyConfig);				
-
-				VariabilityInfo variabilityInfo = activityDeepCopyConfigurator.getVariabilityInfo(activity);
-
-				if (variabilityInfo != null && ! variabilityInfo.getInheritanceList().isEmpty() ) {
-					Activity replacer = (Activity)variabilityInfo.getInheritanceList().get(0);
-					return  replacer == activity ? null : replacer;
-				}
-			}
-			return null;
-		} finally{
-			if (configSetter != null ) {
-				configSetter.restore();
-			}
-		}
-	}
-	
-	/**
-	 * Checks for the contributors of activity in the copy based configuration.
-	 * @param activity
-	 * @return a list including contributors or empty list
-	 */
-	protected List getContributors(Activity activity){
-		ConfigurationSetter configSetter = new ConfigurationSetter(getAdapterFactory());
-		try {
-			if (activityDeepCopyConfigurator != null ) {
-				MethodConfiguration currentConfig = configSetter.getOldConfiguration(); 
-				MethodConfiguration copyConfig = config == null ? (currentConfig != null ? currentConfig
-						: targetProcess.getDefaultContext())
-						: config;
-				activityDeepCopyConfigurator.setMethodConfiguration(copyConfig);				
-
-				VariabilityInfo variabilityInfo = activityDeepCopyConfigurator.getVariabilityInfo(activity);
-
-				if (variabilityInfo != null ) {
-					return variabilityInfo.getContributors();
-				}
-			}
-			return Collections.EMPTY_LIST;
-		} finally{
-			if (configSetter != null ) {
-				configSetter.restore();
-			}
-		}
-	}
 	private class CreateDeepCopyCommand extends CreateCopyCommand {
 
 		/**
@@ -346,7 +217,7 @@ public class ActivityDeepCopyCommand extends CopyCommand {
 									VariabilityElement ve = (VariabilityElement) e;
 									VariabilityElement baseElement = ve.getVariabilityBasedOnElement();
 									if(baseElement != null &&
-											(ve.getVariabilityType() == VariabilityType.LOCAL_CONTRIBUTION || ve.getVariabilityType() == VariabilityType.LOCAL_REPLACEMENT))
+											(ve.getVariabilityType() == VariabilityType.LOCAL_CONTRIBUTION_LITERAL || ve.getVariabilityType() == VariabilityType.LOCAL_REPLACEMENT_LITERAL))
 									{
 										helper.putVariabilityElement(baseElement, ve);
 										childBases.add(baseElement);
@@ -354,15 +225,14 @@ public class ActivityDeepCopyCommand extends CopyCommand {
 								}
 							}
 
-							ActivityDeepCopyCommand cmd = new ActivityDeepCopyCommand(base, helper, config, targetProcess, monitor, false,activityDeepCopyConfigurator);
-							cmd.copyExternalVariations = copyExternalVariations;
+							ActivityDeepCopyCommand cmd = new ActivityDeepCopyCommand(base, helper, config, targetProcess, monitor, false);
 							cmd.guidList = new LinkedList<String>(ActivityDeepCopyCommand.this.guidList);
 							cmd.guidList.addAll(ProcessUtil.getGuidList(ActivityDeepCopyCommand.this.activity, activity));
 							try {
 								cmd.execute();
 
 								baseCopy = (Activity) helper.get(base);
-								if(activity.getVariabilityType() == VariabilityType.EXTENDS) {
+								if(activity.getVariabilityType() == VariabilityType.EXTENDS_LITERAL) {
 									// keep activity only as backup copy of base
 									//
 									helper.removeVariabilityElement(base);
@@ -474,21 +344,9 @@ public class ActivityDeepCopyCommand extends CopyCommand {
 					// copy presentation name
 					//
 					activityCopy.setPresentationName(ProcessUtil.getPresentationName(activity));					
-				}
-				
-				// copy contributors				
-				if (copyExternalVariations && owner instanceof Activity && (copyContributors || owner != ActivityDeepCopyCommand.this.activity)) {
-					Activity activity = (Activity)owner;					
-					List contributors = getContributors(activity);
-					if (!contributors.isEmpty()) {
-						doCopyContributors(contributors,activity);
-					}
-				}
-				
-				// clear the variability data
-				//
-				if (copy instanceof Activity) {
-					Activity activityCopy = ((Activity) copy);
+
+					// clear the variability data
+					//
 					activityCopy.setVariabilityBasedOnElement(null);
 					activityCopy.setVariabilityType(null);
 				}
@@ -509,76 +367,7 @@ public class ActivityDeepCopyCommand extends CopyCommand {
 					EcoreUtil.remove(rule);
 				}
 			}
-		}
-		
-		
-		/**
-		 * Copy contributors
-		 * @param contributors
-		 */
-		protected void doCopyContributors(List contributors, Activity owner ) {
-			ConfigurationSetter configSetter = new ConfigurationSetter(getAdapterFactory());
-			try {
-				MethodConfiguration currentConfig = configSetter.getOldConfiguration();
-				MethodConfiguration copyConfig = config == null ? (currentConfig != null ? currentConfig
-						: targetProcess.getDefaultContext())
-						: config;
-				configSetter.set(copyConfig);
-				IConfigurator configurator = configSetter.getConfigurator();
-				for (Iterator iterator = contributors.iterator(); iterator.hasNext();) {
-					Activity contributedActivity = (Activity) iterator.next();
-					CopyHelper helper = (CopyHelper)copyHelper;
-					Activity contributorCopy = (Activity) helper.get(contributedActivity);
-					ActivityDeepCopyCommand cmd = new ActivityDeepCopyCommand(contributedActivity, helper, 
-							config, targetProcess, monitor, false,activityDeepCopyConfigurator);
-					cmd.copyContributors = false; // don't copy contributor's contributors since they already are included in the given contributors list
-					cmd.guidList = new LinkedList<String>(ActivityDeepCopyCommand.this.guidList);
-					cmd.guidList.addAll(ProcessUtil.getGuidList(ActivityDeepCopyCommand.this.activity, owner));
-					try {
-						cmd.execute();
-
-						contributorCopy = (Activity) helper.get(contributedActivity);
-
-						Activity activityCopy = (Activity) copy;
-
-						// remove the copies of base diagram if the activity already have diagram of the same type
-						//
-						for (int i = 0; i < diagramTypes.length; i++) {
-							int type = diagramTypes[i];
-							if(diagramMgr.getDiagram(activity, type) != null) {
-								Diagram diagram = diagramMgr.getDiagram(activityCopy, type);
-								if(diagram != null) {
-									EcoreUtil.remove(diagram);
-								}
-							}
-						}
-
-						// move content of base package over to the activity's package
-						//
-						moveContent(cmd.pkgCopy, activityCopy);	
-
-						List<BreakdownElement> breakdownElements = new ArrayList<BreakdownElement>();
-						for (Iterator<BreakdownElement> iter = contributorCopy.getBreakdownElements().iterator(); iter.hasNext();) {
-							BreakdownElement e = iter.next();
-							if(configurator == null || configurator.accept(e)){
-								breakdownElements.add(e);
-							}						
-						}
-						activityCopy.getBreakdownElements().addAll(breakdownElements);
-						contributorCopy.setSuperActivities(null);
-						EcoreUtil.remove(contributorCopy);
-
-					}
-					finally {
-						cmd.dispose();
-					}
-				}
-			}finally{
-				if (configSetter != null ) {
-					configSetter.restore();
-				}
-			}
-		}
+		}		
 	}
 
 	protected ProcessPackage pkgCopy;
@@ -595,16 +384,9 @@ public class ActivityDeepCopyCommand extends CopyCommand {
 
 	private BreakdownElementWrapperItemProvider wrapper;
 	
-	//used to retrieve replacers and contributors
-	private IConfigurator activityDeepCopyConfigurator;
-	
-	private boolean copyExternalVariations = true;
-	
-	private boolean copyContributors = true;
-	
 	private ActivityDeepCopyCommand(Activity activity, CopyHelper copyHelper,
 			MethodConfiguration config, Process targetProcess,
-			IProgressMonitor monitor, boolean initGuidList,IConfigurator activityDeepCopyConfigurator) {
+			IProgressMonitor monitor, boolean initGuidList) {
 		super(null, activity.eContainer(), copyHelper);
 		Assert.isTrue(activity.eContainer() instanceof ProcessPackage, "Activity's container must be a ProcessPackage"); //$NON-NLS-1$
 		this.activity = activity;
@@ -617,28 +399,22 @@ public class ActivityDeepCopyCommand extends CopyCommand {
 		if(initGuidList) {
 			guidList = ProcessUtil.getGuidList(null, this.activity);
 		}
-		this.activityDeepCopyConfigurator = activityDeepCopyConfigurator;
 	}
 	
 	public ActivityDeepCopyCommand(Activity activity, CopyHelper copyHelper,
 			MethodConfiguration config, Process targetProcess,
-			IProgressMonitor monitor, IConfigurator activityDeepCopyConfigurator) {
-		this(activity, copyHelper, config, targetProcess, monitor, true,activityDeepCopyConfigurator);		
+			IProgressMonitor monitor) {
+		this(activity, copyHelper, config, targetProcess, monitor, true);
 	}
 	
-	public ActivityDeepCopyCommand(Object activityOrWrapper, CopyHelper copyHelper, MethodConfiguration config,
-			Process targetProcess, IProgressMonitor monitor, IConfigurator activityDeepCopyConfigurator) {
+	public ActivityDeepCopyCommand(Object activityOrWrapper, CopyHelper copyHelper, MethodConfiguration config, Process targetProcess, IProgressMonitor monitor) {
 		this((Activity)TngUtil.unwrap(activityOrWrapper), copyHelper, config, targetProcess, monitor, 
-				activityOrWrapper instanceof Activity,activityDeepCopyConfigurator);
+				activityOrWrapper instanceof Activity);
 		if(activityOrWrapper instanceof BreakdownElementWrapperItemProvider) {
 			wrapper = (BreakdownElementWrapperItemProvider) activityOrWrapper;
 			guidList = ProcessUtil.getGuidList(wrapper);
 		}
 	}	
-	
-	public void setCopyExternalVariations(boolean copyExternalVariations) {
-		this.copyExternalVariations = copyExternalVariations;
-	}
 	
 	public AdapterFactory getAdapterFactory() {
 		return ((AdapterFactoryEditingDomain)domain).getAdapterFactory();
@@ -653,41 +429,11 @@ public class ActivityDeepCopyCommand extends CopyCommand {
 		Collection<?> result = super.getResult();
 		if(!result.isEmpty()) {
 			pkgCopy = (ProcessPackage) result.iterator().next();
-			fixCustomWorkOrders();
 			fixProcessComponent();
 			replaceTextReferences();
 		}
 	}
 	
-	private void fixCustomWorkOrders() {
-		Map<?, ?> objectToCopyMap = ((CopyHelper) copyHelper).getObjectToCopyMap();
-		Map<String, String> oldGuidToNewGuidMap = new HashMap<String, String>();
-		for (Map.Entry<?, ?> entry : objectToCopyMap.entrySet()) {
-			if(entry.getKey() instanceof WorkBreakdownElement) {
-				WorkBreakdownElement copy = ((WorkBreakdownElement) entry
-						.getValue());
-				if (copy != null) {
-					WorkBreakdownElement orig = ((WorkBreakdownElement) entry
-							.getKey());
-					oldGuidToNewGuidMap.put(orig.getGuid(), copy.getGuid());
-				}
-			}
-		}
-		for (ProcessElement element : pkgCopy.getProcessElements()) {
-			if(element instanceof WorkOrder) {
-				MethodElementProperty prop = MethodElementPropertyHelper.getProperty(element, MethodElementPropertyHelper.WORK_ORDER__SUCCESSOR);
-				if(prop != null) {
-					String newGuid = oldGuidToNewGuidMap.get(prop.getValue());
-					if(newGuid != null) {
-						prop.setValue(newGuid);
-					}
-				}
-			}
-		}
-		oldGuidToNewGuidMap.clear();
-		objectToCopyMap.clear();
-	}
-
 	/**
 	 * fix the process component to make it a process package.
 	 * This method might be overriden by subclass to achive difference result.
@@ -739,7 +485,6 @@ public class ActivityDeepCopyCommand extends CopyCommand {
 				}
 			}
 		}
-		oldToNewObjectMap.clear();
 	}
 	
 	/* (non-Javadoc)
@@ -955,87 +700,4 @@ public class ActivityDeepCopyCommand extends CopyCommand {
 	public CopyHelper getCopyHelper() {
 		return (CopyHelper) copyHelper;
 	}
-	
-	/**
-	 * References to inherited elements could be copied before the inherited
-	 * elements are copied. They are still referencing the inherited elements
-	 * instead of their copies. This method will fix those references to refer
-	 * to the copies.
-	 */
-	public void fixReferences() {
-		List<EReference> referencesToFix = Arrays.asList(new EReference[] {
-			
-		});
-		int refMax = referencesToFix.size();
-		CopyHelper helper = ((CopyHelper) copyHelper);
-		Map<?, ?> objectToCopyMap = helper.getObjectToCopyMap();
-		for (Object copy : objectToCopyMap.values()) {
-			// update WorkOrder copies with correct reference to predecessor
-			//
-			if(copy instanceof WorkBreakdownElement) {
-				WorkBreakdownElement we = (WorkBreakdownElement) copy;
-				Map<WorkOrder, MethodElementProperty> workOrderToPathPropertyMap = new HashMap<WorkOrder, MethodElementProperty>();
-				for (WorkOrder wo : we.getLinkToPredecessor()) {
-					MethodElementProperty prop = MethodElementPropertyHelper.getProperty(wo, 
-							MethodElementPropertyHelper.WORK_ORDER__PREDECESSOR_PROCESS_PATH);
-					if(prop != null) {
-						workOrderToPathPropertyMap.put(wo, prop);
-					} else {
-						Object predCopy = copyHelper.getCopy(wo.getPred());
-						if(predCopy instanceof WorkBreakdownElement) {
-							wo.setPred((WorkBreakdownElement) predCopy);
-						}
-						prop = MethodElementPropertyHelper.getProperty(wo, 
-								MethodElementPropertyHelper.WORK_ORDER__PREDECESSOR_IS_SIBLING);
-						if(prop != null && wo.getPred().getSuperActivities() == we.getSuperActivities()) {
-							EcoreUtil.remove(prop);
-						}
-					}
-				}
-				if(!workOrderToPathPropertyMap.isEmpty()) {
-					Object orig = helper.getOriginal(copy);
-					Object ip = TngAdapterFactory.INSTANCE.getWBS_ComposedAdapterFactory().adapt(orig, ITreeItemContentProvider.class);
-					if(ip instanceof IBSItemProvider) {
-						PredecessorList predList = ((IBSItemProvider) ip).getPredecessors();
-						int start = new String(Suppression.WBS + ":/").length();
-						for (Map.Entry<WorkOrder, MethodElementProperty> entry : workOrderToPathPropertyMap.entrySet()) {
-							String path = predList.resolvePredecessorProcessPath(entry.getValue().getValue());
-							if(path != null) {
-								BreakdownElement be = helper.getWrapperCopy(path.substring(start));
-								if(be instanceof WorkBreakdownElement) {
-									entry.getKey().setPred((WorkBreakdownElement) be);
-									// remove the path property from work order
-									//
-									EcoreUtil.remove(entry.getValue());
-								}
-							}
-						}
-					}
-				}
-			}
-			if(copy instanceof EObject) {
-				EObject eObject = (EObject) copy;
-				for(int i = 0; i < refMax; i++) {
-					EReference ref = referencesToFix.get(i);
-					if(ref.getEContainingClass().isSuperTypeOf(eObject.eClass())) {
-						Object value = eObject.eGet(ref);
-						if(ref.isMany()) {
-							Collection<?> values = (Collection<?>) value;
-							Collection<Object> newValues = new ArrayList<Object>();
-							for (Object object : values) {
-								Object refCopy = copyHelper.getCopy((EObject) object);
-								newValues.add(refCopy != null ? refCopy : object);
-							}
-						} else {
-							Object refCopy = copyHelper.getCopy((EObject) value);
-							if(refCopy != null) {
-								eObject.eSet(ref, refCopy);
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	
 }

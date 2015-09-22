@@ -16,7 +16,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.emf.edit.ui.provider.ExtendedImageRegistry;
 import org.eclipse.epf.library.LibraryServiceUtil;
 import org.eclipse.epf.library.edit.LibraryEditPlugin;
 import org.eclipse.epf.library.edit.util.TngUtil;
@@ -100,8 +99,8 @@ public class ProcessTreeContentProvider implements ITreeContentProvider {
 			if (capabilityPatternUIFolder == null) {
 				capabilityPatternUIFolder = new ProcessTreeUIFolder(
 						CAPABILITY_PATTERNS,
-						ExtendedImageRegistry.getInstance().getImage(LibraryEditPlugin.INSTANCE
-								.getImage("full/obj16/CapabilityPatterns")), parentElement); //$NON-NLS-1$
+						LibraryEditPlugin.INSTANCE
+								.getImage("full/obj16/CapabilityPatterns"), parentElement); //$NON-NLS-1$
 				capabilityPatternUIFolders.put(plugin,
 						capabilityPatternUIFolder);
 			}
@@ -111,8 +110,8 @@ public class ProcessTreeContentProvider implements ITreeContentProvider {
 			if (deliveryProcessUIFolder == null) {
 				deliveryProcessUIFolder = new ProcessTreeUIFolder(
 						DELIVERY_PROCESSES,
-						ExtendedImageRegistry.getInstance().getImage(LibraryEditPlugin.INSTANCE
-								.getImage("full/obj16/DeliveryProcesses")), parentElement); //$NON-NLS-1$
+						LibraryEditPlugin.INSTANCE
+								.getImage("full/obj16/DeliveryProcesses"), parentElement); //$NON-NLS-1$
 				deliveryProcessUIFolders.put(plugin, deliveryProcessUIFolder);
 			}
 

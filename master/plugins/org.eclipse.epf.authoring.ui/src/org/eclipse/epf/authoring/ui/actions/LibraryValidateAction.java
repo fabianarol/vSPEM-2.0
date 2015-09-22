@@ -34,13 +34,8 @@ import org.eclipse.emf.edit.ui.EMFEditUIPlugin;
 import org.eclipse.emf.edit.ui.action.ValidateAction;
 import org.eclipse.epf.authoring.ui.providers.MethodElementLabelDecorator;
 import org.eclipse.epf.authoring.ui.util.LibraryValidationMarkerHelper;
-import org.eclipse.epf.authoring.ui.views.ViewHelper;
-import org.eclipse.epf.library.edit.util.LibraryEditUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.edit.validation.DependencyValidationMgr;
-import org.eclipse.epf.library.services.SafeUpdateController;
-import org.eclipse.epf.library.ui.preferences.LibraryUIPreferences;
-import org.eclipse.epf.library.validation.ValidationManager;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.MethodLibrary;
 import org.eclipse.epf.uma.NamedElement;
@@ -48,7 +43,6 @@ import org.eclipse.epf.uma.util.UmaUtil;
 import org.eclipse.epf.validation.LibraryEValidator;
 import org.eclipse.epf.validation.constraints.LibraryTraversalStrategy;
 import org.eclipse.epf.validation.constraints.LibraryTraversalStrategy.LibraryIterator;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ui.PlatformUI;
@@ -63,22 +57,15 @@ public class LibraryValidateAction extends ValidateAction {
 	private boolean success;
 	private boolean showSuccess = true;
 	private Map contextData = new HashMap();
-	private MethodLibrary library;
 
 	public LibraryValidateAction() {
 		super();
 		eclipseResourcesUtil = new LibraryValidationMarkerHelper();
 	}
 	
-	//Called from method editors only
 	public LibraryValidateAction(boolean showSuccess) {
 		this();
 		this.showSuccess  = showSuccess;
-	}
-	
-	public LibraryValidateAction(MethodLibrary library) {
-		this();
-		this.library = library;
 	}
 	
 	public void putContextData(Object key, Object value) {
@@ -89,38 +76,6 @@ public class LibraryValidateAction extends ValidateAction {
 	 * @see org.eclipse.emf.edit.ui.action.ValidateAction#validate(org.eclipse.core.runtime.IProgressMonitor)
 	 */
 	protected Diagnostic validate(final IProgressMonitor progressMonitor) {
-		ValidationManager validationMgr = (ValidationManager) LibraryEditUtil.getInstance().getValidationManager();
-		LibraryUIPreferences.update(validationMgr);
-		validationMgr.setEmfValidateAction(this);
-		
-		if (showSuccess) {	
-			SafeUpdateController.syncExec(new Runnable() {	
-				public void run() {
-					PlatformUI.
-					getWorkbench().
-					getActiveWorkbenchWindow().
-					getActivePage().
-					closeAllEditors(true);
-					
-					ViewHelper.checkLibraryHealth(library == null ? selectedObjects : library);
-				}
-			});			
-		} else {	//called from an method element editing
-			validationMgr.setNameCheck(true);
-			validationMgr.setCircularDependancyCheck(true);
-			validationMgr.setUndeclaredDependancyCheck(false);
-		}
-		
-		BasicDiagnostic ret = validate_old(progressMonitor);
-		
-//		deleteMarkers();
-		Object scope = library == null ? selectedObjects : library;
-		validationMgr.validate(ret, scope, progressMonitor);	
-				
-		return ret;
-	}
-	
-	private BasicDiagnostic validate_old(final IProgressMonitor progressMonitor) {				
 	    if(resources == null) {
 	    	resources = new HashSet();
 	    }
@@ -129,10 +84,8 @@ public class LibraryValidateAction extends ValidateAction {
 	    }
 	    boolean dependencyInfoMgrSet = false;
 		Collection eObjects = new ArrayList();
-		
-		Iterator it = library == null ? selectedObjects.iterator() : library.getMethodPlugins().iterator();
-		for ( ; it.hasNext();) {
-			Object element = TngUtil.unwrap(it.next());
+		for (Iterator iter = selectedObjects.iterator(); iter.hasNext();) {
+			Object element = TngUtil.unwrap(iter.next());
 			if(element instanceof EObject) {
 				eObjects.add(element);
 				Resource resource = ((EObject)element).eResource();
@@ -219,17 +172,7 @@ public class LibraryValidateAction extends ValidateAction {
 	             EcorePlugin.INSTANCE.getString
 	               ("_UI_DiagnosticRoot_diagnostic", //$NON-NLS-1$ 
 	                new Object [] { strBuf.toString() }), 
-	             list.toArray()) {
-	    	  
-	    	  @Override
-	    	  public String getMessage() {
-	    		  String msg = super.getMessage();
-	    		  if (msg != null && msg.length() > 2000) {
-	    			  msg = msg.substring(0, 2000) + " ... ";	//$NON-NLS-1$ 
-	    		  }
-	    		  return msg;
-	    	  }
-	      };
+	             list.toArray());
 	      for (Iterator iter = eObjects.iterator(); iter.hasNext();) {
 	    	  EObject eObject = (EObject) iter.next();
 	    	  progressMonitor.setTaskName
@@ -265,7 +208,9 @@ public class LibraryValidateAction extends ValidateAction {
 			{
 				// delete old markers
 				//					
-//				deleteMakers();
+				for (Iterator iter = resources.iterator(); iter.hasNext();) {
+					eclipseResourcesUtil.deleteMarkers((Resource) iter.next());
+				}
 				
 				Viewer viewer = null;
 				if (!diagnostic.getChildren().isEmpty())
@@ -340,12 +285,6 @@ public class LibraryValidateAction extends ValidateAction {
 			}
 		}
 	}
-
-	private void deleteMarkers() {
-		for (Iterator iter = resources.iterator(); iter.hasNext();) {
-			eclipseResourcesUtil.deleteMarkers((Resource) iter.next());
-		}
-	}
 	
 	protected void refreshViews() {
 		// no error markers for configuration view
@@ -355,14 +294,5 @@ public class LibraryValidateAction extends ValidateAction {
 
 	public boolean isSuccessful() {
 		return success;
-	}
-	
-	@Override
-	public boolean updateSelection(IStructuredSelection selection) {
-		if (selection == null) {		//A hack for ValidataionManager to access deleteMarkers through ValidationAction API
-			deleteMarkers();
-			return false;
-		}
-		return super.updateSelection(selection);
 	}
 }

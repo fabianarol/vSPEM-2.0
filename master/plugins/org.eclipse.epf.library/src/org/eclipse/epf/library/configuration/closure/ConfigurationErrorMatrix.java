@@ -11,8 +11,6 @@
 package org.eclipse.epf.library.configuration.closure;
 
 import org.eclipse.epf.library.LibraryResources;
-import org.eclipse.epf.library.configuration.ConfigurationData;
-import org.eclipse.epf.library.configuration.ConfigurationHelper;
 import org.eclipse.epf.library.util.LibraryUtil;
 import org.eclipse.epf.uma.BreakdownElement;
 import org.eclipse.epf.uma.ContentCategory;
@@ -30,7 +28,6 @@ import org.eclipse.epf.uma.WorkProduct;
  * define the configuration error level metrix
  * 
  * @author Jinhua Xi
- * @author Weiping Lu
  * @since 1.2
  *
  */
@@ -50,12 +47,6 @@ public class ConfigurationErrorMatrix {
 	
 	public static ElementError getError(MethodConfiguration config, ElementReference ref) {
 		
-		MethodElement e_ref = (MethodElement)ref.getRefElement();		
-		ConfigurationData cData = ConfigurationHelper.getDelegate().getConfigurationData(config);
-		if (cData != null && cData.isElementSubtracted(e_ref)) {
-			return null;
-		}
-		
 		if ( ref.hasFeature(UmaPackage.eINSTANCE.getVariabilityElement_VariabilityBasedOnElement()) ) {
 			return getVariabilityError(config, ref);
 		} 
@@ -64,6 +55,7 @@ public class ConfigurationErrorMatrix {
 		String messageId = LibraryResources.ElementError_missing_element;
 		
 		MethodElement e = (MethodElement)ref.getElement();
+		MethodElement e_ref = (MethodElement)ref.getRefElement();
 
 		if ( ref.hasFeature(UmaPackage.eINSTANCE.getTask_MandatoryInput()) ) {
 			errorLevel = ErrorInfo.ERROR;
@@ -74,11 +66,9 @@ public class ConfigurationErrorMatrix {
 		} else if ( ref.hasFeature(UmaPackage.eINSTANCE.getTask_PerformedBy()) ) {
 			errorLevel = ErrorInfo.WARNING;
 			messageId = LibraryResources.ElementError_missing_primary_performer;
-		} else if ( ref.hasFeature(UmaPackage.eINSTANCE.getRole_ResponsibleFor()) ) {
-			errorLevel = ErrorInfo.WARNING;
-			messageId = LibraryResources.ElementError_missing_responsible_for_workProduct;
 		} else if ( ref.hasFeature(UmaPackage.eINSTANCE.getTask_AdditionallyPerformedBy()) 
-				|| ref.hasFeature(UmaPackage.eINSTANCE.getTask_OptionalInput()) 
+				|| ref.hasFeature(UmaPackage.eINSTANCE.getTask_OptionalInput())
+				|| ref.hasFeature(UmaPackage.eINSTANCE.getRole_ResponsibleFor()) 
 				|| ref.hasFeature(UmaPackage.eINSTANCE.getRole_Modifies())
 				 ) {
 			// default
@@ -94,7 +84,7 @@ public class ConfigurationErrorMatrix {
 				(new String[] {LibraryUtil.getTypePath(e), 
 						LibraryUtil.getTypePath(e_ref) }));
 
-		return new ElementError(config, errorLevel, message, e, e_ref, ErrorInfo.REFERENCE_TO, messageId);
+		return new ElementError(config, errorLevel, message, e, e_ref, ErrorInfo.REFERENCE_TO);
 	}
 	
 	private static boolean isBreakdownReference(MethodElement e, MethodElement e_ref) {
@@ -121,17 +111,17 @@ public class ConfigurationErrorMatrix {
 		int errorLevel = ErrorInfo.WARNING;
 		String messageId = LibraryResources.ElementError_missing_element;
 
-		if ( type == VariabilityType.CONTRIBUTES ) {
+		if ( type == VariabilityType.CONTRIBUTES_LITERAL ) {
 			if ( e instanceof ContentCategory || e instanceof Guidance ) {
 				errorLevel = ErrorInfo.INFO;
 			}
 			
 			messageId = LibraryResources.ElementError_contributor_missing_base;
-		} else if ( type == VariabilityType.EXTENDS ) {
+		} else if ( type == VariabilityType.EXTENDS_LITERAL ) {
 			messageId = LibraryResources.ElementError_extender_missing_base;
 			
-		} else if ( type == VariabilityType.REPLACES 
-				|| type == VariabilityType.EXTENDS_REPLACES) {
+		} else if ( type == VariabilityType.REPLACES_LITERAL 
+				|| type == VariabilityType.EXTENDS_REPLACES_LITERAL) {
 			messageId = LibraryResources.ElementError_replacer_missing_base;
 		}
 		
@@ -139,6 +129,6 @@ public class ConfigurationErrorMatrix {
 				(new String[] {LibraryUtil.getTypePath(e), 
 						LibraryUtil.getTypePath(e_ref) }));
 
-		return new ElementError(config, errorLevel, message, e, e_ref, ErrorInfo.REFERENCE_TO, messageId);
+		return new ElementError(config, errorLevel, message, e, e_ref, ErrorInfo.REFERENCE_TO);
 	}
 }

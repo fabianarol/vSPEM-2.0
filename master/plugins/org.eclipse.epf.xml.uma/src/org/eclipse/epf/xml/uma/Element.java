@@ -1,16 +1,12 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: Element.java,v 1.2 2006/06/23 00:01:26 jxi Exp $
+ */
 package org.eclipse.epf.xml.uma;
 
-import org.eclipse.epf.uma.ecore.IModelObject;
+import org.eclipse.emf.ecore.sdo.EDataObject;
 
 /**
  * <!-- begin-user-doc -->
@@ -24,8 +20,8 @@ import org.eclipse.epf.uma.ecore.IModelObject;
  *
  * @see org.eclipse.epf.xml.uma.UmaPackage#getElement()
  * @model extendedMetaData="name='Element' kind='empty'"
- * @extends IModelObject
+ * @extends EDataObject
  * @generated
  */
-public interface Element extends IModelObject {
+public interface Element extends EDataObject {
 } // Element

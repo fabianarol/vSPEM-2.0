@@ -11,7 +11,6 @@
 package org.eclipse.epf.persistence.util;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -35,8 +34,8 @@ import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.epf.common.service.versioning.EPFVersions;
-import org.eclipse.epf.common.service.versioning.VersionUtil;
+import org.eclipse.epf.common.serviceability.EPFVersions;
+import org.eclipse.epf.common.serviceability.VersionUtil;
 import org.eclipse.epf.library.persistence.ILibraryResource;
 import org.eclipse.epf.library.persistence.ILibraryResourceSet;
 import org.eclipse.epf.persistence.FileManager;
@@ -206,16 +205,16 @@ public class PersistenceUtil {
 	}
 	
 	public static Resource getResource(String path, ResourceSet resourceSet) {
-		File file = new File(path);
-		for (Resource resource : new ArrayList<Resource>(resourceSet.getResources())) {
-			if(resource != null) {
-				URI finalURI = MultiFileSaveUtil.getFinalURI(resource);
-				if(finalURI.isFile() && file.equals(new File(finalURI.toFileString()))) {
-					return resource;
-				}
+		URI uri = URI.createFileURI(path);
+		for (Iterator iter = new ArrayList<Resource>(resourceSet.getResources())
+				.iterator(); iter.hasNext();) {
+			Resource resource = (Resource) iter.next();
+			if (uri.equals(MultiFileSaveUtil.getFinalURI(resource))) {
+				return resource;
 			}
 		}
 		return null;
+
 	}
 	
 	/**
@@ -345,7 +344,7 @@ public class PersistenceUtil {
 	 * @param elements
 	 * @return true if the given method element has duplicate GUID
 	 */
-	public static boolean hasDuplicateGUID(MethodElement e, Collection<? extends MethodElement> elements) {
+	public static boolean hasDuplicateGUID(MethodElement e, Collection<MethodElement> elements) {
 		for (MethodElement element : elements) {
 			if(e.getGuid().equals(element.getGuid())) {
 				return true;
@@ -358,17 +357,9 @@ public class PersistenceUtil {
 		return path.endsWith(File.separator) ? path : path + File.separator;
 	}
 	
-	/**
-	 * 
-	 * @param resources
-	 * @param oldPrefix
-	 * @param newPrefix
-	 * @return Resources with new URI
-	 */
-	public static Collection<Resource> replaceURIPrefix(Collection<Resource> resources, String oldPrefix, String newPrefix) {
+	public static void replaceURIPrefix(Collection<Resource> resources, String oldPrefix, String newPrefix) {
 		URI oldPrefixURI = URI.createFileURI(toPrefix(oldPrefix));
 		URI newPrefixURI = URI.createFileURI(toPrefix(newPrefix));
-		ArrayList<Resource> resourcesWithNewURI = new ArrayList<Resource>();
 		for(Resource resource : resources) {
 			URI uri = resource.getURI();
 			URI newURI = null;
@@ -378,12 +369,10 @@ public class PersistenceUtil {
 			catch(Exception e) {
 				
 			}
-			if(newURI != null && !newURI.equals(resource.getURI())) {
+			if(newURI != null) {
 				resource.setURI(newURI);
-				resourcesWithNewURI.add(resource);
 			}
 		}
-		return resourcesWithNewURI;
 	}
 	
 	public static URI getProxyURI(EObject object) {
@@ -398,26 +387,6 @@ public class PersistenceUtil {
 		}
 		return uri;
 	}
-	
-	public static MultiFileResourceSetImpl getImportPluginResourceSet() {
-		MultiFileResourceSetImpl resourceSet;
-		resourceSet = new MultiFileResourceSetImpl(false) {
-			protected void demandLoad(Resource resource) throws IOException {
-				if (! skipDemandLoad(resource)) {
-					super.demandLoad(resource);
-				}
-			}
-			private boolean skipDemandLoad(Resource res) {
-				File file = new File(res.getURI().toFileString());
-				if (! file.exists() && file.getName().equals(MultiFileSaveUtil.DEFAULT_PLUGIN_MODEL_FILENAME)) {
-					return true;
-				}
-				return false;
-			}
-		};
-		return resourceSet;
-	}
-
 	
 	public static void main(String[] args) {
 		String attrib = getTopAttribute(new File(args[0]), args[1]);

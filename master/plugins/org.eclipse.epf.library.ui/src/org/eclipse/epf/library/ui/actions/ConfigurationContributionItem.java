@@ -22,7 +22,6 @@ import org.eclipse.epf.library.LibraryService;
 import org.eclipse.epf.library.LibraryServiceUtil;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
 import org.eclipse.epf.library.edit.util.Comparators;
-import org.eclipse.epf.library.edit.util.DebugUtil;
 import org.eclipse.epf.library.prefs.PreferenceUtil;
 import org.eclipse.epf.library.ui.LibraryUIResources;
 import org.eclipse.epf.uma.MethodConfiguration;
@@ -36,7 +35,6 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -77,7 +75,7 @@ public class ConfigurationContributionItem extends ContributionItem {
 	
 	protected ISelectionChangedListener postSelectionChangedListener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
-			performSelectionChanged(getCollapseConfigViewAction());
+			performSelectionChanged();
 		}
 	};
 
@@ -141,38 +139,8 @@ public class ConfigurationContributionItem extends ContributionItem {
 		configCombo = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
 		configCombo.setVisibleItemCount(10);
 		configCombo.setEnabled(true);
-		configComboViewer = new ComboViewer(configCombo) {
-			protected void handleDispose(DisposeEvent event) {
-				super.handleDispose(event);
-				
-				// With removing libSvcListener here, some previous changes (check for compbo dispose 
-				// and adding dummy content provider) may not be needed - but ok to leave them
-				if (libSvcListener != null) {
-					LibraryService.getInstance().removeListener(libSvcListener);
-				}				
-				if (postSelectionChangedListener != null) {
-					removePostSelectionChangedListener(postSelectionChangedListener);
-				}
-				
-				if (!getCombo().isDisposed()) {
-					IStructuredContentProvider c = new IStructuredContentProvider() {
-						public void inputChanged(Viewer viewer,
-								Object oldInput, Object newInput) {
-						}
+		configComboViewer = new ComboViewer(configCombo);
 
-						public Object[] getElements(Object inputElement) {
-							return new Object[0];
-						}
-
-						public void dispose() {
-
-						}
-					};
-					setContentProvider(c);
-				}
-			}
-
-		};
 		contentProvider = new AdapterFactoryContentProvider(
 				TngAdapterFactory.INSTANCE
 						.getNavigatorView_ComposedAdapterFactory()) {
@@ -208,8 +176,6 @@ public class ConfigurationContributionItem extends ContributionItem {
 		configComboViewer.setLabelProvider(labelProvider);
 		configComboViewer.setInput(LibraryService.getInstance()
 				.getCurrentMethodLibrary());
-		setInputDebugLog("createControl", LibraryService.getInstance()
-				.getCurrentMethodLibrary());
 
 		String savedConfigName = PreferenceUtil.getSavedLastConfig();
 		MethodConfiguration savedConfig = LibraryServiceUtil
@@ -238,65 +204,33 @@ public class ConfigurationContributionItem extends ContributionItem {
 		libSvcListener = new ILibraryServiceListener() {
 
 			public void configurationSet(MethodConfiguration config) {
-				configComboViewer.removePostSelectionChangedListener(postSelectionChangedListener);
-				if (configComboViewer.getCombo().isDisposed()) {
-					return;
-				}
-				try {
-					selectConfiguration(config);
-				}
-				finally {
-					configComboViewer
-					.addPostSelectionChangedListener(postSelectionChangedListener);
-				}
-				
+				selectConfiguration(config);
 			}
 
 			public void libraryClosed(MethodLibrary library) {
-				if (configComboViewer.getCombo().isDisposed()) {
-					return;
-				}
 				configComboViewer.setInput(null);
-				setInputDebugLog("libraryClosed", null);
 			}
 
 			public void libraryCreated(MethodLibrary library) {
-				if (configComboViewer.getCombo().isDisposed()) {
-					return;
-				}
 				configComboViewer.setInput(library);
-				setInputDebugLog("libraryCreated", library);
 				selectConfiguration(null);
 			}
 
 			public void libraryOpened(MethodLibrary library) {
-				if (configComboViewer.getCombo().isDisposed()) {
-					return;
-				}
 				configComboViewer.setInput(library);
-				refresh();
-				setInputDebugLog("libraryOpened", library);
-				MethodConfiguration config = LibraryService.getInstance().getCurrentMethodConfiguration();					
 				configComboViewer.setSelection(new StructuredSelection(
-						config != null ? config : LibraryUIResources.selectConfigLabel_text), true);
-
+						LibraryUIResources.selectConfigLabel_text), true);
+				refresh();
 			}
 
 			public void libraryReopened(MethodLibrary library) {
-				if (configComboViewer.getCombo().isDisposed()) {
-					return;
-				}
 				if (library != configComboViewer.getInput()) {
 					configComboViewer.setInput(library);
 					refresh();
-					setInputDebugLog("libraryReopened", library);
 				}
 			}
 
 			public void librarySet(MethodLibrary library) {
-				if (configComboViewer.getCombo().isDisposed()) {
-					return;
-				}
 				if (library != configComboViewer.getInput()) {
 					configComboViewer.setInput(library);
 					if (library == null) {
@@ -304,44 +238,23 @@ public class ConfigurationContributionItem extends ContributionItem {
 					} else {
 						refresh();
 					}
-					setInputDebugLog("librarySet", library);
 				}
 			}
 
 		};
 		LibraryService.getInstance().addListener(libSvcListener);
-		if (DebugUtil.uiDebug) {
-			DebugUtil.print("libSvcListener added at createControl");//$NON-NLS-1$
-			DebugUtil.print();
-		}
-		libSvcListenerAdded = true;
-		
+
 		return configCombo;
 	}
 
-	private boolean libSvcListenerAdded = false;
 	/*
 	 * @see org.eclipse.jface.action.ContributionItem#void setVisibile(boolean)
 	 */
-	public void setVisible(boolean visible) {
-		if (libSvcListener == null) {
-			return;
-		}
-		if (visible && !libSvcListenerAdded && !configCombo.isDisposed()) {
+	public void setVisibile(boolean visible) {
+		if (visible) {
 			LibraryService.getInstance().addListener(libSvcListener);
-			if (DebugUtil.uiDebug) {
-				DebugUtil.print("libSvcListener added at setVisible");//$NON-NLS-1$
-				DebugUtil.print();
-			}
-			
-//		} else {
-		} else if (!visible || configCombo.isDisposed()) {
+		} else {
 			LibraryService.getInstance().removeListener(libSvcListener);
-			libSvcListenerAdded = false;
-			if (DebugUtil.uiDebug) {
-				DebugUtil.print("libSvcListener removed at setVisible");//$NON-NLS-1$
-				DebugUtil.print();
-			}
 		}
 		super.setVisible(visible);
 	}
@@ -374,29 +287,16 @@ public class ConfigurationContributionItem extends ContributionItem {
 		return ""; //$NON-NLS-1$
 	}
 
-	private static void performSelectionChanged(IAction collapseConfigViewAction) {
+	private static void performSelectionChanged() {
 		if (LibraryService.getInstance().getCurrentMethodLibrary() != null) {
 			MethodConfiguration config = getSelectedConfig();
 			if (config != LibraryService.getInstance()
 					.getCurrentMethodConfiguration()) {
-				if (collapseConfigViewAction != null) {
-					collapseConfigViewAction.run();
-				}
 				LibraryService.getInstance().setCurrentMethodConfiguration(config);
 			}
 			PreferenceUtil.saveSelectedConfigIntoPersistence(getCurrentSelectedConfigName());
 			refresh();
 		}
-	}
-
-	private IAction collapseConfigViewAction;
-	
-	private IAction getCollapseConfigViewAction() {
-		return collapseConfigViewAction;
-	}
-
-	public void setCollapseConfigViewAction(IAction collapseConfigViewAction) {
-		this.collapseConfigViewAction = collapseConfigViewAction;
 	}
 
 	/*
@@ -407,7 +307,7 @@ public class ConfigurationContributionItem extends ContributionItem {
 			LibraryService.getInstance().removeListener(libSvcListener);
 		}
 		
-		if (configComboViewer != null && postSelectionChangedListener != null) {
+		if (configComboViewer != null) {
 			configComboViewer
 			.removePostSelectionChangedListener(postSelectionChangedListener);
 		}
@@ -418,11 +318,7 @@ public class ConfigurationContributionItem extends ContributionItem {
 	/**
 	 * Refreshes the configuration combo.
 	 */
-	public static void refresh() {
-		if (configComboViewer == null || configComboViewer.getCombo() == null || 
-			 configComboViewer.getCombo().isDisposed()) {
-			 return;
-		}
+	private static void refresh() {
 		configComboViewer.refresh();
 	}
 
@@ -447,14 +343,4 @@ public class ConfigurationContributionItem extends ContributionItem {
 		}
 	}
 
-	public void setEnabled(boolean enabled) {
-		configCombo.setEnabled(enabled);
-	}
-	
-	public void setInputDebugLog(String caller, Object input) {
-		if (DebugUtil.uiDebug) {
-			DebugUtil.print(caller + ", configComboViewer input set: " + input);//$NON-NLS-1$
-			DebugUtil.print();
-		}
-	}
 }

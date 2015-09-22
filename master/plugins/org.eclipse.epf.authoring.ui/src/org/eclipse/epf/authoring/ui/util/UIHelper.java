@@ -12,29 +12,24 @@ package org.eclipse.epf.authoring.ui.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
-import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.epf.authoring.ui.AuthoringUIPlugin;
 import org.eclipse.epf.authoring.ui.AuthoringUIResources;
 import org.eclipse.epf.authoring.ui.editors.BreakdownElementEditorInput;
-import org.eclipse.epf.common.ui.util.MsgBox;
+import org.eclipse.epf.authoring.ui.editors.EditorChooser;
+import org.eclipse.epf.common.serviceability.MsgBox;
 import org.eclipse.epf.common.utils.StrUtil;
 import org.eclipse.epf.diagram.core.part.AbstractDiagramEditor;
 import org.eclipse.epf.diagram.core.part.DiagramEditorInput;
 import org.eclipse.epf.diagram.core.part.DiagramEditorInputProxy;
 import org.eclipse.epf.diagram.ui.service.DiagramEditorHelper;
-import org.eclipse.epf.library.edit.IModifyChecker;
 import org.eclipse.epf.library.edit.LibraryEditResources;
 import org.eclipse.epf.library.edit.process.BreakdownElementWrapperItemProvider;
-import org.eclipse.epf.library.edit.ui.UserInteractionHelper;
 import org.eclipse.epf.library.edit.util.MethodElementUtil;
-import org.eclipse.epf.library.edit.util.PracticePropUtil;
 import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.edit.validation.DependencyChecker;
@@ -53,17 +48,13 @@ import org.eclipse.epf.uma.UmaPackage;
 import org.eclipse.epf.uma.VariabilityElement;
 import org.eclipse.epf.uma.VariabilityType;
 import org.eclipse.epf.uma.WorkProduct;
-import org.eclipse.epf.uma.util.UserDefinedTypeMeta;
 import org.eclipse.jface.dialogs.IInputValidator;
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.osgi.util.TextProcessor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.List;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IEditorInput;
@@ -133,29 +124,10 @@ public class UIHelper {
 		if (methodElement instanceof WorkProduct) {
 			return LibraryUIText.TEXT_WORK_PRODUCT + " (" + elementLabel + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else if (methodElement instanceof Guidance) {
-			if (methodElement instanceof Practice) {
-				Practice prac = (Practice)methodElement;
-				if (PracticePropUtil.getPracticePropUtil().isUdtType(prac)) {
-					elementLabel = getNameForUtd(prac);
-					return elementLabel;
-				}
-			}			
 			return LibraryUIText.TEXT_GUIDANCE + " (" + elementLabel + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 		} else {
 			return elementLabel;
 		}
-	}
-	
-	private static String getNameForUtd(Practice prac) {
-		try {
-			String typeName = PracticePropUtil.getPracticePropUtil().getUtdData(prac)
-				.getRteNameMap().get(UserDefinedTypeMeta._typeName);			
-			return typeName;
-		} catch (Exception e) {
-			AuthoringUIPlugin.getDefault().getLogger().logError(e);
-		}
-		
-		return null;
 	}
 
 	/**
@@ -166,7 +138,6 @@ public class UIHelper {
 	 * @param element
 	 */
 	public static void setFormText(ScrolledForm form, MethodElement element) {
-		String delimiter = ". ,  ;  ! ? ~ @ # $ % ^ & *  ( ) { } [ ]   < > \\ / \" ' `  | ";	//$NON-NLS-1$
 		if (form != null && !form.isDisposed()) {
 			StringBuffer str = new StringBuffer();
 			str.append(getFormPageTitlePrefixFor(element));
@@ -179,7 +150,7 @@ public class UIHelper {
 			else if(element.getName() != null){
 				str.append(element.getName());
 			}
-			form.setText(TextProcessor.process(str.toString(), delimiter));
+			form.setText(str.toString());
 		}
 	}
 
@@ -424,7 +395,7 @@ public class UIHelper {
 	 */
 	public static VariabilityElement getBaseActivity(Activity activity){
 		while (!activity.getVariabilityType().equals(
-				VariabilityType.NA)) {
+				VariabilityType.NA_LITERAL)) {
 
 			VariabilityElement ve = activity
 					.getVariabilityBasedOnElement();
@@ -611,49 +582,5 @@ public class UIHelper {
 				}
 			}
 		});
-	}
-	
-	public static boolean checkModify(Resource res, Shell shell) {
-		return checkModify(Collections.singleton(res), shell);
-	}
-	
-	public static class ModifyChecker implements IModifyChecker {
-		private Shell shell;
-		
-		public ModifyChecker(Shell shell) {
-			this.shell = shell;
-		}
-		
-		public boolean checkModify(Resource res) {
-			return UIHelper.checkModify(res, shell);
-		}
-
-		public boolean checkModify(Collection<Resource> modifiedResources) {
-			return UIHelper.checkModify(modifiedResources, shell);	
-		}
-	}
-	
-	public static boolean checkModify(Collection modifiedResources, Shell shell) {
-		if (shell == null) {
-			Display display = Display.getCurrent();
-			if (display != null) {
-				shell = display.getActiveShell();
-			}
-		}
-		IStatus status = UserInteractionHelper.checkModify(modifiedResources,
-				shell);
-		if (!status.isOK()) {
-			handleError(status);
-			return false;
-		}
-		return true;
-	}
-
-	private static void handleError(IStatus status) {
-		AuthoringUIPlugin
-				.getDefault()
-				.getMsgDialog()
-				.display(AuthoringUIResources.errorDialog_title,
-						AuthoringUIResources.editDialog_msgCannotEdit, status);
 	}
 }

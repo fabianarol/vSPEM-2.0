@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.diagram.core;
 
-import org.eclipse.epf.common.ui.AbstractPlugin;
+import org.eclipse.epf.common.plugin.AbstractPlugin;
 import org.osgi.framework.BundleContext;
 
 /**

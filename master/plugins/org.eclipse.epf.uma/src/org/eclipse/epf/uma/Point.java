@@ -42,7 +42,7 @@ public interface Point extends IModelObject {
 	 * @return the value of the '<em>X</em>' attribute.
 	 * @see #setX(Double)
 	 * @see org.eclipse.epf.uma.UmaPackage#getPoint_X()
-	 * @model dataType="org.eclipse.epf.uma.Double" required="true" ordered="false"
+	 * @model
 	 * @generated
 	 */
 	Double getX();
@@ -68,7 +68,7 @@ public interface Point extends IModelObject {
 	 * @return the value of the '<em>Y</em>' attribute.
 	 * @see #setY(Double)
 	 * @see org.eclipse.epf.uma.UmaPackage#getPoint_Y()
-	 * @model dataType="org.eclipse.epf.uma.Double" required="true" ordered="false"
+	 * @model
 	 * @generated
 	 */
 	Double getY();

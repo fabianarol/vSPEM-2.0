@@ -87,8 +87,6 @@ public class BreakdownElementDocumentSection extends AbstractSection {
 	
 	protected RichTextImageLinkContainer usageGuidanceContainer;
 
-	protected ImageHyperlink keyConsiderationsLink;
-	
 	protected IMethodRichText keyConsiderations;
 	
 	protected RichTextImageLinkContainer keyConsiderationsContainer;
@@ -200,13 +198,10 @@ public class BreakdownElementDocumentSection extends AbstractSection {
 		this.parent = parent;
 		super.createControls(parent, tabbedPropertySheetPage);
 		init();
+
 		parent.setLayout(new GridLayout());
 		parent.setLayoutData(new GridData(GridData.FILL_BOTH));
-		createControls_(parent, tabbedPropertySheetPage);
-	}
-	
-	protected void createControls_(Composite parent,
-			TabbedPropertySheetPage tabbedPropertySheetPage) {
+
 		// create Docment section
 		createDocumentSection(parent);
 
@@ -374,7 +369,6 @@ public class BreakdownElementDocumentSection extends AbstractSection {
 				documentComposite, heightHint, contentElementPath, element,
 				PropertiesResources.BreakdownElement_keyConsiderations);
 		addHyperLinkListener(keyConsiderationsContainer.link);
-		keyConsiderationsLink = keyConsiderationsContainer.link;
 		keyConsiderations = keyConsiderationsContainer.richText;
 
 		// create expanded composite
@@ -421,7 +415,6 @@ public class BreakdownElementDocumentSection extends AbstractSection {
 		}
 
 		if (expandFlag) {
-			ctrl_document_expanded.collapse();
 			documentComposite.setVisible(true);
 			documentSection.setClient(documentComposite);
 

@@ -10,22 +10,22 @@
    <extension-point
          id="newConfigurationWizard"
          name="New Method Configuration Wizard Extension"
-         schema="schema/NewConfigurationWizard.exsd" />         
-   
-   <extension-point
-         id="descriptionPageColumnProvider"
-         name="Editor Description Page Column Provider"
-         schema="schema/descriptionPageColumnProvider.exsd"/>
+         schema="schema/NewConfigurationWizard.exsd" />     
          
+            <!--extension-point
+         id="newProcessLineWizard"
+         name="New Process Line Wizard Extension"
+         schema="schema/NewProcessLineWizard.exsd" /-->       
+
    <extension-point
-         id="descriptionPageSectionProvider"
-         name="Editor Description Page Section Provider"
-         schema="schema/descriptionPageSectionProvider.exsd"/>
-         
-  <extension-point
-         id="configurationViewMenuProvider"
-         name="Configuration View Menu Provider"
-         schema="schema/configurationViewMenuProvider.exsd"/>
+         id="TaskEditorPageProvider"
+         name="Task Editor Page Provider"
+         schema="schema/TaskEditorPageProvider.exsd"/>
+
+   <extension-point
+         id="ProcessEditorPageProvider"
+         name="Process Editor Page Provider"
+         schema="schema/ProcessEditorPageProvider.exsd"/>
 
    <extension-point
          id="wizardRegistryProvider"
@@ -33,11 +33,8 @@
          schema="schema/wizardRegistryProvider.exsd"/>
    <extension-point id="EditorOpener" name="Editor Opener" schema="schema/editorOpener.exsd"/>
    <extension-point id="CustomizedLocker" name="Customized Locker" schema="schema/CustomizedLocker.exsd"/>
-   <extension-point id="methodRichText" name="Method Rich Text Extension" schema="schema/methodRichText.exsd"/>
-   <extension-point id="methodRichTextEditor" name="Method Rich Text Editor Extension" schema="schema/methodRichTextEditor.exsd"/>
-   <extension-point id="contentProviderFactories" name="Content Provider Factories" schema="schema/contentProviderFactories.exsd"/>
-   <extension-point id="MethodElementEditorPageProviders" name="Method Element Editor Page Providers" schema="schema/MethodElementEditorPageProviders.exsd"/>
-   
+   <extension-point id="kk" name="ll" schema="schema/kk.exsd"/>
+
    <extension point="org.eclipse.ui.perspectives">
       <perspective
             class="org.eclipse.epf.authoring.ui.AuthoringPerspective"
@@ -105,7 +102,6 @@
    <extension point="org.eclipse.ui.editors">
       <editor
             class="org.eclipse.epf.authoring.ui.editors.MethodElementEditor"
-            contributorClass="org.eclipse.epf.authoring.ui.actions.MethodLibraryActionBarContributor"
             icon="icons/full/obj16/MethodElement.gif"
             id="org.eclipse.epf.authoring.ui.editors.MethodElementEditor"
             name="%methodElementEditorName"
@@ -121,8 +117,7 @@
             contributorClass="org.eclipse.epf.authoring.ui.editors.ProcessEditorActionBarContributor"
             icon="icons/full/obj16/Process.gif"
             id="org.eclipse.epf.authoring.ui.editors.ProcessEditor"
-            name="%processEditorName"
-            matchingStrategy="org.eclipse.epf.authoring.ui.editors.MethodElementEditorMatchingStrategy"/>
+            name="%processEditorName"/>
       <editor
             class="org.eclipse.epf.authoring.ui.editors.GraphicalWorkflowEditor"
             icon="icons/full/obj16/Activity.gif"
@@ -142,6 +137,20 @@
    
    <extension
          point="org.eclipse.ui.newWizards">
+         
+            <wizard
+            category="org.eclipse.epf.ui.newWizards.category"
+            class="org.eclipse.epf.authoring.ui.wizards.NewProcessLineWizard"
+            icon="icons/full/obj16/MethodLibrary.gif"
+            id="org.eclipse.epf.authoring.ui.wizards.NewProcessLineWizard"
+            name="%newProcessLineWizardName">
+         <description>
+               %newProcessLineWizardDescription
+         </description>
+      </wizard>  
+         
+         
+         
       <wizard
             category="org.eclipse.epf.ui.newWizards.category"
             class="org.eclipse.epf.authoring.ui.wizards.NewLibraryWizard"
@@ -172,6 +181,9 @@
                %newConfigurationWizardDescription
          </description>
       </wizard>
+      <primaryWizard
+            id="org.eclipse.epf.authoring.ui.primaryWizard1">
+      </primaryWizard>
    </extension>
 
    <extension point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
@@ -232,20 +244,12 @@
                afterTab="properties.tab.TaskDescriptor.General"/>
 		 <!-- END DOCUMENTATION -->
 		
-		 <!-- START GUIDANCE -->
-		  <propertyTab
-               label="%_UI_Properties_Guidance"
-               category="element"
-               afterTab="properties.tab.BreakdownElement.Documentation"
-               id="properties.tab.BreakdownElement.Guidance"/>  
-          <propertyTab
+		 <!-- ACTIVITY -->
+         <propertyTab
                label="%_UI_Properties_Guidance"
                category="element"
                afterTab="properties.tab.Activity.Documentation"
-               id="properties.tab.Activity.Guidance"/> 
-         <!-- END GUIDANCE-->
-         
-		 <!-- ACTIVITY -->       
+               id="properties.tab.Activity.Guidance"/>  
          <propertyTab
                label="%_UI_Properties_Work_Rollup"
                category="element"
@@ -290,13 +294,6 @@
                category="element"
                afterTab="properties.tab.RoleDescriptor.WorkProduct"
                id="properties.tab.RoleDescriptor.Team"/>
-                           
-         <!-- Milestone -->
-         <propertyTab
-               label="%_UI_Properties_WorkProducts"
-               category="element"
-               afterTab="properties.tab.BreakdownElement.Guidance"
-               id="properties.tab.Milestone.WorkProduct"/>
          
          <!-- TEAM PROFILE -->
          <propertyTab
@@ -390,20 +387,7 @@
          </propertySection>       
          <!-- END DOCUMENTATION SECTION -->
       
-         <!-- START GUIDANCE SECTION -->
-         <propertySection
-               tab="properties.tab.BreakdownElement.Guidance"
-               class="org.eclipse.epf.authoring.ui.properties.BreakdownElementGuidanceSection"
-               id="properties.section.BreakdownElement.Guidance">
-            <input type="org.eclipse.epf.uma.Milestone"/>
-            <input type="org.eclipse.epf.uma.TeamProfile"/>
-            <input type="org.eclipse.epf.uma.Descriptor"/>
-            <input type="org.eclipse.epf.library.edit.process.TaskDescriptorWrapperItemProvider"/>
-            <input type="org.eclipse.epf.library.edit.process.RoleDescriptorWrapperItemProvider"/>
-            <input type="org.eclipse.epf.library.edit.process.WorkProductDescriptorWrapperItemProvider"/>
-            <input type="org.eclipse.epf.library.edit.process.MilestoneWrapperItemProvider"/>
-            <input type="org.eclipse.epf.library.edit.process.TeamProfileWrapperItemProvider"/>
-         </propertySection>
+         <!-- ACTIVITY -->
          <propertySection
                tab="properties.tab.Activity.Guidance"
                class="org.eclipse.epf.authoring.ui.properties.ActivityGuidanceSection"
@@ -411,9 +395,6 @@
             <input type="org.eclipse.epf.uma.Activity"/>
             <input type="org.eclipse.epf.library.edit.process.ActivityWrapperItemProvider"/>
          </propertySection>
-         <!-- END GUIDANCE SECTION -->
-         
-         <!-- ACTIVITY -->    
          <propertySection
                tab="properties.tab.Activity.WorkRollup"
                class="org.eclipse.epf.authoring.ui.properties.ActivityWorkRollupSection"
@@ -476,14 +457,6 @@
             <input type="org.eclipse.epf.library.edit.process.RoleDescriptorWrapperItemProvider"/>
          </propertySection> 
       
-        <!-- Sections for Milestone -->
-         <propertySection
-               tab="properties.tab.Milestone.WorkProduct"
-               class="org.eclipse.epf.authoring.ui.properties.MilestoneWorkProductSection"
-               id="properties.section.Milestone.WorkProduct">
-            <input type="org.eclipse.epf.uma.Milestone"/>
-            <input type="org.eclipse.epf.library.edit.process.MilestoneWrapperItemProvider"/>
-         </propertySection> 
 
          <!-- Section for TeamProfile -->
          <propertySection
@@ -525,17 +498,7 @@
             category="org.eclipse.epf.authoring.ui.preferences.AuthoringPreferencePage"
             class="org.eclipse.epf.authoring.ui.preferences.LibraryViewPrefPage"
             id="org.eclipse.epf.authoring.ui.preferences.LibraryViewPrefPage"
-            name="%libraryViewOptions"/>            
-       <page
-            category="org.eclipse.epf.authoring.ui.preferences.AuthoringPreferencePage"
-            class="org.eclipse.epf.authoring.ui.preferences.ActivityDiagramPrefPage"
-            id="org.eclipse.epf.authoring.ui.preferences.ActivityDiagramPrefPage"
-            name="%activityDiagram"/>
-        <page
-            category="org.eclipse.epf.authoring.ui.preferences.AuthoringPreferencePage"
-            class="org.eclipse.epf.authoring.ui.preferences.AuthoringValidationPrefPage"
-            id="org.eclipse.epf.authoring.ui.preferences.AuthoringValidationPrefPage"
-            name="%validation"/>  
+            name="%libraryViewOptions"/>
       <!--
       <page
             class="org.eclipse.epf.authoring.ui.preferences.RootPrefPage"
@@ -670,53 +633,14 @@
       <attribute name="configGuid"/>
       <attribute name="elementGuid"/> 
       <attribute name="causeGuid"/>
-   </extension>      
-   
-   <extension
-         point="org.eclipse.ui.ide.markerResolution">
-      <markerResolutionGenerator class="org.eclipse.epf.authoring.ui.util.LibraryProblemMarkerResolutionGenerator"
-      markerType="org.eclipse.epf.library.unresolvedBasePlugins"/>
-   </extension>  
-   <extension
-         point="org.eclipse.ui.ide.markerResolution">
-      <markerResolutionGenerator class="org.eclipse.epf.authoring.ui.util.LibraryProblemMarkerResolutionGenerator"
-      markerType="org.eclipse.epf.library.multipleReplacers"/>
-   </extension>  
+   </extension>
    <extension
          point="org.eclipse.ui.ide.markerResolution">
       <markerResolutionGenerator class="org.eclipse.epf.authoring.ui.util.ConfigurationMarkerResolutionGenerator"
       markerType="org.eclipse.epf.authoring.ui.configuration"/>
    </extension>
-   
-   <extension
-      	point="org.eclipse.ui.ide.markerResolution">
-      <markerResolutionGenerator class="org.eclipse.epf.authoring.ui.util.ValidationMarkerResolutionGenerator"
-      markerType="org.eclipse.epf.library.validation"/>
-   </extension>  
-   
    <extension
          point="org.eclipse.epf.library.edit.userInteractionHandler">
       <userInteractionHandler class="org.eclipse.epf.authoring.ui.actions.UserInteractionHandler"/>
-   </extension>
-   <extension
-         point="org.eclipse.epf.authoring.ui.methodRichText">
-      <methodRichText
-            class="org.eclipse.epf.authoring.ui.editors.MethodRichText"
-            version="0">
-      </methodRichText>
-   </extension>
-   <extension
-         point="org.eclipse.epf.authoring.ui.methodRichTextEditor">
-      <methodRichTextEditor
-            class="org.eclipse.epf.authoring.ui.editors.MethodRichTextEditor"
-            version="0">
-      </methodRichTextEditor>
-   </extension>
-   
-    <extension point="org.eclipse.ui.popupMenus">
-      <viewerContribution id="org.eclipse.epf.authoring.ui.actions.ClearValidationMarkers" targetID="org.eclipse.ui.views.ProblemView">
-         <action class="org.eclipse.epf.authoring.ui.actions.ClearValidationMarkersAction" id="org.eclipse.epf.authoring.ui.actions.ClearValidationMarkers" label="%ClearAllValidationItems" menubarPath="additions">
-         </action>
-      </viewerContribution>
    </extension>
 </plugin>

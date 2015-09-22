@@ -10,9 +10,9 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.library.xmi.preferences;
 
-import org.eclipse.epf.common.preferences.IPreferenceStoreWrapper;
 import org.eclipse.epf.common.utils.FileUtil;
 import org.eclipse.epf.library.xmi.XMILibraryPlugin;
+import org.eclipse.jface.preference.IPreferenceStore;
 
 /**
  * The XML Method Library preferences.
@@ -29,7 +29,7 @@ public class XMILibraryPreferences {
 
 	static {
 		// Initialize the default preference values.
-		IPreferenceStoreWrapper store = XMILibraryPlugin.getDefault()
+		IPreferenceStore store = XMILibraryPlugin.getDefault()
 				.getPreferenceStore();
 		String defaultLibraryPath = System.getProperty("user.home") //$NON-NLS-1$
 				// FIXME! Avoid using hard coded constant

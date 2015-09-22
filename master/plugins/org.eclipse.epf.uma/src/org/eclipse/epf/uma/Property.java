@@ -40,7 +40,7 @@ public interface Property extends DiagramElement {
 	 * @return the value of the '<em>Key</em>' attribute.
 	 * @see #setKey(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getProperty_Key()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getKey();
@@ -67,7 +67,7 @@ public interface Property extends DiagramElement {
 	 * @return the value of the '<em>Value</em>' attribute.
 	 * @see #setValue(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getProperty_Value()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getValue();

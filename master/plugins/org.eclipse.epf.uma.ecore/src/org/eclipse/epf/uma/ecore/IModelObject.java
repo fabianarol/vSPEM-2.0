@@ -11,10 +11,9 @@
 package org.eclipse.epf.uma.ecore;
 
 import java.util.Collection;
-import java.util.List;
 
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.emf.ecore.sdo.EDataObject;
 import org.eclipse.epf.uma.ecore.util.OppositeFeature;
 
 /**
@@ -27,7 +26,7 @@ import org.eclipse.epf.uma.ecore.util.OppositeFeature;
  * @author Phong Nguyen Le
  * @since 1.0
  */
-public interface IModelObject extends EObject {
+public interface IModelObject extends EDataObject {
 
 	/**
 	 * Gets the default value of a feature.
@@ -56,19 +55,5 @@ public interface IModelObject extends EObject {
 	 * @return a collection of opposite features
 	 */
 	public Collection getOppositeFeatures();
-	
-	//=======================================================
-	// EDataObject methods
-	//=======================================================
-	
-	public Type getType();
-	
-	public IModelObject getContainer();
-	
-	public List<Property> getInstanceProperties();
-	
-	public List getList(int propertyIndex);
-	
-	public void set(int propertyIndex, Object value);
 
 }

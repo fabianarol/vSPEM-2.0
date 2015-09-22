@@ -38,8 +38,8 @@ import org.eclipse.epf.uma.UmaPackage;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link org.eclipse.epf.uma.impl.GraphElementImpl#getContained <em>Contained</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.impl.GraphElementImpl#getPosition <em>Position</em>}</li>
+ *   <li>{@link org.eclipse.epf.uma.impl.GraphElementImpl#getContained <em>Contained</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.impl.GraphElementImpl#getLink <em>Link</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.impl.GraphElementImpl#getAnchorage <em>Anchorage</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.impl.GraphElementImpl#getSemanticModel <em>Semantic Model</em>}</li>
@@ -51,6 +51,23 @@ import org.eclipse.epf.uma.UmaPackage;
 public abstract class GraphElementImpl extends DiagramElementImpl implements
 		GraphElement {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * The cached value of the '{@link #getPosition() <em>Position</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getPosition()
+	 * @generated
+	 * @ordered
+	 */
+	protected Point position = null;
+
+	/**
 	 * The cached value of the '{@link #getContained() <em>Contained</em>}' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -58,17 +75,7 @@ public abstract class GraphElementImpl extends DiagramElementImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<DiagramElement> contained;
-
-	/**
-	 * The cached value of the '{@link #getPosition() <em>Position</em>}' reference.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getPosition()
-	 * @generated
-	 * @ordered
-	 */
-	protected Point position;
+	protected EList contained = null;
 
 	/**
 	 * The cached value of the '{@link #getLink() <em>Link</em>}' containment reference list.
@@ -78,7 +85,7 @@ public abstract class GraphElementImpl extends DiagramElementImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<DiagramLink> link;
+	protected EList link = null;
 
 	/**
 	 * The cached value of the '{@link #getAnchorage() <em>Anchorage</em>}' containment reference list.
@@ -88,7 +95,7 @@ public abstract class GraphElementImpl extends DiagramElementImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<GraphConnector> anchorage;
+	protected EList anchorage = null;
 
 	/**
 	 * The cached value of the '{@link #getSemanticModel() <em>Semantic Model</em>}' containment reference.
@@ -98,7 +105,7 @@ public abstract class GraphElementImpl extends DiagramElementImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected SemanticModelBridge semanticModel;
+	protected SemanticModelBridge semanticModel = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -110,7 +117,7 @@ public abstract class GraphElementImpl extends DiagramElementImpl implements
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -118,7 +125,6 @@ public abstract class GraphElementImpl extends DiagramElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.GRAPH_ELEMENT;
 	}
@@ -133,6 +139,17 @@ public abstract class GraphElementImpl extends DiagramElementImpl implements
 			InternalEObject oldPosition = (InternalEObject) position;
 			position = (Point) eResolveProxy(oldPosition);
 			if (position != oldPosition) {
+				InternalEObject newPosition = (InternalEObject) position;
+				NotificationChain msgs = oldPosition.eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE
+								- UmaPackage.GRAPH_ELEMENT__POSITION, null,
+						null);
+				if (newPosition.eInternalContainer() == null) {
+					msgs = newPosition.eInverseAdd(this, EOPPOSITE_FEATURE_BASE
+							- UmaPackage.GRAPH_ELEMENT__POSITION, null, msgs);
+				}
+				if (msgs != null)
+					msgs.dispatch();
 				if (eNotificationRequired())
 					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
 							UmaPackage.GRAPH_ELEMENT__POSITION, oldPosition,
@@ -156,12 +173,20 @@ public abstract class GraphElementImpl extends DiagramElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setPosition(Point newPosition) {
+	public NotificationChain basicSetPosition(Point newPosition,
+			NotificationChain msgs) {
 		Point oldPosition = position;
 		position = newPosition;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					UmaPackage.GRAPH_ELEMENT__POSITION, oldPosition, position));
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, UmaPackage.GRAPH_ELEMENT__POSITION,
+					oldPosition, newPosition);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
+		}
+		return msgs;
 	}
 
 	/**
@@ -169,9 +194,36 @@ public abstract class GraphElementImpl extends DiagramElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<DiagramElement> getContained() {
+	public void setPosition(Point newPosition) {
+		if (newPosition != position) {
+			NotificationChain msgs = null;
+			if (position != null)
+				msgs = ((InternalEObject) position).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE
+								- UmaPackage.GRAPH_ELEMENT__POSITION, null,
+						msgs);
+			if (newPosition != null)
+				msgs = ((InternalEObject) newPosition).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE
+								- UmaPackage.GRAPH_ELEMENT__POSITION, null,
+						msgs);
+			msgs = basicSetPosition(newPosition, msgs);
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					UmaPackage.GRAPH_ELEMENT__POSITION, newPosition,
+					newPosition));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public List getContained() {
 		if (contained == null) {
-			contained = new EObjectContainmentWithInverseEList.Resolving<DiagramElement>(
+			contained = new EObjectContainmentWithInverseEList.Resolving(
 					DiagramElement.class, this,
 					UmaPackage.GRAPH_ELEMENT__CONTAINED,
 					UmaPackage.DIAGRAM_ELEMENT__CONTAINER);
@@ -184,9 +236,9 @@ public abstract class GraphElementImpl extends DiagramElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<DiagramLink> getLink() {
+	public List getLink() {
 		if (link == null) {
-			link = new EObjectContainmentWithInverseEList.Resolving<DiagramLink>(
+			link = new EObjectContainmentWithInverseEList.Resolving(
 					DiagramLink.class, this, UmaPackage.GRAPH_ELEMENT__LINK,
 					UmaPackage.DIAGRAM_LINK__GRAPH_ELEMENT);
 		}
@@ -198,9 +250,9 @@ public abstract class GraphElementImpl extends DiagramElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<GraphConnector> getAnchorage() {
+	public List getAnchorage() {
 		if (anchorage == null) {
-			anchorage = new EObjectContainmentWithInverseEList.Resolving<GraphConnector>(
+			anchorage = new EObjectContainmentWithInverseEList.Resolving(
 					GraphConnector.class, this,
 					UmaPackage.GRAPH_ELEMENT__ANCHORAGE,
 					UmaPackage.GRAPH_CONNECTOR__GRAPH_ELEMENT);
@@ -298,20 +350,15 @@ public abstract class GraphElementImpl extends DiagramElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case UmaPackage.GRAPH_ELEMENT__CONTAINED:
-			return ((InternalEList<InternalEObject>) (InternalEList<?>) getContained())
-					.basicAdd(otherEnd, msgs);
+			return ((InternalEList) getContained()).basicAdd(otherEnd, msgs);
 		case UmaPackage.GRAPH_ELEMENT__LINK:
-			return ((InternalEList<InternalEObject>) (InternalEList<?>) getLink())
-					.basicAdd(otherEnd, msgs);
+			return ((InternalEList) getLink()).basicAdd(otherEnd, msgs);
 		case UmaPackage.GRAPH_ELEMENT__ANCHORAGE:
-			return ((InternalEList<InternalEObject>) (InternalEList<?>) getAnchorage())
-					.basicAdd(otherEnd, msgs);
+			return ((InternalEList) getAnchorage()).basicAdd(otherEnd, msgs);
 		case UmaPackage.GRAPH_ELEMENT__SEMANTIC_MODEL:
 			if (semanticModel != null)
 				msgs = ((InternalEObject) semanticModel).eInverseRemove(this,
@@ -328,18 +375,17 @@ public abstract class GraphElementImpl extends DiagramElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
+		case UmaPackage.GRAPH_ELEMENT__POSITION:
+			return basicSetPosition(null, msgs);
 		case UmaPackage.GRAPH_ELEMENT__CONTAINED:
-			return ((InternalEList<?>) getContained()).basicRemove(otherEnd,
-					msgs);
+			return ((InternalEList) getContained()).basicRemove(otherEnd, msgs);
 		case UmaPackage.GRAPH_ELEMENT__LINK:
-			return ((InternalEList<?>) getLink()).basicRemove(otherEnd, msgs);
+			return ((InternalEList) getLink()).basicRemove(otherEnd, msgs);
 		case UmaPackage.GRAPH_ELEMENT__ANCHORAGE:
-			return ((InternalEList<?>) getAnchorage()).basicRemove(otherEnd,
-					msgs);
+			return ((InternalEList) getAnchorage()).basicRemove(otherEnd, msgs);
 		case UmaPackage.GRAPH_ELEMENT__SEMANTIC_MODEL:
 			return basicSetSemanticModel(null, msgs);
 		}
@@ -351,15 +397,14 @@ public abstract class GraphElementImpl extends DiagramElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-		case UmaPackage.GRAPH_ELEMENT__CONTAINED:
-			return getContained();
 		case UmaPackage.GRAPH_ELEMENT__POSITION:
 			if (resolve)
 				return getPosition();
 			return basicGetPosition();
+		case UmaPackage.GRAPH_ELEMENT__CONTAINED:
+			return getContained();
 		case UmaPackage.GRAPH_ELEMENT__LINK:
 			return getLink();
 		case UmaPackage.GRAPH_ELEMENT__ANCHORAGE:
@@ -377,26 +422,22 @@ public abstract class GraphElementImpl extends DiagramElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-		case UmaPackage.GRAPH_ELEMENT__CONTAINED:
-			getContained().clear();
-			getContained().addAll(
-					(Collection<? extends DiagramElement>) newValue);
-			return;
 		case UmaPackage.GRAPH_ELEMENT__POSITION:
 			setPosition((Point) newValue);
 			return;
+		case UmaPackage.GRAPH_ELEMENT__CONTAINED:
+			getContained().clear();
+			getContained().addAll((Collection) newValue);
+			return;
 		case UmaPackage.GRAPH_ELEMENT__LINK:
 			getLink().clear();
-			getLink().addAll((Collection<? extends DiagramLink>) newValue);
+			getLink().addAll((Collection) newValue);
 			return;
 		case UmaPackage.GRAPH_ELEMENT__ANCHORAGE:
 			getAnchorage().clear();
-			getAnchorage().addAll(
-					(Collection<? extends GraphConnector>) newValue);
+			getAnchorage().addAll((Collection) newValue);
 			return;
 		case UmaPackage.GRAPH_ELEMENT__SEMANTIC_MODEL:
 			setSemanticModel((SemanticModelBridge) newValue);
@@ -410,14 +451,13 @@ public abstract class GraphElementImpl extends DiagramElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case UmaPackage.GRAPH_ELEMENT__CONTAINED:
-			getContained().clear();
-			return;
 		case UmaPackage.GRAPH_ELEMENT__POSITION:
 			setPosition((Point) null);
+			return;
+		case UmaPackage.GRAPH_ELEMENT__CONTAINED:
+			getContained().clear();
 			return;
 		case UmaPackage.GRAPH_ELEMENT__LINK:
 			getLink().clear();
@@ -437,7 +477,6 @@ public abstract class GraphElementImpl extends DiagramElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);
@@ -446,10 +485,10 @@ public abstract class GraphElementImpl extends DiagramElementImpl implements
 		}
 		//UMA<--		
 		switch (featureID) {
-		case UmaPackage.GRAPH_ELEMENT__CONTAINED:
-			return contained != null && !contained.isEmpty();
 		case UmaPackage.GRAPH_ELEMENT__POSITION:
 			return position != null;
+		case UmaPackage.GRAPH_ELEMENT__CONTAINED:
+			return contained != null && !contained.isEmpty();
 		case UmaPackage.GRAPH_ELEMENT__LINK:
 			return link != null && !link.isEmpty();
 		case UmaPackage.GRAPH_ELEMENT__ANCHORAGE:

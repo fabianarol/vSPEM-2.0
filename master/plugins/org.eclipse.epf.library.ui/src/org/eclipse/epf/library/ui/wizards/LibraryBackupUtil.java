@@ -11,28 +11,21 @@
 package org.eclipse.epf.library.ui.wizards;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.epf.common.ui.util.MsgBox;
+import org.eclipse.epf.common.serviceability.MsgBox;
 import org.eclipse.epf.library.ILibraryService;
 import org.eclipse.epf.library.edit.ui.UserInteractionHelper;
 import org.eclipse.epf.library.layout.LayoutResources;
 import org.eclipse.epf.library.services.SafeUpdateController;
-import org.eclipse.epf.library.ui.LibraryUIPlugin;
 import org.eclipse.epf.library.ui.LibraryUIResources;
 import org.eclipse.epf.library.ui.dialogs.LibraryBackupDialog;
-import org.eclipse.epf.uma.MethodLibrary;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Shell;
 
 /**
  * Utility class to back up library.
  * 
  * @author Jinhua Xi
- * @author Weiping Lu
  * @since 1.0
  */
 public class LibraryBackupUtil {
@@ -45,12 +38,6 @@ public class LibraryBackupUtil {
 	 * @param shell
 	 */
 	public static void promptBackupCurrentLibrary(Shell shell, ILibraryService service) {
-		MethodLibrary lib = service.getCurrentMethodLibrary();
-		if (lib != null && lib.getMethodPlugins().isEmpty() &&
-				lib.getPredefinedConfigurations().isEmpty()) {
-			return;
-		}
-				
 		String libPathStr = service.getCurrentMethodLibraryLocation();
 		File libPath = new File(libPathStr);
 		new LibraryBackupUtil().doBackup(shell, libPath, service);
@@ -68,8 +55,7 @@ public class LibraryBackupUtil {
 
 	private void doBackup(final Shell shell, final File libPath, ILibraryService service) {
 		path = null;
-		final ILibraryService fservice = service;
-		
+
 		SafeUpdateController.syncExec(new Runnable() {
 			public void run() {
 				Shell s = shell;
@@ -91,31 +77,16 @@ public class LibraryBackupUtil {
 				if (dlg.open() == Dialog.OK) {
 					path = dlg.getPath();
 				}
-				
-				ProgressMonitorDialog pmDialog = new ProgressMonitorDialog(s);
-				IRunnableWithProgress op = new IRunnableWithProgress() {
-					public void run(IProgressMonitor monitor)
-							throws InvocationTargetException {
-						monitor.beginTask(
-								LibraryUIResources.backingUpLibraryTask_name,
-								IProgressMonitor.UNKNOWN);
-						if (path != null) {
-							if (fservice == null) {
-								backup(libPath, new File(path));
-							} else {
-								fservice.getCurrentLibraryManager().backupMethodLibrary(path);
-							}
-						}
-					}
-				};
-				
-				try {
-					pmDialog.run(true, false, op);
-				} catch (Exception e){
-					LibraryUIPlugin.getDefault().getLogger().logError(e);
-				}
 			}
 		});
+
+		if (path != null) {
+			if (service == null) {
+				backup(libPath, new File(path));
+			} else {
+				service.getCurrentLibraryManager().backupMethodLibrary(path);
+			}
+		}
 
 	}
 
@@ -134,7 +105,7 @@ public class LibraryBackupUtil {
 					String excludes = ".lock"; //$NON-NLS-1$
 					LayoutResources.copyDir(source, dest, "**", excludes); //$NON-NLS-1$
 				} catch (RuntimeException e) {
-					LibraryUIPlugin.getDefault().getLogger().logError(e);
+					e.printStackTrace();
 				}
 			}
 		};

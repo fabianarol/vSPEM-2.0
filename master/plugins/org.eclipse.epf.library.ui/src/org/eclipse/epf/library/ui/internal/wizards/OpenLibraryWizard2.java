@@ -16,8 +16,8 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.epf.common.service.versioning.VersionUtil;
-import org.eclipse.epf.common.ui.util.MsgDialog;
+import org.eclipse.epf.common.serviceability.MsgDialog;
+import org.eclipse.epf.common.serviceability.VersionUtil;
 import org.eclipse.epf.library.LibraryManagerFactory;
 import org.eclipse.epf.library.LibraryService;
 import org.eclipse.epf.library.ui.LibraryUIManager;

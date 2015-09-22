@@ -17,10 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.eclipse.epf.common.preferences.IPreferenceStoreWrapper;
 import org.eclipse.epf.library.LibraryPlugin;
 import org.eclipse.epf.library.edit.process.IBSItemProvider;
-import org.eclipse.epf.publish.layout.LayoutPlugin;
+import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.ibm.icu.util.StringTokenizer;
 
@@ -43,7 +42,7 @@ public class PreferenceUtil {
 	private static final String ID_STEPS = "steps"; //$NON-NLS-1$
 	static {
 		try {
-			Properties params = LayoutPlugin.getDefault().getProperties(
+			Properties params = LibraryPlugin.getDefault().getProperties(
 					"/layout/xsl/resources.properties"); //$NON-NLS-1$
 			
 			setXslProperties(params);
@@ -78,7 +77,7 @@ public class PreferenceUtil {
 
 	}
 	
-	public static String getLabel(String key) {
+	private static String getLabel(String key) {
 		String label = xslParams.getProperty(key);
 		if ( label == null ) {
 			System.out.println("Can't find property entry for " + key); //$NON-NLS-1$
@@ -132,7 +131,7 @@ public class PreferenceUtil {
 	
 	private static List getPreferenceItems(String key) {
 		
-		IPreferenceStoreWrapper store = LibraryPlugin.getDefault().getPreferenceStore();		
+		IPreferenceStore store = LibraryPlugin.getDefault().getPreferenceStore();		
 		String str = store.getString(key);
 		if (str == null) {
 			str = store.getDefaultString(key);
@@ -207,7 +206,7 @@ public class PreferenceUtil {
 	}
 
 	public static void saveSelectedConfigIntoPersistence(String configName) {
-		IPreferenceStoreWrapper store = LibraryPlugin.getDefault()
+		IPreferenceStore store = LibraryPlugin.getDefault()
 				.getPreferenceStore();
 		store
 				.setValue(
@@ -217,7 +216,7 @@ public class PreferenceUtil {
 	}
 
 	public static String getSavedLastConfig() {
-		IPreferenceStoreWrapper store = LibraryPlugin.getDefault()
+		IPreferenceStore store = LibraryPlugin.getDefault()
 				.getPreferenceStore();
 		return store
 				.getString(LibraryPreferenceConstants.PREF_SELECTED_CONFIG_IN_LAST_SESSION);

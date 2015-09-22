@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: UmaFactory.java,v 1.3 2007/05/04 22:46:43 klow Exp $
+ */
 package org.eclipse.epf.xml.uma;
 
 import org.eclipse.emf.ecore.EFactory;
@@ -46,15 +42,6 @@ public interface UmaFactory extends EFactory {
 	 * @generated
 	 */
 	ActivityDescription createActivityDescription();
-
-	/**
-	 * Returns a new object of class '<em>Applicable Meta Class Info</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Applicable Meta Class Info</em>'.
-	 * @generated
-	 */
-	ApplicableMetaClassInfo createApplicableMetaClassInfo();
 
 	/**
 	 * Returns a new object of class '<em>Artifact</em>'.
@@ -370,15 +357,6 @@ public interface UmaFactory extends EFactory {
 	 * @generated
 	 */
 	Iteration createIteration();
-
-	/**
-	 * Returns a new object of class '<em>Kind</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Kind</em>'.
-	 * @generated
-	 */
-	Kind createKind();
 
 	/**
 	 * Returns a new object of class '<em>Method Configuration</em>'.

@@ -11,29 +11,24 @@
 package org.eclipse.epf.authoring.ui.editors;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.epf.authoring.ui.AuthoringUIPlugin;
+import org.eclipse.epf.authoring.ui.forms.ConfigViewPage;
+import org.eclipse.epf.authoring.ui.forms.ConfigurationDescription;
 import org.eclipse.epf.authoring.ui.forms.ConfigurationPage;
-import org.eclipse.epf.authoring.ui.providers.ConfigurationEditorDefaultPageProvider;
-import org.eclipse.epf.authoring.ui.providers.IMethodElementEditorPageProviderExtension;
+import org.eclipse.epf.library.configuration.closure.ConfigurationClosure;
 import org.eclipse.epf.persistence.refresh.RefreshJob;
 import org.eclipse.epf.persistence.util.PersistenceUtil;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodElement;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.forms.editor.IFormPage;
 import org.eclipse.ui.ide.IGotoMarker;
 import org.eclipse.ui.part.FileEditorInput;
 
@@ -51,7 +46,6 @@ public class ConfigurationEditor extends MethodElementEditor implements IGotoMar
 	 * The editor ID.
 	 */
 	public static final String EDITOR_ID = ConfigurationEditor.class.getName();
-	protected static IMethodElementEditorPageProviderExtension defaultConfigPageProvider;
 
 	ConfigurationPage configPage = null;
 
@@ -85,50 +79,15 @@ public class ConfigurationEditor extends MethodElementEditor implements IGotoMar
 
 		super.init(site, input);
 	}
-	
-	
-	protected IMethodElementEditorPageProviderExtension getDefaultPageProvider() {
-		if (defaultConfigPageProvider == null) {
-			defaultConfigPageProvider = new ConfigurationEditorDefaultPageProvider();
-		}
-		return defaultConfigPageProvider;
-	}
-
 	/**
 	 * @see org.eclipse.ui.forms.editor.FormEditor#addPages()
 	 */
 	protected void addPages() {
-		// first get original list
-		Map<Object,String> pageMap = getDefaultPageProvider().getPages(new LinkedHashMap<Object,String>(), this, elementObj);
-		
-		// let extensions modify
-		List<IMethodElementEditorPageProviderExtension> pageProviders = getAllPageProviders();
-		if (pageProviders != null && pageProviders.size() > 0) {
-			for (IMethodElementEditorPageProviderExtension extension : pageProviders) {
-				pageMap = extension.getPages(pageMap, this, elementObj);
-			}
-		}
-		// now add pages
 		try {
-			for (Map.Entry<Object, String> pageEntry : pageMap.entrySet()) {
-				Object page = pageEntry.getKey();
-				String name = pageEntry.getValue();
-				int index = -1;
-				if (page instanceof Control) {
-					index = addPage((Control)page);
-				} else if (page instanceof IFormPage) {
-					index = addPage((IFormPage)page);
-				} else if (page instanceof IEditorPart) {
-					index = addPage((IEditorPart)page, getEditorInput());
-				}
-				if (name != null) {
-					setPageText(index, name);
-				}
-				
-				if (page instanceof ConfigurationPage) {
-					configPage = (ConfigurationPage)page;
-				}
-			}
+			addPage(new ConfigurationDescription(this));
+			configPage = new ConfigurationPage(this);
+			addPage(configPage);
+			addPage(new ConfigViewPage(this));
 		} catch (PartInitException e) {
 			AuthoringUIPlugin.getDefault().getLogger().logError(e);
 		}
@@ -139,6 +98,14 @@ public class ConfigurationEditor extends MethodElementEditor implements IGotoMar
 	 */
 	public void dispose() {
 		super.dispose();
+	}
+
+	/**
+	 * Returns closure for this configuration
+	 * @return closure
+	 */
+	public ConfigurationClosure getClosure() {
+		return configPage.getClosure();
 	}
 
 	/**
@@ -185,10 +152,4 @@ public class ConfigurationEditor extends MethodElementEditor implements IGotoMar
     public void doQuickFix(IMarker marker) {
     	configPage.doQuickFix(marker);
     }
-    
-	public void doSave(IProgressMonitor monitor) {
-    	super.doSave(monitor);
-    	configPage.showErrorsOnSave();
-    }
-    
 }

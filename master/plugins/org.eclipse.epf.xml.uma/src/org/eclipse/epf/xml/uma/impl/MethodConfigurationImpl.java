@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: MethodConfigurationImpl.java,v 1.5 2007/06/05 21:14:59 klow Exp $
+ */
 package org.eclipse.epf.xml.uma.impl;
 
 import java.util.Collection;
@@ -53,7 +49,7 @@ public class MethodConfigurationImpl extends MethodUnitImpl implements MethodCon
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<String> baseConfiguration;
+	protected EList baseConfiguration;
 
 	/**
 	 * The cached value of the '{@link #getMethodPluginSelection() <em>Method Plugin Selection</em>}' attribute list.
@@ -63,7 +59,7 @@ public class MethodConfigurationImpl extends MethodUnitImpl implements MethodCon
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<String> methodPluginSelection;
+	protected EList methodPluginSelection;
 
 	/**
 	 * The cached value of the '{@link #getMethodPackageSelection() <em>Method Package Selection</em>}' attribute list.
@@ -73,7 +69,7 @@ public class MethodConfigurationImpl extends MethodUnitImpl implements MethodCon
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<String> methodPackageSelection;
+	protected EList methodPackageSelection;
 
 	/**
 	 * The default value of the '{@link #getDefaultView() <em>Default View</em>}' attribute.
@@ -103,7 +99,7 @@ public class MethodConfigurationImpl extends MethodUnitImpl implements MethodCon
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<String> processView;
+	protected EList processView;
 
 	/**
 	 * The cached value of the '{@link #getSubtractedCategory() <em>Subtracted Category</em>}' attribute list.
@@ -113,7 +109,7 @@ public class MethodConfigurationImpl extends MethodUnitImpl implements MethodCon
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<String> subtractedCategory;
+	protected EList subtractedCategory;
 
 	/**
 	 * The cached value of the '{@link #getAddedCategory() <em>Added Category</em>}' attribute list.
@@ -123,7 +119,7 @@ public class MethodConfigurationImpl extends MethodUnitImpl implements MethodCon
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<String> addedCategory;
+	protected EList addedCategory;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -139,7 +135,6 @@ public class MethodConfigurationImpl extends MethodUnitImpl implements MethodCon
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.METHOD_CONFIGURATION;
 	}
@@ -149,9 +144,9 @@ public class MethodConfigurationImpl extends MethodUnitImpl implements MethodCon
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<String> getBaseConfiguration() {
+	public EList getBaseConfiguration() {
 		if (baseConfiguration == null) {
-			baseConfiguration = new EDataTypeEList<String>(String.class, this, UmaPackage.METHOD_CONFIGURATION__BASE_CONFIGURATION);
+			baseConfiguration = new EDataTypeEList(String.class, this, UmaPackage.METHOD_CONFIGURATION__BASE_CONFIGURATION);
 		}
 		return baseConfiguration;
 	}
@@ -161,9 +156,9 @@ public class MethodConfigurationImpl extends MethodUnitImpl implements MethodCon
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<String> getMethodPluginSelection() {
+	public EList getMethodPluginSelection() {
 		if (methodPluginSelection == null) {
-			methodPluginSelection = new EDataTypeEList<String>(String.class, this, UmaPackage.METHOD_CONFIGURATION__METHOD_PLUGIN_SELECTION);
+			methodPluginSelection = new EDataTypeEList(String.class, this, UmaPackage.METHOD_CONFIGURATION__METHOD_PLUGIN_SELECTION);
 		}
 		return methodPluginSelection;
 	}
@@ -173,9 +168,9 @@ public class MethodConfigurationImpl extends MethodUnitImpl implements MethodCon
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<String> getMethodPackageSelection() {
+	public EList getMethodPackageSelection() {
 		if (methodPackageSelection == null) {
-			methodPackageSelection = new EDataTypeEList<String>(String.class, this, UmaPackage.METHOD_CONFIGURATION__METHOD_PACKAGE_SELECTION);
+			methodPackageSelection = new EDataTypeEList(String.class, this, UmaPackage.METHOD_CONFIGURATION__METHOD_PACKAGE_SELECTION);
 		}
 		return methodPackageSelection;
 	}
@@ -206,9 +201,9 @@ public class MethodConfigurationImpl extends MethodUnitImpl implements MethodCon
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<String> getProcessView() {
+	public EList getProcessView() {
 		if (processView == null) {
-			processView = new EDataTypeEList<String>(String.class, this, UmaPackage.METHOD_CONFIGURATION__PROCESS_VIEW);
+			processView = new EDataTypeEList(String.class, this, UmaPackage.METHOD_CONFIGURATION__PROCESS_VIEW);
 		}
 		return processView;
 	}
@@ -218,9 +213,9 @@ public class MethodConfigurationImpl extends MethodUnitImpl implements MethodCon
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<String> getSubtractedCategory() {
+	public EList getSubtractedCategory() {
 		if (subtractedCategory == null) {
-			subtractedCategory = new EDataTypeEList<String>(String.class, this, UmaPackage.METHOD_CONFIGURATION__SUBTRACTED_CATEGORY);
+			subtractedCategory = new EDataTypeEList(String.class, this, UmaPackage.METHOD_CONFIGURATION__SUBTRACTED_CATEGORY);
 		}
 		return subtractedCategory;
 	}
@@ -230,9 +225,9 @@ public class MethodConfigurationImpl extends MethodUnitImpl implements MethodCon
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<String> getAddedCategory() {
+	public EList getAddedCategory() {
 		if (addedCategory == null) {
-			addedCategory = new EDataTypeEList<String>(String.class, this, UmaPackage.METHOD_CONFIGURATION__ADDED_CATEGORY);
+			addedCategory = new EDataTypeEList(String.class, this, UmaPackage.METHOD_CONFIGURATION__ADDED_CATEGORY);
 		}
 		return addedCategory;
 	}
@@ -242,7 +237,6 @@ public class MethodConfigurationImpl extends MethodUnitImpl implements MethodCon
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 			case UmaPackage.METHOD_CONFIGURATION__BASE_CONFIGURATION:
@@ -268,36 +262,34 @@ public class MethodConfigurationImpl extends MethodUnitImpl implements MethodCon
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-		@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 			case UmaPackage.METHOD_CONFIGURATION__BASE_CONFIGURATION:
 				getBaseConfiguration().clear();
-				getBaseConfiguration().addAll((Collection<? extends String>)newValue);
+				getBaseConfiguration().addAll((Collection)newValue);
 				return;
 			case UmaPackage.METHOD_CONFIGURATION__METHOD_PLUGIN_SELECTION:
 				getMethodPluginSelection().clear();
-				getMethodPluginSelection().addAll((Collection<? extends String>)newValue);
+				getMethodPluginSelection().addAll((Collection)newValue);
 				return;
 			case UmaPackage.METHOD_CONFIGURATION__METHOD_PACKAGE_SELECTION:
 				getMethodPackageSelection().clear();
-				getMethodPackageSelection().addAll((Collection<? extends String>)newValue);
+				getMethodPackageSelection().addAll((Collection)newValue);
 				return;
 			case UmaPackage.METHOD_CONFIGURATION__DEFAULT_VIEW:
 				setDefaultView((String)newValue);
 				return;
 			case UmaPackage.METHOD_CONFIGURATION__PROCESS_VIEW:
 				getProcessView().clear();
-				getProcessView().addAll((Collection<? extends String>)newValue);
+				getProcessView().addAll((Collection)newValue);
 				return;
 			case UmaPackage.METHOD_CONFIGURATION__SUBTRACTED_CATEGORY:
 				getSubtractedCategory().clear();
-				getSubtractedCategory().addAll((Collection<? extends String>)newValue);
+				getSubtractedCategory().addAll((Collection)newValue);
 				return;
 			case UmaPackage.METHOD_CONFIGURATION__ADDED_CATEGORY:
 				getAddedCategory().clear();
-				getAddedCategory().addAll((Collection<? extends String>)newValue);
+				getAddedCategory().addAll((Collection)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -308,7 +300,6 @@ public class MethodConfigurationImpl extends MethodUnitImpl implements MethodCon
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 			case UmaPackage.METHOD_CONFIGURATION__BASE_CONFIGURATION:
@@ -341,7 +332,6 @@ public class MethodConfigurationImpl extends MethodUnitImpl implements MethodCon
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 			case UmaPackage.METHOD_CONFIGURATION__BASE_CONFIGURATION:
@@ -367,7 +357,6 @@ public class MethodConfigurationImpl extends MethodUnitImpl implements MethodCon
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 

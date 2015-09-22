@@ -1,13 +1,6 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+/**
+ * 
+ */
 package org.eclipse.epf.authoring.gef.figures;
 
 import java.util.Iterator;
@@ -55,7 +48,7 @@ public class RoleTaskFlowLayout extends FlowLayout {
 	/**
 	 * Initializes the state of row data, which is internal to the layout process. 
 	 */
-	protected void initRow() {
+	private void initRow() {
 		data.rowX = 0;
 		data.rowHeight = 0;
 		data.rowWidth = 0;
@@ -68,7 +61,7 @@ public class RoleTaskFlowLayout extends FlowLayout {
 	 * @param parent the parent figure
 	 * @since 2.0 
 	 */
-	protected void initVariables(IFigure parent) {
+	private void initVariables(IFigure parent) {
 		data.row = new IFigure[parent.getChildren().size()];
 		data.bounds = new Rectangle[data.row.length];
 		data.maxWidth = data.area.width;

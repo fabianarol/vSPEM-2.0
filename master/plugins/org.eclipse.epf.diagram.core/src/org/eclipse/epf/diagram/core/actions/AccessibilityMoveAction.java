@@ -1,13 +1,6 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+/**
+ * 
+ */
 package org.eclipse.epf.diagram.core.actions;
 
 import java.util.Iterator;
@@ -51,10 +44,10 @@ import org.eclipse.ui.IWorkbenchPart;
  */
 public class AccessibilityMoveAction extends DiagramAction {
 
-	public static final String MOVE_LEFT_ACTION = "move_left_action";		//$NON-NLS-1$
-	public static final String MOVE_RIGHT_ACTION = "move_right_action";		//$NON-NLS-1$
-	public static final String MOVE_DOWN_ACTION = "move_down_action";		//$NON-NLS-1$		
-	public static final String MOVE_UP_ACTION = "move_up_action";			//$NON-NLS-1$
+	public static final String MOVE_LEFT_ACTION = "move_left_action";
+	public static final String MOVE_RIGHT_ACTION = "move_right_action";
+	public static final String MOVE_DOWN_ACTION = "move_down_action";
+	public static final String MOVE_UP_ACTION = "move_up_action";
 	
 	private int direction;
 	

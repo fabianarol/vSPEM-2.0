@@ -26,8 +26,7 @@ import org.eclipse.emf.ecore.xmi.XMLHelper;
 import org.eclipse.emf.ecore.xmi.XMLResource;
 import org.eclipse.emf.ecore.xmi.impl.SAXXMIHandler;
 import org.eclipse.emf.ecore.xmi.impl.XMILoadImpl;
-import org.eclipse.epf.common.service.versioning.EPFVersions;
-import org.eclipse.epf.common.service.versioning.VersionUtil;
+import org.eclipse.epf.common.serviceability.EPFVersions;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
@@ -46,16 +45,14 @@ public class MultiFileXMILoadImpl extends XMILoadImpl {
 		return new SAXXMIHandler(resource, helper, options) {
 			  
 			protected EStructuralFeature getFeature(EObject object, String prefix, String name, boolean isElement) {
-				//shijin Defect 42141 [version information]should not have activte the action of  setting the "version" attribute when read "rmc:version" attribute
-				if (EPFVersions.TOOL_ID.equals(prefix) || VersionUtil.getPrimaryToolID().equals(prefix)) {
+				if (EPFVersions.TOOL_ID.equals(prefix)) {
 					return null;
 				}
 				return super.getFeature(object, prefix, name, isElement);
 			}
 			
 			protected void handleUnknownFeature(String prefix, String name, boolean isElement, EObject peekObject, String value) {
-				//shijin Defect42141 just like dealing with the "epf:version"
-				if (EPFVersions.TOOL_ID.equals(prefix) || VersionUtil.getPrimaryToolID().equals(prefix)) {
+				if (EPFVersions.TOOL_ID.equals(prefix)) {
 					return;
 				}
 				super.handleUnknownFeature(prefix, name, isElement, peekObject, value);

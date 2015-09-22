@@ -13,7 +13,6 @@ package org.eclipse.epf.library.edit.process.command;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -22,21 +21,21 @@ import org.eclipse.emf.common.command.CompoundCommand;
 import org.eclipse.emf.common.command.IdentityCommand;
 import org.eclipse.emf.common.command.UnexecutableCommand;
 import org.eclipse.emf.common.notify.AdapterFactory;
+import org.eclipse.emf.common.ui.viewer.IViewerProvider;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.epf.library.edit.command.ResourceAwareCompoundCommand;
 import org.eclipse.epf.library.edit.command.ResourceAwareDragAndDropCommand;
-import org.eclipse.epf.library.edit.ui.UserInteractionHelper;
-import org.eclipse.epf.library.edit.util.ProcessScopeUtil;
-import org.eclipse.epf.library.edit.util.ProcessUtil;
+import org.eclipse.epf.library.edit.util.ExposedAdapterFactory;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.edit.validation.DependencyChecker;
 import org.eclipse.epf.uma.Activity;
 import org.eclipse.epf.uma.BreakdownElement;
-import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.Process;
-import org.eclipse.epf.uma.util.Scope;
+import org.eclipse.epf.uma.ProcessComponent;
+import org.eclipse.jface.viewers.IContentProvider;
+import org.eclipse.jface.viewers.Viewer;
 
 
 /**
@@ -68,24 +67,12 @@ public abstract class BSDragAndDropCommand extends ResourceAwareDragAndDropComma
 	protected boolean prepareDropLinkOn() {
 		dragCommand = IdentityCommand.INSTANCE;
 		dropCommand = UnexecutableCommand.INSTANCE;
-		
-		Scope scope = null;
-		if (owner instanceof Activity) {
-			Process proc = ProcessUtil.getProcess((Activity) owner); 
-			scope = ProcessScopeUtil.getInstance().getScope(proc);
-		}
-		
+
 		ArrayList list = new ArrayList();
 		ArrayList actList = new ArrayList();
 		for (Iterator iter = collection.iterator(); iter.hasNext();) {
 			Object obj = iter.next();
 			Object e = TngUtil.unwrap(obj);
-			
-			if (scope != null && e instanceof MethodElement) {
-				ProcessScopeUtil.getInstance().addReferenceToScope(
-						scope, (MethodElement) e, new HashSet<MethodElement>());
-			}
-			
 			if (TngUtil.isLocked((EObject) owner))
 				return false;
 			if (accept(e)) {
@@ -116,7 +103,7 @@ public abstract class BSDragAndDropCommand extends ResourceAwareDragAndDropComma
 				// since introduction of deep-copy. Deep copy can always be applied regardless of source and target
 				// processes.
 				//
-				actList.add(e);
+				actList.add(obj);
 			}
 		}
 
@@ -139,12 +126,26 @@ public abstract class BSDragAndDropCommand extends ResourceAwareDragAndDropComma
 		return result;
 	}
 
-	protected Object getTargetViewer() {
+	protected Viewer getTargetViewer() {
 		if (domain instanceof AdapterFactoryEditingDomain) {
 			Process proc = TngUtil.getOwningProcess((BreakdownElement) owner);
 			AdapterFactory adapterFactory = ((AdapterFactoryEditingDomain) domain)
 					.getAdapterFactory();
-			return UserInteractionHelper.getUIHelper().getViewer(adapterFactory, proc);
+			if (adapterFactory instanceof ExposedAdapterFactory) {
+				for (Iterator iter = Collections.unmodifiableList(
+						((ExposedAdapterFactory) adapterFactory)
+								.getChangeListeners()).iterator(); iter
+						.hasNext();) {
+					Object listener = iter.next();
+					if (listener instanceof IContentProvider && listener instanceof IViewerProvider) {					
+						Viewer viewer = ((IViewerProvider) listener).getViewer();
+						if (viewer.getInput() instanceof ProcessComponent
+								&& ((ProcessComponent) viewer.getInput())
+										.getProcess() == proc)
+							return viewer;
+					}
+				}
+			}
 		}
 		return null;
 	}

@@ -12,7 +12,6 @@ package org.eclipse.epf.common.utils;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IPath;
@@ -31,7 +30,6 @@ import com.ibm.icu.util.StringTokenizer;
  * @since 1.0
  */
 public class StrUtil {
-	public static final String EMPTY_STRING = ""; //$NON-NLS-1$
 
 	public static final String TAB = "\t"; //$NON-NLS-1$
 
@@ -69,10 +67,6 @@ public class StrUtil {
 	public static final String HTML_REG = "&reg;";//$NON-NLS-1$ 
 
 	public static final String HTML_TRADEMARK = "&trade;";//$NON-NLS-1$
-	
-	public static boolean during_migration = false;
-	
-	private static StrUtilOptions options;
 
 	/**
 	 * Private constructor to prevent this class from being instantiated. All
@@ -141,29 +135,6 @@ public class StrUtil {
 			}
 		}
 		return ""; //$NON-NLS-1$
-	}
-
-	/**
-	 * Removes CR, LF from a string.
-	 * 
-	 * @param str
-	 *            a string
-	 * @return a string with CR, LF removed
-	 */
-	public static String removeNewlines(String str) {
-		StringBuffer sb = new StringBuffer();
-		int len = (str == null) ? 0 : str.length();
-		for (int i = 0; i < len; i++) {
-			char c = str.charAt(i);
-			switch (c) {
-			case '\r':
-			case '\n':
-				break;
-			default:
-				sb.append(c);
-			}
-		}
-		return sb.toString(); 
 	}
 
 	/**
@@ -362,7 +333,6 @@ public class StrUtil {
 			return ""; //$NON-NLS-1$
 		}
 
-		StrUtilOptions options = getOptions();
 		StringBuffer result = new StringBuffer();
 		int length = html.length();
 		for (int i = 0; i < length; i++) {
@@ -372,38 +342,13 @@ public class StrUtil {
 				if (i + 4 < length) {
 					String hexStr = html.substring(i + 1, i + 5);
 					boolean validHextStr = true;
-					
 					for (int j = 0; j < hexStr.length(); j++) {
 						char c = hexStr.charAt(j);
-						if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))) {
+						if (!(c >= '0' && c <= '9') || (c >= 'a' && c <= 'f')) {
 							validHextStr = false;
 							break;
 						}
 					}
-					
-					if (options == null) {
-						//code below will treat "%20de" as " de"
-						//this may lose some double bytes character(e.g. Chinese), which start with %20, but keep all url links
-						//so far open this convertion not only during library migration to support file like "my design.gif"
-						if (/*during_migration && */validHextStr) {
-							if (hexStr.startsWith("20")) { //$NON-NLS-1$
-								result.append("%20"); //$NON-NLS-1$
-								i += 2;
-								break;
-							}
-						}
-					} else {
-						int ix = options.getRteUrlDecodingOption();
-						if (ix == 1) {
-							validHextStr = false;
-						} else if (ix == 2) {
-							String key = getHexStr("%" + hexStr);
-							if (key != null && options.getRteUrlDecodingHexMap().containsKey(key)) {
-								validHextStr = false;
-							}
-						}
-					}
-					
 					if (validHextStr) {
 						try {
 							int codePoint = Integer.parseInt(hexStr, 16);
@@ -411,11 +356,7 @@ public class StrUtil {
 							result.append(c);
 							i += 4;
 							break;
-						} catch (NumberFormatException e) {
-							// wasn't a valid hex string..
-							// fall through to the result.append(ch)
 						} catch (Exception e) {
-							CommonPlugin.getDefault().getLogger().logError(e);
 						}
 					}
 				}
@@ -615,62 +556,4 @@ public class StrUtil {
 		return null;
 	}
 
-	public static String escapeChar(String text, char c) {
-		int i=text.indexOf(c); 
-		if ( i < 0 ) {
-			return text;
-		}
-		
-		int start = 0;
-		StringBuffer buffer = new StringBuffer();
-		while ( i > start ) {
-			buffer.append(text.substring(start, i)).append("\\"); //$NON-NLS-1$
-			start = i;
-			i=text.indexOf(c, start+1); 
-		}
-		
-		buffer.append(text.substring(start));
-		
-		return buffer.toString();
-	}
-	
-	public static String getHexStr(String str) {
-		if (str.length() < 3) {
-			return null;
-		}
-		if (str.charAt(0) != '%') {
-			return null;
-		}
-		StringBuffer b = new StringBuffer();
-		b.append('%');
-		for (int i = 1 ; i <= 2; i++) {
-			char c = str.charAt(i);
-			if (c >= 'a' && c <= 'z') {
-				c -= 'a';
-				c += 'A'; 
-			} 			
-			boolean valid = (c >= '0' && c <= '9') ||
-							(c >= 'A' && c <= 'F');
-			if (!valid) {
-				return null;
-			}
-			b.append(c);			
-		}
-		
-		return b.toString();
-	}
-	
-	public interface StrUtilOptions {
-		int getRteUrlDecodingOption();
-		Map<String, String> getRteUrlDecodingHexMap();		
-	}
-
-	public static StrUtilOptions getOptions() {
-		return options;
-	}
-
-	public static void setOptions(StrUtilOptions options) {
-		StrUtil.options = options;
-	}
-	
 }

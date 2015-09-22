@@ -14,10 +14,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.epf.common.utils.StrUtil;
+import org.eclipse.epf.library.LibraryPlugin;
 import org.eclipse.epf.library.configuration.ConfigurationHelper;
-import org.eclipse.epf.library.edit.configuration.PracticeSubgroupItemProvider;
 import org.eclipse.epf.library.layout.ElementLayoutManager;
-import org.eclipse.epf.library.layout.HtmlBuilder;
 import org.eclipse.epf.library.layout.IElementLayout;
 import org.eclipse.epf.library.layout.LayoutInfo;
 import org.eclipse.epf.library.layout.util.XmlElement;
@@ -31,7 +30,6 @@ import org.eclipse.epf.uma.MethodElement;
  * The summarypage layout a list of elements referenced by the owner element
  * 
  * @author Jinhua Xi
- * @author Weiping Lu
  * @since 1.0
  */
 public class SummaryPageLayout implements IElementLayout {
@@ -49,11 +47,7 @@ public class SummaryPageLayout implements IElementLayout {
 	String title;
 	
 	String prefix;
-	
-	private String typeName;
 
-	private HtmlBuilder htmlBuilder;
-	
 	// String fileName;
 	IElementLayout elementLayout;
 
@@ -66,16 +60,11 @@ public class SummaryPageLayout implements IElementLayout {
 //
 //		this.elementLayout = layoutManager.getLayout(element, true);
 //	}
-	public SummaryPageLayout(ElementLayoutManager layoutManager,
-			MethodElement element, String prefix, String title, List refList) {
-		this(layoutManager, element, prefix, title, refList, null);
-	}
 	
 	public SummaryPageLayout(ElementLayoutManager layoutManager,
 			MethodElement element, String prefix, String title, 
-			List refList, String typeName) 
+			List refList) 
 	{
-		this.typeName = typeName;
 		this.layoutManager = layoutManager;
 		this.element = element;
 		this.refList = refList;
@@ -130,10 +119,6 @@ public class SummaryPageLayout implements IElementLayout {
 		return elementLayout.getFilePath();
 	}
 
-	public String getNoAdjustedElementPath() {
-		return elementLayout.getNoAdjustedElementPath();
-	}
-	
 	public String getFilePath(IElementLayout relativeTo) {
 		return elementLayout.getFilePath(relativeTo);
 	}
@@ -168,10 +153,6 @@ public class SummaryPageLayout implements IElementLayout {
 				.setAttribute("BackPath", getBackPath()) //$NON-NLS-1$
 				.setAttribute("ImageUrl", getShapeiconUrl()) //$NON-NLS-1$
 				.setAttribute("DisplayName", getDisplayName()); //$NON-NLS-1$
-		
-		if (typeName != null) {
-			elementXml.setAttribute("TypeName", typeName);//$NON-NLS-1$
-		}
 
 		if (includeReferences) {
 			
@@ -197,19 +178,6 @@ public class SummaryPageLayout implements IElementLayout {
 							// elements, otherwise, may cause deadlock
 							refXml.addChild(l.getXmlElement(false));
 						}
-					}
-				} else if (e instanceof PracticeSubgroupItemProvider) {
-					PracticeSubgroupItemProvider provider = (PracticeSubgroupItemProvider) e;
-					IElementLayout l = new SummaryPageLayout(getLayoutMgr(),
-							provider.getPractice(), provider.getPrefix(),
-							provider.getText(null), (List) provider
-									.getChildren(null), provider.getText(null));
-					refXml.addChild(l.getXmlElement(false));
-					
-					//This is a short cut approach.
-					//To do: generalize layoutManager to handle non method element layouts
-					if (!this.layoutManager.isPublishingMode() && htmlBuilder != null) {
-						htmlBuilder.generateHtml(l);						
 					}
 				}
 			}
@@ -249,10 +217,6 @@ public class SummaryPageLayout implements IElementLayout {
 	}
 	
 	public void setShowElementLink(boolean show) {
-	}
-
-	public void setHtmlBuilder(HtmlBuilder htmlBuilder) {
-		this.htmlBuilder = htmlBuilder;
 	}
 
 }

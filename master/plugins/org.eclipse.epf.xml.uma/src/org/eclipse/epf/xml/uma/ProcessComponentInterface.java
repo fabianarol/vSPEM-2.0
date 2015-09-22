@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: ProcessComponentInterface.java,v 1.4 2007/05/04 22:46:43 klow Exp $
+ */
 package org.eclipse.epf.xml.uma;
 
 import org.eclipse.emf.common.util.EList;
@@ -25,7 +21,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link org.eclipse.epf.xml.uma.ProcessComponentInterface#getGroup2 <em>Group2</em>}</li>
+ *   <li>{@link org.eclipse.epf.xml.uma.ProcessComponentInterface#getGroup1 <em>Group1</em>}</li>
  *   <li>{@link org.eclipse.epf.xml.uma.ProcessComponentInterface#getInterfaceSpecification <em>Interface Specification</em>}</li>
  *   <li>{@link org.eclipse.epf.xml.uma.ProcessComponentInterface#getInterfaceIO <em>Interface IO</em>}</li>
  * </ul>
@@ -37,21 +33,21 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  */
 public interface ProcessComponentInterface extends BreakdownElement {
 	/**
-	 * Returns the value of the '<em><b>Group2</b></em>' attribute list.
+	 * Returns the value of the '<em><b>Group1</b></em>' attribute list.
 	 * The list contents are of type {@link org.eclipse.emf.ecore.util.FeatureMap.Entry}.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Group2</em>' attribute list isn't clear,
+	 * If the meaning of the '<em>Group1</em>' attribute list isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Group2</em>' attribute list.
-	 * @see org.eclipse.epf.xml.uma.UmaPackage#getProcessComponentInterface_Group2()
+	 * @return the value of the '<em>Group1</em>' attribute list.
+	 * @see org.eclipse.epf.xml.uma.UmaPackage#getProcessComponentInterface_Group1()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
-	 *        extendedMetaData="kind='group' name='group:30'"
+	 *        extendedMetaData="kind='group' name='group:20'"
 	 * @generated
 	 */
-	FeatureMap getGroup2();
+	FeatureMap getGroup1();
 
 	/**
 	 * Returns the value of the '<em><b>Interface Specification</b></em>' containment reference list.
@@ -64,11 +60,11 @@ public interface ProcessComponentInterface extends BreakdownElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Interface Specification</em>' containment reference list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getProcessComponentInterface_InterfaceSpecification()
-	 * @model containment="true" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='InterfaceSpecification' group='#group:30'"
+	 * @model type="org.eclipse.epf.xml.uma.TaskDescriptor" containment="true" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='InterfaceSpecification' group='#group:20'"
 	 * @generated
 	 */
-	EList<TaskDescriptor> getInterfaceSpecification();
+	EList getInterfaceSpecification();
 
 	/**
 	 * Returns the value of the '<em><b>Interface IO</b></em>' containment reference list.
@@ -81,10 +77,10 @@ public interface ProcessComponentInterface extends BreakdownElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Interface IO</em>' containment reference list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getProcessComponentInterface_InterfaceIO()
-	 * @model containment="true" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='InterfaceIO' group='#group:30'"
+	 * @model type="org.eclipse.epf.xml.uma.WorkProductDescriptor" containment="true" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='InterfaceIO' group='#group:20'"
 	 * @generated
 	 */
-	EList<WorkProductDescriptor> getInterfaceIO();
+	EList getInterfaceIO();
 
 } // ProcessComponentInterface

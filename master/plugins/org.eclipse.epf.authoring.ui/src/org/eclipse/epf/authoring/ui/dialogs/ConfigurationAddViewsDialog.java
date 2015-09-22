@@ -10,12 +10,9 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.authoring.ui.dialogs;
 
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
-import org.eclipse.epf.uma.CustomCategory;
 import org.eclipse.epf.uma.DescribableElement;
-import org.eclipse.epf.uma.util.UmaUtil;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
@@ -48,12 +45,7 @@ public class ConfigurationAddViewsDialog extends ItemsFilterDialog {
 				}
 				if (presentationName == null || "".equals(presentationName)) { //$NON-NLS-1$
 					presentationName = super.getText(object);
-				}			
-				if (object instanceof CustomCategory) {
-					String pluginName = UmaUtil.getMethodPlugin((EObject)object).getName();
-					presentationName = presentationName + " (" + pluginName + ")"; //$NON-NLS-1$ //$NON-NLS-2$
 				}
-				
 				return presentationName;
 			}
 		};

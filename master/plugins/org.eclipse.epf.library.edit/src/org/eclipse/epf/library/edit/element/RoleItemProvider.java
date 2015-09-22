@@ -13,10 +13,15 @@ package org.eclipse.epf.library.edit.element;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.edit.command.CopyCommand.Helper;
+import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.epf.library.edit.util.TngUtil;
+import org.eclipse.epf.uma.edit.command.MethodElementCreateCopyCommand;
+import org.eclipse.epf.uma.edit.command.MethodElementInitializeCopyCommand;
 
 /**
  * The item provider adapter for a role.
@@ -79,6 +84,16 @@ public class RoleItemProvider extends org.eclipse.epf.uma.provider.RoleItemProvi
 		return TngUtil.getLabel(object, getString("_UI_Role_type")); //$NON-NLS-1$
 	}
 
+	protected Command createInitializeCopyCommand(EditingDomain domain,
+			EObject owner, Helper helper) {
+		return new MethodElementInitializeCopyCommand(domain, owner, helper);
+	}
+
+	protected Command createCreateCopyCommand(EditingDomain domain,
+			EObject owner, Helper helper) {
+		return new MethodElementCreateCopyCommand(domain, owner, helper);
+	}
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.epf.uma.provider.RoleItemProvider#notifyChanged(org.eclipse.emf.common.notify.Notification)
 	 */
@@ -88,14 +103,5 @@ public class RoleItemProvider extends org.eclipse.epf.uma.provider.RoleItemProvi
 		TngUtil.refreshParentIfNameChanged(notification, this);
 		
 		super.notifyChanged(notification);
-	}
-	
-	@Override
-	public Object getImage(Object object) {
-		Object image = TngUtil.getCustomNodeIcon(object);
-		if(image != null) {
-			return image;
-		}
-		return super.getImage(object);
 	}
 }

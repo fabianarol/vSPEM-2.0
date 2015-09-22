@@ -20,7 +20,6 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.edit.provider.ComposeableAdapterFactory;
 import org.eclipse.emf.edit.provider.IEditingDomainItemProvider;
 import org.eclipse.emf.edit.provider.IItemLabelProvider;
-import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.IItemPropertySource;
 import org.eclipse.emf.edit.provider.IStructuredItemContentProvider;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
@@ -55,13 +54,11 @@ public class DiagramLinkItemProvider extends DiagramElementItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	public List<IItemPropertyDescriptor> getPropertyDescriptors(Object object) {
+	public List getPropertyDescriptors(Object object) {
 		if (itemPropertyDescriptors == null) {
 			super.getPropertyDescriptors(object);
 
 			addZoomPropertyDescriptor(object);
-			addViewportPropertyDescriptor(object);
 			addDiagramPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
@@ -88,25 +85,6 @@ public class DiagramLinkItemProvider extends DiagramElementItemProvider
 	}
 
 	/**
-	 * This adds a property descriptor for the Viewport feature.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected void addViewportPropertyDescriptor(Object object) {
-		itemPropertyDescriptors
-				.add(createItemPropertyDescriptor(
-						((ComposeableAdapterFactory) adapterFactory)
-								.getRootAdapterFactory(),
-						getResourceLocator(),
-						getString("_UI_DiagramLink_viewport_feature"), //$NON-NLS-1$
-						getString(
-								"_UI_PropertyDescriptor_description", "_UI_DiagramLink_viewport_feature", "_UI_DiagramLink_type"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						UmaPackage.Literals.DIAGRAM_LINK__VIEWPORT, true,
-						false, true, null, null, null));
-	}
-
-	/**
 	 * This adds a property descriptor for the Diagram feature.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -126,12 +104,39 @@ public class DiagramLinkItemProvider extends DiagramElementItemProvider
 	}
 
 	/**
+	 * This specifies how to implement {@link #getChildren} and is used to deduce an appropriate feature for an
+	 * {@link org.eclipse.emf.edit.command.AddCommand}, {@link org.eclipse.emf.edit.command.RemoveCommand} or
+	 * {@link org.eclipse.emf.edit.command.MoveCommand} in {@link #createCommand}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Collection getChildrenFeatures(Object object) {
+		if (childrenFeatures == null) {
+			super.getChildrenFeatures(object);
+			childrenFeatures.add(UmaPackage.Literals.DIAGRAM_LINK__VIEWPORT);
+		}
+		return childrenFeatures;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected EStructuralFeature getChildFeature(Object object, Object child) {
+		// Check the type of the specified child object and return the proper feature to use for
+		// adding (see {@link AddCommand}) it as a child.
+
+		return super.getChildFeature(object, child);
+	}
+
+	/**
 	 * This returns DiagramLink.gif.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object getImage(Object object) {
 		return overlayImage(object, getResourceLocator().getImage(
 				"full/obj16/DiagramLink")); //$NON-NLS-1$
@@ -143,7 +148,6 @@ public class DiagramLinkItemProvider extends DiagramElementItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String getText(Object object) {
 		String label = ((DiagramLink) object).getName();
 		return label == null || label.length() == 0 ? getString("_UI_DiagramLink_type") : //$NON-NLS-1$
@@ -157,7 +161,6 @@ public class DiagramLinkItemProvider extends DiagramElementItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void notifyChanged(Notification notification) {
 		updateChildren(notification);
 
@@ -165,6 +168,10 @@ public class DiagramLinkItemProvider extends DiagramElementItemProvider
 		case UmaPackage.DIAGRAM_LINK__ZOOM:
 			fireNotifyChanged(new ViewerNotification(notification, notification
 					.getNotifier(), false, true));
+			return;
+		case UmaPackage.DIAGRAM_LINK__VIEWPORT:
+			fireNotifyChanged(new ViewerNotification(notification, notification
+					.getNotifier(), true, false));
 			return;
 		}
 		super.notifyChanged(notification);
@@ -177,10 +184,13 @@ public class DiagramLinkItemProvider extends DiagramElementItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	protected void collectNewChildDescriptors(
-			Collection<Object> newChildDescriptors, Object object) {
+	protected void collectNewChildDescriptors(Collection newChildDescriptors,
+			Object object) {
 		super.collectNewChildDescriptors(newChildDescriptors, object);
+
+		newChildDescriptors.add(createChildParameter(
+				UmaPackage.Literals.DIAGRAM_LINK__VIEWPORT,
+				UmaFactory.eINSTANCE.createPoint()));
 	}
 
 	/**
@@ -189,7 +199,6 @@ public class DiagramLinkItemProvider extends DiagramElementItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public ResourceLocator getResourceLocator() {
 		return UmaEditPlugin.INSTANCE;
 	}

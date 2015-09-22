@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: ContentElementImpl.java,v 1.4 2007/06/05 21:14:59 klow Exp $
+ */
 package org.eclipse.epf.xml.uma.impl;
 
 import java.util.Collection;
@@ -86,7 +82,7 @@ public class ContentElementImpl extends DescribableElementImpl implements Conten
 	 * @generated
 	 * @ordered
 	 */
-	protected static final VariabilityType VARIABILITY_TYPE_EDEFAULT = VariabilityType.NA;
+	protected static final VariabilityType VARIABILITY_TYPE_EDEFAULT = VariabilityType.NA_LITERAL;
 
 	/**
 	 * The cached value of the '{@link #getVariabilityType() <em>Variability Type</em>}' attribute.
@@ -121,7 +117,6 @@ public class ContentElementImpl extends DescribableElementImpl implements Conten
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.CONTENT_ELEMENT;
 	}
@@ -143,7 +138,7 @@ public class ContentElementImpl extends DescribableElementImpl implements Conten
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<String> getChecklist() {
+	public EList getChecklist() {
 		return getGroup1().list(UmaPackage.Literals.CONTENT_ELEMENT__CHECKLIST);
 	}
 
@@ -152,7 +147,7 @@ public class ContentElementImpl extends DescribableElementImpl implements Conten
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<String> getConcept() {
+	public EList getConcept() {
 		return getGroup1().list(UmaPackage.Literals.CONTENT_ELEMENT__CONCEPT);
 	}
 
@@ -161,7 +156,7 @@ public class ContentElementImpl extends DescribableElementImpl implements Conten
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<String> getExample() {
+	public EList getExample() {
 		return getGroup1().list(UmaPackage.Literals.CONTENT_ELEMENT__EXAMPLE);
 	}
 
@@ -170,7 +165,7 @@ public class ContentElementImpl extends DescribableElementImpl implements Conten
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<String> getGuideline() {
+	public EList getGuideline() {
 		return getGroup1().list(UmaPackage.Literals.CONTENT_ELEMENT__GUIDELINE);
 	}
 
@@ -179,7 +174,7 @@ public class ContentElementImpl extends DescribableElementImpl implements Conten
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<String> getReusableAsset() {
+	public EList getReusableAsset() {
 		return getGroup1().list(UmaPackage.Literals.CONTENT_ELEMENT__REUSABLE_ASSET);
 	}
 
@@ -188,7 +183,7 @@ public class ContentElementImpl extends DescribableElementImpl implements Conten
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<String> getSupportingMaterial() {
+	public EList getSupportingMaterial() {
 		return getGroup1().list(UmaPackage.Literals.CONTENT_ELEMENT__SUPPORTING_MATERIAL);
 	}
 
@@ -197,7 +192,7 @@ public class ContentElementImpl extends DescribableElementImpl implements Conten
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<String> getWhitepaper() {
+	public EList getWhitepaper() {
 		return getGroup1().list(UmaPackage.Literals.CONTENT_ELEMENT__WHITEPAPER);
 	}
 
@@ -273,11 +268,10 @@ public class ContentElementImpl extends DescribableElementImpl implements Conten
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 			case UmaPackage.CONTENT_ELEMENT__GROUP1:
-				return ((InternalEList<?>)getGroup1()).basicRemove(otherEnd, msgs);
+				return ((InternalEList)getGroup1()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -287,7 +281,6 @@ public class ContentElementImpl extends DescribableElementImpl implements Conten
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 			case UmaPackage.CONTENT_ELEMENT__GROUP1:
@@ -320,8 +313,6 @@ public class ContentElementImpl extends DescribableElementImpl implements Conten
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-		@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 			case UmaPackage.CONTENT_ELEMENT__GROUP1:
@@ -329,31 +320,31 @@ public class ContentElementImpl extends DescribableElementImpl implements Conten
 				return;
 			case UmaPackage.CONTENT_ELEMENT__CHECKLIST:
 				getChecklist().clear();
-				getChecklist().addAll((Collection<? extends String>)newValue);
+				getChecklist().addAll((Collection)newValue);
 				return;
 			case UmaPackage.CONTENT_ELEMENT__CONCEPT:
 				getConcept().clear();
-				getConcept().addAll((Collection<? extends String>)newValue);
+				getConcept().addAll((Collection)newValue);
 				return;
 			case UmaPackage.CONTENT_ELEMENT__EXAMPLE:
 				getExample().clear();
-				getExample().addAll((Collection<? extends String>)newValue);
+				getExample().addAll((Collection)newValue);
 				return;
 			case UmaPackage.CONTENT_ELEMENT__GUIDELINE:
 				getGuideline().clear();
-				getGuideline().addAll((Collection<? extends String>)newValue);
+				getGuideline().addAll((Collection)newValue);
 				return;
 			case UmaPackage.CONTENT_ELEMENT__REUSABLE_ASSET:
 				getReusableAsset().clear();
-				getReusableAsset().addAll((Collection<? extends String>)newValue);
+				getReusableAsset().addAll((Collection)newValue);
 				return;
 			case UmaPackage.CONTENT_ELEMENT__SUPPORTING_MATERIAL:
 				getSupportingMaterial().clear();
-				getSupportingMaterial().addAll((Collection<? extends String>)newValue);
+				getSupportingMaterial().addAll((Collection)newValue);
 				return;
 			case UmaPackage.CONTENT_ELEMENT__WHITEPAPER:
 				getWhitepaper().clear();
-				getWhitepaper().addAll((Collection<? extends String>)newValue);
+				getWhitepaper().addAll((Collection)newValue);
 				return;
 			case UmaPackage.CONTENT_ELEMENT__VARIABILITY_BASED_ON_ELEMENT:
 				setVariabilityBasedOnElement((String)newValue);
@@ -370,7 +361,6 @@ public class ContentElementImpl extends DescribableElementImpl implements Conten
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 			case UmaPackage.CONTENT_ELEMENT__GROUP1:
@@ -412,7 +402,6 @@ public class ContentElementImpl extends DescribableElementImpl implements Conten
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 			case UmaPackage.CONTENT_ELEMENT__GROUP1:
@@ -444,7 +433,6 @@ public class ContentElementImpl extends DescribableElementImpl implements Conten
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 

@@ -11,8 +11,6 @@
 package org.eclipse.epf.authoring.ui.preferences;
 
 import org.eclipse.epf.authoring.ui.AuthoringUIResources;
-import org.eclipse.epf.common.preferences.IPreferenceStoreWrapper;
-import org.eclipse.epf.common.ui.PreferenceStoreWrapper;
 import org.eclipse.epf.library.LibraryPlugin;
 import org.eclipse.epf.library.ui.LibraryUIPlugin;
 import org.eclipse.epf.library.ui.preferences.LibraryUIPreferences;
@@ -242,11 +240,7 @@ public class BreakdownElementPrefPage extends BasePreferencePage implements
 	 * @see org.eclipse.epf.authoring.ui.preferences.CommonPrefPage#doGetPreferenceStore()
 	 */
 	protected IPreferenceStore doGetPreferenceStore() {
-		IPreferenceStoreWrapper wrapper = LibraryPlugin.getDefault().getPreferenceStore();
-		if ( wrapper instanceof PreferenceStoreWrapper ) {
-			return ((PreferenceStoreWrapper)wrapper).getStore();
-		}
-		return null;
+		return LibraryPlugin.getDefault().getPreferenceStore();
 	}
 
 }

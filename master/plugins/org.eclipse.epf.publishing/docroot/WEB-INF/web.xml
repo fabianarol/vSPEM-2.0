@@ -10,7 +10,7 @@
   	<servlet-class>org.eclipse.epf.web.servlet.SearchServlet</servlet-class>
   	<init-param>
   		<param-name>searchIndex</param-name>
-  		<param-value>/search/index</param-value>
+  		<param-value>search/index</param-value>
   	</init-param>
   	<init-param>
   		<param-name>xslFile</param-name>

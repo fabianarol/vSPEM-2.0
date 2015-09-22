@@ -42,6 +42,13 @@ import org.eclipse.epf.uma.WorkOrder;
 public abstract class WorkBreakdownElementImpl extends BreakdownElementImpl
 		implements WorkBreakdownElement {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The default value of the '{@link #getIsRepeatable() <em>Is Repeatable</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -109,7 +116,7 @@ public abstract class WorkBreakdownElementImpl extends BreakdownElementImpl
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<WorkOrder> linkToPredecessor;
+	protected EList linkToPredecessor = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -121,7 +128,7 @@ public abstract class WorkBreakdownElementImpl extends BreakdownElementImpl
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -129,7 +136,6 @@ public abstract class WorkBreakdownElementImpl extends BreakdownElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.WORK_BREAKDOWN_ELEMENT;
 	}
@@ -208,10 +214,10 @@ public abstract class WorkBreakdownElementImpl extends BreakdownElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<WorkOrder> getLinkToPredecessor() {
+	public List getLinkToPredecessor() {
 		if (linkToPredecessor == null) {
-			linkToPredecessor = new EObjectResolvingEList<WorkOrder>(
-					WorkOrder.class, this,
+			linkToPredecessor = new EObjectResolvingEList(WorkOrder.class,
+					this,
 					UmaPackage.WORK_BREAKDOWN_ELEMENT__LINK_TO_PREDECESSOR);
 		}
 		return linkToPredecessor;
@@ -222,7 +228,6 @@ public abstract class WorkBreakdownElementImpl extends BreakdownElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.WORK_BREAKDOWN_ELEMENT__IS_REPEATABLE:
@@ -242,8 +247,6 @@ public abstract class WorkBreakdownElementImpl extends BreakdownElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.WORK_BREAKDOWN_ELEMENT__IS_REPEATABLE:
@@ -257,8 +260,7 @@ public abstract class WorkBreakdownElementImpl extends BreakdownElementImpl
 			return;
 		case UmaPackage.WORK_BREAKDOWN_ELEMENT__LINK_TO_PREDECESSOR:
 			getLinkToPredecessor().clear();
-			getLinkToPredecessor().addAll(
-					(Collection<? extends WorkOrder>) newValue);
+			getLinkToPredecessor().addAll((Collection) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -269,7 +271,6 @@ public abstract class WorkBreakdownElementImpl extends BreakdownElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.WORK_BREAKDOWN_ELEMENT__IS_REPEATABLE:
@@ -293,7 +294,6 @@ public abstract class WorkBreakdownElementImpl extends BreakdownElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);
@@ -322,7 +322,6 @@ public abstract class WorkBreakdownElementImpl extends BreakdownElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy())
 			return super.toString();

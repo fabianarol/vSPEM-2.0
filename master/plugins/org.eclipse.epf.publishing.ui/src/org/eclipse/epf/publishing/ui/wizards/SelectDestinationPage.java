@@ -17,18 +17,19 @@ import java.util.List;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.epf.authoring.ui.AuthoringUIText;
+import org.eclipse.epf.common.preferences.CommonPreferences;
 import org.eclipse.epf.common.utils.StrUtil;
 import org.eclipse.epf.publishing.ui.PublishingUIPlugin;
 import org.eclipse.epf.publishing.ui.PublishingUIResources;
 import org.eclipse.epf.publishing.ui.preferences.PublishingUIPreferences;
 import org.eclipse.epf.ui.wizards.BaseWizardPage;
 import org.eclipse.epf.uma.MethodConfiguration;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -53,6 +54,9 @@ public class SelectDestinationPage extends BaseWizardPage {
 
 	public static final String SPLIT_PREFERENCE_DELIMITER = "\\" + PREFERENCE_DELIMITER;//$NON-NLS-1$
 
+	private String defaultPath = PublishingUIPreferences
+			.getDefaultPublishPath();
+
 	protected Shell shell;
 
 	protected Combo dirCombo;
@@ -68,8 +72,6 @@ public class SelectDestinationPage extends BaseWizardPage {
 	protected Button javaWebAppRadioButton;
 
 	protected Composite javaWebAppComposite;
-	
-	protected Composite extendComposite;
 
 	protected Label webAppNameLabel;
 
@@ -78,8 +80,6 @@ public class SelectDestinationPage extends BaseWizardPage {
 	protected Button includeSearchCheckbox;
 
 	protected MethodConfiguration config;
-	
-	protected Composite composite;
 
 	protected List<MethodConfiguration> selectedConfigs = new ArrayList<MethodConfiguration>();
 
@@ -107,7 +107,7 @@ public class SelectDestinationPage extends BaseWizardPage {
 	public void createControl(Composite parent) {
 		shell = parent.getShell();
 
-		composite = createGridLayoutComposite(parent, 1);
+		Composite composite = createGridLayoutComposite(parent, 1);
 
 		Composite dirComposite = createGridLayoutComposite(composite, 3);
 
@@ -120,20 +120,19 @@ public class SelectDestinationPage extends BaseWizardPage {
 
 		webAppGroup = super.createGridLayoutGroup(composite,
 				PublishingUIResources.webAppGroup_text, 1);
-		javaWebAppRadioButton = createRadioButton(webAppGroup,
-				PublishingUIResources.dynamicWebAppRadioButton_text);
-		javaWebAppComposite = createChildGridLayoutComposite(webAppGroup, 3);
+
 		staticWebSiteRadioButton = createRadioButton(webAppGroup,
 				PublishingUIResources.staticWebSiteRadioButton_text);
 
-		staticWebSiteComposite = createChildGridLayoutComposite(webAppGroup, 3);
+		staticWebSiteComposite = createChildGridLayoutComposite(webAppGroup, 1);
+
+		javaWebAppRadioButton = createRadioButton(webAppGroup,
+				PublishingUIResources.dynamicWebAppRadioButton_text);
+
+		javaWebAppComposite = createChildGridLayoutComposite(webAppGroup, 3);
+
 		includeSearchCheckbox = createCheckbox(javaWebAppComposite,
 				PublishingUIResources.includeSearchCheckbox_text, 3);
-
-		extendComposite = createChildGridLayoutComposite(javaWebAppComposite, 1);
-		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-		gd.horizontalSpan = 3;
-		extendComposite.setLayoutData(gd);
 
 		webAppNameLabel = createLabel(javaWebAppComposite,
 				PublishingUIResources.webApplicationNameLabel_text);
@@ -155,7 +154,7 @@ public class SelectDestinationPage extends BaseWizardPage {
 
 		String dir = PublishingUIPreferences.getPublishPath(configId);
 		if (dir != null && dir.length() > 0) {
-			dirCombo.setItems(coverStringToArray(dir));
+			dirCombo.setItems(subArray(coverStringToArray(dir)));
 			dirCombo.select(0);
 		}
 
@@ -185,13 +184,6 @@ public class SelectDestinationPage extends BaseWizardPage {
 				setPageComplete(isPageComplete());
 			}
 		});
-		
-		dirCombo.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				String dir = dirCombo.getText();
-				processDirectory(dir);
-			}			
-		});
 
 		browseButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
@@ -200,8 +192,7 @@ public class SelectDestinationPage extends BaseWizardPage {
 							SWT.NONE);
 					String selectedDir = dialog.open();
 					if (selectedDir != null) {
-						String dir = selectedDir.trim();
-						processDirectory(dir);
+						dirCombo.setText(selectedDir);
 					}
 				} catch (Exception e) {
 					PublishingUIPlugin.getDefault().getLogger().logError(e);
@@ -226,6 +217,26 @@ public class SelectDestinationPage extends BaseWizardPage {
 				setPageComplete(isPageComplete());
 			}
 		});
+	}
+
+	protected String[] subArray(String[] arr) {
+		int ll = CommonPreferences.getPreferenceHistorySize();
+		if (ll < 1)
+			ll = CommonPreferences.getDefaultPreferenceHistorySize();
+
+		int arrLength = arr.length;
+
+		if (arrLength < ll && arr[0].equals(defaultPath))
+			return arr;
+
+		ll = arrLength >= ll ? ll : arrLength + 1;
+		String[] result = new String[ll];
+		for (int i = 0; i < ll - 1; i++) {
+			result[i] = arr[i];
+		}
+		result[ll - 1] = arr[0].equals(defaultPath) ? arr[ll] : defaultPath;
+
+		return result;
 	}
 
 	protected String[] coverStringToArray(String preferenceStr) {
@@ -309,27 +320,29 @@ public class SelectDestinationPage extends BaseWizardPage {
 	 */
 	public String getPublishDirectory() {
 		String dirText = dirCombo.getText().trim();
-		if (dirText.length() > 0) {			
-			File dir = new File(dirText);
+		if (dirText.length() > 0) {
+			File dir = new File(dirCombo.getText().trim());
 			return dir.getAbsolutePath();
 		}
-		
 		return dirText;
 	}
 
 	protected String[] getPublishDirectoryArray() {
-		String dir = dirCombo.getText().trim();
-		processDirectory(dir);
-		
-		return dirCombo.getItems();
-	}
-	
-	private void processDirectory(String dir) {
-		if (dirCombo.indexOf(dir) != -1) {
-			dirCombo.remove(dir);
+		String selectedtext = dirCombo.getText();
+
+		if (dirCombo.indexOf(selectedtext) > 0) {
+			dirCombo.remove(selectedtext);
 		}
-		dirCombo.add(dir, 0);
-		dirCombo.select(0);
+
+		if (dirCombo.indexOf(selectedtext) < 0) {
+			dirCombo.add(selectedtext, 0);
+		}
+
+		if (dirCombo.indexOf(defaultPath) > 0) {
+			dirCombo.remove(defaultPath);
+		}
+
+		return dirCombo.getItems();
 	}
 
 	/**
@@ -337,13 +350,6 @@ public class SelectDestinationPage extends BaseWizardPage {
 	 */
 	public boolean getStaticWebSiteSelection() {
 		return staticWebSiteRadioButton.getSelection();
-	}
-	
-	/**
-	 * Gets the user specified java web application selection.
-	 */
-	public boolean getJavaWebAppSelection() {
-		return javaWebAppRadioButton.getSelection();
 	}
 
 	/**

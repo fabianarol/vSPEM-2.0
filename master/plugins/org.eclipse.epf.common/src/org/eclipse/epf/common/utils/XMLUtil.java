@@ -17,20 +17,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
-import org.apache.tools.ant.util.ReaderInputStream;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -44,7 +37,6 @@ import org.xml.sax.SAXParseException;
  * 
  * @author Kelvin Low
  * @author Jinhua Xi
- * @author Phong Nguyen Le
  * @since 1.0
  */
 public class XMLUtil {
@@ -113,13 +105,7 @@ public class XMLUtil {
 			if (childNodes != null) {
 				for (int i = 0; i < childNodes.getLength(); i++) {
 					Node childNode = childNodes.item(i);
-					if (childNode == null) {
-						continue;
-					}
 					Node childClone = cloneNode(childNode, doc);
-					if (childClone == null) {
-						continue;
-					}
 					clone.appendChild(childClone);
 				}
 			}
@@ -516,15 +502,6 @@ public class XMLUtil {
 		return builder.parse(file);
 	}
 
-	public static Document loadXml(String xmlString) throws Exception {
-		DocumentBuilderFactory builderFactory = DocumentBuilderFactory
-				.newInstance();
-		DocumentBuilder builder = builderFactory.newDocumentBuilder();
-		ReaderInputStream istrem = new ReaderInputStream(new StringReader(xmlString), "UTF-8"); //$NON-NLS-1$
-		
-		return builder.parse(istrem);
-	}
-	
 	public static Document createDocument() throws Exception {
 		DocumentBuilderFactory builderFactory = DocumentBuilderFactory
 				.newInstance();
@@ -532,18 +509,6 @@ public class XMLUtil {
 		return builder.newDocument();
 	}
 
-	public static String toXmlString(Document doc) throws Exception {
-		DOMSource domSource = new DOMSource(doc);
-		StringWriter writer = new StringWriter();
-		StreamResult result = new StreamResult(writer);
-		TransformerFactory tf = TransformerFactory.newInstance();
-		Transformer transformer = tf.newTransformer();
-		transformer.transform(domSource, result);
-		writer.flush();
-
-		return writer.toString();
-	}
-	
 	/**
 	 * text of a leaf node, without child element
 	 * 
@@ -644,82 +609,4 @@ public class XMLUtil {
 		return new NodeIterator(nodes);
 	}
 
-	/**
-	 * Gets the list of immediate child elements with the given tag name.
-	 * 
-	 * @param element
-	 * @param tagName
-	 * @return list of {@link Element} objects
-	 */
-	public static List<Element> getChildElementsByTagName(Element element, String tagName) {	
-		List<Element> elements = new ArrayList<Element>();
-		NodeList list = element.getChildNodes();
-		int size = list.getLength(); 
-		if(size > 0) {
-			for (int i = 0; i < size; i++) {
-				Node node = list.item(i);
-				if(node instanceof Element) {
-					Element e = (Element) node;
-					if(e.getTagName().equals(tagName)) {
-						elements.add(e);
-					}
-				}
-			}
-		}
-		return elements;
-	}
-	
-	public static List<String> getChildTextsByTagName(Element element, String tagName) {	
-		List<Element> elements = getChildElementsByTagName(element, tagName);
-		List <String> list = new ArrayList<String>();
-		for (Element e : elements) {
-			String textValue = e.getTextContent().trim();
-			if (textValue.length() != 0) {
-				list.add(textValue);
-			}
-		}
-		return list;
-	}
-	
-	public static String getFirstChildTextByTagName(Element element, String tagName) {	
-		Element e = getFirstChildElementByTagName(element, tagName);
-		return e == null ? null : e.getTextContent().trim();
-	}
-	
-	/**
-	 * Gets the first element with the given tag name in the immediate child elements.
-	 * 
-	 * @param element
-	 * @param tagName
-	 * @return
-	 */
-	public static Element getFirstChildElementByTagName(Node element, String tagName) {
-		NodeList list = element.getChildNodes();
-		int size = list.getLength(); 
-		if(size > 0) {
-			for (int i = 0; i < size; i++) {
-				Node node = list.item(i);
-				if(node instanceof Element) {
-					Element e = (Element) node;
-					if(e.getTagName().equals(tagName)) {
-						return e;
-					}
-				}
-			}
-		}
-		return null;
-	}
-	
-	public static String removeBOM(String xml) {
-		return xml.trim().replaceFirst("^([\\W]+)<", "<"); //$NON-NLS-1$ //$NON-NLS-2$
-	}
-	
-	public static String elementToString(Element element) throws IOException {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		DataOutputStream dos = new DataOutputStream(baos);
-		writeNode(element, " ", dos); //$NON-NLS-1$
-		
-		return baos.toString();
-	}
-	
 }

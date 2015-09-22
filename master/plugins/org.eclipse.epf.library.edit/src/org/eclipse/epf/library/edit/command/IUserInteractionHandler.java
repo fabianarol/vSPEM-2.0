@@ -13,7 +13,8 @@ package org.eclipse.epf.library.edit.command;
 import java.util.List;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.emf.edit.provider.IItemLabelProvider;
+import org.eclipse.jface.operation.IRunnableContext;
+import org.eclipse.jface.viewers.ILabelProvider;
 
 /**
  * Interface to handle user interactions during command execution
@@ -127,7 +128,7 @@ public interface IUserInteractionHandler {
 	 * @return the collection of selected elements, or <code>null</code> if
 	 *         the selection was canceled.
 	 */
-	List select(List objectsToSelect, IItemLabelProvider labelProvider,
+	List select(List objectsToSelect, ILabelProvider labelProvider,
 			boolean multiple, List intitialSelection, String title, String msg);
 
 	/**
@@ -163,6 +164,13 @@ public interface IUserInteractionHandler {
 	 * @return the UI context
 	 */
 	Object getUIContext();
+
+	/**
+	 * Gets the runnable context.
+	 * 
+	 * @return the runnable context
+	 */
+	IRunnableContext getRunnableContext();
 
 	/**
 	 * Gets the messenger

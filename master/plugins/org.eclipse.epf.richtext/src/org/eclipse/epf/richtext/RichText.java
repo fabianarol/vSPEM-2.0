@@ -1,13 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
- *******************************************************************************/
 //------------------------------------------------------------------------------
 // Copyright (c) 2005, 2007 IBM Corporation and others.
 // All rights reserved. This program and the accompanying materials
@@ -31,19 +21,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.epf.common.CommonPlugin;
-import org.eclipse.epf.common.IHTMLFormatter;
+import org.eclipse.epf.common.html.HTMLFormatter;
 import org.eclipse.epf.common.serviceability.Logger;
-import org.eclipse.epf.common.utils.ExtensionHelper;
 import org.eclipse.epf.common.utils.FileUtil;
 import org.eclipse.epf.common.utils.XMLUtil;
 import org.eclipse.epf.common.xml.XSLTProcessor;
-import org.eclipse.epf.richtext.actions.AddColumnAction;
-import org.eclipse.epf.richtext.actions.AddRowAction;
 import org.eclipse.epf.richtext.actions.CopyAction;
 import org.eclipse.epf.richtext.actions.CutAction;
-import org.eclipse.epf.richtext.actions.DeleteLastColumnAction;
-import org.eclipse.epf.richtext.actions.DeleteLastRowAction;
 import org.eclipse.epf.richtext.actions.FindReplaceAction;
 import org.eclipse.epf.richtext.actions.PasteAction;
 import org.eclipse.epf.richtext.actions.PastePlainTextAction;
@@ -53,13 +37,9 @@ import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.StatusTextEvent;
 import org.eclipse.swt.browser.StatusTextListener;
-import org.eclipse.swt.dnd.Clipboard;
-import org.eclipse.swt.dnd.HTMLTransfer;
-import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.HelpListener;
-import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MenuEvent;
@@ -87,7 +67,6 @@ import org.eclipse.ui.PlatformUI;
  * 
  * @author Kelvin Low
  * @author Jeff Hardy
- * @author Shi Jin
  * @since 1.0
  */
 public class RichText implements IRichText {
@@ -98,31 +77,31 @@ public class RichText implements IRichText {
 
 	private static final String ENCODED_NEWLINE = "%EOL%"; //$NON-NLS-1$
 
-	protected static final String STATUS_PREFIX = "$$$"; //$NON-NLS-1$
+	private static final String STATUS_PREFIX = "$$$"; //$NON-NLS-1$
 
-	protected static final int STATUS_PREFIX_LENGTH = STATUS_PREFIX.length();
+	private static final int STATUS_PREFIX_LENGTH = STATUS_PREFIX.length();
 
-	protected static final int STATUS_NOP = 0;
+	private static final int STATUS_NOP = 0;
 
-	protected static final int STATUS_INITIALIZED = 1;
+	private static final int STATUS_INITIALIZED = 1;
 
-	protected static final int STATUS_MODIFIED = 2;
+	private static final int STATUS_MODIFIED = 2;
 
-	protected static final int STATUS_GET_TEXT = 3;
+	private static final int STATUS_GET_TEXT = 3;
 
-	protected static final int STATUS_KEY_DOWN = 4;
+	private static final int STATUS_KEY_DOWN = 4;
 
-	protected static final int STATUS_KEY_UP = 5;
+	private static final int STATUS_KEY_UP = 5;
 
-	protected static final int STATUS_SELECT_TEXT = 6;
+	private static final int STATUS_SELECT_TEXT = 6;
 
-	protected static final int STATUS_SELECT_CONTROL = 7;
+	private static final int STATUS_SELECT_CONTROL = 7;
 
-	protected static final int STATUS_SELECT_NONE = 8;
+	private static final int STATUS_SELECT_NONE = 8;
 
-	protected static final int STATUS_EXEC_CMD = 9;
+	private static final int STATUS_EXEC_CMD = 9;
 
-	protected static final int STATUS_REFORMAT_LINKS = 10;
+	private static final int STATUS_REFORMAT_LINKS = 10;
 
 	// The default base path used for resolving links (<href>, <img>, etc.)
 	private static final String DEFAULT_BASE_PATH = System
@@ -170,8 +149,6 @@ public class RichText implements IRichText {
 	// The control's current text.
 	protected String currentText = ""; //$NON-NLS-1$
 
-	private String currentRawText = "";	//$NON-NLS-1$
-
 	// The control's editable flag.
 	protected boolean editable = true;
 
@@ -188,7 +165,7 @@ public class RichText implements IRichText {
 	protected int status = 0;
 
 	// The HTML source formatter.
-	protected IHTMLFormatter htmlFormatter;
+	protected HTMLFormatter htmlFormatter;
 
 	// The SWT event listeners.
 	protected Map<Listener, RichTextListener> listeners;
@@ -213,15 +190,7 @@ public class RichText implements IRichText {
 	
 	// The control's IE flag
 	protected boolean isIE = false;
-	
-	// A event type indicate control has been initialized
-	public static final int RICH_TEXT_INITIALIZED_WIN32 = 98979695;
-	public static final int RICH_TEXT_INITIALIZED_LINUX = 98979694;
-	
-	protected static final int STATUS_SELECT_TABLE = 51;
-	// The table selection flag
-	protected boolean tableSelection;
-	
+
 	/**
 	 * Creates a new instance.
 	 * 
@@ -241,16 +210,7 @@ public class RichText implements IRichText {
 		setBasePath(basePath);
 
 		try {
-			boolean enableMozilla = false;
-			String enableMozillaProperty = System.getProperty("rte.enable.mozilla");
-			if (enableMozillaProperty != null) {
-				enableMozilla = Boolean.valueOf(enableMozillaProperty);
-			}
-			if (enableMozilla) {
-				editor = new Browser(parent, SWT.MOZILLA);
-			} else {
-				editor = new Browser(parent, SWT.NONE);
-			}
+			editor = new Browser(parent, SWT.NONE);
 			if (debug) {
 				printDebugMessage("RichText", "basePath=" + basePath); //$NON-NLS-1$ //$NON-NLS-2$
 			}
@@ -266,7 +226,6 @@ public class RichText implements IRichText {
 				e.printStackTrace();
 			}
 		}
-		tableSelection = false;
 	}
 
 	/**
@@ -339,9 +298,7 @@ public class RichText implements IRichText {
 				printDebugMessage("init", "added listeners"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
-//			htmlFormatter = new HTMLFormatter();
-			htmlFormatter = (IHTMLFormatter) ExtensionHelper.createExtensionForJTidy(
-					CommonPlugin.getDefault().getId(), "htmlFormatter"); //$NON-NLS-1$
+			htmlFormatter = new HTMLFormatter();
 			if (debug) {
 				printDebugMessage("init", "instantiated HTMLFormatter"); //$NON-NLS-1$ //$NON-NLS-2$
 			}
@@ -394,14 +351,12 @@ public class RichText implements IRichText {
 		}
 		if (editor != null) {
 			if (initialized) {
-				if (!editor.isFocusControl()) {
-					if (!Platform.getOS().equals("win32")) { //$NON-NLS-1$
-						// Workaround for Mozilla and Firefox rich text editor focus
-						// issue.
-						editor.setFocus();
-					}
-					executeCommand(RichTextCommand.SET_FOCUS);
+				if (!Platform.getOS().equals("win32")) { //$NON-NLS-1$
+					// Workaround for Mozilla and Firefox rich text editor focus
+					// issue.
+					editor.setFocus();
 				}
+				executeCommand(RichTextCommand.SET_FOCUS);
 				hasFocus = true;
 			} else {
 				initializedWithFocus = true;
@@ -564,8 +519,6 @@ public class RichText implements IRichText {
 				printDebugMessage("setText", "text=", text); //$NON-NLS-1$ //$NON-NLS-2$
 			}
 
-			setCurrentRawText(text);
-			
 			String newText = text;
 			if (newText != null) {
 				newText = tidyText(newText);
@@ -590,7 +543,7 @@ public class RichText implements IRichText {
 
 			if (initialized) {
 				try {
-					executeCommand(RichTextCommand.SET_TEXT, workaroundForObjectParamNode(newText));
+					executeCommand(RichTextCommand.SET_TEXT, newText);
 					executeCommand(RichTextCommand.SET_EDITABLE, "" + editable); //$NON-NLS-1$				
 				} catch (Exception e) {
 					logger.logError(e);
@@ -639,7 +592,7 @@ public class RichText implements IRichText {
 	 */
 	public Object getData(String key) {
 		if (editor != null) {
-			return editor.getData(key);
+			editor.getData(key);
 		}
 		return null;
 	}
@@ -672,14 +625,7 @@ public class RichText implements IRichText {
 				if (!isIE && processingJSEvent) {
 					Display.getCurrent().asyncExec(new Runnable() {
 						public void run() {
-							if (!isDisposed()) {
-								editor.execute(script);
-								if (!Platform.getOS().equals(Platform.OS_WIN32)) {
-									if (script.startsWith(RichTextCommand.SET_TEXT)) {
-										notifyListeners(RichText.RICH_TEXT_INITIALIZED_LINUX, new Event());
-									}
-								}
-							}
+							editor.execute(script);
 						}
 					});
 				} else {
@@ -1003,7 +949,7 @@ public class RichText implements IRichText {
 											"" + editor.getBounds().height); //$NON-NLS-1$
 								}
 								executeCommand(RichTextCommand.SET_TEXT,
-										workaroundForObjectParamNode(currentText));
+										currentText);
 								if (initializedWithFocus) {
 									setFocus();
 								}
@@ -1011,10 +957,6 @@ public class RichText implements IRichText {
 									executeCommand(
 											RichTextCommand.SET_EDITABLE,
 											"" + editable); //$NON-NLS-1$
-								}								
-								
-								if (Platform.getOS().equals(Platform.OS_WIN32)) {
-									notifyListeners(RichText.RICH_TEXT_INITIALIZED_WIN32, new Event());
 								}
 							}
 							break;
@@ -1029,8 +971,6 @@ public class RichText implements IRichText {
 							if (eventTextLength >= STATUS_PREFIX_LENGTH + 2) {
 								currentText = eventText
 										.substring(STATUS_PREFIX_LENGTH + 2);
-								
-								currentText = unWorkaroundForObjectParamNode(currentText); 
 							} else {
 								currentText = ""; //$NON-NLS-1$
 							}
@@ -1083,12 +1023,6 @@ public class RichText implements IRichText {
 							}
 							checkModify();
 							break;
-						case STATUS_SELECT_TABLE:
-							tableSelection = true;
-							
-							if (hasFocus())
-								notifyListeners(SWT.SELECTED, new Event());
-							break;
 						case STATUS_SELECT_TEXT:
 							if (eventTextLength >= STATUS_PREFIX_LENGTH + 2) {
 								String[] strings = eventText.substring(
@@ -1109,12 +1043,8 @@ public class RichText implements IRichText {
 											"selectionStatusListener", //$NON-NLS-1$
 											"current selection is=" + richTextSelection); //$NON-NLS-1$
 								}
-								if(strings[4].length() == 0) {
-									hasSelection = false;
-								} else {
-									hasSelection = true;
-								}
-								
+
+								hasSelection = true;
 								if (hasFocus())
 									notifyListeners(SWT.SELECTED, new Event());
 							} else {
@@ -1126,7 +1056,6 @@ public class RichText implements IRichText {
 										"statusTextListener", //$NON-NLS-1$
 										"STATUS_SELECT_TEXT, selectedText=", richTextSelection.getText()); //$NON-NLS-1$
 							}
-							tableSelection = false;
 							break;
 						case STATUS_SELECT_CONTROL:
 							if (debug) {
@@ -1141,7 +1070,6 @@ public class RichText implements IRichText {
 										"STATUS_SELECT_NONE, no selection"); //$NON-NLS-1$
 							}
 							hasSelection = false;
-							tableSelection = false;
 							break;
 						case STATUS_EXEC_CMD:
 							if (eventTextLength >= STATUS_PREFIX_LENGTH + 3) {
@@ -1167,10 +1095,10 @@ public class RichText implements IRichText {
 							if (Platform.getOS().equals("win32")) { //$NON-NLS-1$ 
 								// Workaround the drag and drop issue with DBCS
 								// characters.
-//								if (modified) {
-//									setText(getText());
-//									modified = true;
-//								}
+								if (modified) {
+									setText(getText());
+									modified = true;
+								}
 							}
 							checkModify();
 							break;
@@ -1219,7 +1147,6 @@ public class RichText implements IRichText {
 	protected void fillContextMenu(Menu contextMenu) {
 		final MenuItem cutItem = new MenuItem(contextMenu, SWT.PUSH);
 		cutItem.setText(RichTextResources.cutAction_text);
-		cutItem.setImage(RichTextImages.IMG_CUT);
 		cutItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				CutAction action = new CutAction(RichText.this);
@@ -1228,7 +1155,6 @@ public class RichText implements IRichText {
 		});
 		final MenuItem copyItem = new MenuItem(contextMenu, SWT.PUSH);
 		copyItem.setText(RichTextResources.copyAction_text);
-		copyItem.setImage(RichTextImages.IMG_COPY);
 		copyItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				CopyAction action = new CopyAction(RichText.this);
@@ -1237,7 +1163,6 @@ public class RichText implements IRichText {
 		});
 		final MenuItem pasteItem = new MenuItem(contextMenu, SWT.PUSH);
 		pasteItem.setText(RichTextResources.pasteAction_text);
-		pasteItem.setImage(RichTextImages.IMG_PASTE);
 		pasteItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				PasteAction action = new PasteAction(RichText.this);
@@ -1256,66 +1181,16 @@ public class RichText implements IRichText {
 			}
 		});
 
-		final MenuItem sperate1 = new MenuItem(contextMenu, SWT.SEPARATOR);
-		
-		final MenuItem addRowItem = new MenuItem(contextMenu, SWT.PUSH);
-		addRowItem.setText(RichTextResources.addRowAction_text);
-		addRowItem.setImage(RichTextImages.IMG_ADD_ROW);
-		addRowItem.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				AddRowAction action = new AddRowAction(RichText.this);
-				action.execute(RichText.this);
-			}
-		});
-		
-		final MenuItem addColumnItem = new MenuItem(contextMenu, SWT.PUSH);
-		addColumnItem.setText(RichTextResources.addColumnAction_text);
-		addColumnItem.setImage(RichTextImages.IMG_ADD_COLUMN);
-		addColumnItem.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				AddColumnAction action = new AddColumnAction(RichText.this);
-				action.execute(RichText.this);
-			}
-		});
-		
-		final MenuItem deleteLastRowItem = new MenuItem(contextMenu, SWT.PUSH);
-		deleteLastRowItem.setText(RichTextResources.deleteLastRowAction_text);
-		deleteLastRowItem.setImage(RichTextImages.IMG_DELETE_ROW);
-		deleteLastRowItem.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				DeleteLastRowAction action = new DeleteLastRowAction(RichText.this);
-				action.execute(RichText.this);
-			}
-		});
-		
-		final MenuItem deleteLastColumnItem = new MenuItem(contextMenu, SWT.PUSH);
-		deleteLastColumnItem.setText(RichTextResources.deleteLastColumnAction_text);
-		deleteLastColumnItem.setImage(RichTextImages.IMG_DELETE_COLUMN);
-		deleteLastColumnItem.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				DeleteLastColumnAction action = new DeleteLastColumnAction(RichText.this);
-				action.execute(RichText.this);
-			}
-		});
-		
 		contextMenu.addMenuListener(new MenuListener() {
 			public void menuHidden(MenuEvent e) {
 			}
 
 			public void menuShown(MenuEvent e) {
-				Clipboard clipboard = new Clipboard(Display.getCurrent());
-				String html = (String) clipboard.getContents(HTMLTransfer
-						.getInstance());
-				String text = (String) clipboard.getContents(TextTransfer
-						.getInstance());
+				getSelectedText();
 				cutItem.setEnabled(editable && hasSelection);
 				copyItem.setEnabled(hasSelection);
-				pasteItem.setEnabled(editable && (html != null));
-				pastePlainTextItem.setEnabled(editable && (text != null));
-				addRowItem.setEnabled(tableSelection);
-				addColumnItem.setEnabled(tableSelection);
-				deleteLastRowItem.setEnabled(tableSelection);
-				deleteLastColumnItem.setEnabled(tableSelection);
+				pasteItem.setEnabled(editable);
+				pastePlainTextItem.setEnabled(editable);
 			}
 		});
 	}
@@ -1364,78 +1239,39 @@ public class RichText implements IRichText {
 				}
 			});
 
-	        editorControl.addKeyListener(new KeyAdapter() {
-	        	   public void keyReleased(KeyEvent event) {
-						int keyCode = event.keyCode;
-						int stateMask = event.stateMask;
-						if (debug) {
-							printDebugMessage(
-									"keyUpListener", "keyCode=" + keyCode //$NON-NLS-1$ //$NON-NLS-2$
-											+ ", stateMask=" + stateMask + ", editable=" + editable); //$NON-NLS-1$ //$NON-NLS-2$
-						}
-						
-						if ( stateMask == SWT.CTRL && event.keyCode == 0x11 ) { //0x11 is for all Control key, such as ctrl-b, ctrl-I, ctrl-c, etc.. 
-							executeCommand("updateSelection");
-						} 
-						
-						if ((stateMask & SWT.CTRL) > 0
-								|| (stateMask & SWT.ALT) > 0
-								|| ((stateMask & SWT.SHIFT) > 0 && keyCode == stateMask)) {
+			editorControl.addListener(SWT.KeyUp, new Listener() {
+				public void handleEvent(Event event) {
+					int keyCode = event.keyCode;
+					int stateMask = event.stateMask;
+					if (debug) {
+						printDebugMessage(
+								"keyUpListener", "keyCode=" + keyCode //$NON-NLS-1$ //$NON-NLS-2$
+										+ ", stateMask=" + stateMask + ", editable=" + editable); //$NON-NLS-1$ //$NON-NLS-2$
+					}
+					if ((stateMask & SWT.CTRL) > 0
+							|| (stateMask & SWT.ALT) > 0
+							|| ((stateMask & SWT.SHIFT) > 0 && keyCode == stateMask)) {
+						return;
+					}
+					if (editable) {
+						switch (event.keyCode) {
+						case SWT.ARROW_DOWN:
+						case SWT.ARROW_LEFT:
+						case SWT.ARROW_RIGHT:
+						case SWT.ARROW_UP:
+						case SWT.END:
+						case SWT.HOME:
+						case SWT.PAGE_DOWN:
+						case SWT.PAGE_UP:
+						case SWT.TAB:
 							return;
-						}
-						if (editable) {
-							switch (event.keyCode) {
-							case SWT.ARROW_DOWN:
-							case SWT.ARROW_LEFT:
-							case SWT.ARROW_RIGHT:
-							case SWT.ARROW_UP:
-							case SWT.END:
-							case SWT.HOME:
-							case SWT.PAGE_DOWN:
-							case SWT.PAGE_UP:
-							case SWT.TAB:
-								return;
-							default:
-								checkModify();
-								break;
-							}
+						default:
+							checkModify();
+							break;
 						}
 					}
-				});
-			
-//			editorControl.addListener(SWT.KeyUp, new Listener() {
-//				public void handleEvent(Event event) {
-//					int keyCode = event.keyCode;
-//					int stateMask = event.stateMask;
-//					if (debug) {
-//						printDebugMessage(
-//								"keyUpListener", "keyCode=" + keyCode //$NON-NLS-1$ //$NON-NLS-2$
-//										+ ", stateMask=" + stateMask + ", editable=" + editable); //$NON-NLS-1$ //$NON-NLS-2$
-//					}
-//					if ((stateMask & SWT.CTRL) > 0
-//							|| (stateMask & SWT.ALT) > 0
-//							|| ((stateMask & SWT.SHIFT) > 0 && keyCode == stateMask)) {
-//						return;
-//					}
-//					if (editable) {
-//						switch (event.keyCode) {
-//						case SWT.ARROW_DOWN:
-//						case SWT.ARROW_LEFT:
-//						case SWT.ARROW_RIGHT:
-//						case SWT.ARROW_UP:
-//						case SWT.END:
-//						case SWT.HOME:
-//						case SWT.PAGE_DOWN:
-//						case SWT.PAGE_UP:
-//						case SWT.TAB:
-//							return;
-//						default:
-//							checkModify();
-//							break;
-//						}
-//					}
-//				}
-//			});
+				}
+			});
 
 			editor.addLocationListener(new LocationAdapter() {
 				public void changing(LocationEvent event) {
@@ -1459,7 +1295,7 @@ public class RichText implements IRichText {
 					if (e.keyCode == SWT.TAB) {
 						if ((e.stateMask & SWT.SHIFT) != 0) {
 							editor.traverse(SWT.TRAVERSE_TAB_PREVIOUS);
-						} else if ((e.stateMask & SWT.CTRL) == 0 ){
+						} else {
 							editor.traverse(SWT.TRAVERSE_TAB_NEXT);
 						}
 						return;
@@ -1614,7 +1450,7 @@ public class RichText implements IRichText {
 	 * @param text
 	 *            rich text encoded in HTML format
 	 */
-	public String tidyText(String text) {
+	protected String tidyText(String text) {
 		return text;
 	}
 
@@ -1624,7 +1460,7 @@ public class RichText implements IRichText {
 	 * @param text
 	 *            rich text encoded in HTML format
 	 */
-	public String formatText(String text) {
+	protected String formatText(String text) {
 		if (text == null || text.length() == 0) {
 			return text;
 		}
@@ -1727,30 +1563,6 @@ public class RichText implements IRichText {
 		setText(text);
 		initialText = text == null ? "" : text; //$NON-NLS-1$
 		modified = false;
-	}
-	
-	public boolean hasError() {
-		return htmlFormatter.getLastErrorStr() != null;
-	}
-	
-	public static String workaroundForObjectParamNode(String html) {
-		String result = html.replaceAll("<param", "<paramTemp"); //$NON-NLS-1$ //$NON-NLS-2$
-		
-		return result;
-	}
-	
-	private String unWorkaroundForObjectParamNode(String html) {
-		String result = html.replaceAll("<paramTemp", "<param"); //$NON-NLS-1$ //$NON-NLS-2$		
-				
-		return result;
-	}
-	
-	public String getCurrentRawText() {
-		return currentRawText;
-	}
-
-	private void setCurrentRawText(String currentRawText) {
-		this.currentRawText = currentRawText == null ? "" : currentRawText;	//$NON-NLS-1		
 	}
 
 }

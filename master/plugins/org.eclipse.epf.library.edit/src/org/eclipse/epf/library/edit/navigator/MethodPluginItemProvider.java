@@ -15,8 +15,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 
+import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.edit.command.CopyCommand.Helper;
+import org.eclipse.emf.edit.domain.EditingDomain;
+import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
 import org.eclipse.emf.edit.provider.ViewerNotification;
 import org.eclipse.epf.library.edit.ILibraryItemProvider;
 import org.eclipse.epf.library.edit.IStatefulItemProvider;
@@ -26,7 +31,10 @@ import org.eclipse.epf.library.edit.StructuredMethodPluginItemProvider;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.uma.MethodPlugin;
 import org.eclipse.epf.uma.UmaPackage;
+import org.eclipse.epf.uma.edit.command.MethodElementCreateCopyCommand;
+import org.eclipse.epf.uma.edit.command.MethodElementInitializeCopyCommand;
 import org.eclipse.epf.uma.provider.UmaEditPlugin;
+import org.eclipse.epf.uma.util.UmaUtil;
 
 /**
  * The item provider adapter for a method plug-in in the Library
@@ -87,19 +95,41 @@ public class MethodPluginItemProvider extends StructuredMethodPluginItemProvider
 
 			children = new ArrayList();
 			groupItemProviderMap = new HashMap();
-
+			//Contenido
 			String name = LibraryEditPlugin.INSTANCE
 					.getString("_UI_Content_group"); //$NON-NLS-1$
 			Object child = new ContentItemProvider(adapterFactory, plugin,
 					getModelStructure());
 			children.add(child);
 			groupItemProviderMap.put(name, child);
-
+			//Procesos
 			name = LibraryEditPlugin.INSTANCE.getString("_UI_Processes_group"); //$NON-NLS-1$
 			child = new ProcessesItemProvider(adapterFactory, plugin,
 					getModelStructure());
 			children.add(child);
 			groupItemProviderMap.put(name, child);
+			
+			/*****vEPF*****/	
+			
+			//Lineas de procesos
+			//
+			org.eclipse.epf.uma.ProcessLinesPackage pkgProcessLines = (org.eclipse.epf.uma.ProcessLinesPackage) UmaUtil.findMethodPackage(plugin , getModelStructure().processLineElementPath);
+			if (pkgProcessLines != null) {
+				ProcessLinesPackageItemProvider adapter = (ProcessLinesPackageItemProvider) TngUtil
+						.getBestAdapterFactory(adapterFactory).adapt(pkgProcessLines,
+								ITreeItemContentProvider.class);
+			
+				/*Seteamos valores para nuestro Proceso hibrido*/
+				adapter.setProcessType(UmaPackage.eINSTANCE.getLineProcess());//Instancia LineProcess
+				adapter.setParent(this);
+				adapter.setMethodPlugin(plugin);
+				adapter.setModelStructure(getModelStructure());
+				children.add(pkgProcessLines);
+				groupItemProviderMap.put(LibraryEditPlugin.INSTANCE.getString("_UI_Process_Lines_Package_group"), pkgProcessLines);
+			}
+			
+			/**********/
+			
 		}
 
 		return children;
@@ -117,6 +147,16 @@ public class MethodPluginItemProvider extends StructuredMethodPluginItemProvider
 		}
 
 		super.dispose();
+	}
+
+	protected Command createInitializeCopyCommand(EditingDomain domain,
+			EObject owner, Helper helper) {
+		return new MethodElementInitializeCopyCommand(domain, owner, helper);
+	}
+
+	protected Command createCreateCopyCommand(EditingDomain domain,
+			EObject owner, Helper helper) {
+		return new MethodElementCreateCopyCommand(domain, owner, helper);
 	}
 
 	public Object getImage(Object object) {

@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: Artifact.java,v 1.4 2007/05/04 22:46:43 klow Exp $
+ */
 package org.eclipse.epf.xml.uma;
 
 import org.eclipse.emf.common.util.EList;
@@ -48,7 +44,7 @@ public interface Artifact extends WorkProduct {
 	 * @return the value of the '<em>Group3</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getArtifact_Group3()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
-	 *        extendedMetaData="kind='group' name='group:30'"
+	 *        extendedMetaData="kind='group' name='group:28'"
 	 * @generated
 	 */
 	FeatureMap getGroup3();
@@ -64,10 +60,10 @@ public interface Artifact extends WorkProduct {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Contained Artifact</em>' containment reference list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getArtifact_ContainedArtifact()
-	 * @model containment="true" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='ContainedArtifact' group='#group:30'"
+	 * @model type="org.eclipse.epf.xml.uma.Artifact" containment="true" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='ContainedArtifact' group='#group:28'"
 	 * @generated
 	 */
-	EList<Artifact> getContainedArtifact();
+	EList getContainedArtifact();
 
 } // Artifact

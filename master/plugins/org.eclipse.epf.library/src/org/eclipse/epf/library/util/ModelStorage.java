@@ -29,11 +29,17 @@ import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.persistence.ILibraryResourceSet;
 import org.eclipse.epf.persistence.MultiFileSaveUtil;
 import org.eclipse.epf.uma.ContentPackage;
+import org.eclipse.epf.uma.CoreProcessPackage;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.MethodLibrary;
 import org.eclipse.epf.uma.MethodPlugin;
+import org.eclipse.epf.uma.ProcessLinesPackage;
 import org.eclipse.epf.uma.ProcessPackage;
 import org.eclipse.epf.uma.UmaFactory;
+import org.eclipse.epf.uma.Variant;
+import org.eclipse.epf.uma.VariantsListPackage;
+import org.eclipse.epf.uma.VariantsPackage;
+import org.eclipse.epf.uma.impl.VariantsListPackageImpl;
 import org.eclipse.epf.uma.util.UmaUtil;
 
 
@@ -47,11 +53,11 @@ public final class ModelStorage {
 	 * return the MethodPlugins in the current MethodLibrary
 	 * @return List
 	 */
-	public static List<MethodPlugin> getBaseModels() {
+	public static List getBaseModels() {
 		MethodLibrary lib = LibraryService.getInstance().getCurrentMethodLibrary();
 		if (lib != null)
-			return new ArrayList<MethodPlugin>(lib.getMethodPlugins());
-		return Collections.emptyList();
+			return new ArrayList(lib.getMethodPlugins());
+		return Collections.EMPTY_LIST;
 	}
 
 	/**
@@ -89,10 +95,13 @@ public final class ModelStorage {
 	 * initialize a new method plugin
 	 * @param emptyModel MethodPlugin
 	 * @return MethodPlugin
+	 * @throws ClassNotFoundException 
 	 */
-	public static MethodPlugin initialize(MethodPlugin emptyModel) {
+	public static MethodPlugin initialize(MethodPlugin emptyModel) throws ClassNotFoundException {
 		emptyModel.setUserChangeable(Boolean.TRUE);
 
+		createContentPackages(emptyModel, ModelStructure.DEFAULT_PRUEBASLINEAS_PATH);//Creacion de pruebasLineas
+		
 		createContentPackages(emptyModel, ModelStructure.DEFAULT_DOMAIN_PATH);
 		createContentPackages(emptyModel,
 				ModelStructure.DEFAULT.disciplineDefinitionPath);
@@ -112,7 +121,7 @@ public final class ModelStorage {
 		// create DeliveryProcesses process package
 		//
 		ProcessPackage pkg = UmaFactory.eINSTANCE.createProcessPackage();
-		pkg.setName(ModelStructure.DEFAULT.deliveryProcessPath[0]);
+		pkg.setName(ModelStructure.DEFAULT.deliveryProcessPath[0]); //Delivery Process - (Carpeta)
 		emptyModel.getMethodPackages().add(pkg);
 
 		// create ProcessContributions process package
@@ -128,8 +137,39 @@ public final class ModelStorage {
 		System.arraycopy(ModelStructure.DEFAULT.capabilityPatternPath, 0, path,
 				0, len);
 		ContentPackage contPkg = UmaUtil.findContentPackage(emptyModel, path);
-		contPkg.getChildPackages().add(pkg);
-
+		contPkg.getChildPackages().add(pkg); //Capability Pattern - (Carpeta)
+		
+		
+		/***Lineas de Proceso***/		
+		// create ProcessLinesPackage process lines package -> MethodPackage
+		//
+		ProcessLinesPackage pkgLines = UmaFactory.eINSTANCE.createProcessLinesPackage();
+		pkgLines.setName(ModelStructure.DEFAULT.processLineElementPath[0]);//ProcessLineElement -> Lineas de procesos (Carpeta)
+		emptyModel.getMethodPackages().add(pkgLines);
+		
+		
+		
+		/**Delivery, Capability y Variability se crean de forma dinamica*/
+		
+		// create variablityDeliveryProcesses process package (Un paquete solo para los capability que sean de lineas de procesos)
+		//
+//		CoreProcessPackage pkgVDelivery = UmaFactory.eINSTANCE.createCoreProcessPackage();
+//		pkgVDelivery.setName(ModelStructure.DEFAULT.variabilityDeliveryProcessPath[0]); //Delivery Process - (Carpeta)
+//		emptyModel.getMethodPackages().add(pkgVDelivery);
+		
+		// create variabilityCapabilityPatterns process package (Un paquete solo sea para los delivery que sean de lineas de procesos)
+		//
+//		CoreProcessPackage pkgVCapability = UmaFactory.eINSTANCE.createCoreProcessPackage();
+//		pkgVCapability.setName(ModelStructure.DEFAULT.variabilityCapabilityPatternPath[0]);
+//		emptyModel.getMethodPackages().add(pkgVCapability); //Capability Pattern - (Carpeta)
+		
+		// create variabilityContent
+		//
+//		VariantsPackage variantListPkg = UmaFactory.eINSTANCE.createVariantsPackage();
+//		variantListPkg.setName(ModelStructure.DEFAULT.variantsPath[0]);
+//		emptyModel.getMethodPackages().add(variantListPkg);
+		/******/
+		
 		// // create inherited domains
 		// //
 		// List allBase = Misc.getAllBase(emptyModel);

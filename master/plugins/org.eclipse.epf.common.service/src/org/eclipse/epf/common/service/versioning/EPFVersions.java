@@ -45,17 +45,7 @@ public class EPFVersions {
 			"1.0.4.1", //$NON-NLS-1$  library version
 			"1.0.1"); //$NON-NLS-1$  xml schema version
 
-	// EPF 1.5 release
-	private static EPFVersion EPF_15 = new EPFVersion("1.5", //$NON-NLS-1$  tool version
-			"1.0.5.0", //$NON-NLS-1$  library version
-			"1.0.2"); //$NON-NLS-1$  xml schema version
-	
-	// EPF 1.5 release
-	private static EPFVersion EPF_151 = new EPFVersion("1.5.1", //$NON-NLS-1$  tool version
-			"1.0.6.0", //$NON-NLS-1$  library version
-			"1.0.2"); //$NON-NLS-1$  xml schema version
-
-	private static EPFVersion currentVersion = EPF_151;
+	private static EPFVersion currentVersion = EPF_12;
 
 	public EPFVersion getCurrentVersion() {
 		return currentVersion;
@@ -78,8 +68,6 @@ public class EPFVersions {
 		versions.add(EPF_10);
 		versions.add(EPF_11);
 		versions.add(EPF_12);
-		versions.add(EPF_15);
-		versions.add(EPF_151);
 		return versions;
 	}
 

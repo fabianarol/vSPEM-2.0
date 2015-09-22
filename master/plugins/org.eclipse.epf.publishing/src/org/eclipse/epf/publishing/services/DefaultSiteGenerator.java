@@ -18,6 +18,7 @@ import java.util.List;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.epf.common.utils.FileUtil;
+import org.eclipse.epf.common.utils.StrUtil;
 import org.eclipse.epf.library.layout.Bookmark;
 import org.eclipse.epf.library.layout.BookmarkList;
 import org.eclipse.epf.library.layout.HtmlBuilder;
@@ -66,24 +67,18 @@ public class DefaultSiteGenerator extends AbstractSiteGenerator {
 	private static final String APPLET_PATH = "applet" + File.separatorChar; //$NON-NLS-1$
 	private static final String NO_APPLET_PATH = "noapplet" + File.separatorChar; //$NON-NLS-1$
 	private static final String ICON_PATH = "images" + File.separatorChar; //$NON-NLS-1$
-	private static final String CUSTOMIZED_ICON_PATH = ICON_PATH + AbstractSiteGenerator.customizedName + File.separatorChar; //$NON-NLS-1$
 	
 	private static final String SERVER_SEARCH_PATH = "docroot/server_search"; //$NON-NLS-1$	
 	
 	private static final String DEFAULT_BANNER_FILE = "EPFC_banner.jpg"; //$NON-NLS-1$
 
 	protected File iconPath;
-	
-	protected File customizedIconPath;
 
 	public DefaultSiteGenerator(HtmlBuilder builder, PublishHTMLOptions options) {
 		super(builder, options);
-		
+
 		iconPath = new File(pubDir, (options.isPublishDynamicWebApp() ) ? NO_APPLET_PATH  + ICON_PATH 
 				: APPLET_PATH + ICON_PATH);
-		
-		customizedIconPath = new File(pubDir, (options.isPublishDynamicWebApp() ) ? NO_APPLET_PATH  + CUSTOMIZED_ICON_PATH 
-				: APPLET_PATH + CUSTOMIZED_ICON_PATH);
 	}
 	
 	public HtmlBuilder getHtmlBuilder() {
@@ -98,10 +93,6 @@ public class DefaultSiteGenerator extends AbstractSiteGenerator {
 		return iconPath.getAbsolutePath();
 	}
 	
-	public String getCustomizedNodeIconPath() {
-		return customizedIconPath.getAbsolutePath();
-	}
-
 	public String getDefaultBannerImageFile() {
 		//return "banner.gif"; //$NON-NLS-1$
 		return DEFAULT_BANNER_FILE;
@@ -193,7 +184,6 @@ public class DefaultSiteGenerator extends AbstractSiteGenerator {
 			{
 				// also copy the icons to the no-applet folder
 				LayoutResources.copyDir(iconPath.getAbsolutePath(), pubDir + NO_APPLET_PATH + ICON_PATH);
-				LayoutResources.copyDir(customizedIconPath.getAbsolutePath(), pubDir + NO_APPLET_PATH + CUSTOMIZED_ICON_PATH);
 			}
 		}
 		catch (Exception ex)

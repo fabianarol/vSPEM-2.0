@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.ui.viewer.IViewerProvider;
 import org.eclipse.emf.ecore.EClass;
@@ -39,17 +40,14 @@ import org.eclipse.epf.library.edit.command.IActionManager;
 import org.eclipse.epf.library.edit.process.BreakdownElementWrapperItemProvider;
 import org.eclipse.epf.library.edit.process.IBSItemProvider;
 import org.eclipse.epf.library.edit.process.IColumnAware;
-import org.eclipse.epf.library.edit.util.DescriptorPropUtil;
 import org.eclipse.epf.library.edit.util.PredecessorList;
 import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.library.edit.util.Suppression;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.uma.BreakdownElement;
 import org.eclipse.epf.uma.DescribableElement;
-import org.eclipse.epf.uma.Descriptor;
 import org.eclipse.epf.uma.Process;
 import org.eclipse.epf.uma.ProcessComponent;
-import org.eclipse.epf.uma.TaskDescriptor;
 import org.eclipse.epf.uma.UmaPackage;
 import org.eclipse.epf.uma.WorkBreakdownElement;
 import org.eclipse.epf.uma.WorkOrder;
@@ -165,14 +163,7 @@ public class ProcessBreakdownStructureFormPage extends ProcessFormPage
 			}
 			else if (isExternal(element)) {
 				return Colors.INHERITED_ELEMENT_LABEL;
-			}
-			Object obj = TngUtil.unwrap(element);
-			if (obj instanceof Descriptor) {
-				Descriptor d = (Descriptor) obj;
-				if (DescriptorPropUtil.getDesciptorPropUtil().isCreatedByReference(d)) {
-					return Colors.DYNAMIC_ELEMENT_LABEL;
-				}
-			}
+			}			
 			return null;
 		}
 
@@ -216,12 +207,6 @@ public class ProcessBreakdownStructureFormPage extends ProcessFormPage
 		public Font getFont(Object element) {
 			if (isExternal(element)) {
 				return italicFont;
-			}
-			if (element instanceof TaskDescriptor) {
-				TaskDescriptor td = (TaskDescriptor) element;
-				if (DescriptorPropUtil.getDesciptorPropUtil().getGreenParentDescriptor(td) != null) {
-					return italicFont;
-				}
 			}
 			return regularFont;
 		}
@@ -591,7 +576,6 @@ public class ProcessBreakdownStructureFormPage extends ProcessFormPage
 		
 		viewer = new ProcessViewer(comp, SWT.MULTI | SWT.H_SCROLL
 				| SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
-		viewer.setUseHashlookup(true);
 		viewer.getControl().setLayoutData(gd);
 		viewer.setupColumns(columnDescriptors);
 		viewer.setContentProvider(new ExposedAdapterFactoryContentProvider(

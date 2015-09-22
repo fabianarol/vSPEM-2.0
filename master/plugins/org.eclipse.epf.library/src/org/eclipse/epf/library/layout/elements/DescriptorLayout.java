@@ -14,18 +14,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.epf.library.configuration.ConfigurationHelper;
-import org.eclipse.epf.library.edit.util.LibraryEditUtil;
-import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.library.edit.util.Suppression;
 import org.eclipse.epf.library.layout.ElementLayoutManager;
 import org.eclipse.epf.library.layout.IElementLayout;
-import org.eclipse.epf.library.layout.util.XmlElement;
 import org.eclipse.epf.uma.Descriptor;
 import org.eclipse.epf.uma.DescriptorDescription;
 import org.eclipse.epf.uma.MethodElement;
@@ -55,10 +50,6 @@ public abstract class DescriptorLayout extends AbstractProcessElementLayout {
 	});
 
 	MethodElement linkedElement = null;
-
-	public MethodElement getLinkedElement() {
-		return linkedElement;
-	}
 
 	AbstractElementLayout elementLayout = null;
 	
@@ -195,59 +186,4 @@ public abstract class DescriptorLayout extends AbstractProcessElementLayout {
 		|| ( feature == AssociationHelper.WorkProductDescriptor_OutputFrom_TaskDescriptors);
 		
 	}
-	
-	public XmlElement getXmlElement(boolean includeReferences) {
-		XmlElement elementXml = super.getXmlElement(includeReferences);
-		if (linkedElement != null) {
-			String cType = linkedElement.getType().getName();
-			elementXml.setAttribute(
-				"ConcreteType", cType); //$NON-NLS-1$ 
-		}
-		
-		return elementXml;
-	}
-	
-	@Override
-	protected MethodElement getElementForElementPath() {
-		// This method gets called before "linkedElement" is assigned a value
-		if (layoutManager.getValidator().showLinkedPageForDescriptor()
-				&& element instanceof Descriptor) {
-			MethodElement linkedContentElement = ProcessUtil
-					.getAssociatedElement((Descriptor) element);
-			if (linkedContentElement != null) {
-				linkedContentElement = ConfigurationHelper.getCalculatedElement(linkedContentElement, layoutManager.getElementRealizer());
-			}
-			if (linkedContentElement != null) {
-				return linkedContentElement;
-			}
-		}
-		return super.getElementForElementPath();
-	}
-
-	@Override
-	protected boolean isExcludeFeature(EStructuralFeature feature) {
-		UmaPackage up = UmaPackage.eINSTANCE;
-
-		boolean b = feature == up
-				.getTaskDescriptor_PerformedPrimarilyByExcluded()
-				|| feature == up
-						.getTaskDescriptor_AdditionallyPerformedByExclude()
-				|| feature == up.getTaskDescriptor_MandatoryInputExclude()
-				|| feature == up.getTaskDescriptor_OptionalInputExclude()
-				|| feature == up.getTaskDescriptor_OutputExclude()
-				|| feature == up.getRoleDescriptor_ResponsibleForExclude()
-				|| feature == up.getDescriptor_GuidanceAdditional()
-				|| feature == up.getDescriptor_GuidanceExclude();
-
-		return b;
-	}
-
-	protected boolean isSynReferece(EStructuralFeature feature) {
-		if (! ProcessUtil.isSynFree() || linkedElement == null) {
-			return false;
-		}
-		Map<EReference, EReference> guidanceRefMap = LibraryEditUtil.getInstance().getGuidanceRefMap(linkedElement.eClass());
-		return guidanceRefMap == null ? false : guidanceRefMap.containsKey(feature);
-	}
-	
 }

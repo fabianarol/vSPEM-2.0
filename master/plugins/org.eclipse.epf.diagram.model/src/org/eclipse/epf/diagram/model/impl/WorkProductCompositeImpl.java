@@ -26,7 +26,6 @@ import org.eclipse.epf.diagram.model.ActivityDetailDiagram;
 import org.eclipse.epf.diagram.model.ModelFactory;
 import org.eclipse.epf.diagram.model.ModelPackage;
 import org.eclipse.epf.diagram.model.Node;
-import org.eclipse.epf.diagram.model.TaskNode;
 import org.eclipse.epf.diagram.model.WorkProductComposite;
 import org.eclipse.epf.diagram.model.WorkProductDescriptorNode;
 import org.eclipse.epf.diagram.model.util.GraphicalDataHelper;
@@ -551,15 +550,4 @@ public class WorkProductCompositeImpl extends NodeContainerImpl implements
 		}
 		return adapterFactory;
 	}
-	
-	private TaskNode taskNode;
-
-	protected TaskNode getTaskNode() {
-		return taskNode;
-	}
-
-	protected void setTaskNode(TaskNode taskNode) {
-		this.taskNode = taskNode;
-	}
-	
 } // WorkProductCompositeImpl

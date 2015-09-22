@@ -116,7 +116,7 @@ public class DescriptorProcessFilter extends AbstractBaseFilter implements
 		}
 	}
 	public DescriptorProcessFilter(MethodConfiguration config) {
-		setAdditionalFilters(new IFilter[] { new ProcessConfigurator(config) });
+		setAdditionalFilters(new IFilter[] { new ProcessConfigurator(config, null) });
 	}
 
 }

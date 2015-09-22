@@ -38,7 +38,7 @@ public interface BreakdownElementDescription extends ContentDescription {
 	 * @return the value of the '<em>Usage Guidance</em>' attribute.
 	 * @see #setUsageGuidance(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getBreakdownElementDescription_UsageGuidance()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getUsageGuidance();

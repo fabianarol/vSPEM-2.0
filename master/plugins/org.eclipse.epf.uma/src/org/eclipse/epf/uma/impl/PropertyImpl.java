@@ -33,6 +33,13 @@ import org.eclipse.epf.uma.UmaPackage;
  */
 public class PropertyImpl extends DiagramElementImpl implements Property {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The default value of the '{@link #getKey() <em>Key</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -82,7 +89,7 @@ public class PropertyImpl extends DiagramElementImpl implements Property {
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -90,7 +97,6 @@ public class PropertyImpl extends DiagramElementImpl implements Property {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.PROPERTY;
 	}
@@ -144,7 +150,6 @@ public class PropertyImpl extends DiagramElementImpl implements Property {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.PROPERTY__KEY:
@@ -160,7 +165,6 @@ public class PropertyImpl extends DiagramElementImpl implements Property {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.PROPERTY__KEY:
@@ -178,7 +182,6 @@ public class PropertyImpl extends DiagramElementImpl implements Property {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.PROPERTY__KEY:
@@ -196,7 +199,6 @@ public class PropertyImpl extends DiagramElementImpl implements Property {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);
@@ -220,7 +222,6 @@ public class PropertyImpl extends DiagramElementImpl implements Property {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy())
 			return super.toString();

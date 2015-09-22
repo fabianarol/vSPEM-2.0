@@ -19,7 +19,7 @@ import org.eclipse.epf.authoring.ui.AuthoringUIPlugin;
 import org.eclipse.epf.authoring.ui.AuthoringUIResources;
 import org.eclipse.epf.authoring.ui.BrowsingPerspective;
 import org.eclipse.epf.authoring.ui.UIActionDispatcher;
-import org.eclipse.epf.common.ui.util.PerspectiveUtil;
+import org.eclipse.epf.common.utils.PerspectiveUtil;
 import org.eclipse.epf.diagram.ui.service.DiagramImageService;
 import org.eclipse.epf.library.ILibraryManager;
 import org.eclipse.epf.library.ILibraryServiceListener;

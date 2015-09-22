@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.net.URL;
 
 import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.epf.common.AbstractActivator;
+import org.eclipse.epf.common.plugin.AbstractPlugin;
 import org.eclipse.epf.library.layout.LayoutResources;
 import org.osgi.framework.BundleContext;
 
@@ -24,13 +24,21 @@ import org.osgi.framework.BundleContext;
  * @author Kelvin Low
  * @since 1.0
  */
-public class LibraryPlugin extends AbstractActivator {
+public class LibraryPlugin extends AbstractPlugin {
 
-	// The plug-in ID
-	public static final String PLUGIN_ID = "org.eclipse.epf.library"; //$NON-NLS-1$
-	
+	private static final String LAYOUT_PATH = "layout/"; //$NON-NLS-1$;
+
+	public static final String LAYOUT_XSL_PATH = "layout/xsl/"; //$NON-NLS-1$;
+	private static final String LAYOUT_CSS_PATH = "layout/css/"; //$NON-NLS-1$;
+
+	public static final String LAYOUT_SCRIPTS_FOLDER = "scripts"; //$NON-NLS-1$;
+
+	public static final String LAYOUT_SCRIPTS_PATH = "layout/scripts/"; //$NON-NLS-1$;
+
 	// The shared plug-in instance.
 	private static LibraryPlugin plugin;
+
+	private String layoutPath, layoutXslPath, layoutCssPath;
 
 	/**
 	 * Creates a new instance.
@@ -41,16 +49,27 @@ public class LibraryPlugin extends AbstractActivator {
 	}
 
 	/**
-	 * @see org.eclipse.epf.common.ui.AbstractPlugin#start(BundleContext)
+	 * @see org.eclipse.epf.common.plugin.AbstractPlugin#start(BundleContext)
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		
-		LibraryService.getInstance().getLibraryProblemMonitor();
+		try {
+			URL url = new URL(super.getInstallURL(), LAYOUT_PATH);
+			layoutPath = FileLocator.resolve(url).getPath();
+
+			url = new URL(super.getInstallURL(), LAYOUT_XSL_PATH);
+			layoutXslPath = FileLocator.resolve(url).getPath();
+
+			url = new URL(super.getInstallURL(), LAYOUT_CSS_PATH);
+			layoutCssPath = FileLocator.resolve(url).getPath();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
-	 * @see org.eclipse.epf.common.ui.AbstractPlugin#start(BundleContext)
+	 * @see org.eclipse.epf.common.plugin.AbstractPlugin#start(BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
@@ -64,5 +83,17 @@ public class LibraryPlugin extends AbstractActivator {
 	 */
 	public static LibraryPlugin getDefault() {
 		return plugin;
+	}
+
+	public String getLayoutPath() {
+		return layoutPath;
+	}
+
+	public String getLayoutXslPath() {
+		return layoutXslPath;
+	}
+
+	public String getLayoutCssPath() {
+		return layoutCssPath;
 	}
 }

@@ -16,7 +16,7 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.epf.authoring.gef.util.DiagramUIResources;
 import org.eclipse.epf.authoring.ui.AuthoringUIPlugin;
 import org.eclipse.epf.authoring.ui.AuthoringUIResources;
-import org.eclipse.epf.common.ui.util.MsgDialog;
+import org.eclipse.epf.common.serviceability.MsgDialog;
 import org.eclipse.epf.diagram.model.Node;
 import org.eclipse.epf.uma.GraphNode;
 import org.eclipse.epf.uma.Property;

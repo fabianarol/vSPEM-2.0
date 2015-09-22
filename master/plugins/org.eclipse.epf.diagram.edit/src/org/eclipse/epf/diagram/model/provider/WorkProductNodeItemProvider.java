@@ -12,7 +12,7 @@
  * <copyright>
  * </copyright>
  *
- * $Id: WorkProductNodeItemProvider.java,v 1.1 2008/01/15 08:53:03 jtham Exp $
+ * $Id: WorkProductNodeItemProvider.java,v 1.4 2007/07/25 18:28:37 ple Exp $
  */
 package org.eclipse.epf.diagram.model.provider;
 

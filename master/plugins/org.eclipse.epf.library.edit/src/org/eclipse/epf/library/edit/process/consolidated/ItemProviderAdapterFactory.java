@@ -13,7 +13,10 @@ package org.eclipse.epf.library.edit.process.consolidated;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 import org.eclipse.epf.library.edit.process.TeamProfileItemProvider;
+import org.eclipse.epf.library.edit.process.VarTeamProfileItemProvider;
 import org.eclipse.epf.library.edit.process.WBSItemProviderAdapterFactory;
+import org.eclipse.epf.library.edit.process.vpTeamProfileItemProvider;
+import org.eclipse.epf.library.edit.process.publishing.WPBSActivityItemProvider;
 import org.eclipse.epf.library.edit.util.TngUtil;
 
 
@@ -33,11 +36,39 @@ public class ItemProviderAdapterFactory extends WBSItemProviderAdapterFactory {
 				(ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
 						.createTaskDescriptorAdapter());
 	}
+	
+	public Adapter createVarTaskDescriptorAdapter() {
+//		return createTaskDescriptorAdapter();
+		return new VarTaskDescriptorItemProvider(this,
+				(ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
+						.createVarTaskDescriptorAdapter());
+	}
+	
+	public Adapter createvpTaskDescriptorAdapter() {
+//		return createTaskDescriptorAdapter();
+		return new vpTaskDescriptorItemProvider(this,
+				(ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
+						.createvpTaskDescriptorAdapter());
+	}
 
 	public Adapter createRoleDescriptorAdapter() {
 		return new RoleDescriptorItemProvider(this,
 				(ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
 						.createRoleDescriptorAdapter());
+	}
+	
+	public Adapter createVarRoleDescriptorAdapter() {
+//		return createRoleDescriptorAdapter();
+		return new VarRoleDescriptorItemProvider(this,
+				(ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
+						.createVarRoleDescriptorAdapter());
+	}
+	
+	public Adapter createvpRoleDescriptorAdapter() {
+//		return createRoleDescriptorAdapter();
+		return new vpRoleDescriptorItemProvider(this,
+				(ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
+						.createvpRoleDescriptorAdapter());
 	}
 
 	public Adapter createWorkProductDescriptorAdapter() {
@@ -45,9 +76,29 @@ public class ItemProviderAdapterFactory extends WBSItemProviderAdapterFactory {
 				(ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
 						.createWorkProductDescriptorAdapter());
 	}
+	
+	public Adapter createVarWorkProductDescriptorAdapter() {
+		return new VarWorkProductDescriptorItemProvider(this,
+				(ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
+						.createVarWorkProductDescriptorAdapter());
+	}
+	
+	public Adapter createvpWorkProductDescriptorAdapter() {
+		return new vpWorkProductDescriptorItemProvider(this,
+				(ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
+						.createvpWorkProductDescriptorAdapter());
+	}
 
 	public Adapter createActivityAdapter() {
 		return new ActivityItemProvider(this);
+	}
+	
+	public Adapter createvpActivityAdapter() {
+		return createActivityAdapter();
+	}
+	
+	public Adapter createVarActivityAdapter() {
+		return createActivityAdapter();
 	}
 
 	public Adapter createCapabilityPatternAdapter() {
@@ -67,5 +118,13 @@ public class ItemProviderAdapterFactory extends WBSItemProviderAdapterFactory {
 	 */
 	public Adapter createTeamProfileAdapter() {
 		return new TeamProfileItemProvider(this, (ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory.createTeamProfileAdapter());
+	}
+	
+	public Adapter createVarTeamProfileAdapter() {
+		return new VarTeamProfileItemProvider(this, (ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory.createVarTeamProfileAdapter());
+	}
+	
+	public Adapter createvpTeamProfileAdapter() {
+		return new vpTeamProfileItemProvider(this, (ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory.createvpTeamProfileAdapter());
 	}
 }

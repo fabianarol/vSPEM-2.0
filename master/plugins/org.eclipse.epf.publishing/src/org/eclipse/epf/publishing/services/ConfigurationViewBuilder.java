@@ -34,19 +34,12 @@ import org.eclipse.epf.common.serviceability.DebugTrace;
 import org.eclipse.epf.common.utils.FileUtil;
 import org.eclipse.epf.common.utils.StrUtil;
 import org.eclipse.epf.common.utils.Timer;
-import org.eclipse.epf.library.LibraryService;
 import org.eclipse.epf.library.configuration.ConfigurationFilter;
 import org.eclipse.epf.library.configuration.ConfigurationHelper;
 import org.eclipse.epf.library.edit.IFilter;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
-import org.eclipse.epf.library.edit.configuration.PracticeSubgroupItemProvider;
-import org.eclipse.epf.library.edit.meta.TypeDefUtil;
-import org.eclipse.epf.library.edit.meta.internal.ExtendedReferenceImpl;
 import org.eclipse.epf.library.edit.process.IBSItemProvider;
-import org.eclipse.epf.library.edit.util.LibraryEditUtil;
-import org.eclipse.epf.library.edit.util.PracticePropUtil;
 import org.eclipse.epf.library.edit.util.ProcessUtil;
-import org.eclipse.epf.library.edit.util.PropUtil;
 import org.eclipse.epf.library.edit.util.Suppression;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.layout.Bookmark;
@@ -70,7 +63,6 @@ import org.eclipse.epf.uma.Guidance;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.MethodPackage;
 import org.eclipse.epf.uma.MethodPlugin;
-import org.eclipse.epf.uma.Practice;
 import org.eclipse.epf.uma.Process;
 import org.eclipse.epf.uma.ProcessElement;
 import org.eclipse.epf.uma.Role;
@@ -80,11 +72,6 @@ import org.eclipse.epf.uma.Tool;
 import org.eclipse.epf.uma.UmaPackage;
 import org.eclipse.epf.uma.WorkProduct;
 import org.eclipse.epf.uma.util.AssociationHelper;
-import org.eclipse.epf.uma.util.ExtendedAttribute;
-import org.eclipse.epf.uma.util.ExtendedReference;
-import org.eclipse.epf.uma.util.ModifiedTypeMeta;
-import org.eclipse.epf.uma.util.UmaUtil;
-import org.eclipse.epf.uma.util.UserDefinedTypeMeta;
 
 /**
  * Builds the views defined for a method configuration.
@@ -105,7 +92,7 @@ public class ConfigurationViewBuilder extends AbstractViewBuilder {
 	private static final String PREFIX_ParticipatesIn_Tasks = "Additionally_Performs"; //$NON-NLS-1$
 
 	private static final String PREFIX_Performing_Roles = "Performing_Roles"; //$NON-NLS-1$
-	
+
 	private static final String PREFIX_Input_Work_Products = "Input_Work_Products"; //$NON-NLS-1$
 
 	private static final String PREFIX_Output_Work_Products = "Output_Work_Products"; //$NON-NLS-1$
@@ -215,7 +202,7 @@ public class ConfigurationViewBuilder extends AbstractViewBuilder {
 
 			// create a filter that does not discard the contributors.
 			// so we get the contributors in to show in the navigation tree
-			IFilter configFilter = new ConfigurationFilter(config, false);
+			IFilter configFilter = new ConfigurationFilter(config, null, false);
 			adapterFactory = TngAdapterFactory.INSTANCE
 					.getConfigurationView_AdapterFactory(configFilter);
 
@@ -264,9 +251,7 @@ public class ConfigurationViewBuilder extends AbstractViewBuilder {
 		if (profiling) {
 			startTime = System.currentTimeMillis();
 		}
-		if (! ConfigurationHelper.serverMode) {
-			publishReferenceElements();
-		}		
+		publishReferenceElements();
 		if (profiling) {
 			DebugTrace.print(this, "publishReferenceElements", //$NON-NLS-1$
 					(System.currentTimeMillis() - startTime) + " ms"); //$NON-NLS-1$
@@ -386,7 +371,7 @@ public class ConfigurationViewBuilder extends AbstractViewBuilder {
 
 		// now all the published elements are the element closure, make the
 		// final closure
-		getValidator().makeElementClosure(config);
+		getValidator().makeElementClosure();
 	}
 
 	private void makeProcessClosure(org.eclipse.epf.uma.Process proc) {
@@ -559,14 +544,10 @@ public class ConfigurationViewBuilder extends AbstractViewBuilder {
 				treeItemContentProvider = (ITreeItemContentProvider) adapterFactory
 						.adapt(obj, ITreeItemContentProvider.class);
 			}
-		
+
 			// Either delegate the call or return nothing.
 			if (treeItemContentProvider != null) {
 				Collection items = treeItemContentProvider.getChildren(obj);
-				Collection udtReference = getUDTReference(obj);
-				if(udtReference != null){
-					items.addAll(udtReference);
-				}	
 				for (Iterator it = items.iterator(); it.hasNext();) {
 					if (monitor.isCanceled()) {
 						return;
@@ -614,13 +595,9 @@ public class ConfigurationViewBuilder extends AbstractViewBuilder {
 											discardEmptyCategory(cc, true);
 										}
 									} else {
-										if (itorObj instanceof PracticeSubgroupItemProvider) {
-											isCreateSubFolder(obj, parent, itorObj);
-										} else {										
-											Bookmark b = createBookmark(me, parent);
-											if (!buildSubTree(itorObj, me, b)) {
-												iterate(itorObj, b);
-											}
+										Bookmark b = createBookmark(me, parent);
+										if (!buildSubTree(itorObj, me, b)) {
+											iterate(itorObj, b);
 										}
 									}
 								}
@@ -632,11 +609,7 @@ public class ConfigurationViewBuilder extends AbstractViewBuilder {
 							e.printStackTrace();
 						}
 					} else {
-						if (itorObj instanceof PracticeSubgroupItemProvider) {
-							isCreateSubFolder(obj, parent, itorObj);
-						} else {
-							iterate(itorObj, parent);
-						}
+						iterate(itorObj, parent);
 					}
 
 				}
@@ -646,51 +619,6 @@ public class ConfigurationViewBuilder extends AbstractViewBuilder {
 			getHtmlBuilder().getValidator().logError(message, e);
 
 			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * it udt designed as have treebroswer,create tree node for it
-	 * @param obj
-	 * @return
-	 */
-	private Collection<?> getUDTReference(Object obj) {
-		Collection<?> result = null;
-		if(obj instanceof Practice && PracticePropUtil.getPracticePropUtil().isUdtType((Practice)obj)){
-			Practice practice = (Practice)obj;
-			UserDefinedTypeMeta udtMeta = PracticePropUtil.getPracticePropUtil().getUdtMeta(practice);
-			ModifiedTypeMeta modifiedTypeMeta = LibraryEditUtil.getInstance().getModifiedType(udtMeta.getId());
-			if(modifiedTypeMeta != null){
-				List<ExtendedAttribute> attributes = modifiedTypeMeta.getAttributes();
-				String flag = null;
-				if(flag != null && !new Boolean(flag)){
-					result = practice.getContentReferences();
-				}
-			}
-		}
-		return result;
-	}
-
-	/**
-	 * for udt generateTreebrowserFolders attribute.If false,no sub folder
-	 * @param obj
-	 * @param parent
-	 * @param itorObj
-	 */
-	private void isCreateSubFolder(Object obj, Bookmark parent, Object itorObj) {
-		PracticeSubgroupItemProvider provider = (PracticeSubgroupItemProvider)itorObj;
-		if(provider.getPractice() != null && PracticePropUtil.getPracticePropUtil().isUdtType(provider.getPractice())){
-			//first UDT to get ID,use ID to get generateTreebrowserFolders
-			UserDefinedTypeMeta udtMeta = PracticePropUtil.getPracticePropUtil().getUdtMeta(provider.getPractice());
-			UserDefinedTypeMeta userDefineType = LibraryService.getInstance().getCurrentLibraryManager().getUserDefineType(udtMeta.getId());
-			String flag = userDefineType.getRteNameMap().get(UserDefinedTypeMeta._generateTreebrowserFolders);
-			if(Boolean.FALSE.toString().equals(flag)){
-				iterate(itorObj, parent);
-			}else{
-				buildPracticeSubgroupTree(obj, parent, (PracticeSubgroupItemProvider) itorObj);
-			}
-		}else{
-			buildPracticeSubgroupTree(obj, parent, (PracticeSubgroupItemProvider) itorObj);
 		}
 	}
 
@@ -722,63 +650,20 @@ public class ConfigurationViewBuilder extends AbstractViewBuilder {
 	 * @return boolean
 	 */
 	private boolean buildSubTree(Object obj, MethodElement element, Bookmark bm) {
-		boolean isShowRelatedLinks = options.isShowRelatedLinks();
 		if (element instanceof Task) {
-			if(isShowRelatedLinks) {
-				buildTaskSubTree((Task) element, bm);
-			} else {
-				return true;
-			}
+			buildTaskSubTree((Task) element, bm);
 		} else if (element instanceof Role) {
-			if(isShowRelatedLinks) {
-				buildRoleSubTree((Role) element, bm);
-			} else {
-				return true;
-			}
+			buildRoleSubTree((Role) element, bm);
 		} else if (element instanceof WorkProduct) {
-			if(isShowRelatedLinks) {
-				buildWorkProductSubTree((WorkProduct) element, bm);
-			} else {
-				return true;
-			}
+			buildWorkProductSubTree((WorkProduct) element, bm);
 		} else if (LibraryUtil.isProcess(element)) {
 			buildProcessSubTree(obj, (org.eclipse.epf.uma.Process) element, bm);
-		} else if (element instanceof Practice) {
-			ModifiedTypeMeta meta = TypeDefUtil.getMdtMeta(element);
-			if (meta == null) {
-				return false;
-			}else{
-				buildUDTSubTree(obj, element, bm, meta);
-				return true;
-			}
 		} else {
 			// System.out.println("Not handled: " + element);
 			return false;
 		}
 
 		return true;
-	}
-
-	/**
-	 * create the children of the UDT
-	 * @param obj
-	 * @param element
-	 * @param bm
-	 * @param meta
-	 */
-	private void buildUDTSubTree(Object obj, MethodElement element,
-			Bookmark bm, ModifiedTypeMeta meta) {
-		List<ExtendedReference> references = meta.getReferences();
-		iterate(obj, bm);//create references elements
-		for(ExtendedReference reference:references){
-			ExtendedReferenceImpl referenceimpl = (ExtendedReferenceImpl)reference;
-			boolean createUDTChild = referenceimpl.isCreateUDTChild();
-			List<MethodElement> items = PropUtil.getPropUtil().getExtendedReferenceList(
-					element, referenceimpl, false);
-			if(createUDTChild){
-				createFolderBookmark(element, bm, referenceimpl.getName(), referenceimpl.getName(), items, true);
-			}
-		}
 	}
 
 	private void buildItems(List elements, Bookmark bm) {
@@ -893,38 +778,6 @@ public class ConfigurationViewBuilder extends AbstractViewBuilder {
 
 		return b;
 	}
-	
-	private void buildPracticeSubgroupTree(Object providerParent,
-			Bookmark parent, PracticeSubgroupItemProvider provider) {
-		Collection children = provider.getChildren(null);
-		List items = children instanceof List ? (List) children
-				: new ArrayList(children);
-
-		if (items != null && items.size() > 0) {
-			Practice practice = provider.getPractice();
-			if (practice == null) {
-				return;
-			}
-
-			IElementLayout l = new SummaryPageLayout(getHtmlBuilder()
-					.getLayoutManager(), practice, provider.getPrefix(),
-					provider.getText(null), items, provider.getText(null));
-			
-			String url = l.getUrl();
-
-			String imageString = this.getNodeIconName(provider);
-			Bookmark b = createBookmark(provider.getText(null), EcoreUtil
-					.generateUUID(), url, imageString, imageString, null);
-			parent.addChild(b);
-			this.iterate(provider, b);
-			
-			if (!summaryPagesGenerated.contains(url)) {
-				getHtmlBuilder().generateHtml(l);
-				summaryPagesGenerated.add(url);
-			}
-		}
-
-	}
 
 	private Bookmark buildDisciplineSubTree(Discipline element, Bookmark parent) {
 		String url = ""; //$NON-NLS-1$
@@ -1022,7 +875,7 @@ public class ConfigurationViewBuilder extends AbstractViewBuilder {
 		if (options.isPublishLightWeightTree()) {
 
 			Collections.sort(items_workflow, nameComparator);
-			//Collections.sort(items_task, nameComparator);
+			Collections.sort(items_task, nameComparator);
 			Collections.sort(items_guidance, nameComparator);
 
 			buildItems(items_workflow, bm);
@@ -1123,10 +976,10 @@ public class ConfigurationViewBuilder extends AbstractViewBuilder {
 
 		// performing roles
 		List items = new ArrayList();
-		List rList = (List) calc0nFeatureValue(element, UmaPackage.eINSTANCE
+		Role r = (Role) calc01FeatureValue(element, UmaPackage.eINSTANCE
 				.getTask_PerformedBy());
-		if (rList != null) {
-			items.addAll(rList);
+		if (r != null) {
+			items.add(r);
 		}
 		items.addAll(calc0nFeatureValue(element, UmaPackage.eINSTANCE
 				.getTask_AdditionallyPerformedBy()));
@@ -1234,8 +1087,8 @@ public class ConfigurationViewBuilder extends AbstractViewBuilder {
 		List items = calc0nFeatureValue(element,
 				AssociationHelper.Role_Primary_Tasks);
 		if (items.size() > 0) {
-			Collections.sort(items, nameComparator);
 			if (options.isPublishLightWeightTree()) {
+				Collections.sort(items, nameComparator);
 				allItems.addAll(items);
 			} else {
 				createFolderBookmark(element, bm, PREFIX_ResponsibleFor_Tasks,
@@ -1252,7 +1105,6 @@ public class ConfigurationViewBuilder extends AbstractViewBuilder {
 			items = calc0nFeatureValue(element,
 					AssociationHelper.Role_Secondary_Tasks);
 			if (items.size() > 0) {
-				Collections.sort(items, nameComparator);
 				createFolderBookmark(element, bm, PREFIX_ParticipatesIn_Tasks,
 						NODE_ParticipatesIn_Tasks, items, true);
 			}
@@ -1267,8 +1119,8 @@ public class ConfigurationViewBuilder extends AbstractViewBuilder {
 				.getRole_ResponsibleFor());
 
 		if (items.size() > 0) {
-			Collections.sort(items, nameComparator);
 			if (options.isPublishLightWeightTree()) {
+				Collections.sort(items, nameComparator);
 				allItems.addAll(items);
 			} else {
 				b = createFolderBookmark(element, bm,
@@ -1287,7 +1139,6 @@ public class ConfigurationViewBuilder extends AbstractViewBuilder {
 			items = calc0nFeatureValue(element, UmaPackage.eINSTANCE
 					.getRole_Modifies());
 			if (items.size() > 0) {
-				Collections.sort(items, nameComparator);
 				b = createFolderBookmark(element, bm,
 						PREFIX_Work_Products_Modified,
 						NODE_Work_Products_Modified, items, false);
@@ -1315,8 +1166,8 @@ public class ConfigurationViewBuilder extends AbstractViewBuilder {
 				.getContentElement_SupportingMaterials()));
 
 		if (items.size() > 0) {
-			Collections.sort(items, nameComparator);
 			if (options.isPublishLightWeightTree()) {
+				Collections.sort(items, nameComparator);
 				allItems.addAll(items);
 			} else {
 				createFolderBookmark(element, bm, PREFIX_Guidances, NODE_Guidances, items, true);
@@ -1663,15 +1514,15 @@ public class ConfigurationViewBuilder extends AbstractViewBuilder {
 		// all guidances
 		items = new ArrayList();
 		items.addAll(calc0nFeatureValue(element, UmaPackage.eINSTANCE
-				.getBreakdownElement_Checklists()));
+				.getActivity_Checklists()));
 		items.addAll(calc0nFeatureValue(element, UmaPackage.eINSTANCE
-				.getBreakdownElement_Concepts()));
+				.getActivity_Concepts()));
 		items.addAll(calc0nFeatureValue(element, UmaPackage.eINSTANCE
-				.getBreakdownElement_Examples()));
+				.getActivity_Examples()));
 		items.addAll(calc0nFeatureValue(element, UmaPackage.eINSTANCE
-				.getBreakdownElement_Guidelines()));
+				.getActivity_Guidelines()));
 		items.addAll(calc0nFeatureValue(element, UmaPackage.eINSTANCE
-				.getBreakdownElement_ReusableAssets()));
+				.getActivity_ReusableAssets()));
 		items.addAll(calc0nFeatureValue(element, UmaPackage.eINSTANCE
 				.getActivity_Roadmaps()));
 
@@ -1681,7 +1532,7 @@ public class ConfigurationViewBuilder extends AbstractViewBuilder {
 		org.eclipse.epf.diagram.model.util.DiagramInfo userDiagramInfo = 
 				new org.eclipse.epf.diagram.model.util.DiagramInfo(element);
 		List v = calc0nFeatureValue(element, UmaPackage.eINSTANCE
-				.getBreakdownElement_SupportingMaterials());
+				.getActivity_SupportingMaterials());
 		for ( Iterator it = v.iterator(); it.hasNext(); ) {
 			SupportingMaterial s = (SupportingMaterial)it.next();
 			if ( !userDiagramInfo.isDiagram( (SupportingMaterial)s ) ) {
@@ -1783,7 +1634,7 @@ public class ConfigurationViewBuilder extends AbstractViewBuilder {
 
 	class EObjectComparator implements Comparator {
 		private EStructuralFeature pName = UmaPackage.eINSTANCE
-				.getMethodElement_PresentationName();
+				.getDescribableElement_PresentationName();
 		private EStructuralFeature name = UmaPackage.eINSTANCE
 				.getNamedElement_Name();
 

@@ -597,7 +597,7 @@ public class LinkNameEditPart extends LabelEditPart implements
 		 */
 		public LinkNameFigure() {
 
-			this.setText("");	//$NON-NLS-1$
+			this.setText("");
 			createContents();
 		}
 

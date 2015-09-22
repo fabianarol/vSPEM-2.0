@@ -10,11 +10,12 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.library.edit.ui;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -22,6 +23,8 @@ import java.util.List;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.resources.WorkspaceJob;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -31,27 +34,29 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.emf.common.notify.AdapterFactory;
+import org.eclipse.emf.common.util.WrappedException;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.edit.command.AddCommand;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
+import org.eclipse.emf.edit.ui.provider.AdapterFactoryContentProvider;
+import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
+import org.eclipse.epf.common.serviceability.MsgBox;
 import org.eclipse.epf.library.edit.IConfigurator;
 import org.eclipse.epf.library.edit.IFilter;
 import org.eclipse.epf.library.edit.LibraryEditPlugin;
 import org.eclipse.epf.library.edit.LibraryEditResources;
 import org.eclipse.epf.library.edit.Providers;
+import org.eclipse.epf.library.edit.TngAdapterFactory;
 import org.eclipse.epf.library.edit.command.IUserInteractionHandler;
-import org.eclipse.epf.library.edit.command.UserInput;
 import org.eclipse.epf.library.edit.util.ExtensionManager;
-import org.eclipse.epf.library.edit.util.IRunnableWithProgress;
 import org.eclipse.epf.library.edit.util.Messenger;
-import org.eclipse.epf.library.edit.util.ProcessScopeUtil;
 import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
-import org.eclipse.epf.library.edit.validation.AbstractStringValidator;
 import org.eclipse.epf.library.edit.validation.IValidator;
 import org.eclipse.epf.services.IAccessController;
 import org.eclipse.epf.services.Services;
@@ -71,9 +76,22 @@ import org.eclipse.epf.uma.WorkProduct;
 import org.eclipse.epf.uma.WorkProductDescriptor;
 import org.eclipse.epf.uma.ecore.impl.MultiResourceEObject;
 import org.eclipse.epf.uma.ecore.util.OppositeFeature;
-import org.eclipse.epf.uma.util.Scope;
+import org.eclipse.epf.uma.util.MessageException;
 import org.eclipse.epf.uma.util.UmaUtil;
+import org.eclipse.jface.dialogs.IInputValidator;
+import org.eclipse.jface.dialogs.InputDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableContext;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.progress.WorkbenchJob;
 
 /**
  * Defines static methods that interact with user via dialog boxes to retrieve
@@ -84,11 +102,7 @@ import org.eclipse.osgi.util.NLS;
  * @since 1.0
  */
 public final class UserInteractionHelper {
-	
 	private static final boolean canInteract = true;
-	
-	private static final IUIHelper uiHelper = (IUIHelper) ExtensionManager.getExtension(
-			LibraryEditPlugin.getDefault().getId(), "uiHelper"); //$NON-NLS-1$
 
 	private UserInteractionHelper() {
 		super();
@@ -151,13 +165,6 @@ public final class UserInteractionHelper {
 		if (!(e instanceof MethodElement))
 			return 0;
 
-		Scope scope = ProcessScopeUtil.getInstance().getScope(proc);
-		if (scope != null) {
-			ProcessScopeUtil.getInstance().addReferenceToScope(
-					scope, (MethodElement) e, new HashSet<MethodElement>());
-			return 1;
-		}
-		
 		if (configurator == null)
 			configurator = Providers.getConfiguratorFactory()
 					.createConfigurator(proc.getDefaultContext());
@@ -185,32 +192,46 @@ public final class UserInteractionHelper {
 		String msg = NLS
 				.bind(
 						LibraryEditResources.ui_UserInteractionHelper_defaultconfigcheck,
-						((MethodElement) e).getName());		
-		IUserInteractionHandler uiHandler = ExtensionManager.getDefaultUserInteractionHandler();
-		if(uiHandler != null) {
-			int ret = uiHandler.selectOne(new int[] {
-					IUserInteractionHandler.ACTION_YES,
-					IUserInteractionHandler.ACTION_NO,
-					IUserInteractionHandler.ACTION_CANCEL
-				}, LibraryEditResources.add_to_default_config_dlg_title, msg, null);
-			if (TngUtil.DEBUG) {
-				System.out
-				.println("UserInteractionHelper.checkAgainstDefaultConfiguration(): element=" //$NON-NLS-1$
-						+ e + ", path=" + TngUtil.getLabelWithPath(e)); //$NON-NLS-1$
-			}
-			switch (ret) {
-			case IUserInteractionHandler.ACTION_YES:
-				IStatus status = TngUtil.checkEdit(proc.getDefaultContext(), null);
-				if (!status.isOK()) {
-					return 0;
-				}
-				return 2;
-			case IUserInteractionHandler.ACTION_NO:
-				return 0;
-			case IUserInteractionHandler.ACTION_CANCEL:
-				return -1;
-			}
+						((MethodElement) e).getName());
+
+		int ret = MsgBox.prompt(msg);
+		if (TngUtil.DEBUG) {
+			System.out
+					.println("UserInteractionHelper.checkAgainstDefaultConfiguration(): element=" //$NON-NLS-1$
+							+ e + ", path=" + TngUtil.getLabelWithPath(e)); //$NON-NLS-1$
 		}
+		switch (ret) {
+		case SWT.YES:
+			IStatus status = TngUtil.checkEdit(proc.getDefaultContext(), null);
+			if (!status.isOK()) {
+				return 0;
+			}
+			return 2;
+		case SWT.NO:
+			return 0;
+		case SWT.CANCEL:
+			return -1;
+		}
+
+		// WrappedMessageDialog msgBox = new
+		// WrappedMessageDialog(MsgBox.getDefaultShell(), null, null, msg,
+		// MessageDialog.QUESTION,
+		// new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL,
+		// IDialogConstants.CANCEL_LABEL },
+		// 0);
+		// switch (msgBox.open()) {
+		// case IDialogConstants.OK_ID:
+		// IStatus status = TngUtil.checkEdit(proc.getDefaultContext(), null);
+		// if (!status.isOK()) {
+		// return 0;
+		// }
+		// return 2;
+		// case IDialogConstants.NO_ID:
+		// return 0;
+		// case IDialogConstants.CANCEL_ID:
+		// return -1;
+		// };
+
 		return 0;
 	}
 
@@ -222,7 +243,54 @@ public final class UserInteractionHelper {
 	 * @return
 	 */
 	public static List selectTasks(List taskList, WorkProduct wp) {
-		return uiHelper.selectTasks(taskList, wp);
+		ILabelProvider labelProvider = new AdapterFactoryLabelProvider(
+				TngAdapterFactory.INSTANCE
+						.getNavigatorView_ComposedAdapterFactory()) {
+			public String getColumnText(Object obj, int column) {
+				if (obj instanceof MethodElement) {
+					return TngUtil.getPresentationName(obj);
+				}
+				return super.getText(obj);
+			}
+		};
+
+		IStructuredContentProvider contentProvider = new AdapterFactoryContentProvider(
+				TngAdapterFactory.INSTANCE
+						.getNavigatorView_ComposedAdapterFactory()) {
+			public Object[] getElements(Object object) {
+				return ((List) object).toArray();
+			}
+		};
+
+		try {
+			ProcessListSelectionDialog dlg = new ProcessListSelectionDialog(
+					PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+							.getShell(),
+					taskList,
+					contentProvider,
+					labelProvider,
+					NLS
+							.bind(
+									LibraryEditResources.ui_UserInteractionHelper_wplistdlg_msg,
+									wp.getName()));
+
+			dlg.setTitle(LibraryEditResources.ui_UserInteractionHelper_tasks);
+			dlg.setBlockOnOpen(true);
+			dlg.open();
+			Object[] objs = dlg.getResult();
+
+			List selectedTasks = new ArrayList();
+			if ((objs != null) && (objs.length > 0)) {
+				for (int i = 0; i < objs.length; i++) {
+					selectedTasks.add(objs[i]);
+				}
+			}
+			return selectedTasks;
+		} finally {
+			// dispose
+			labelProvider.dispose();
+			contentProvider.dispose();
+		}
 	}
 
 	/**
@@ -233,7 +301,56 @@ public final class UserInteractionHelper {
 	 * @return
 	 */
 	public static List selectWorkProducts(List wpList, Role role) {
-		return uiHelper.selectWorkProducts(wpList, role);
+		ILabelProvider labelProvider = new AdapterFactoryLabelProvider(
+				TngAdapterFactory.INSTANCE
+						.getNavigatorView_ComposedAdapterFactory()) {
+			public String getColumnText(Object obj, int column) {
+				if (obj instanceof MethodElement) {
+					return TngUtil.getPresentationName(obj);
+				}
+				return super.getText(obj);
+			}
+		};
+
+		IStructuredContentProvider contentProvider = new AdapterFactoryContentProvider(
+				TngAdapterFactory.INSTANCE
+						.getNavigatorView_ComposedAdapterFactory()) {
+			public Object[] getElements(Object object) {
+				return ((List) object).toArray();
+			}
+		};
+
+		try {
+			ProcessListSelectionDialog dlg = new ProcessListSelectionDialog(
+					PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+							.getShell(),
+					// MsgBox.getDefaultShell(),
+					wpList,
+					contentProvider,
+					labelProvider,
+					NLS
+							.bind(
+									LibraryEditResources.ui_UserInteractionHelper_rolelistdlg_msg,
+									role.getName()));
+
+			dlg
+					.setTitle(LibraryEditResources.ui_UserInteractionHelper_workproducts); 
+			dlg.setBlockOnOpen(true);
+			dlg.open();
+			Object[] objs = dlg.getResult();
+
+			List selectedWps = new ArrayList();
+			if ((objs != null) && (objs.length > 0)) {
+				for (int i = 0; i < objs.length; i++) {
+					selectedWps.add(objs[i]);
+				}
+			}
+			return selectedWps;
+		} finally {
+			// dispose
+			labelProvider.dispose();
+			contentProvider.dispose();
+		}
 	}
 
 	/**
@@ -246,7 +363,7 @@ public final class UserInteractionHelper {
 	public static String requestName(Object child,
 			EStructuralFeature nameFeature, String title,
 			final IValidator validator) {
-		IValidator inputValidator = new AbstractStringValidator() {
+		IInputValidator inputValidator = new IInputValidator() {
 
 			public String isValid(String newText) {
 				if (validator != null) {
@@ -264,16 +381,12 @@ public final class UserInteractionHelper {
 				name = str;
 			}
 		}
-		IUserInteractionHandler uiHandler = ExtensionManager.getDefaultUserInteractionHandler();
-		if(uiHandler == null) {
-			return null;
-		}
-		UserInput input = new UserInput("", UserInput.TEXT, false, null, null, inputValidator, null); //$NON-NLS-1$
-		input.setInput(name);
-		boolean ret = uiHandler.requestInput(title, LibraryEditResources.UserInteractionHelper_ProcessPackage_Name, 
-			Collections.singletonList(input));
-		if(ret) {
-			return input.getInput().toString().trim();
+		InputDialog inputDialog = new InputDialog(Display.getCurrent()
+				.getActiveShell(), title,
+				LibraryEditResources.UserInteractionHelper_ProcessPackage_Name,
+				name, inputValidator); 
+		if (inputDialog.open() == Window.OK) {
+			return inputDialog.getValue().trim();		
 		}
 		return null;
 	}
@@ -328,21 +441,146 @@ public final class UserInteractionHelper {
 
 	public static TeamProfile getTeam(Activity activity, Role role,
 			Object UIContext) {
-		return uiHelper.getTeam(activity, role, UIContext);
+		List teamList = new ArrayList();
+		AdapterFactory adapterFactory = TngAdapterFactory.INSTANCE
+				.getOBS_ComposedAdapterFactory();
+		// find out all team in visible scope
+		getTeamsInScope(adapterFactory, activity, role, teamList);
+		if (teamList.size() == 1) {
+			return (TeamProfile) teamList.get(0);
+		}
+		if (teamList.size() > 1) {
+			return TeamSelection.getSelectedTeam(teamList, role,
+					UIContext instanceof Shell ? (Shell) UIContext : null);
+		}
+		// there are no teams to assign
+		return null;
+	}
+
+	/**
+	 * Get teams in scope
+	 * 
+	 * @param adapterFactory
+	 * @param e
+	 * @param role
+	 * @param teamList
+	 */
+	private static void getTeamsInScope(AdapterFactory adapterFactory,
+			BreakdownElement e, Role role, List teamList) {
+		// get children for activity
+		ITreeItemContentProvider itemProvider = (ITreeItemContentProvider) adapterFactory
+				.adapt(e, ITreeItemContentProvider.class);
+		Collection children = itemProvider.getChildren(e);
+		for (Iterator itor = children.iterator(); itor.hasNext();) {
+			Object obj = itor.next();
+			if (obj instanceof TeamProfile) {
+				TeamProfile team = (TeamProfile) obj;
+				List allTeams = new ArrayList();
+				// get all sub teams as well
+				ProcessUtil.getAllSubTeams(team, allTeams);
+
+				for (Iterator teamItor = allTeams.iterator(); teamItor
+						.hasNext();) {
+					Object o = teamItor.next();
+					if (o instanceof TeamProfile) {
+						// get roles from teams
+						List roles = ProcessUtil.getRoles(((TeamProfile) o)
+								.getTeamRoles());
+						if (roles.contains(role)) {
+							teamList.add(o);
+						}
+					}
+				}
+			}
+		}
+
+		// get parent
+		Object currentParent = itemProvider.getParent(e);
+		if (currentParent != null) {
+			// go up
+			getTeamsInScope(adapterFactory, (BreakdownElement) currentParent,
+					role, teamList);
+		}
+	}
+
+	private static IRunnableContext getRunnableContext() {
+		return ExtensionManager.getDefaultUserInteractionHandler()
+				.getRunnableContext();
 	}
 
 	public static final boolean runWithProgress(final Runnable runnable,
 			final String msg) {
+		final MultiStatus status = new MultiStatus(LibraryEditPlugin.INSTANCE
+				.getSymbolicName(), IStatus.OK,
+				LibraryEditResources.error_reason, null); 
+
 		final IRunnableWithProgress operation = new IRunnableWithProgress() {
 
 			public void run(IProgressMonitor monitor)
 					throws InvocationTargetException, InterruptedException {
-				runnable.run();
+				monitor.beginTask(msg, IProgressMonitor.UNKNOWN);
+				monitor.subTask(""); //$NON-NLS-1$
+				try {
+					runnable.run();
+				} catch (RuntimeException e) {
+					String msg;
+					Throwable ex = null;
+					if (e instanceof MessageException) {
+						msg = e.getMessage();
+					} else {
+						StringWriter strWriter = new StringWriter();
+						e.printStackTrace(new PrintWriter(strWriter));
+						msg = strWriter.toString();
+						ex = e;
+					}
+					status.add(new Status(IStatus.ERROR,
+							LibraryEditPlugin.INSTANCE.getSymbolicName(), 0,
+							msg, ex));
+				} finally {
+					monitor.done();
+				}
 			}
 
 		};
-		
-		return runWithProgress(operation, msg);
+
+		try {
+			// This runs the operation, and shows progress.
+			//
+			if (Display.getCurrent() == null) {
+				// current thread is not a user-interface thread
+				//
+				Display.getDefault().syncExec(new Runnable() {
+
+					public void run() {
+						try {
+							getRunnableContext().run(true, false, operation);
+						} catch (Exception e) {
+							LibraryEditPlugin.getDefault().getLogger().logError(e);
+						}
+					}
+
+				});
+			} else {
+				getRunnableContext().run(true, false, operation);
+			}
+
+			
+
+			if (!status.isOK()) {
+				Messenger.INSTANCE.showError(
+						LibraryEditResources.errorDialog_title, 
+						LibraryEditResources.error_msgWithDetails, 
+						status);
+			} else {
+				return true;
+			}
+		} catch (Exception exception) {
+			// Something went wrong that shouldn't.
+			//
+			LibraryEditPlugin.getDefault().getLogger().logError(exception);
+		}
+
+		return false;
 	}
 
 	public static final boolean runWithProgress(
@@ -353,12 +591,12 @@ public final class UserInteractionHelper {
 	public static final boolean runWithProgress(
 			final IRunnableWithProgress runnable, final boolean canCancel,
 			final String msg) {
-		return uiHelper.runWithProgress(runnable, canCancel, msg);
+		return runWithProgress(runnable, getRunnableContext(), canCancel, msg);
 	}
 
 	public static final IStatus runAsJob(IRunnableWithProgress runnable,
 			String taskName) {
-		Object shell = LibraryEditPlugin.getDefault().getContext();
+		Shell shell = MsgBox.getDefaultShell();
 		if (shell == null) {
 			try {
 				runnable.run(new NullProgressMonitor());
@@ -373,10 +611,112 @@ public final class UserInteractionHelper {
 	}
 
 	public static final IStatus runAsJob(final IRunnableWithProgress runnable,
-			final String taskName, Object shell) {
-		return uiHelper.runAsJob(runnable, taskName, shell);
+			final String taskName, Shell shell) {
+		Job job = new WorkspaceJob(taskName) {
+
+			public IStatus runInWorkspace(IProgressMonitor monitor)
+					throws CoreException {
+				try {
+					// monitor.beginTask(taskName, IProgressMonitor.UNKNOWN);
+					runnable.run(monitor);
+					return Status.OK_STATUS;
+				} catch (InvocationTargetException e) {
+					Throwable ex;
+					if (e.getCause() != null) {
+						ex = e.getCause();
+					} else {
+						ex = e;
+					}
+					return new Status(IStatus.ERROR, LibraryEditPlugin
+							.getPlugin().getId(), 0, ex.toString(), ex);
+				} catch (InterruptedException e) {
+					return new Status(IStatus.ERROR, LibraryEditPlugin
+							.getPlugin().getId(), 0, e.toString(), e);
+				} finally {
+					monitor.done();
+				}
+			}
+
+		};
+		PlatformUI.getWorkbench().getProgressService().showInDialog(shell, job);
+		job.schedule();
+		return job.getResult();
+	}
+
+	public static void runInUI(final IRunnableWithProgress runnable,
+			final String taskName) {
+		Shell shell = MsgBox.getDefaultShell();
+		if (shell == null) {
+			try {
+				runnable.run(new NullProgressMonitor());
+				return;
+			} catch (Exception e) {
+				LibraryEditPlugin.getDefault().getLogger().logError(e);
+				throw new WrappedException(e);
+			}
+		}
+		Job job = new WorkbenchJob(taskName) {
+
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				monitor.beginTask("", IProgressMonitor.UNKNOWN); //$NON-NLS-1$
+				try {
+					runnable.run(monitor);
+					return Status.OK_STATUS;
+				} catch (InvocationTargetException e) {
+					Throwable ex;
+					if (e.getCause() != null) {
+						ex = e.getCause();
+					} else {
+						ex = e;
+					}
+					return new Status(IStatus.ERROR, LibraryEditPlugin
+							.getPlugin().getId(), 0, ex.toString(), ex);
+				} catch (InterruptedException e) {
+					return new Status(IStatus.ERROR, LibraryEditPlugin
+							.getPlugin().getId(), 0, e.toString(), e);
+				} finally {
+					monitor.done();
+				}
+			}
+
+		};
+		PlatformUI.getWorkbench().getProgressService().showInDialog(shell, job);
+		job.schedule();
 	}
 	
+	public static final void runInUIThread(Runnable runnable) {
+		runInUIThread(runnable, false);
+	}
+	
+	public static final void runInUIThread(Runnable runnable, boolean async) {
+		if(Display.getCurrent() == null) {
+			// current thread is not a user-interface thread
+			//
+			Display display = null;
+			try {
+				display = Display.getDefault();
+			}
+			catch(Exception e) {
+				
+			}
+			if(display != null) {
+				if(async) {
+					display.asyncExec(runnable);
+				}
+				else {
+					display.syncExec(runnable);
+				}
+			}
+			else {
+				runnable.run();
+			}
+		}
+		else {
+			runnable.run();
+		}
+		
+	}
+
 	public static final boolean runInUI(final Runnable runnable,
 			final String taskName) {
 		return runInUI(runnable, taskName, null);
@@ -384,7 +724,7 @@ public final class UserInteractionHelper {
 
 	public static final boolean runInUI(final Runnable runnable,
 			final String taskName, ISchedulingRule rule) {
-		Object shell = LibraryEditPlugin.getDefault().getContext();
+		Shell shell = MsgBox.getDefaultShell();
 		if (shell == null) {
 			runnable.run();
 			return true;
@@ -408,13 +748,101 @@ public final class UserInteractionHelper {
 	}
 
 	public static final boolean runInUI(IRunnableWithProgress runnable,
-			Object shell) {
+			Shell shell) {
 		return runInUI(runnable, null, shell);
 	}
 
 	public static final boolean runInUI(IRunnableWithProgress runnable,
-			ISchedulingRule rule, Object shell) {
-		return uiHelper.runInUI(runnable, rule, shell);
+			ISchedulingRule rule, Shell shell) {
+		if (shell == null) {
+			shell = MsgBox.getDefaultShell();
+		}
+		IRunnableContext context = new ProgressMonitorDialog(shell);
+		try {
+			PlatformUI.getWorkbench().getProgressService().runInUI(context,
+					runnable, rule);
+			return true;
+		} catch (Exception e) {
+			LibraryEditPlugin.getDefault().getLogger().logError(e);
+			String title = LibraryEditResources.errorDialog_title;
+			ExtensionManager.getDefaultUserInteractionHandler().getMessenger()
+				.showError(title, e.toString(), null, e);
+//			LibraryEditPlugin.getDefault().getMsgDialog().displayError(title,
+//					e.toString(), e);
+		}
+		return false;
+	}
+
+	public static final boolean runWithProgress(
+			final IRunnableWithProgress runnable,
+			final IRunnableContext runnableContext, final boolean canCancel,
+			final String msg) {
+		final MultiStatus status = new MultiStatus(LibraryEditPlugin.INSTANCE
+				.getSymbolicName(), IStatus.OK,
+				LibraryEditResources.error_reason, null); 
+
+		final IRunnableWithProgress operation = new IRunnableWithProgress() {
+
+			public void run(IProgressMonitor monitor)
+					throws InvocationTargetException, InterruptedException {
+				monitor.beginTask(msg, IProgressMonitor.UNKNOWN);
+				monitor.subTask(""); //$NON-NLS-1$
+				try {
+					runnable.run(monitor);
+				} catch (RuntimeException e) {
+					String msg;
+					if (e instanceof MessageException) {
+						msg = e.getMessage();
+					} else {
+						StringWriter strWriter = new StringWriter();
+						e.printStackTrace(new PrintWriter(strWriter));
+						msg = strWriter.toString();
+					}
+					status.add(new Status(IStatus.ERROR,
+							LibraryEditPlugin.INSTANCE.getSymbolicName(), 0,
+							msg, e));
+				} finally {
+					monitor.done();
+				}
+			}
+
+		};
+
+		try {
+			if (Display.getCurrent() == null) {
+				// current thread is not a user-interface thread
+				//
+				Display.getDefault().syncExec(new Runnable() {
+
+					public void run() {
+						try {
+							runnableContext.run(true, canCancel, operation);
+						} catch (Exception e) {
+							LibraryEditPlugin.getDefault().getLogger().logError(e);
+						}
+					}
+
+				});
+			} else {
+				runnableContext.run(true, canCancel, operation);
+			}
+
+			if (!status.isOK()) {
+				ExtensionManager.getDefaultUserInteractionHandler()
+						.getMessenger().showError(
+								LibraryEditResources.errorDialog_title,
+								LibraryEditResources.error_msgWithDetails,
+								status);
+			} else {
+				return true;
+			}
+		} catch (Exception exception) {
+			// Something went wrong that shouldn't.
+			//
+			LibraryEditPlugin.getDefault().getLogger().logError(exception);
+		}
+
+		return false;
 	}
 
 	/**
@@ -496,7 +924,7 @@ public final class UserInteractionHelper {
 	 * @param shell
 	 * @return
 	 */
-	public static IStatus checkModify(EObject element, Object shell) {
+	public static IStatus checkModify(EObject element, Shell shell) {
 		if (TngUtil.isLocked(element)) {
 			String msg = MessageFormat
 					.format(
@@ -514,18 +942,18 @@ public final class UserInteractionHelper {
 	 * 
 	 * @param modifiedResources
 	 *            A collection of resources.
-	 * @param context
-	 *            The context of this call. For RCP, this is the shell.
+	 * @param shell
+	 *            The parent shell.
 	 * @return An <code>IStatus</code> object.
 	 */
-	public static IStatus checkModify(Collection modifiedResources, Object context) {
+	public static IStatus checkModify(Collection modifiedResources, Shell shell) {
 		IAccessController ac = Services.getAccessController();
 		if (ac == null) {
 			return Status.OK_STATUS;
 		}
 		Resource[] resources = new Resource[modifiedResources.size()];
 		modifiedResources.toArray(resources);
-		return ac.checkModify(resources, context);
+		return ac.checkModify(resources, shell);
 	}
 
 	public static IResource getWorkspaceResource(Resource resource) {
@@ -639,13 +1067,7 @@ public final class UserInteractionHelper {
 	 * @return
 	 */
 	public static IStatus checkConfigurationsToUpdate(AddCommand addCommand,
-			Object shell) {
-		//wlu0 9-12-2012: we are now using "loadCheckPkgs" property mechanism to handle adding to configuration. No need to checkModify here.
-		//				  Therefore, directly return ok stat.	
-		if (true) {
-			return Status.OK_STATUS;
-		}
-		
+			Shell shell) {
 		EObject parent = addCommand.getOwner();
 		if (!(parent instanceof MethodPackage)) {
 			return Status.OK_STATUS;
@@ -737,62 +1159,18 @@ public final class UserInteractionHelper {
 					&& currentConfig != targetProcess.getDefaultContext()) {
 				if (UserInteractionHelper.canInteract()) {
 					String msg = LibraryEditResources.ActivityDropCommand_deepCopy_promptConfigurationMsg;
-					IUserInteractionHandler uiHandler = ExtensionManager.getDefaultUserInteractionHandler();
-					if(uiHandler != null) {
-						int ret = uiHandler.selectOne(new int[] {
-								IUserInteractionHandler.ACTION_YES,
-								IUserInteractionHandler.ACTION_NO,
-								IUserInteractionHandler.ACTION_CANCEL
-							}, LibraryEditResources.deepCopy_title, msg, null);						
-						switch (ret) {
-						case IUserInteractionHandler.ACTION_YES:
-							break;
-						case IUserInteractionHandler.ACTION_NO:
-							deepCopyConfig = currentConfig;
-							break;
-						case IUserInteractionHandler.ACTION_CANCEL:
-							throw new OperationCanceledException();
-						}
+					switch (MsgBox.prompt(msg)) {
+					case SWT.YES:
+						break;
+					case SWT.NO:
+						deepCopyConfig = currentConfig;
+						break;
+					case SWT.CANCEL:
+						throw new OperationCanceledException();
 					}
 				}
 			}
 		}
 		return deepCopyConfig;
-	}
-	
-	public static boolean copyExternalVariationsAllowed(Process targetProcess, AdapterFactory adapterFactory) {
-		// ask users to copy external contribution(s)/replacement(s) if
-		// current config is not the default config of the target process
-		//
-		IFilter filter = ProcessUtil.getFilter(adapterFactory);
-		if (filter instanceof IConfigurator) {
-			MethodConfiguration currentConfig = ((IConfigurator) filter)
-					.getMethodConfiguration();
-			if (currentConfig != null
-					&& currentConfig != targetProcess.getDefaultContext()) {				
-				String msg = LibraryEditResources.activity_deep_copy_variability_prompt;
-				IUserInteractionHandler uiHandler = ExtensionManager.getDefaultUserInteractionHandler();
-				if(uiHandler != null) {
-					int ret = uiHandler.selectOne(new int[] {
-							IUserInteractionHandler.ACTION_YES,
-							IUserInteractionHandler.ACTION_NO,
-							IUserInteractionHandler.ACTION_CANCEL
-						}, LibraryEditResources.deepCopy_title, msg, null);						
-					switch (ret) {
-					case IUserInteractionHandler.ACTION_YES:
-						return true;
-					case IUserInteractionHandler.ACTION_NO:
-						return false;
-					case IUserInteractionHandler.ACTION_CANCEL:
-						throw new OperationCanceledException();
-					}
-				}				
-			}
-		}
-		return true;
-	}
-
-	public static IUIHelper getUIHelper() {
-		return uiHelper;
 	}
 }

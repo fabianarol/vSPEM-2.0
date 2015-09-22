@@ -20,6 +20,7 @@ import org.eclipse.epf.library.configuration.ElementRealizer;
 import org.eclipse.epf.library.layout.ElementLayoutManager;
 import org.eclipse.epf.library.layout.util.XmlElement;
 import org.eclipse.epf.uma.MethodElement;
+import org.eclipse.epf.uma.RoleDescriptor;
 import org.eclipse.epf.uma.UmaPackage;
 import org.eclipse.epf.uma.ecore.util.OppositeFeature;
 import org.eclipse.epf.uma.util.AssociationHelper;
@@ -68,9 +69,7 @@ public class RoleDescriptorLayout extends DescriptorLayout {
 			// also load the linked element referenced information
 			for (Iterator<EStructuralFeature> iter = getExtraFeaturesFromContentElement().iterator(); iter.hasNext();) {
 				EStructuralFeature feature = (EStructuralFeature) iter.next();
-				if (! isSynReferece(feature)) {
-					super.elementLayout.loadFeature(feature, elementXml, false);
-				}
+				super.elementLayout.loadFeature(feature, elementXml, false);
 			}
 		}
 	}
@@ -105,10 +104,8 @@ public class RoleDescriptorLayout extends DescriptorLayout {
 				
 				String path = super.makePath(getSuperActivityPath(), e);
 				TaskDescriptorLayout tl = (TaskDescriptorLayout)layoutManager.createLayout(e, owningProcess, path);
-				//RoleDescriptor r = (RoleDescriptor)tl.getFeatureValue(UmaPackage.eINSTANCE.getTaskDescriptor_PerformedPrimarilyBy(), null, false);
-				List rList = (List)tl.getFeatureValue(UmaPackage.eINSTANCE.getTaskDescriptor_PerformedPrimarilyBy(), null, false);
-				//if ( r == this.element ) {
-				if (rList != null && rList.contains(this.element) ) {
+				RoleDescriptor r = (RoleDescriptor)tl.getFeatureValue(UmaPackage.eINSTANCE.getTaskDescriptor_PerformedPrimarilyBy(), null, false);
+				if ( r == this.element ) {
 					List value = (List)tl.getFeatureValue(feature, null, false);
 					if ( value != null && value.size() > 0 ) {
 						for ( Iterator itr = value.iterator(); itr.hasNext(); ) {

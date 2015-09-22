@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: MethodPlugin.java,v 1.2 2006/06/23 00:01:26 jxi Exp $
+ */
 package org.eclipse.epf.xml.uma;
 
 import org.eclipse.emf.common.util.EList;
@@ -28,7 +24,6 @@ import org.eclipse.emf.common.util.EList;
  * <ul>
  *   <li>{@link org.eclipse.epf.xml.uma.MethodPlugin#getReferencedMethodPlugin <em>Referenced Method Plugin</em>}</li>
  *   <li>{@link org.eclipse.epf.xml.uma.MethodPlugin#getMethodPackage <em>Method Package</em>}</li>
- *   <li>{@link org.eclipse.epf.xml.uma.MethodPlugin#isSupporting <em>Supporting</em>}</li>
  *   <li>{@link org.eclipse.epf.xml.uma.MethodPlugin#isUserChangeable <em>User Changeable</em>}</li>
  * </ul>
  * </p>
@@ -49,11 +44,11 @@ public interface MethodPlugin extends MethodUnit {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Referenced Method Plugin</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getMethodPlugin_ReferencedMethodPlugin()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="kind='element' name='ReferencedMethodPlugin'"
 	 * @generated
 	 */
-	EList<String> getReferencedMethodPlugin();
+	EList getReferencedMethodPlugin();
 
 	/**
 	 * Returns the value of the '<em><b>Method Package</b></em>' containment reference list.
@@ -66,65 +61,11 @@ public interface MethodPlugin extends MethodUnit {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Method Package</em>' containment reference list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getMethodPlugin_MethodPackage()
-	 * @model containment="true"
+	 * @model type="org.eclipse.epf.xml.uma.MethodPackage" containment="true"
 	 *        extendedMetaData="kind='element' name='MethodPackage'"
 	 * @generated
 	 */
-	EList<MethodPackage> getMethodPackage();
-
-	/**
-	 * Returns the value of the '<em><b>Supporting</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Supporting</em>' attribute isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Supporting</em>' attribute.
-	 * @see #isSetSupporting()
-	 * @see #unsetSupporting()
-	 * @see #setSupporting(boolean)
-	 * @see org.eclipse.epf.xml.uma.UmaPackage#getMethodPlugin_Supporting()
-	 * @model unsettable="true" dataType="org.eclipse.emf.ecore.xml.type.Boolean"
-	 *        extendedMetaData="kind='attribute' name='supporting'"
-	 * @generated
-	 */
-	boolean isSupporting();
-
-	/**
-	 * Sets the value of the '{@link org.eclipse.epf.xml.uma.MethodPlugin#isSupporting <em>Supporting</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Supporting</em>' attribute.
-	 * @see #isSetSupporting()
-	 * @see #unsetSupporting()
-	 * @see #isSupporting()
-	 * @generated
-	 */
-	void setSupporting(boolean value);
-
-	/**
-	 * Unsets the value of the '{@link org.eclipse.epf.xml.uma.MethodPlugin#isSupporting <em>Supporting</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #isSetSupporting()
-	 * @see #isSupporting()
-	 * @see #setSupporting(boolean)
-	 * @generated
-	 */
-	void unsetSupporting();
-
-	/**
-	 * Returns whether the value of the '{@link org.eclipse.epf.xml.uma.MethodPlugin#isSupporting <em>Supporting</em>}' attribute is set.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return whether the value of the '<em>Supporting</em>' attribute is set.
-	 * @see #unsetSupporting()
-	 * @see #isSupporting()
-	 * @see #setSupporting(boolean)
-	 * @generated
-	 */
-	boolean isSetSupporting();
+	EList getMethodPackage();
 
 	/**
 	 * Returns the value of the '<em><b>User Changeable</b></em>' attribute.
@@ -139,7 +80,7 @@ public interface MethodPlugin extends MethodUnit {
 	 * @see #unsetUserChangeable()
 	 * @see #setUserChangeable(boolean)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getMethodPlugin_UserChangeable()
-	 * @model unsettable="true" dataType="org.eclipse.emf.ecore.xml.type.Boolean"
+	 * @model unique="false" unsettable="true" dataType="org.eclipse.emf.ecore.xml.type.Boolean"
 	 *        extendedMetaData="kind='attribute' name='userChangeable'"
 	 * @generated
 	 */

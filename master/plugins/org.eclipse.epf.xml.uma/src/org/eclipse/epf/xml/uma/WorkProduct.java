@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: WorkProduct.java,v 1.4 2007/05/04 22:46:43 klow Exp $
+ */
 package org.eclipse.epf.xml.uma;
 
 import org.eclipse.emf.common.util.EList;
@@ -52,7 +48,7 @@ public interface WorkProduct extends ContentElement {
 	 * @return the value of the '<em>Group2</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getWorkProduct_Group2()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
-	 *        extendedMetaData="kind='group' name='group:24'"
+	 *        extendedMetaData="kind='group' name='group:22'"
 	 * @generated
 	 */
 	FeatureMap getGroup2();
@@ -68,11 +64,11 @@ public interface WorkProduct extends ContentElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Estimate</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getWorkProduct_Estimate()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='Estimate' group='#group:24'"
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='Estimate' group='#group:22'"
 	 * @generated
 	 */
-	EList<String> getEstimate();
+	EList getEstimate();
 
 	/**
 	 * Returns the value of the '<em><b>Estimation Considerations</b></em>' attribute list.
@@ -85,11 +81,11 @@ public interface WorkProduct extends ContentElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Estimation Considerations</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getWorkProduct_EstimationConsiderations()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='EstimationConsiderations' group='#group:24'"
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='EstimationConsiderations' group='#group:22'"
 	 * @generated
 	 */
-	EList<String> getEstimationConsiderations();
+	EList getEstimationConsiderations();
 
 	/**
 	 * Returns the value of the '<em><b>Report</b></em>' attribute list.
@@ -102,11 +98,11 @@ public interface WorkProduct extends ContentElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Report</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getWorkProduct_Report()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='Report' group='#group:24'"
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='Report' group='#group:22'"
 	 * @generated
 	 */
-	EList<String> getReport();
+	EList getReport();
 
 	/**
 	 * Returns the value of the '<em><b>Template</b></em>' attribute list.
@@ -119,11 +115,11 @@ public interface WorkProduct extends ContentElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Template</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getWorkProduct_Template()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='Template' group='#group:24'"
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='Template' group='#group:22'"
 	 * @generated
 	 */
-	EList<String> getTemplate();
+	EList getTemplate();
 
 	/**
 	 * Returns the value of the '<em><b>Tool Mentor</b></em>' attribute list.
@@ -136,10 +132,10 @@ public interface WorkProduct extends ContentElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Tool Mentor</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getWorkProduct_ToolMentor()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='ToolMentor' group='#group:24'"
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='ToolMentor' group='#group:22'"
 	 * @generated
 	 */
-	EList<String> getToolMentor();
+	EList getToolMentor();
 
 } // WorkProduct

@@ -32,6 +32,5 @@ public class DiagramDiagramPreferenceInitializer extends
 	public void initializeDefaultPreferences() {
 		super.initializeDefaultPreferences();
 		DiagramCoreUtil.setDefaultFontPreference(getPreferenceStore());
-		DiagramCoreUtil.hideConnectionHandles(getPreferenceStore());
 	}
 }

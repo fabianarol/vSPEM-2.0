@@ -29,12 +29,29 @@ public class OBSItemProviderAdapterFactory extends ItemProviderAdapterFactory {
 		return new OBSActivityItemProvider(this);
 	}
 
+	public Adapter createvpActivityAdapter() {
+		return createActivityAdapter();
+	}
+	
+	public Adapter createVarActivityAdapter() {
+		return createActivityAdapter();
+	}
+	
+	
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.epf.uma.util.BreakdownAdapterFactory#createIterationAdapter()
 	 */
 	public Adapter createIterationAdapter() {
+		return createActivityAdapter();
+	}
+	
+	public Adapter createvpIterationAdapter() {
+		return createActivityAdapter();
+	}
+	
+	public Adapter createVarIterationAdapter() {
 		return createActivityAdapter();
 	}
 
@@ -46,6 +63,14 @@ public class OBSItemProviderAdapterFactory extends ItemProviderAdapterFactory {
 	public Adapter createPhaseAdapter() {
 		return createActivityAdapter();
 	}
+	
+	public Adapter createvpPhaseAdapter() {
+		return createActivityAdapter();
+	}
+	
+	public Adapter createVarPhaseAdapter() {
+		return createActivityAdapter();
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -54,6 +79,14 @@ public class OBSItemProviderAdapterFactory extends ItemProviderAdapterFactory {
 	 */
 	public Adapter createTeamProfileAdapter() {
 		return new TeamProfileItemProvider(this, (ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory.createTeamProfileAdapter());
+	}
+	
+	public Adapter createVarTeamProfileAdapter() {
+		return new VarTeamProfileItemProvider(this, (ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory.createVarTeamProfileAdapter());
+	}
+	
+	public Adapter createvpTeamProfileAdapter() {
+		return new vpTeamProfileItemProvider(this, (ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory.createvpTeamProfileAdapter());
 	}
 
 	// /* (non-Javadoc)
@@ -72,6 +105,20 @@ public class OBSItemProviderAdapterFactory extends ItemProviderAdapterFactory {
 	public Adapter createMilestoneAdapter() {
 		return new OBSMilestoneItemProvider(this, (ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
 				.createMilestoneAdapter());
+	}
+	
+	public Adapter createVarMilestoneAdapter() {
+		return new OBSMilestoneItemProvider(this, (ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
+				.createVarMilestoneAdapter());
+		
+//		return createMilestoneAdapter();
+	}
+	
+	public Adapter createvpMilestoneAdapter() {
+		return new OBSMilestoneItemProvider(this, (ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
+				.createvpMilestoneAdapter());
+		
+//		return createMilestoneAdapter();
 	}
 
 	/*

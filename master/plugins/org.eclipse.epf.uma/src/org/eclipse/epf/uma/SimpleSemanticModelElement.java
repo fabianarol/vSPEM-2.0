@@ -39,7 +39,7 @@ public interface SimpleSemanticModelElement extends SemanticModelBridge {
 	 * @return the value of the '<em>Type Info</em>' attribute.
 	 * @see #setTypeInfo(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getSimpleSemanticModelElement_TypeInfo()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getTypeInfo();

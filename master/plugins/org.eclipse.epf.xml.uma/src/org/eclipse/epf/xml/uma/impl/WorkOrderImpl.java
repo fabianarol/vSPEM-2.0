@@ -1,19 +1,19 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: WorkOrderImpl.java,v 1.6 2007/06/05 21:14:59 klow Exp $
+ */
 package org.eclipse.epf.xml.uma.impl;
 
 import org.eclipse.emf.common.notify.Notification;
+
 import org.eclipse.emf.ecore.EClass;
+
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-import org.eclipse.epf.uma.ecore.impl.MultiResourceEObject;
+
+import org.eclipse.emf.ecore.sdo.impl.EDataObjectImpl;
+
 import org.eclipse.epf.xml.uma.UmaPackage;
 import org.eclipse.epf.xml.uma.WorkOrder;
 import org.eclipse.epf.xml.uma.WorkOrderType;
@@ -28,13 +28,12 @@ import org.eclipse.epf.xml.uma.WorkOrderType;
  *   <li>{@link org.eclipse.epf.xml.uma.impl.WorkOrderImpl#getValue <em>Value</em>}</li>
  *   <li>{@link org.eclipse.epf.xml.uma.impl.WorkOrderImpl#getId <em>Id</em>}</li>
  *   <li>{@link org.eclipse.epf.xml.uma.impl.WorkOrderImpl#getLinkType <em>Link Type</em>}</li>
- *   <li>{@link org.eclipse.epf.xml.uma.impl.WorkOrderImpl#getProperties <em>Properties</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
-public class WorkOrderImpl extends MultiResourceEObject implements WorkOrder {
+public class WorkOrderImpl extends EDataObjectImpl implements WorkOrder {
 	/**
 	 * The default value of the '{@link #getValue() <em>Value</em>}' attribute.
 	 * <!-- begin-user-doc -->
@@ -83,7 +82,7 @@ public class WorkOrderImpl extends MultiResourceEObject implements WorkOrder {
 	 * @generated
 	 * @ordered
 	 */
-	protected static final WorkOrderType LINK_TYPE_EDEFAULT = WorkOrderType.FINISH_TO_START;
+	protected static final WorkOrderType LINK_TYPE_EDEFAULT = WorkOrderType.FINISH_TO_START_LITERAL;
 
 	/**
 	 * The cached value of the '{@link #getLinkType() <em>Link Type</em>}' attribute.
@@ -105,26 +104,6 @@ public class WorkOrderImpl extends MultiResourceEObject implements WorkOrder {
 	protected boolean linkTypeESet;
 
 	/**
-	 * The default value of the '{@link #getProperties() <em>Properties</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getProperties()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String PROPERTIES_EDEFAULT = null;
-
-	/**
-	 * The cached value of the '{@link #getProperties() <em>Properties</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getProperties()
-	 * @generated
-	 * @ordered
-	 */
-	protected String properties = PROPERTIES_EDEFAULT;
-
-	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -138,7 +117,6 @@ public class WorkOrderImpl extends MultiResourceEObject implements WorkOrder {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.WORK_ORDER;
 	}
@@ -236,28 +214,6 @@ public class WorkOrderImpl extends MultiResourceEObject implements WorkOrder {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public String getProperties() {
-		return properties;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setProperties(String newProperties) {
-		String oldProperties = properties;
-		properties = newProperties;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, UmaPackage.WORK_ORDER__PROPERTIES, oldProperties, properties));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 			case UmaPackage.WORK_ORDER__VALUE:
@@ -266,8 +222,6 @@ public class WorkOrderImpl extends MultiResourceEObject implements WorkOrder {
 				return getId();
 			case UmaPackage.WORK_ORDER__LINK_TYPE:
 				return getLinkType();
-			case UmaPackage.WORK_ORDER__PROPERTIES:
-				return getProperties();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -277,7 +231,6 @@ public class WorkOrderImpl extends MultiResourceEObject implements WorkOrder {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 			case UmaPackage.WORK_ORDER__VALUE:
@@ -289,9 +242,6 @@ public class WorkOrderImpl extends MultiResourceEObject implements WorkOrder {
 			case UmaPackage.WORK_ORDER__LINK_TYPE:
 				setLinkType((WorkOrderType)newValue);
 				return;
-			case UmaPackage.WORK_ORDER__PROPERTIES:
-				setProperties((String)newValue);
-				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -301,7 +251,6 @@ public class WorkOrderImpl extends MultiResourceEObject implements WorkOrder {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 			case UmaPackage.WORK_ORDER__VALUE:
@@ -313,9 +262,6 @@ public class WorkOrderImpl extends MultiResourceEObject implements WorkOrder {
 			case UmaPackage.WORK_ORDER__LINK_TYPE:
 				unsetLinkType();
 				return;
-			case UmaPackage.WORK_ORDER__PROPERTIES:
-				setProperties(PROPERTIES_EDEFAULT);
-				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -325,7 +271,6 @@ public class WorkOrderImpl extends MultiResourceEObject implements WorkOrder {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 			case UmaPackage.WORK_ORDER__VALUE:
@@ -334,8 +279,6 @@ public class WorkOrderImpl extends MultiResourceEObject implements WorkOrder {
 				return ID_EDEFAULT == null ? id != null : !ID_EDEFAULT.equals(id);
 			case UmaPackage.WORK_ORDER__LINK_TYPE:
 				return isSetLinkType();
-			case UmaPackage.WORK_ORDER__PROPERTIES:
-				return PROPERTIES_EDEFAULT == null ? properties != null : !PROPERTIES_EDEFAULT.equals(properties);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -345,7 +288,6 @@ public class WorkOrderImpl extends MultiResourceEObject implements WorkOrder {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
@@ -356,8 +298,6 @@ public class WorkOrderImpl extends MultiResourceEObject implements WorkOrder {
 		result.append(id);
 		result.append(", linkType: ");
 		if (linkTypeESet) result.append(linkType); else result.append("<unset>");
-		result.append(", properties: ");
-		result.append(properties);
 		result.append(')');
 		return result.toString();
 	}

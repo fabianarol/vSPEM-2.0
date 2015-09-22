@@ -33,7 +33,7 @@ class HttpClientTimeout extends HttpClient
     HttpClientTimeout(URL url, int timeout) throws IOException
 	{
 		super(url, (String)null, -1);
-		setTimeout(timeout);
+		_setTimeout(timeout);
     }
 
 	private void _setTimeout(int i)

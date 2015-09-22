@@ -15,11 +15,6 @@ import java.util.Collections;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExtension;
-import org.eclipse.core.runtime.IExtensionPoint;
-import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.ui.viewer.IViewerProvider;
 import org.eclipse.emf.common.util.URI;
@@ -34,7 +29,6 @@ import org.eclipse.epf.authoring.ui.AuthoringUIPlugin;
 import org.eclipse.epf.authoring.ui.AuthoringUIResources;
 import org.eclipse.epf.authoring.ui.UIActionDispatcher;
 import org.eclipse.epf.authoring.ui.actions.ILibraryActionBarContributor;
-import org.eclipse.epf.authoring.ui.providers.IContentProviderFactory;
 import org.eclipse.epf.library.ILibraryManager;
 import org.eclipse.epf.library.ILibraryServiceListener;
 import org.eclipse.epf.library.LibraryService;
@@ -48,7 +42,6 @@ import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -68,7 +61,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.ide.IGotoMarker;
 import org.eclipse.ui.views.properties.IPropertySheetPage;
 import org.eclipse.ui.views.properties.PropertySheetPage;
-import org.osgi.framework.Bundle;
 
 /**
  * The abstract base class for all Method Library views.
@@ -153,8 +145,6 @@ public abstract class AbstractBaseView extends SaveableLibraryViewPart
 			}
 		}
 	};
-
-	private IContentProviderFactory contentProviderFactory;
 
 	/**
 	 * Displays a dialog that asks if conflicting changes should be discarded.
@@ -473,66 +463,11 @@ public abstract class AbstractBaseView extends SaveableLibraryViewPart
 		}
 	}
 
-	protected IContentProviderFactory getContentProviderFactory() {
-		if(contentProviderFactory == null) {
-			// Process the contributors.
-			//
-			IExtensionRegistry extensionRegistry = Platform
-					.getExtensionRegistry();
-			IExtensionPoint extensionPoint = extensionRegistry
-					.getExtensionPoint(AuthoringUIPlugin.getDefault().getId(),
-							"contentProviderFactories"); //$NON-NLS-1$
-			if (extensionPoint != null) {
-				IExtension[] extensions = extensionPoint.getExtensions();
-				Object ext = null;
-				ext_walk:
-				for (int i = 0; i < extensions.length; i++) {
-					IExtension extension = extensions[i];
-					String pluginId = extension.getNamespaceIdentifier();
-					Bundle bundle = Platform.getBundle(pluginId);
-					IConfigurationElement[] configElements = extension
-							.getConfigurationElements();
-					for (int j = 0; j < configElements.length; j++) {
-						IConfigurationElement configElement = configElements[j];
-						try {
-							String viewId = configElement.getAttribute("view"); //$NON-NLS-1$
-							if (getViewId().equals(viewId)) {
-								String className = configElement
-										.getAttribute("class"); //$NON-NLS-1$
-								if (className != null) {
-									ext = bundle.loadClass(className)
-											.newInstance();
-									if (ext instanceof IContentProviderFactory) {
-										contentProviderFactory = (IContentProviderFactory) ext;
-										break ext_walk;
-									}
-								}
-							}
-						} catch (Exception e) {
-							AuthoringUIPlugin.getDefault().getLogger()
-									.logError(e);
-						}
-					}
-				}
-			}
-		}
-		
-		return contentProviderFactory;		
-	}
-
 	/**
 	 * @return a new AdapterFactoryContentProvider
 	 */
-	protected AdapterFactoryContentProvider createContentProvider() {
-		IContentProviderFactory factory = getContentProviderFactory();		
-		AdapterFactoryContentProvider cp = null;
-		if(factory != null) {
-			IContentProvider contentProvider = factory.createProvider(adapterFactory, this);
-			if(contentProvider instanceof AdapterFactoryContentProvider) {
-				cp = (AdapterFactoryContentProvider) contentProvider;
-			}
-		}
-		return cp != null ? cp : new AdapterFactoryContentProvider(adapterFactory);
+	public AdapterFactoryContentProvider getContentProvider() {
+		return new AdapterFactoryContentProvider(adapterFactory);
 	}
 
 	/**
@@ -558,5 +493,4 @@ public abstract class AbstractBaseView extends SaveableLibraryViewPart
 	public abstract void setInputForViewer(Object model);
 
 	public abstract String getViewId();
-	
 }

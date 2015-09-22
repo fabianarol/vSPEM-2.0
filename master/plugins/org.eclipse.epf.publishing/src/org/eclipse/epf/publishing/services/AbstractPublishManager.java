@@ -12,21 +12,16 @@ package org.eclipse.epf.publishing.services;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.HashMap;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.epf.common.serviceability.DebugTrace;
-import org.eclipse.epf.common.utils.FileUtil;
-import org.eclipse.epf.library.configuration.ConfigurationHelper;
-import org.eclipse.epf.library.services.SafeUpdateController;
 import org.eclipse.epf.library.util.FileNameGenerator;
 import org.eclipse.epf.library.util.LibraryUtil;
 import org.eclipse.epf.publishing.PublishingPlugin;
 import org.eclipse.epf.publishing.PublishingResources;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodLibrary;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * The abstract base class for all Publish Managers.
@@ -134,23 +129,9 @@ public abstract class AbstractPublishManager {
 		Runtime.getRuntime().gc();
 		
 		try {
-			ConfigurationHelper.getDelegate().setPublishingMode(true);
-			if (! ConfigurationHelper.serverMode) {
-				SafeUpdateController.syncExec(new Runnable() {	
-					public void run() {
-						PlatformUI.
-						getWorkbench().
-						getActiveWorkbenchWindow().
-						getActivePage().
-						closeAllEditors(true);
-					}
-				});
-			}
-			
 			if (profiling) {
 				beginTime = startTime = System.currentTimeMillis();
 			}
-			FileUtil.setCopiedFileMap(new HashMap<File, File>());
 			
 			prePublish(monitor);
 			if (profiling) {
@@ -161,10 +142,8 @@ public abstract class AbstractPublishManager {
 			if (profiling) {
 				startTime = System.currentTimeMillis();
 			}
-			
-			getViewBuilder().getLayoutMgr().prepareElementPathAdjustment();
+						
 			doPublish(monitor);
-			getViewBuilder().getLayoutMgr().handlePluginFolderRename();
 			if (profiling) {
 				DebugTrace.print(this, "doPublish", //$NON-NLS-1$
 						(System.currentTimeMillis() - startTime) + " ms"); //$NON-NLS-1$
@@ -183,9 +162,6 @@ public abstract class AbstractPublishManager {
 		} catch (Exception e) {
 			throw new PublishingServiceException(e);
 		} finally {
-			FileUtil.setCopiedFileMap(null);
-			
-			ConfigurationHelper.getDelegate().setPublishingMode(false);
 			if (profiling) {
 				System.out
 						.println("Time taken to publish configuration '" + config.getName() //$NON-NLS-1$
@@ -204,7 +180,7 @@ public abstract class AbstractPublishManager {
 			startTime = System.currentTimeMillis();
 		}
 		
-		Collection<Resource> changedResources = LibraryUtil.loadAll((MethodLibrary) config.eContainer(), config);
+		Collection<Resource> changedResources = LibraryUtil.loadAll((MethodLibrary) config.eContainer());
 		if (profiling) {
 			DebugTrace.print(this, "loadLibrary", "LibraryUtil.loadAll: " //$NON-NLS-1$  //$NON-NLS-2$
 							+ (System.currentTimeMillis() - startTime)

@@ -211,7 +211,7 @@ public class MigrationUtil {
 	public static Map getActivities(Process process, boolean linkedHashMap){
 		Map result = linkedHashMap ? new LinkedHashMap() : new TreeMap();
 		MethodConfiguration defaultContext = process.getDefaultContext();
-		ProcessConfigurator filter = new ProcessConfigurator(defaultContext);
+		ProcessConfigurator filter = new ProcessConfigurator(defaultContext, null);
 		getActivities(process, result, filter);
 		return result;
 	}

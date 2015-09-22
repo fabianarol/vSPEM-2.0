@@ -21,7 +21,6 @@ import java.util.Date;
  * Planning Data is a Method Element that adds planning data to Breakdown Elements when it is used for a Process Planning Template.  For Delivery Processes and Capability Patterns this class can either not be instantiated or populated with default data.
  * Planning Data factors out specific optional data needed for representing planning templates.  This association allows to access planning data if it is stored for the Breakdown Element.
  * (NOTE, THE ATTRIBUTES FOR THIS CLASS ARE NOT COMPLETE, YET)
- * 
  * <!-- end-model-doc -->
  *
  * <p>
@@ -48,7 +47,7 @@ public interface PlanningData extends ProcessElement {
 	 * @return the value of the '<em>Start Date</em>' attribute.
 	 * @see #setStartDate(Date)
 	 * @see org.eclipse.epf.uma.UmaPackage#getPlanningData_StartDate()
-	 * @model dataType="org.eclipse.epf.uma.Date" required="true" ordered="false"
+	 * @model dataType="org.eclipse.epf.uma.Date"
 	 * @generated
 	 */
 	Date getStartDate();
@@ -73,7 +72,7 @@ public interface PlanningData extends ProcessElement {
 	 * @return the value of the '<em>Finish Date</em>' attribute.
 	 * @see #setFinishDate(Date)
 	 * @see org.eclipse.epf.uma.UmaPackage#getPlanningData_FinishDate()
-	 * @model dataType="org.eclipse.epf.uma.Date" required="true" ordered="false"
+	 * @model dataType="org.eclipse.epf.uma.Date"
 	 * @generated
 	 */
 	Date getFinishDate();
@@ -98,7 +97,7 @@ public interface PlanningData extends ProcessElement {
 	 * @return the value of the '<em>Rank</em>' attribute.
 	 * @see #setRank(int)
 	 * @see org.eclipse.epf.uma.UmaPackage#getPlanningData_Rank()
-	 * @model dataType="org.eclipse.epf.uma.Integer" required="true" ordered="false"
+	 * @model dataType="org.eclipse.epf.uma.Integer"
 	 * @generated
 	 */
 	int getRank();

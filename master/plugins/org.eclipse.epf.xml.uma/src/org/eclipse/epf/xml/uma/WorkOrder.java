@@ -1,16 +1,12 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: WorkOrder.java,v 1.4 2007/04/05 20:50:18 klow Exp $
+ */
 package org.eclipse.epf.xml.uma;
 
-import org.eclipse.epf.uma.ecore.IModelObject;
+import org.eclipse.emf.ecore.sdo.EDataObject;
 
 /**
  * <!-- begin-user-doc -->
@@ -28,16 +24,15 @@ import org.eclipse.epf.uma.ecore.IModelObject;
  *   <li>{@link org.eclipse.epf.xml.uma.WorkOrder#getValue <em>Value</em>}</li>
  *   <li>{@link org.eclipse.epf.xml.uma.WorkOrder#getId <em>Id</em>}</li>
  *   <li>{@link org.eclipse.epf.xml.uma.WorkOrder#getLinkType <em>Link Type</em>}</li>
- *   <li>{@link org.eclipse.epf.xml.uma.WorkOrder#getProperties <em>Properties</em>}</li>
  * </ul>
  * </p>
  *
  * @see org.eclipse.epf.xml.uma.UmaPackage#getWorkOrder()
  * @model extendedMetaData="name='WorkOrder' kind='simple'"
- * @extends IModelObject
+ * @extends EDataObject
  * @generated
  */
-public interface WorkOrder extends IModelObject {
+public interface WorkOrder extends EDataObject {
 	/**
 	 * Returns the value of the '<em><b>Value</b></em>' attribute.
 	 * <!-- begin-user-doc -->
@@ -49,7 +44,7 @@ public interface WorkOrder extends IModelObject {
 	 * @return the value of the '<em>Value</em>' attribute.
 	 * @see #setValue(String)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getWorkOrder_Value()
-	 * @model dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="name=':0' kind='simple'"
 	 * @generated
 	 */
@@ -75,7 +70,7 @@ public interface WorkOrder extends IModelObject {
 	 * @return the value of the '<em>Id</em>' attribute.
 	 * @see #setId(String)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getWorkOrder_Id()
-	 * @model dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="kind='attribute' name='id'"
 	 * @generated
 	 */
@@ -106,7 +101,7 @@ public interface WorkOrder extends IModelObject {
 	 * @see #unsetLinkType()
 	 * @see #setLinkType(WorkOrderType)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getWorkOrder_LinkType()
-	 * @model default="finishToStart" unsettable="true"
+	 * @model default="finishToStart" unique="false" unsettable="true"
 	 *        extendedMetaData="kind='attribute' name='linkType'"
 	 * @generated
 	 */
@@ -147,31 +142,5 @@ public interface WorkOrder extends IModelObject {
 	 * @generated
 	 */
 	boolean isSetLinkType();
-
-	/**
-	 * Returns the value of the '<em><b>Properties</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
-	 * This attribute store method element property values associated with this work order
-	 * <!-- end-model-doc -->
-	 * @return the value of the '<em>Properties</em>' attribute.
-	 * @see #setProperties(String)
-	 * @see org.eclipse.epf.xml.uma.UmaPackage#getWorkOrder_Properties()
-	 * @model dataType="org.eclipse.emf.ecore.xml.type.String"
-	 *        extendedMetaData="kind='attribute' name='properties'"
-	 * @generated
-	 */
-	String getProperties();
-
-	/**
-	 * Sets the value of the '{@link org.eclipse.epf.xml.uma.WorkOrder#getProperties <em>Properties</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Properties</em>' attribute.
-	 * @see #getProperties()
-	 * @generated
-	 */
-	void setProperties(String value);
 
 } // WorkOrder

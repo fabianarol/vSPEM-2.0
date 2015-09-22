@@ -57,11 +57,10 @@ public class WhitepaperLayout extends AbstractElementLayout {
 					layoutManager.getElementRealizer());
 			
 			List activities = ConfigurationHelper.calc0nFeatureValue(super.element,
-					AssociationHelper.Concept_BreakdownElements, layoutManager
+					AssociationHelper.Concept_Activities, layoutManager
 							.getElementRealizer());
 
-//			contentElements.addAll(activities);
-			contentElements = addBreakdownElementsToContentElements(contentElements, activities);
+			contentElements.addAll(activities);
 
 			addReferences(AssociationHelper.Concept_ContentElements, elementXml, "contentElements", contentElements); //$NON-NLS-1$
 

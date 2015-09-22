@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: DisciplineGroupingImpl.java,v 1.4 2007/06/05 21:14:59 klow Exp $
+ */
 package org.eclipse.epf.xml.uma.impl;
 
 import java.util.Collection;
@@ -61,7 +57,6 @@ public class DisciplineGroupingImpl extends ContentCategoryImpl implements Disci
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.DISCIPLINE_GROUPING;
 	}
@@ -83,7 +78,7 @@ public class DisciplineGroupingImpl extends ContentCategoryImpl implements Disci
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<String> getDiscipline() {
+	public EList getDiscipline() {
 		return getGroup2().list(UmaPackage.Literals.DISCIPLINE_GROUPING__DISCIPLINE);
 	}
 
@@ -92,11 +87,10 @@ public class DisciplineGroupingImpl extends ContentCategoryImpl implements Disci
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 			case UmaPackage.DISCIPLINE_GROUPING__GROUP2:
-				return ((InternalEList<?>)getGroup2()).basicRemove(otherEnd, msgs);
+				return ((InternalEList)getGroup2()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -106,7 +100,6 @@ public class DisciplineGroupingImpl extends ContentCategoryImpl implements Disci
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 			case UmaPackage.DISCIPLINE_GROUPING__GROUP2:
@@ -123,8 +116,6 @@ public class DisciplineGroupingImpl extends ContentCategoryImpl implements Disci
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-		@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 			case UmaPackage.DISCIPLINE_GROUPING__GROUP2:
@@ -132,7 +123,7 @@ public class DisciplineGroupingImpl extends ContentCategoryImpl implements Disci
 				return;
 			case UmaPackage.DISCIPLINE_GROUPING__DISCIPLINE:
 				getDiscipline().clear();
-				getDiscipline().addAll((Collection<? extends String>)newValue);
+				getDiscipline().addAll((Collection)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -143,7 +134,6 @@ public class DisciplineGroupingImpl extends ContentCategoryImpl implements Disci
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 			case UmaPackage.DISCIPLINE_GROUPING__GROUP2:
@@ -161,7 +151,6 @@ public class DisciplineGroupingImpl extends ContentCategoryImpl implements Disci
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 			case UmaPackage.DISCIPLINE_GROUPING__GROUP2:
@@ -177,7 +166,6 @@ public class DisciplineGroupingImpl extends ContentCategoryImpl implements Disci
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 

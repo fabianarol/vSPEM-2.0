@@ -14,13 +14,11 @@ import org.eclipse.epf.authoring.ui.AuthoringPerspective;
 import org.eclipse.epf.authoring.ui.BrowsingPerspective;
 import org.eclipse.epf.authoring.ui.editors.EditorChooser;
 import org.eclipse.epf.authoring.ui.views.ContentView;
-import org.eclipse.epf.common.ui.util.PerspectiveUtil;
+import org.eclipse.epf.common.utils.PerspectiveUtil;
 import org.eclipse.epf.library.LibraryService;
 import org.eclipse.epf.library.LibraryServiceListener;
-import org.eclipse.epf.library.edit.util.ExtensionManager;
-import org.eclipse.epf.library.ui.providers.ElementTreeLabelProvider;
-import org.eclipse.epf.search.ui.internal.ISearchResultProviderFactory;
 import org.eclipse.epf.search.ui.internal.MethodElementViewSorter;
+import org.eclipse.epf.search.ui.internal.SearchResultLabelProvider;
 import org.eclipse.epf.search.ui.internal.SearchResultTableContentProvider;
 import org.eclipse.epf.search.ui.internal.SearchResultTreeContentProvider;
 import org.eclipse.epf.uma.ContentPackage;
@@ -29,7 +27,6 @@ import org.eclipse.epf.uma.MethodLibrary;
 import org.eclipse.epf.uma.MethodPlugin;
 import org.eclipse.epf.uma.ProcessElement;
 import org.eclipse.epf.uma.util.UmaUtil;
-import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -37,7 +34,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.search.ui.NewSearchUI;
 import org.eclipse.search.ui.text.AbstractTextSearchViewPage;
 import org.eclipse.search.ui.text.Match;
@@ -51,7 +47,6 @@ import org.eclipse.ui.PlatformUI;
  * can be displayed in a hierarchical or flat view.
  * 
  * @author Kelvin Low
- * @author Phong Nguyen Le
  * @since 1.0
  */
 public class MethodSearchResultPage extends AbstractTextSearchViewPage
@@ -59,14 +54,14 @@ public class MethodSearchResultPage extends AbstractTextSearchViewPage
 
 	private IStructuredContentProvider contentProvider;
 
-	private ILabelProvider labelProvider;
+	private SearchResultLabelProvider labelProvider;
 
 	/**
 	 * Creates a new instance.
 	 */
 	public MethodSearchResultPage() {
 		super();
-		labelProvider = createLabelProvider();
+		labelProvider = new SearchResultLabelProvider();
 		
 		// Clear the search result when the current method library is closed by the user.
 		LibraryService.getInstance().addListener(new LibraryServiceListener() {
@@ -82,46 +77,12 @@ public class MethodSearchResultPage extends AbstractTextSearchViewPage
 	public boolean isLayoutSupported(int layout) {
 		return ((layout & FLAG_LAYOUT_FLAT) != 0 || (layout & FLAG_LAYOUT_TREE) != 0);
 	}
-	
-	private static final ISearchResultProviderFactory getSearchResultProviderFactory() {
-		return (ISearchResultProviderFactory) ExtensionManager.getExtension(
-				SearchUIPlugin.getDefault().getId(),
-				"searchResultProviderFactory"); //$NON-NLS-1$
-	}
-	
-	protected IStructuredContentProvider createContentProvider(Viewer viewer) {
-		ISearchResultProviderFactory factory = getSearchResultProviderFactory();
-		if(viewer instanceof TreeViewer) {
-			IStructuredContentProvider cp = null;
-			if(factory != null) {
-				cp = factory.createTreeContentProvider();
-			}
-			return cp != null ? cp : new SearchResultTreeContentProvider();
-		}
-		else if(viewer instanceof TableViewer) {
-			IStructuredContentProvider cp = null;
-			if(factory != null) {
-				cp = factory.createTableContentProvider();
-			}
-			return cp != null ? cp : new SearchResultTableContentProvider();
-		}
-		return null;
-	}
-	
-	protected ILabelProvider createLabelProvider() {
-		ILabelProvider lp = null;
-		ISearchResultProviderFactory factory = getSearchResultProviderFactory();
-		if(factory != null) {
-			lp = factory.createLabelProvider();
-		}
-		return lp != null ? lp : new ElementTreeLabelProvider();
-	}
 
 	/**
 	 * @see org.eclipse.search.ui.text.AbstractTextSearchViewPage#configureTreeViewer(TreeViewer)
 	 */
 	protected void configureTreeViewer(TreeViewer viewer) {
-		contentProvider = createContentProvider(viewer);
+		contentProvider = new SearchResultTreeContentProvider();
 		viewer.setContentProvider(contentProvider);
 		viewer.setLabelProvider(labelProvider);
 		viewer.setSorter(new MethodElementViewSorter());
@@ -132,7 +93,7 @@ public class MethodSearchResultPage extends AbstractTextSearchViewPage
 	 * @see org.eclipse.search.ui.text.AbstractTextSearchViewPage#configureTableViewer(TableViewer)
 	 */
 	protected void configureTableViewer(TableViewer viewer) {
-		contentProvider = createContentProvider(viewer);
+		contentProvider = new SearchResultTableContentProvider();
 		viewer.setContentProvider(contentProvider);
 		viewer.setLabelProvider(labelProvider);
 		viewer.setSorter(new MethodElementViewSorter());
@@ -152,7 +113,7 @@ public class MethodSearchResultPage extends AbstractTextSearchViewPage
 			}
 		}
 	}
-	
+
 	/**
 	 * @see org.eclipse.search.ui.text.AbstractTextSearchViewPage#clear()
 	 */

@@ -14,7 +14,6 @@ import org.eclipse.epf.authoring.ui.views.ConfigurationView;
 import org.eclipse.epf.authoring.ui.views.ContentView;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
-import org.eclipse.ui.IPlaceholderFolderLayout;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
@@ -42,9 +41,6 @@ public class BrowsingPerspective implements IPerspectiveFactory {
 				editorArea);
 		PerspectiveListUtil.addPerspectiveShortList(layout);
 		layout.addView(ContentView.VIEW_ID, IPageLayout.RIGHT, 0.70f, editorArea);
-		IPlaceholderFolderLayout rightBottom = layout.createPlaceholderFolder("rightBottom", //$NON-NLS-1$
-				IPageLayout.BOTTOM, 0.70f, ContentView.VIEW_ID);
-		rightBottom.addPlaceholder(IPageLayout.ID_PROBLEM_VIEW);
 	}
 
 	/**

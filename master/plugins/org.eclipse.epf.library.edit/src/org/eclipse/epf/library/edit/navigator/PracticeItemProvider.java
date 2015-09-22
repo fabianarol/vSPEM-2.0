@@ -11,7 +11,6 @@
 package org.eclipse.epf.library.edit.navigator;
 
 import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -21,12 +20,12 @@ import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.edit.command.AddCommand;
+import org.eclipse.emf.edit.command.CopyCommand.Helper;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.epf.library.edit.IDefaultNameSetter;
 import org.eclipse.epf.library.edit.LibraryEditPlugin;
 import org.eclipse.epf.library.edit.command.MethodElementAddCommand;
 import org.eclipse.epf.library.edit.util.LibraryEditConstants;
-import org.eclipse.epf.library.edit.util.PracticePropUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.uma.DescribableElement;
 import org.eclipse.epf.uma.Guidance;
@@ -34,8 +33,8 @@ import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.Practice;
 import org.eclipse.epf.uma.UmaFactory;
 import org.eclipse.epf.uma.UmaPackage;
-import org.eclipse.epf.uma.util.UserDefinedTypeMeta;
-import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.epf.uma.edit.command.MethodElementCreateCopyCommand;
+import org.eclipse.epf.uma.edit.command.MethodElementInitializeCopyCommand;
 
 /**
  * The item provider adapter for a practice.
@@ -59,15 +58,10 @@ public class PracticeItemProvider extends
 	 */
 	protected void collectNewChildDescriptors(Collection newChildDescriptors,
 			Object object) {
-		
-		//User defined type won't have sub practice
-		if (PracticePropUtil.getPracticePropUtil().isUdtType((Practice)object)) {
-			return;
-		}
-		
 		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
 				.getPractice_SubPractices(), UmaFactory.eINSTANCE
 				.createPractice()));
+
 	}
 
 	/*
@@ -107,7 +101,7 @@ public class PracticeItemProvider extends
 		return TngUtil.getLabel(object, getString("_UI_Practice_type")); //$NON-NLS-1$
 	}
 
-	public Object getImage(Object object) {		
+	public Object getImage(Object object) {
 		if (object instanceof DescribableElement) {
 			if (((DescribableElement) object).getNodeicon() != null) {
 				URI imgUri = TngUtil.getFullPathofNodeorShapeIconURI(
@@ -119,17 +113,7 @@ public class PracticeItemProvider extends
 					return image;
 			}
 		}
-		
-		if (PracticePropUtil.getPracticePropUtil().isUdtType((Practice)object)) {	
-			ImageDescriptor img = TngUtil.getImageForUdt((Practice)object);
-			if (img != null) {
-				return img;
-			}
-			return overlayImage(object, getResourceLocator().getImage(
-			"full/obj16/UdtNode")); //$NON-NLS-1$
-		}
-				
-		return super.getImage(object);		
+		return super.getImage(object);
 	}
 
 	/*
@@ -159,10 +143,20 @@ public class PracticeItemProvider extends
 		return Practice.class;
 	}
 
+	protected Command createInitializeCopyCommand(EditingDomain domain,
+			EObject owner, Helper helper) {
+		return new MethodElementInitializeCopyCommand(domain, owner, helper);
+	}
+
 	protected Command createAddCommand(EditingDomain domain, EObject owner,
 			EStructuralFeature feature, Collection collection, int index) {
 		return new MethodElementAddCommand((AddCommand) super.createAddCommand(
 				domain, owner, feature, collection, index));
+	}
+
+	protected Command createCreateCopyCommand(EditingDomain domain,
+			EObject owner, Helper helper) {
+		return new MethodElementCreateCopyCommand(domain, owner, helper);
 	}
 
 }

@@ -22,19 +22,16 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Matcher;
 
-import org.eclipse.epf.common.utils.NetUtil;
 import org.eclipse.epf.common.xml.XSLTProcessor;
 import org.eclipse.epf.library.ILibraryManager;
+import org.eclipse.epf.library.LibraryPlugin;
 import org.eclipse.epf.library.LibraryService;
 import org.eclipse.epf.library.configuration.ConfigurationHelper;
-import org.eclipse.epf.library.edit.util.MethodElementPropUtil;
 import org.eclipse.epf.library.layout.util.XmlElement;
 import org.eclipse.epf.library.layout.util.XmlHelper;
 import org.eclipse.epf.library.persistence.ILibraryResourceSet;
 import org.eclipse.epf.library.util.LibraryUtil;
 import org.eclipse.epf.library.util.ResourceHelper;
-import org.eclipse.epf.publish.layout.LayoutPlugin;
-import org.eclipse.epf.uma.CustomCategory;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.MethodLibrary;
@@ -242,10 +239,6 @@ public class LinkInfo {
 	}
 
 	protected String decode(String str) throws UnsupportedEncodingException {
-		if (NetUtil.isRawUrl(str)) {
-			return str;
-		}
-		
 		return URLDecoder.decode(str, "UTF-8"); //$NON-NLS-1$
 	}
 
@@ -266,7 +259,7 @@ public class LinkInfo {
 		attributeMap.put(LINK_ATTR_GUID, guid);
 	}
 
-	public void setUrl(String url) {
+	private void setUrl(String url) {
 		attributeMap.put(LINK_ATTR_HREF, url);
 	}
 
@@ -296,29 +289,16 @@ public class LinkInfo {
 				if (config != null) {
 					MethodElement e1 = ConfigurationHelper
 							.getCalculatedElement(e, config);
-					if (e1 != null) {				
-						if (! validator.showBrokenLinks() && validator.isDiscarded(ownerElement, null, e1)) {
-							isMissingReference = true;
-							validator.logMissingReference(ownerElement, e1);
-						} else {
-							e = e1;
-						}
+					if (e1 != null) {
+						e = e1;
 					} else {
 						isMissingReference = true;
 						validator.logMissingReference(ownerElement, e);
 					}
 				}
 			} else {
-				boolean toLog = true;
-				if (ownerElement instanceof CustomCategory) {
-					if (MethodElementPropUtil.getMethodElementPropUtil().isTransientElement(ownerElement)) {
-						toLog = false;
-					}
-				}
-				if (toLog) {
-					isMissingReference = true;
-					validator.logMissingReference(ownerElement, guid, linkedText);
-				}
+				isMissingReference = true;
+				validator.logMissingReference(ownerElement, guid, linkedText);
 			}
 
 			if (e != null) {
@@ -344,14 +324,14 @@ public class LinkInfo {
 
 				if (isElementLink() && !tag.equals("area")) { //$NON-NLS-1$
 					String text = ResourceHelper.getLinkText(e,
-							getElementLinkType(), config);
+							getElementLinkType());
 					if (text != null) {
 						// if null, can be used text, don't reset it
 						this.linkedText = text;
 					}
 				}
 
-				if (validator.isDiscarded(ownerElement, IContentValidator.elementUrlFeature, e, config)) {
+				if (validator.isDiscarded(ownerElement, null, e)) {
 					isMissingReference = true;
 					validator.logMissingReference(ownerElement, e);
 					e = null; // ignore the element since it's discarded
@@ -454,7 +434,7 @@ public class LinkInfo {
 
 			OutputStreamWriter output = new OutputStreamWriter(
 					new FileOutputStream(outputFile), "utf-8"); //$NON-NLS-1$
-			Properties xslParams = LayoutPlugin.getDefault().getProperties(
+			Properties xslParams = LibraryPlugin.getDefault().getProperties(
 					"/layout/xsl/resources.properties"); //$NON-NLS-1$
 
 			XSLTProcessor.transform(xsl_uri, xml.toString(), xslParams, output);

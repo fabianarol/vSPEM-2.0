@@ -12,7 +12,6 @@ package org.eclipse.epf.library.ui;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -23,8 +22,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.eclipse.core.resources.WorkspaceJob;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -32,22 +29,14 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.JobChangeAdapter;
-import org.eclipse.epf.common.service.utils.CommandLineRunUtil;
 import org.eclipse.epf.common.utils.FileUtil;
 import org.eclipse.epf.common.utils.I18nUtil;
 import org.eclipse.epf.common.utils.NetUtil;
 import org.eclipse.epf.common.utils.StrUtil;
-import org.eclipse.epf.library.ILibraryManager;
 import org.eclipse.epf.library.LibraryPlugin;
 import org.eclipse.epf.library.LibraryService;
-import org.eclipse.epf.library.LibraryServiceException;
 import org.eclipse.epf.library.LibraryServiceUtil;
-import org.eclipse.epf.library.configuration.ConfigurationHelper;
 import org.eclipse.epf.library.edit.ui.UserInteractionHelper;
-import org.eclipse.epf.library.edit.util.DebugUtil;
-import org.eclipse.epf.library.edit.util.IRunnableWithProgress;
 import org.eclipse.epf.library.layout.LayoutResources;
 import org.eclipse.epf.library.persistence.ILibraryResourceSet;
 import org.eclipse.epf.library.preferences.LibraryPreferences;
@@ -90,7 +79,6 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
-import org.eclipse.ui.progress.WorkbenchJob;
 
 /**
  * The default Library UI Manager implementation.
@@ -106,17 +94,13 @@ public class LibraryUIManager {
 
 	public static boolean DEBUG = LibraryUIPlugin.getDefault().isDebugging();
 
-	public static final String TOOLBAR_CONFIG_CONTRIBUTION_ID = "toolbar.config.contribution"; //$NON-NLS-1$
+	private static final String TOOLBAR_CONFIG_CONTRIBUTION_ID = "toolbar.config.contribution"; //$NON-NLS-1$
 
 	private static final String CONFIG_VIEW_ID = "org.eclipse.epf.authoring.ui.views.ConfigurationView"; //$NON-NLS-1$
 
 	private static final String PROCESS_EDITOR_ID = "org.eclipse.epf.authoring.ui.editors.ProcessEditor"; //$NON-NLS-1$
-	
-	private static final String REPORT_PERS_ID = "org.eclipse.birt.report.designer.ui.ReportPerspective"; //$NON-NLS-1$
 
 	private static LibraryUIManager instance = null;
-	
-	private static boolean skipInstallPathCheck = false;
 	
 	// The URI of the method library that will be opened regardless of the
 	// saved library preferences.
@@ -127,8 +111,6 @@ public class LibraryUIManager {
 	protected static URI defaultLibraryURI;
 	protected static URI defaultLibraryURI_NL;
 	private boolean libraryInitialized = false;
-	
-	protected ConfigurationContributionItem configCombo = null;
 
 	/**
 	 * Returns the singleton instance.
@@ -152,10 +134,6 @@ public class LibraryUIManager {
 		// Monitor perspective changes to display/hide the configuration combo.
 		IWorkbenchWindow window = PlatformUI.getWorkbench()
 				.getActiveWorkbenchWindow();
-		if (DebugUtil.uiDebug) {
-			DebugUtil.print("LibraryUIManager() called, window: " + window);//$NON-NLS-1$
-			DebugUtil.print();
-		}
 		if (window != null) {
 			window.addPerspectiveListener(new IPerspectiveListener() {
 				public void perspectiveActivated(IWorkbenchPage page,
@@ -170,7 +148,7 @@ public class LibraryUIManager {
 			});
 		}
 	}
-	
+
 	/**
 	 * Creates and opens a new method library.
 	 * 
@@ -194,14 +172,66 @@ public class LibraryUIManager {
 	}
 	
 	/**
-	 * Opens the last opened method library in a non-UI job. If successful,
-	 * successRunnable will be run, otherwise nextRunnable will be run.
+	 * Opens the default method library given the default library path URI.
 	 * 
 	 * @param path
 	 *            URI path to a method library
 	 * @return <code>true</code> if the method library is opened successfully
 	 */
-	private void openLastOpenedLibrary(final Runnable successRunnable, final Runnable nextRunnable) {
+	public boolean openDefaultLibrary(final URI uri) {
+		try {
+			File defaultLibraryPathFile = new File(uri);
+			File libraryXMIFile = new File(defaultLibraryPathFile, XMILibraryManager.LIBRARY_XMI);
+			if (!libraryXMIFile.exists()) {
+				return false;
+			}
+
+			WorkspaceModifyOperation operation = new WorkspaceModifyOperation() {
+				public void execute(IProgressMonitor monitor) {
+					try {
+						URI libUri = uri;
+						String newPath = handleLibraryOnReadOnlyInstallPath(libUri);
+						if (newPath != null) {
+							libUri = StrUtil.toURI(newPath);
+						}
+						
+						String taskName = LibraryUIResources.openingLibraryTask_name;
+						monitor.beginTask(taskName, 2);
+						monitor.setTaskName(taskName);
+						monitor.worked(1);
+						LibraryService.getInstance().closeCurrentMethodLibrary();
+						LibraryService.getInstance().openMethodLibrary("xmi", libUri); //$NON-NLS-1$
+					} catch (Exception e) {
+						LibraryUIPlugin.getDefault().getLogger().logError(e);
+					} finally {
+						monitor.done();
+					}
+				}
+			};
+			Shell shell = Display.getCurrent().getActiveShell();
+			ProgressMonitorDialog dialog = new ProgressMonitorDialog(shell) {
+				protected void configureShell(Shell shell) {
+					super.configureShell(shell);
+					shell.setText(LibraryUIResources.openLibraryWizard_title);
+				}
+			};
+			dialog.run(true, false, operation);
+			return LibraryService.getInstance().getCurrentMethodLibrary() != null;
+			
+		} catch (Exception e) {
+			// don't do anything
+		}
+		return false;
+	}
+
+	/**
+	 * Opens the last opened method library.
+	 * 
+	 * @param path
+	 *            URI path to a method library
+	 * @return <code>true</code> if the method library is opened successfully
+	 */
+	public boolean openLastOpenedLibrary() {
 		try {
 			
 			// first check for saved lib in preference
@@ -210,179 +240,52 @@ public class LibraryUIManager {
 				.getSavedMethodLibraryURI();
 			URI uri = new URI(savedMethodLibraryURI);
 			if (uri.getPath().length() == 0) {
-				nextRunnable.run();
-				return;
+				return false;
 			}
-			
-			final WorkspaceJob openLibraryJob = new WorkspaceJob("Open last opened library") {
 
-				@Override
-				public IStatus runInWorkspace(IProgressMonitor monitor)
-						throws CoreException {
+			WorkspaceModifyOperation operation = new WorkspaceModifyOperation() {
+				public void execute(IProgressMonitor monitor) {
 					try {
-						monitor.beginTask(StrUtil.EMPTY_STRING, IProgressMonitor.UNKNOWN);
+						String taskName = LibraryUIResources.openingLibraryTask_name;
+						monitor.beginTask(taskName, 2);
+						monitor.setTaskName(taskName);
+						monitor.worked(1);
 						LibraryService.getInstance().closeCurrentMethodLibrary();
 						LibraryService.getInstance().openLastOpenedMethodLibrary();
 					} catch (Exception e) {
 						LibraryUIPlugin.getDefault().getLogger().logError(e);
+					} finally {
+						monitor.done();
 					}
-					return Status.OK_STATUS;
 				}
-				
 			};
-			BusyIndicatorHelper.setUserInterfaceActive(false);
-			final Integer openLibraryJobBusyId = BusyIndicatorHelper.showWhile(PlatformUI.getWorkbench().getDisplay());
-			PlatformUI.getWorkbench().getProgressService().showInDialog(null, openLibraryJob);
-			openLibraryJob.setSystem(true);
-			openLibraryJob.addJobChangeListener(new JobChangeAdapter() {
-				@Override
-				public void done(IJobChangeEvent event) {
-					// UI activation job
-					WorkbenchJob reactivateUIJob = new WorkbenchJob(StrUtil.EMPTY_STRING) {
-
-						@Override
-						public IStatus runInUIThread(IProgressMonitor monitor) {
-							BusyIndicatorHelper.setUserInterfaceActive(true);
-							BusyIndicatorHelper.hideWhile(PlatformUI.getWorkbench().getDisplay(), openLibraryJobBusyId);
-							// Show Problems View if necessary.
-							ILibraryManager libMgr = LibraryService
-									.getInstance().getCurrentLibraryManager();
-							if(libMgr != null) {
-								ILibraryResourceSet resourceSet = (ILibraryResourceSet) libMgr.getEditingDomain().getResourceSet();
-								if (resourceSet.hasUnresolvedProxy()) {
-									try {
-										PlatformUI
-										.getWorkbench()
-										.getActiveWorkbenchWindow()
-										.getActivePage()
-										.showView(
-												"org.eclipse.ui.views.ProblemView", null, IWorkbenchPage.VIEW_VISIBLE); //$NON-NLS-1$
-									} catch (Exception e) {
-										LibraryUIPlugin.getDefault().getLogger()
-										.logError(e);
-									}
-								}
-							}
-
-							return Status.OK_STATUS;
-						}
-						
-					};
-					reactivateUIJob.setSystem(true);
-					reactivateUIJob.schedule();
-					
-					if(LibraryService.getInstance().getCurrentMethodLibrary() != null) {
-						successRunnable.run();
-					} else {
-						nextRunnable.run();
-					}
+			Shell shell = Display.getCurrent().getActiveShell();
+			ProgressMonitorDialog dialog = new ProgressMonitorDialog(shell) {
+				protected void configureShell(Shell shell) {
+					super.configureShell(shell);
+					shell.setText(LibraryUIResources.openLibraryWizard_title);
 				}
-
-			});
-			openLibraryJob.schedule();
+			};
+			dialog.run(true, false, operation);
+			return LibraryService.getInstance().getCurrentMethodLibrary() != null;
+			
 		} catch (Exception e) {
 			// don't do anything
-			LibraryUIPlugin.getDefault().getLogger().logError(e);
-		}		
+		}
+		return false;
 	}
-	
+
 	/**
-	 * Opens a method library with the specified library path URI in a non-UI
-	 * job. If successful, successRunnable will be run, otherwise nextRunnable
-	 * will be run.
+	 * Opens a method library given the library path URI.
 	 * 
 	 * @param path
 	 *            URI path to a method library
 	 * @return <code>true</code> if the method library is opened successfully
 	 */
-	private void openLibrary(final URI uri, final Runnable successRunnable, final Runnable nextRunnable) {
-		if(uri == null) {
-			if (nextRunnable != null) {
-				nextRunnable.run();
-			}
-			return;
-		}
-		
-		final Map<String, Object> args = new HashMap<String, Object>();
+	public boolean openLibrary(final URI uri) {
+		Map<String, Object> args = new HashMap<String, Object>();
 		args.put(XMILibraryManager.ARG_LIBRARY_PATH, new File(uri).getAbsolutePath());
-		final List<Exception> errors = new ArrayList<Exception>();
-
-		WorkspaceJob openLibraryJob = new WorkspaceJob(LibraryUIResources.openingLibraryTask_name) {
-		
-			@Override
-			public IStatus runInWorkspace(IProgressMonitor monitor)
-					throws CoreException {
-				try {
-					monitor.beginTask(StrUtil.EMPTY_STRING, IProgressMonitor.UNKNOWN);
-					LibraryService.getInstance().closeCurrentMethodLibrary();
-					String newPath = handleLibraryOnReadOnlyInstallPath(uri);
-					if (newPath != null) {
-						args.put(XMILibraryManager.ARG_LIBRARY_PATH, newPath);
-					}
-					MethodLibrary library = LibraryService.getInstance()
-							.openMethodLibrary(XMILibraryManager.LIBRARY_TYPE, args);
-					LibraryService.getInstance().setCurrentMethodLibrary(
-							library);
-					String path = (String) args.get(XMILibraryManager.ARG_LIBRARY_PATH);
-					LibraryUIPreferences.setSavedLibraryPath(path);
-				} catch (LibraryServiceException e) {
-					errors.add(e);
-				} finally {
-					monitor.done();
-				}
-				return Status.OK_STATUS;
-			}
-		
-		};
-		openLibraryJob.setSystem(true);
-		final Integer openLibraryJobBusyId = BusyIndicatorHelper.showWhile(PlatformUI.getWorkbench().getDisplay());
-		BusyIndicatorHelper.setUserInterfaceActive(false);
-		PlatformUI.getWorkbench().getProgressService().showInDialog(null, openLibraryJob);
-		openLibraryJob.addJobChangeListener(new JobChangeAdapter() {
-			@Override
-			public void done(IJobChangeEvent event) {
-				// UI activation job
-				WorkbenchJob reactivateUIJob = new WorkbenchJob(StrUtil.EMPTY_STRING) {
-
-					@Override
-					public IStatus runInUIThread(IProgressMonitor monitor) {
-						BusyIndicatorHelper.setUserInterfaceActive(true);
-						BusyIndicatorHelper.hideWhile(PlatformUI.getWorkbench().getDisplay(), openLibraryJobBusyId);
-						// Show Problems View if necessary.
-						ILibraryManager libMgr = LibraryService
-							.getInstance().getCurrentLibraryManager();
-						if(libMgr != null) {
-							ILibraryResourceSet resourceSet = (ILibraryResourceSet) libMgr.getEditingDomain().getResourceSet();
-							if (resourceSet.hasUnresolvedProxy()) {
-								try {
-									PlatformUI
-									.getWorkbench()
-									.getActiveWorkbenchWindow()
-									.getActivePage()
-									.showView(
-											"org.eclipse.ui.views.ProblemView", null, IWorkbenchPage.VIEW_VISIBLE); //$NON-NLS-1$
-								} catch (Exception e) {
-									LibraryUIPlugin.getDefault().getLogger()
-									.logError(e);
-								}
-							}
-						}
-						postOpenLibrary(errors, (String) args.get(XMILibraryManager.ARG_LIBRARY_PATH));
-						if(errors.isEmpty()) {
-							successRunnable.run();
-						} else if (nextRunnable != null) {
-							nextRunnable.run();
-						}
-						return Status.OK_STATUS;
-					}
-					
-				};
-				reactivateUIJob.setSystem(true);
-				reactivateUIJob.schedule();
-			}
-
-		});
-		openLibraryJob.schedule();
+		return openLibrary(XMILibraryManager.LIBRARY_TYPE, args);
 	}
 
 	/**
@@ -411,19 +314,20 @@ public class LibraryUIManager {
 		final String path = (String) args
 				.get(XMILibraryManager.ARG_LIBRARY_PATH);
 
-		final List<Exception> errors = new ArrayList<Exception>();
-		
-		UserInteractionHelper.getUIHelper().runWithProgress(new IRunnableWithProgress() {
+		Shell shell = Display.getCurrent().getActiveShell();
 
-			public void run(IProgressMonitor monitor)
-					throws InvocationTargetException, InterruptedException {
+		final List<Exception> errors = new ArrayList<Exception>();
+
+		// Do the work within an operation because this is a long running
+		// activity that modifies the workspace.
+		WorkspaceModifyOperation operation = new WorkspaceModifyOperation() {
+			public void execute(IProgressMonitor monitor) {
+				String taskName = LibraryUIResources.openingLibraryTask_name;
+				monitor.beginTask(taskName, 2);
 				try {
+					monitor.setTaskName(taskName);
+					monitor.worked(1);
 					LibraryService.getInstance().closeCurrentMethodLibrary();
-					URI libURI = Path.fromOSString(path).toFile().toURI();
-					String newPath = handleLibraryOnReadOnlyInstallPath(libURI);
-					if (newPath != null) {
-						args.put(XMILibraryManager.ARG_LIBRARY_PATH, newPath);
-					}
 					MethodLibrary library = LibraryService.getInstance()
 							.openMethodLibrary(type, args);
 					LibraryService.getInstance().setCurrentMethodLibrary(
@@ -457,16 +361,20 @@ public class LibraryUIManager {
 						LibraryUIPlugin.getDefault().getLogger().logError(e);
 					}
 					errors.add(e);
+				} finally {
+					monitor.done();
 				}
 			}
-			
-		}, false, LibraryUIResources.openingLibraryTask_name);
-		
-		return postOpenLibrary(errors, (String) args.get(XMILibraryManager.ARG_LIBRARY_PATH));
-	}
+		};
 
-	private boolean postOpenLibrary(List<Exception> errors, String libPath) {
 		try {
+			ProgressMonitorDialog dialog = new ProgressMonitorDialog(shell) {
+				protected void configureShell(Shell shell) {
+					super.configureShell(shell);
+					shell.setText(LibraryUIResources.openLibraryWizard_title);
+				}
+			};
+			dialog.run(true, false, operation);
 			if (errors.isEmpty()) {
 				IWorkbenchWindow workbenchWindow = PlatformUI.getWorkbench()
 						.getActiveWorkbenchWindow();
@@ -499,7 +407,7 @@ public class LibraryUIManager {
 									null, prompt, MessageDialog.WARNING,
 									buttonLabels, 0);
 							if (msgBox.open() == 0) {
-								return openLibrary(libPath);
+								return openLibrary(path);
 							} else {
 								return true;
 							}
@@ -540,7 +448,7 @@ public class LibraryUIManager {
 	public static boolean upgradeLibrary(final String libPath,
 			final UpgradeCallerInfo callerInfo) {
 		Shell shell = Display.getCurrent().getActiveShell();
-		if (!CommandLineRunUtil.getInstance().isNeedToRun() && UpgradeCallerInfo.isUpgradeLibrary(callerInfo)) {
+		if (UpgradeCallerInfo.isUpgradeLibrary(callerInfo)) {
 			LibraryBackupUtil.promptBackupLibrary(shell, new File(libPath));
 		}
 
@@ -681,7 +589,7 @@ public class LibraryUIManager {
 	 * The method configuration combobox lists all the method configurations in
 	 * the current method library.
 	 */
-	public void checkConfigurationContribution() {
+	private void checkConfigurationContribution() {
 		IWorkbench workbench = LibraryUIPlugin.getDefault().getWorkbench();
 		if (workbench != null) {
 			IWorkbenchWindow window = (IWorkbenchWindow) workbench
@@ -691,15 +599,11 @@ public class LibraryUIManager {
 						.getCoolBarManager();
 				try {
 					IWorkbenchPage activePage = window.getActivePage();
-					if (activePage != null) {
-						if (foundConfigView(activePage)
-								|| foundProcessEditor(activePage)
-								|| foundPerspective(activePage, REPORT_PERS_ID)
-								|| ConfigurationHelper.getDelegate().additionShowConfigSelectMenu(activePage)) {
-							showConfigurationContribution(coolBarMgr);
-						} else {
-							hideConfigurationContribution(coolBarMgr);
-						}
+					if (foundConfigView(activePage)
+							|| foundProcessEditor(activePage)) {
+						showConfigurationContribution(coolBarMgr);
+					} else {
+						hideConfigurationContribution(coolBarMgr);
 					}
 				} catch (Exception e) {
 					LibraryUIPlugin.getDefault().getLogger().logError(e);
@@ -729,18 +633,6 @@ public class LibraryUIManager {
 		IEditorReference[] editorRefs = activePage.findEditors(null,
 				PROCESS_EDITOR_ID, IWorkbenchPage.MATCH_ID);
 		return editorRefs != null && editorRefs.length > 0;
-	}
-	
-	/**
-	 * Checks for the presence of Report Perspective in the active workbench
-	 * page. 
-	 */
-	private boolean foundPerspective(IWorkbenchPage activePage, String persId) {
-		if (activePage.getPerspective().getId().equals(persId)) {		
-			return true;
-		}
-		
-		return false;
 	}
 
 	/**
@@ -773,13 +665,8 @@ public class LibraryUIManager {
 				// The method configuration combobox toolbar has been restored
 				// via a saved perspective, add the method configuration
 				// combobox contribution.
-				configCombo = new ConfigurationContributionItem(
+				ConfigurationContributionItem configCombo = new ConfigurationContributionItem(
 						null);
-				if (DebugUtil.uiDebug) {
-					DebugUtil.print("showConfigurationContribution, configCombo 1: " + configCombo);//$NON-NLS-1$
-					DebugUtil.print();
-				}
-				configCombo.setId(ConfigurationContributionItem.class.getName());
 				toolBarMgr.add(configCombo);
 				configToolBar.setVisible(true);
 				updateSystemToolBar(coolBarMgr);
@@ -788,13 +675,8 @@ public class LibraryUIManager {
 		}
 
 		IToolBarManager toolBarMgr = new ToolBarManager(SWT.FLAT | SWT.LEFT);
-		configCombo = new ConfigurationContributionItem(
+		ConfigurationContributionItem configCombo = new ConfigurationContributionItem(
 				null);
-		if (DebugUtil.uiDebug) {
-			DebugUtil.print("showConfigurationContribution, configCombo 2: " + configCombo);//$NON-NLS-1$
-			DebugUtil.print();
-		}
-		configCombo.setId(ConfigurationContributionItem.class.getName());
 		toolBarMgr.add(configCombo);
 		ToolBarContributionItem configComboToolBar = new ToolBarContributionItem(
 				toolBarMgr, TOOLBAR_CONFIG_CONTRIBUTION_ID);
@@ -912,84 +794,37 @@ public class LibraryUIManager {
 		}
 		libraryInitialized = true;
 		try {
-			String savedMethodLibraryURI = LibraryPreferences.getSavedMethodLibraryURI();
-			final boolean hasSavedUri = savedMethodLibraryURI != null && savedMethodLibraryURI.length() > 0;
+			String savedMethodLibraryURI = LibraryPreferences
+			.getSavedMethodLibraryURI();
+			boolean hasSavedUri = savedMethodLibraryURI != null && savedMethodLibraryURI.length() > 0;
 			
-			final String lastSavedConfigName = PreferenceUtil.getSavedLastConfig();
-			
-			final Runnable successRunnable = new Runnable() {
-
-				public void run() {
-					if (LibraryService.getInstance().getCurrentMethodLibrary() != null) {
-						MethodConfiguration savedConfig = LibraryServiceUtil
-								.getMethodConfiguration(LibraryService.getInstance()
-								.getCurrentMethodLibrary(), lastSavedConfigName);
-						if (savedConfig != null) {
-							LibraryService.getInstance().setCurrentMethodConfiguration(savedConfig);
-						}
-					}
+			String lastSavedConfigName = PreferenceUtil.getSavedLastConfig();
+			if (libraryURI != null && openLibrary(libraryURI)) {
+			} else if (openLastOpenedLibrary()) {
+			} else if (defaultLibraryURI != null && !hasSavedUri) {
+				// Try loading the NL library first.
+				Locale locale = Locale.getDefault();
+				String defaultLibraryStr = new File(defaultLibraryURI)
+						.getAbsolutePath();
+				String localizedLibPath = I18nUtil.getLocalizedFile(
+						FileUtil.removeAllSeparator(defaultLibraryStr),
+						locale);
+				if (localizedLibPath != null) {
+					defaultLibraryURI_NL = StrUtil.toURI(localizedLibPath);
 				}
-				
-			};
-			
-			final Runnable openDefaultLibraryRunnable = new Runnable() {
-
-				public void run() {
-					if (defaultLibraryURI != null && !hasSavedUri) {
-						// Try loading the NL library first.
-						Locale locale = Locale.getDefault();
-						String defaultLibraryStr = new File(defaultLibraryURI)
-								.getAbsolutePath();
-						String localizedLibPath = I18nUtil.getLocalizedFile(
-								FileUtil.removeAllSeparator(defaultLibraryStr),
-								locale);
-						if (localizedLibPath != null) {
-							defaultLibraryURI_NL = StrUtil.toURI(localizedLibPath);
-						}
-						
-						final URI defautlLibUrl = defaultLibraryURI_NL != null ? defaultLibraryURI_NL : defaultLibraryURI;
-						if (defautlLibUrl != null) {
-//							openLibrary(defautlLibUrl, successRunnable, new Runnable() {
-//								public void run() {
-//									openLibrary(defautlLibUrl, successRunnable, null);
-//								}
-//							});
-							openLibrary(defautlLibUrl, successRunnable, null);
-						}
-						
-					}
+				if (defaultLibraryURI_NL != null && openDefaultLibrary(defaultLibraryURI_NL)) {
+				} else {
+					openDefaultLibrary(defaultLibraryURI);
 				}
-				
-			};
-			
-			openLibrary(libraryURI, successRunnable, new Runnable() {
-
-				public void run() {
-					openLastOpenedLibrary(successRunnable, openDefaultLibraryRunnable);
+			}
+			if (LibraryService.getInstance().getCurrentMethodLibrary() != null) {
+				MethodConfiguration savedConfig = LibraryServiceUtil
+						.getMethodConfiguration(LibraryService.getInstance()
+						.getCurrentMethodLibrary(), lastSavedConfigName);
+				if (savedConfig != null) {
+					LibraryService.getInstance().setCurrentMethodConfiguration(savedConfig);
 				}
-
-			});
-			
-//			if (libraryURI != null && openLibrary(libraryURI)) {
-//			} else if (openLastOpenedLibrary()) {
-//			} else if (defaultLibraryURI != null && !hasSavedUri) {
-//				// Try loading the NL library first.
-//				Locale locale = Locale.getDefault();
-//				String defaultLibraryStr = new File(defaultLibraryURI)
-//						.getAbsolutePath();
-//				String localizedLibPath = I18nUtil.getLocalizedFile(
-//						FileUtil.removeAllSeparator(defaultLibraryStr),
-//						locale);
-//				if (localizedLibPath != null) {
-//					defaultLibraryURI_NL = StrUtil.toURI(localizedLibPath);
-//				}
-//				if (defaultLibraryURI_NL != null && openDefaultLibrary(defaultLibraryURI_NL)) {
-//				} else {
-//					openDefaultLibrary(defaultLibraryURI);
-//				}
-//			}
-			
-			
+			}
 		} catch (Exception e) {
 			LibraryUIPlugin.getDefault().getLogger().logError(e);
 		}
@@ -1004,12 +839,7 @@ public class LibraryUIManager {
 	 * 
 	 */
 	private String handleLibraryOnReadOnlyInstallPath(URI libURI) {
-		if (isSkipInstallPathCheck()) {
-			return null;
-		}
 		try {
-			boolean readOnly = false;
-			
 			// determine if path is in Installation directory
 			File libPathFile = new File(libURI);
 			if (!libPathFile.exists()) {
@@ -1019,19 +849,27 @@ public class LibraryUIManager {
 			URL installLocationURL = installLocation.getURL();
 			URI installLocationURI = new URI(NetUtil.encodeFileURL(installLocationURL.toExternalForm()));
 			File installLocFile = new File(installLocationURI);
-			String canonicalLibPath = NetUtil.decodedFileUrl(libPathFile.getCanonicalPath());
-			String canonicalInstallPath = NetUtil.decodedFileUrl(installLocFile.getCanonicalPath());;
-
+			String canonicalLibPath = libPathFile.getCanonicalPath();
+			String canonicalInstallPath = installLocFile.getCanonicalPath();
 			if (!canonicalLibPath.startsWith(canonicalInstallPath)) {
 				return null;
 			}
+			
+			// determine if OS is not vista or linux
+			String osName = System.getProperty("os.name"); //$NON-NLS-1$
+			String platformOS = Platform.getOS();
+			if ((osName.indexOf("Vista") == -1) //$NON-NLS-1$
+					&& !platformOS.equals(Platform.OS_LINUX)) {
+				return null;
+			}
+			
 			// show dialog, allow copy to new path
 
 			final String defaultCopyPath = new File(new File(LibraryUIPreferences.getDefaultLibraryPath()).getParent(), libPathFile.getName()).getAbsolutePath();
 
 			final StringBuffer newPath = new StringBuffer();
 			
-			UserInteractionHelper.getUIHelper().runSafely(new Runnable() {
+			UserInteractionHelper.runInUIThread(new Runnable() {
 				public void run() {
 					String title = LibraryUIResources.copyLibraryDialog_title;
 					String message = LibraryUIResources.copyLibraryDialog_text_readOnlyLib;
@@ -1042,7 +880,7 @@ public class LibraryUIManager {
 						newPath.append(dlg.getPath());
 					}
 				}
-			}, true);
+			}, false);
 			if (newPath.length() > 0) {
 				copyLibrary(libPathFile, new File(newPath.toString()));
 				return newPath.toString();
@@ -1082,21 +920,4 @@ public class LibraryUIManager {
 		UserInteractionHelper.runWithProgress(runnable,
 				LibraryUIResources.copyLibraryTask_name);
 	}
-
-	/**
-	 * 
-	 * @return the current MethodConfiguration dropdown box
-	 */
-	public ConfigurationContributionItem getConfigCombo() {
-		return configCombo;
-	}
-
-	public static boolean isSkipInstallPathCheck() {
-		return skipInstallPathCheck;
-	}
-
-	public static void setSkipInstallPathCheck(boolean skipInstallPathCheck) {
-		LibraryUIManager.skipInstallPathCheck = skipInstallPathCheck;
-	}
-		
 }

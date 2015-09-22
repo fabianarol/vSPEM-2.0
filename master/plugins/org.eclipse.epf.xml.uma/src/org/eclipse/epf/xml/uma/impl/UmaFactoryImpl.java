@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: UmaFactoryImpl.java,v 1.7 2007/09/06 00:09:17 klow Exp $
+ */
 package org.eclipse.epf.xml.uma.impl;
 
 import org.eclipse.emf.ecore.EClass;
@@ -18,7 +14,6 @@ import org.eclipse.emf.ecore.impl.EFactoryImpl;
 import org.eclipse.emf.ecore.plugin.EcorePlugin;
 import org.eclipse.epf.xml.uma.Activity;
 import org.eclipse.epf.xml.uma.ActivityDescription;
-import org.eclipse.epf.xml.uma.ApplicableMetaClassInfo;
 import org.eclipse.epf.xml.uma.Artifact;
 import org.eclipse.epf.xml.uma.ArtifactDescription;
 import org.eclipse.epf.xml.uma.BreakdownElement;
@@ -54,7 +49,6 @@ import org.eclipse.epf.xml.uma.Guidance;
 import org.eclipse.epf.xml.uma.GuidanceDescription;
 import org.eclipse.epf.xml.uma.Guideline;
 import org.eclipse.epf.xml.uma.Iteration;
-import org.eclipse.epf.xml.uma.Kind;
 import org.eclipse.epf.xml.uma.MethodConfiguration;
 import org.eclipse.epf.xml.uma.MethodElement;
 import org.eclipse.epf.xml.uma.MethodElementProperty;
@@ -122,7 +116,7 @@ public class UmaFactoryImpl extends EFactoryImpl implements UmaFactory {
 	 */
 	public static UmaFactory init() {
 		try {
-			UmaFactory theUmaFactory = (UmaFactory)EPackage.Registry.INSTANCE.getEFactory("http://www.eclipse.org/epf/uma/1.0.6"); 
+			UmaFactory theUmaFactory = (UmaFactory)EPackage.Registry.INSTANCE.getEFactory("http://www.eclipse.org/epf/uma/1.0.3"); 
 			if (theUmaFactory != null) {
 				return theUmaFactory;
 			}
@@ -148,12 +142,10 @@ public class UmaFactoryImpl extends EFactoryImpl implements UmaFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public EObject create(EClass eClass) {
 		switch (eClass.getClassifierID()) {
 			case UmaPackage.ACTIVITY: return (EObject)createActivity();
 			case UmaPackage.ACTIVITY_DESCRIPTION: return (EObject)createActivityDescription();
-			case UmaPackage.APPLICABLE_META_CLASS_INFO: return (EObject)createApplicableMetaClassInfo();
 			case UmaPackage.ARTIFACT: return (EObject)createArtifact();
 			case UmaPackage.ARTIFACT_DESCRIPTION: return (EObject)createArtifactDescription();
 			case UmaPackage.BREAKDOWN_ELEMENT: return (EObject)createBreakdownElement();
@@ -189,7 +181,6 @@ public class UmaFactoryImpl extends EFactoryImpl implements UmaFactory {
 			case UmaPackage.GUIDANCE_DESCRIPTION: return (EObject)createGuidanceDescription();
 			case UmaPackage.GUIDELINE: return (EObject)createGuideline();
 			case UmaPackage.ITERATION: return (EObject)createIteration();
-			case UmaPackage.KIND: return (EObject)createKind();
 			case UmaPackage.METHOD_CONFIGURATION: return (EObject)createMethodConfiguration();
 			case UmaPackage.METHOD_ELEMENT: return (EObject)createMethodElement();
 			case UmaPackage.METHOD_ELEMENT_PROPERTY: return (EObject)createMethodElementProperty();
@@ -248,7 +239,6 @@ public class UmaFactoryImpl extends EFactoryImpl implements UmaFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object createFromString(EDataType eDataType, String initialValue) {
 		switch (eDataType.getClassifierID()) {
 			case UmaPackage.VARIABILITY_TYPE:
@@ -269,7 +259,6 @@ public class UmaFactoryImpl extends EFactoryImpl implements UmaFactory {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String convertToString(EDataType eDataType, Object instanceValue) {
 		switch (eDataType.getClassifierID()) {
 			case UmaPackage.VARIABILITY_TYPE:
@@ -303,16 +292,6 @@ public class UmaFactoryImpl extends EFactoryImpl implements UmaFactory {
 	public ActivityDescription createActivityDescription() {
 		ActivityDescriptionImpl activityDescription = new ActivityDescriptionImpl();
 		return activityDescription;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public ApplicableMetaClassInfo createApplicableMetaClassInfo() {
-		ApplicableMetaClassInfoImpl applicableMetaClassInfo = new ApplicableMetaClassInfoImpl();
-		return applicableMetaClassInfo;
 	}
 
 	/**
@@ -663,16 +642,6 @@ public class UmaFactoryImpl extends EFactoryImpl implements UmaFactory {
 	public Iteration createIteration() {
 		IterationImpl iteration = new IterationImpl();
 		return iteration;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Kind createKind() {
-		KindImpl kind = new KindImpl();
-		return kind;
 	}
 
 	/**
@@ -1246,7 +1215,6 @@ public class UmaFactoryImpl extends EFactoryImpl implements UmaFactory {
 	 * @deprecated
 	 * @generated
 	 */
-	@Deprecated
 	public static UmaPackage getPackage() {
 		return UmaPackage.eINSTANCE;
 	}

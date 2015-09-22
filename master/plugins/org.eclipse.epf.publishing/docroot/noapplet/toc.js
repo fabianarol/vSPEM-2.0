@@ -507,13 +507,10 @@ function mouseClickHandler(e) {
 
   	if (isPlusMinus(clickedNode) )
   	{	
-  		if (clickedNode.getAttribute("showIcon") == "true")
-  		{
-	  		if (isCollapsed(clickedNode)) 
-	   			expand(clickedNode);
-	  		else if (isExpanded(clickedNode)) 
-	  	  		collapse(clickedNode);
-  		}
+    	if (isCollapsed(clickedNode)) 
+   			expand(clickedNode);
+  		else if (isExpanded(clickedNode)) 
+  	  		collapse(clickedNode);
   	}
   	else
   	{
@@ -545,13 +542,10 @@ function mouseDblClickHandler(e) {
   		}
   		else
   		{  		
-  			if (clickedNode.getAttribute("showIcon") == "true")
-  			{
-	    		if (isCollapsed(plus_minus)) 
-	   				expand(plus_minus);
-	  			else if (isExpanded(plus_minus)) 
-	  	  			collapse(plus_minus);  	
-	  	  	}  		  		  
+    		if (isCollapsed(plus_minus)) 
+   				expand(plus_minus);
+  			else if (isExpanded(plus_minus)) 
+  	  			collapse(plus_minus);  	  		  		  
   	  			
   			highlightTopic(plus_minus);
   		}

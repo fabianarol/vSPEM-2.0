@@ -37,6 +37,13 @@ import org.eclipse.epf.uma.UmaPackage;
 public class PlanningDataImpl extends ProcessElementImpl implements
 		PlanningData {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The default value of the '{@link #getStartDate() <em>Start Date</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -106,7 +113,7 @@ public class PlanningDataImpl extends ProcessElementImpl implements
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -114,7 +121,6 @@ public class PlanningDataImpl extends ProcessElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.PLANNING_DATA;
 	}
@@ -192,7 +198,6 @@ public class PlanningDataImpl extends ProcessElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.PLANNING_DATA__START_DATE:
@@ -210,7 +215,6 @@ public class PlanningDataImpl extends ProcessElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.PLANNING_DATA__START_DATE:
@@ -231,7 +235,6 @@ public class PlanningDataImpl extends ProcessElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.PLANNING_DATA__START_DATE:
@@ -252,7 +255,6 @@ public class PlanningDataImpl extends ProcessElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);
@@ -278,7 +280,6 @@ public class PlanningDataImpl extends ProcessElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy())
 			return super.toString();

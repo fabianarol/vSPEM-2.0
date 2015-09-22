@@ -1,13 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
- *******************************************************************************/
 //------------------------------------------------------------------------------
 // Copyright (c) 2005, 2006 IBM Corporation and others.
 // All rights reserved. This program and the accompanying materials
@@ -263,25 +253,5 @@ public class RichTextCommand {
 	 * Converts a link to normal text.
 	 */
 	public static final String UNLINK = "unlink"; //$NON-NLS-1$
-	
-	/**
-	 * Add a row to the selected table.
-	 */
-	public static final String ADD_ROW = "addRow"; //$NON-NLS-1$
-	
-	/**
-	 * Add a column to the selected table.
-	 */
-	public static final String ADD_COLUMN = "addColumn"; //$NON-NLS-1$
-	
-	/**
-	 * Delete the last row of the selected table.
-	 */
-	public static final String DELETE_LAST_ROW = "deleteLastRow"; //$NON-NLS-1$
-	
-	/**
-	 * Delete the last column of the selected table.
-	 */
-	public static final String DELETE_LAST_COLUMN = "deleteLastColumn"; //$NON-NLS-1$
-	
+
 }

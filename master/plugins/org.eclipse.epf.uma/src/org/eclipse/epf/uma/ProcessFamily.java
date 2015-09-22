@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.uma;
 
+import org.eclipse.emf.common.util.EList;
 import java.util.List;
 
 /**
@@ -44,9 +45,9 @@ public interface ProcessFamily extends MethodConfiguration {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Delivery Processes</em>' reference list.
 	 * @see org.eclipse.epf.uma.UmaPackage#getProcessFamily_DeliveryProcesses()
-	 * @model ordered="false"
+	 * @model type="org.eclipse.epf.uma.DeliveryProcess" ordered="false"
 	 * @generated
 	 */
-	List<DeliveryProcess> getDeliveryProcesses();
+	List getDeliveryProcesses();
 
 } // ProcessFamily

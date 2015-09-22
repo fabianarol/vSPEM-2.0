@@ -66,19 +66,14 @@ import org.eclipse.epf.authoring.ui.views.ProcessViewer;
 import org.eclipse.epf.authoring.ui.views.ViewHelper;
 import org.eclipse.epf.diagram.ad.ADImages;
 import org.eclipse.epf.diagram.add.ADDImages;
-import org.eclipse.epf.diagram.core.DiagramCorePlugin;
-import org.eclipse.epf.diagram.core.DiagramCoreResources;
 import org.eclipse.epf.diagram.core.part.DiagramEditorInput;
 import org.eclipse.epf.diagram.core.part.util.DiagramEditorUtil;
-import org.eclipse.epf.diagram.core.services.DiagramHelper;
 import org.eclipse.epf.diagram.core.services.DiagramManager;
 import org.eclipse.epf.diagram.model.util.GraphicalDataHelper;
 import org.eclipse.epf.diagram.model.util.GraphicalDataManager;
 import org.eclipse.epf.diagram.ui.service.DiagramEditorHelper;
 import org.eclipse.epf.diagram.wpdd.part.WPDDImages;
 import org.eclipse.epf.library.LibraryService;
-import org.eclipse.epf.library.configuration.ActivityDeepCopyConfigurator;
-import org.eclipse.epf.library.configuration.ConfigurationHelper;
 import org.eclipse.epf.library.edit.IFilter;
 import org.eclipse.epf.library.edit.LibraryEditResources;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
@@ -90,16 +85,13 @@ import org.eclipse.epf.library.edit.process.BreakdownElementWrapperItemProvider;
 import org.eclipse.epf.library.edit.process.IBSItemProvider;
 import org.eclipse.epf.library.edit.process.command.ActivityDropCommand;
 import org.eclipse.epf.library.edit.process.command.ContributeToActivityCommand;
-import org.eclipse.epf.library.edit.process.command.CustomizeDescriptorCommand;
 import org.eclipse.epf.library.edit.process.command.LocallyReplaceAndDeepCopyCommand;
 import org.eclipse.epf.library.edit.process.command.ReplaceActivityCommand;
 import org.eclipse.epf.library.edit.ui.IActionTypeProvider;
 import org.eclipse.epf.library.edit.ui.UserInteractionHelper;
-import org.eclipse.epf.library.edit.util.DescriptorPropUtil;
 import org.eclipse.epf.library.edit.util.DiagramOptions;
 import org.eclipse.epf.library.edit.util.ExposedAdapterFactory;
 import org.eclipse.epf.library.edit.util.IDiagramManager;
-import org.eclipse.epf.library.edit.util.ProcessScopeUtil;
 import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.library.edit.util.Suppression;
 import org.eclipse.epf.library.edit.util.TngUtil;
@@ -117,7 +109,6 @@ import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.Milestone;
 import org.eclipse.epf.uma.Process;
 import org.eclipse.epf.uma.ProcessComponent;
-import org.eclipse.epf.uma.RoleDescriptor;
 import org.eclipse.epf.uma.TaskDescriptor;
 import org.eclipse.epf.uma.VariabilityElement;
 import org.eclipse.epf.uma.VariabilityType;
@@ -142,7 +133,6 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IActionBars;
@@ -281,65 +271,6 @@ public class ProcessEditorActionBarContributor extends
 			}
 		}
 	};
-	
-	private class DeleteDiagramAction extends Action {
-		private int diagramType;
-		private final String DELETE_ICON_PATH = "elcl16/delete_diagram.gif"; //$NON-NLS-1$
-		
-		public DeleteDiagramAction(String text, int diagramType) {
-			super(text);
-			this.diagramType = diagramType;
-			setImageDescriptor(DiagramCorePlugin.getDefault().getImageDescriptor(DELETE_ICON_PATH));
-		}
-		
-		public void run() {
-			DiagramManager mgr = DiagramManager.getInstance(getProcess(), this);
-		
-			try {
-				List<org.eclipse.gmf.runtime.notation.Diagram> diagrams = mgr.getDiagrams(selectedActivity, diagramType);
-				if (diagrams.size() > 0) {
-					String msg = NLS.bind(DiagramCoreResources.DeleteDiagram_prompt_new, getDiagramName(diagramType));					
-					boolean result = DiagramCorePlugin.getDefault().getMsgDialog().displayPrompt(
-							DiagramCoreResources.DeleteDiagram_text, msg);
-					if (result) {	
-						IEditorPart[] editors = getPage().getEditors();
-						for (IEditorPart editor: editors) {
-							if (editor instanceof org.eclipse.epf.diagram.core.part.AbstractDiagramEditor) {
-								getPage().closeEditor(editor, false);
-							}
-						}						
-						
-						DiagramHelper.deleteDiagram(diagrams.get(0), true);
-					}
-				}			
-			} catch (Exception e) {
-				AuthoringUIPlugin.getDefault().getLogger().logError(e);
-			}			
-		}
-		
-		private String getDiagramName(int type) {
-			switch(type) {
-			case IDiagramManager.ACTIVITY_DIAGRAM:
-				return DiagramCoreResources.DeleteDiagram_AD;
-			case IDiagramManager.ACTIVITY_DETAIL_DIAGRAM:
-				return DiagramCoreResources.DeleteDiagram_ADD;
-			case IDiagramManager.WORK_PRODUCT_DEPENDENCY_DIAGRAM:
-				return DiagramCoreResources.DeleteDiagram_WPDD;
-			default:
-				return null;
-			}
-		}
-	}
-	
-	private IAction deleteActivityDiagram = new DeleteDiagramAction(
-			AuthoringUIResources.ProcessEditor_Action_delete_AD_text,
-			IDiagramManager.ACTIVITY_DIAGRAM);
-	private IAction deleteActivityDetailDiagram = new DeleteDiagramAction(
-			AuthoringUIResources.ProcessEditor_Action_delete_ADD_text,
-			IDiagramManager.ACTIVITY_DETAIL_DIAGRAM);	
-	private IAction deleteWPDiagram = new DeleteDiagramAction(
-			AuthoringUIResources.ProcessEditor_Action_delete_WPDD_text,
-			IDiagramManager.WORK_PRODUCT_DEPENDENCY_DIAGRAM);
 	
 	private class OpenDiagramEditorAction extends Action {
 
@@ -557,18 +488,6 @@ public class ProcessEditorActionBarContributor extends
 		}
 	};
 
-	private IAction customizeAction = new Action(
-			AuthoringUIResources.ProcessEditor_Action_Customize) {
-		public void run() {
-			if (!(bsItemProvider instanceof BreakdownElementWrapperItemProvider)) {
-				return;
-			}
-			CustomizeDescriptorCommand command = new CustomizeDescriptorCommand(
-					(BreakdownElementWrapperItemProvider) bsItemProvider);
-			getActionManager().execute(command);			
-		}
-	};
-	
 	private class EditorSuppressionCommand extends SuppressionCommand {
 		EditorSuppressionCommand(Suppression suppression, List selection,
 				boolean suppressed) {
@@ -1330,7 +1249,7 @@ public class ProcessEditorActionBarContributor extends
 
 					ActivityDropCommand cmd = new ActivityDropCommand(
 							selectedActivity, selection, null,
-							getAdapterFactory(),new ActivityDeepCopyConfigurator(config));
+							getAdapterFactory());
 					cmd.setType(IActionTypeProvider.DEEP_COPY);
 					getActionManager().execute(cmd);
 
@@ -1613,6 +1532,7 @@ public class ProcessEditorActionBarContributor extends
 	public void init(IActionBars actionBars) {
 		super.init(actionBars);
 		registerActions();
+		contributeToToolBar(actionBars.getToolBarManager());
 	}
 
 	protected IActionManager getActionManager() {
@@ -1905,9 +1825,7 @@ public class ProcessEditorActionBarContributor extends
 			menuManager.insertBefore(IWorkbenchActionConstants.MB_ADDITIONS,
 					localReplacementAndDeepCopy);
 		}
-		
-		addCustomizeActionToMenu(menuManager);
-				
+
 		if (!isRolledUP) {
 			if (createChildActions != null && !createChildActions.isEmpty()) {
 				menuManager.insertBefore(
@@ -1934,16 +1852,8 @@ public class ProcessEditorActionBarContributor extends
 			menuManager.insertBefore(
 					"fixed-additions", updateSuppressionFromBaseAction); //$NON-NLS-1$
 		}
-		
-		boolean toAdd = true;
-		if (selectedBreakdownElement instanceof TaskDescriptor) {
-			if (DescriptorPropUtil.getDesciptorPropUtil().getGreenParent(
-					(TaskDescriptor) selectedBreakdownElement) != null) {
-				toAdd = false;
-			}
-		}
 
-		if (toAdd && (selectedBreakdownElement != null) && (bsItemProvider != null)) {
+		if ((selectedBreakdownElement != null) && (bsItemProvider != null)) {
 			menuManager.insertBefore("fixed-additions", moveUpAction); //$NON-NLS-1$
 			menuManager.insertBefore("fixed-additions", moveDownAction); //$NON-NLS-1$
 		}
@@ -1979,11 +1889,11 @@ public class ProcessEditorActionBarContributor extends
 					reuseSubMenu);
 		}
 
-		if (autoSynchronize.isEnabled() && ! ProcessUtil.isSynFree()) {
+		if (autoSynchronize.isEnabled()) {
 			menuManager.insertBefore(IWorkbenchActionConstants.MB_ADDITIONS,
 					autoSynchronize);
 		}
-		if (manualSynchronizeAction.isEnabled() && ! ProcessUtil.isSynFree()) {
+		if (manualSynchronizeAction.isEnabled()) {
 			menuManager.insertBefore(IWorkbenchActionConstants.MB_ADDITIONS,
 					manualSynchronizeAction);
 		}
@@ -2013,23 +1923,15 @@ public class ProcessEditorActionBarContributor extends
 			// }
 			// menuManager.appendToGroup("open", diagramSubMenu); //$NON-NLS-1$
 
-			if (selectedActivity != null) {
-				menuManager.appendToGroup("open", newActivityDiagramEditor); //$NON-NLS-1$
-			}
-			
 			MenuManager newDiagramSubMenu = new MenuManager(
 					AuthoringUIResources.ProcessEditor_Action_Diagrams); 
 			if (selectedActivity != null) {
-				//newDiagramSubMenu.add(newActivityDiagramEditor);				
+				newDiagramSubMenu.add(newActivityDiagramEditor);
 				newDiagramSubMenu.add(newActivityDetailDiagramEditor);
 				newDiagramSubMenu.add(newWPDiagramEditor);
-				newDiagramSubMenu.add(new Separator());
-				newDiagramSubMenu.add(deleteActivityDiagram);
-				newDiagramSubMenu.add(deleteActivityDetailDiagram);				
-				newDiagramSubMenu.add(deleteWPDiagram);
-				newDiagramSubMenu.add(new Separator());
 				newDiagramSubMenu.add(newSuppressDiagramAction);
 				newDiagramSubMenu.add(newAssignUserDiagram);
+
 			}
 
 			if (selectedActivity == getProcess()) {
@@ -2048,45 +1950,6 @@ public class ProcessEditorActionBarContributor extends
 			menuManager.appendToGroup("open", expandAllAction); //$NON-NLS-1$
 			menuManager.appendToGroup("open", collapseAllAction); //$NON-NLS-1$
 		}
-	}
-
-	private void addCustomizeActionToMenu(IMenuManager menuManager) {
-		if (! ProcessUtil.isSynFree()) {
-			return;
-		}
-
-		if (!(bsItemProvider instanceof BreakdownElementWrapperItemProvider)) {
-			return;
-		}
-
-		if (!(TngUtil.unwrap(bsItemProvider) instanceof TaskDescriptor)) {
-			return;
-		}
-
-		BreakdownElementWrapperItemProvider provider = (BreakdownElementWrapperItemProvider) bsItemProvider;
-		if (!ProcessUtil.isInherited(provider)) {
-			return;
-		}
-
-		Object parentObj = provider.getParent(null);
-		Activity parentAct = parentObj instanceof Activity ? (Activity) parentObj
-				: null;
-		if (parentAct == null) {
-			return;
-		}
-
-		VariabilityType extendType = parentAct.getVariabilityType();
-		if (extendType != VariabilityType.LOCAL_CONTRIBUTION
-				&& extendType != VariabilityType.EXTENDS) {
-			return;
-		}
-
-		if (provider.getTopItem() != ProcessUtil.getProcess(parentAct)) {
-			return;
-		}
-		menuManager.appendToGroup(IWorkbenchActionConstants.MB_ADDITIONS,
-				customizeAction); //$NON-NLS-1$		
-
 	}
 
 	/**
@@ -2169,31 +2032,6 @@ public class ProcessEditorActionBarContributor extends
 		deepCopyActivityAction.setEnabled(enabled);
 	}
 
-	@Override
-	public void setActiveEditor(IEditorPart part) {
-		super.setActiveEditor(part);
-		if (! ProcessUtil.isSynFree() || part == null) {
-			return;
-		}
-		IEditorPart editor = getActiveEditor();
-		if (editor instanceof ProcessEditor) {
-			ProcessEditor pEditor = (ProcessEditor) editor;
-			Process proc = pEditor.getSelectedProcess();
-			boolean specialUpdateDueToBrowsed = false;
-			if (ProcessScopeUtil.getInstance().isConfigFree(proc)) {
-				if (ConfigurationHelper.getDelegate().isAutoSyncedByBrowsing()) {
-					specialUpdateDueToBrowsed = true;
-				}
-			} 
-			if (specialUpdateDueToBrowsed) {
-				pEditor.updateConfigFreeProcessModelAndRefresh();
-				ConfigurationHelper.getDelegate().setAutoSyncedByBrowsing(false);
-			} else {
-				pEditor.updateAndRefreshProcessModel();				
-			}
-		}
-	}
-	
 	protected Collection generateCreateChildActions(Collection descriptors,
 			ISelection selection) {
 		if (locked) {
@@ -2233,7 +2071,7 @@ public class ProcessEditorActionBarContributor extends
 					// bsItemProvider = null;
 					selectedActivity = null;
 				}
-				AdapterFactoryEditingDomain domain = (AdapterFactoryEditingDomain) ((IEditingDomainProvider) activeEditor)
+				AdapterFactoryEditingDomain domain = (AdapterFactoryEditingDomain) ((IEditingDomainProvider) activeEditorPart)
 						.getEditingDomain();
 				Object providerObj = domain.getAdapterFactory().adapt(
 						selectedObject, ITreeItemContentProvider.class);
@@ -2364,7 +2202,7 @@ public class ProcessEditorActionBarContributor extends
 		// Set Activity Detail Diagram Action enable state.
 		if (selectedObject instanceof Activity
 				|| selectedObject instanceof ActivityWrapperItemProvider) {
-//			setActionStateForADD();
+			setActionStateForADD();
 			setDiagramsContextMenuState();
 		}
 
@@ -2419,8 +2257,8 @@ public class ProcessEditorActionBarContributor extends
 	}
 
 	protected void doRefresh() {
-		if (activeEditor instanceof IViewerProvider) {
-			Display display = activeEditor.getEditorSite().getShell().getDisplay();
+		if (activeEditorPart instanceof IViewerProvider) {
+			Display display = activeEditorPart.getEditorSite().getShell().getDisplay();
 			BusyIndicator.showWhile(display, new Runnable() {
 
 				public void run() {
@@ -2485,7 +2323,7 @@ public class ProcessEditorActionBarContributor extends
 				return;
 
 			while (!activity.getVariabilityType().equals(
-					VariabilityType.NA)) {
+					VariabilityType.NA_LITERAL)) {
 
 				VariabilityElement ve = activity.getVariabilityBasedOnElement();
 				// If Activity is set to local contribution,
@@ -2545,26 +2383,23 @@ public class ProcessEditorActionBarContributor extends
 				// Iterate through the List, to find taskdescriptor and has
 				// primary role within current configuration.
 				// then enable the action.
-				findRoleDesc:
-				for (Iterator<?> iterator = list.iterator(); iterator.hasNext();) {
+				for (Iterator iterator = list.iterator(); iterator.hasNext();) {
 					Object obj = iterator.next();
 					if (obj instanceof TaskDescriptor) {
 						if (!getSuppression().isSuppressed(obj)) {
-							List<RoleDescriptor> primaryPerformers = ((TaskDescriptor) obj)
+							Object e = ((TaskDescriptor) obj)
 									.getPerformedPrimarilyBy();
-							AdapterFactoryEditingDomain domain = (AdapterFactoryEditingDomain) ((IEditingDomainProvider) activeEditor)
+							AdapterFactoryEditingDomain domain = (AdapterFactoryEditingDomain) ((IEditingDomainProvider) activeEditorPart)
 									.getEditingDomain();
 							AdapterFactory factory = domain.getAdapterFactory();
 							if (factory instanceof ExposedAdapterFactory) {
 								IFilter filter = ((ExposedAdapterFactory) factory)
 										.getFilter();
-								for (RoleDescriptor e : primaryPerformers) {
-									if (filter != null && filter.accept(e)
-											&& !getSuppression().isSuppressed(e)) {
-										openWorkflowDetailEditorAction
-												.setEnabled(true);
-										break findRoleDesc;
-									}									
+								if (filter != null && filter.accept(e)
+										&& !getSuppression().isSuppressed(e)) {
+									openWorkflowDetailEditorAction
+											.setEnabled(true);
+									break;
 								}
 							}
 						}
@@ -2604,12 +2439,12 @@ public class ProcessEditorActionBarContributor extends
 				return;
 			}
 			Activity activity = (Activity) unwrapped;
-			List<Object> list = new ArrayList<Object>();
+			List list = new ArrayList();
 			
 			//TODO: check for existing diagrams in immediate base instead of root base
 			
 			while (!activity.getVariabilityType().equals(
-					VariabilityType.NA)) {
+					VariabilityType.NA_LITERAL)) {
 
 				VariabilityElement ve = activity.getVariabilityBasedOnElement();
 				list.addAll(activity.getBreakdownElements());
@@ -2659,26 +2494,23 @@ public class ProcessEditorActionBarContributor extends
 				// Iterate through the List, to find taskdescriptor and has
 				// primary role within current configuration.
 				// then enable the action.
-				findRoleDesc:
-				for (Iterator<?> iterator = list.iterator(); iterator.hasNext();) {
+				for (Iterator iterator = list.iterator(); iterator.hasNext();) {
 					Object obj = iterator.next();
 					if (obj instanceof TaskDescriptor) {
 						if (!getSuppression().isSuppressed(obj)) {
-							List<RoleDescriptor> primaryPerformers = ((TaskDescriptor) obj)
+							Object e = ((TaskDescriptor) obj)
 									.getPerformedPrimarilyBy();
-							AdapterFactoryEditingDomain domain = (AdapterFactoryEditingDomain) ((IEditingDomainProvider) activeEditor)
+							AdapterFactoryEditingDomain domain = (AdapterFactoryEditingDomain) ((IEditingDomainProvider) activeEditorPart)
 									.getEditingDomain();
 							AdapterFactory factory = domain.getAdapterFactory();
 							if (factory instanceof ExposedAdapterFactory) {
 								IFilter filter = ((ExposedAdapterFactory) factory)
 										.getFilter();
-								for (RoleDescriptor e : primaryPerformers) {
-									if (filter != null && filter.accept(e)
-											&& !getSuppression().isSuppressed(e)) {
-										newActivityDetailDiagramEditor
-												.setEnabled(true);
-										break findRoleDesc;
-									}
+								if (filter != null && filter.accept(e)
+										&& !getSuppression().isSuppressed(e)) {
+									newActivityDetailDiagramEditor
+											.setEnabled(true);
+									break;
 								}
 							}
 						}
@@ -2686,39 +2518,5 @@ public class ProcessEditorActionBarContributor extends
 				}
 			}
 		}
-		
-		//for the diagram delete menus
-		updateDiagramDeleteMenu();
-	}
-	
-	private void updateDiagramDeleteMenu() {
-		deleteActivityDiagram.setEnabled(false);
-		deleteActivityDetailDiagram.setEnabled(false);				
-		deleteWPDiagram.setEnabled(false);
-
-		DiagramManager mgr = DiagramManager.getInstance(getProcess(), this);		
-		try {
-			List<org.eclipse.gmf.runtime.notation.Diagram> diagrams = mgr.getDiagrams(selectedActivity,
-					IDiagramManager.ACTIVITY_DIAGRAM);
-			if (diagrams.size() > 0) {
-				deleteActivityDiagram.setEnabled(true);
-			}
-			
-			diagrams = mgr.getDiagrams(selectedActivity, IDiagramManager.ACTIVITY_DETAIL_DIAGRAM);
-			if (diagrams.size() > 0) {
-				deleteActivityDetailDiagram.setEnabled(true);
-			}
-			
-			diagrams = mgr.getDiagrams(selectedActivity, IDiagramManager.WORK_PRODUCT_DEPENDENCY_DIAGRAM);
-			if (diagrams.size() > 0) {
-				deleteWPDiagram.setEnabled(true);
-			}			
-		} catch (Exception e) {
-			if (e instanceof IllegalArgumentException) {
-				//this can happen and is normal when selection is an green activity
-				return;
-			}
-			AuthoringUIPlugin.getDefault().getLogger().logError(e);
-		}		
 	}
 }

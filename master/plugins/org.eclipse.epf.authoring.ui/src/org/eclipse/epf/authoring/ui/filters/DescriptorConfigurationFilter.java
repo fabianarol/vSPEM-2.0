@@ -14,10 +14,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 
-import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.epf.library.configuration.ConfigurationFilter;
 import org.eclipse.epf.library.edit.itemsfilter.FilterHelper;
-import org.eclipse.epf.library.services.SafeUpdateController;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.jface.viewers.Viewer;
 
@@ -37,47 +35,21 @@ public class DescriptorConfigurationFilter extends ConfigurationFilter {
 
 	protected FilterHelper helper;
 
-	protected Viewer viewer;
-	
 	/**
 	 * @param methodConfig
 	 * @param viewer
 	 */
 	public DescriptorConfigurationFilter(MethodConfiguration methodConfig,
 			Viewer viewer, String filterStr) {
-		super(methodConfig);
-		this.viewer = viewer;
+		super(methodConfig, viewer);
 		this.filterStr = filterStr;
 		this.methodConfiguration = methodConfig;
 	}
 
-	public void notifyChanged(final Notification msg) {
-		if (viewer == null) {
-			return;
-		}
-	
-		SafeUpdateController.syncExec(new Runnable() {
-			public void run() {
-				switch (msg.getEventType()) {
-				case Notification.ADD:
-				case Notification.ADD_MANY:
-				case Notification.REMOVE:
-				case Notification.REMOVE_MANY:
-					viewer.refresh();
-				}
-			}
-		});
-
-	}
-	
 	public boolean accept(Object obj) {
 
 		if (obj instanceof MethodConfiguration) {
-			if (methodConfiguration != null) {
-				return methodConfiguration.equals(obj);
-			} else {
-				return false;
-			}
+			return methodConfiguration.equals(obj);
 		}
 
 		if (!super.accept(obj))

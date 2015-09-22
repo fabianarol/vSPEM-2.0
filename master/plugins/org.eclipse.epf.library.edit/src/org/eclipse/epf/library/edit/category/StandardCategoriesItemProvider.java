@@ -211,6 +211,19 @@ public class StandardCategoriesItemProvider extends TransientGroupItemProvider
 				groupItemProviderMap.put(name, child);
 			}
 
+			//Creacion de pruebasLineas
+//			contentPkg = UmaUtil.findContentPackage(plugin,
+//					ModelStructure.DEFAULT.pruebasLineasPath);
+//			if (contentPkg != null) {
+//				name = LibraryEditPlugin.INSTANCE
+//						.getString("_UI_Pruebas_Lineas_group"); //$NON-NLS-1$
+//				child = new PruebasLineasItemProvider(adapterFactory, contentPkg,
+//						name);
+//				child.setParent(this);
+//				children.add(child);
+//				groupItemProviderMap.put(name, child);
+//			}
+			
 			// create work product types folder
 			contentPkg = UmaUtil.findContentPackage(plugin,
 					ModelStructure.DEFAULT.workProductTypePath);

@@ -18,6 +18,8 @@ import java.util.Map;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.edit.command.CopyCommand.Helper;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.emf.edit.provider.ITableItemLabelProvider;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
@@ -35,6 +37,8 @@ import org.eclipse.epf.uma.Activity;
 import org.eclipse.epf.uma.BreakdownElement;
 import org.eclipse.epf.uma.Process;
 import org.eclipse.epf.uma.WorkBreakdownElement;
+import org.eclipse.epf.uma.edit.command.MethodElementCreateCopyCommand;
+import org.eclipse.epf.uma.edit.command.MethodElementInitializeCopyCommand;
 
 
 /**
@@ -217,6 +221,8 @@ public class BreakdownElementItemProvider extends
 	 *      int)
 	 */
 	public Object getColumnImage(Object object, int columnIndex) {
+		// String colName = (String) columnIndexToNameMap.get(new
+		// Integer(columnIndex));
 		String colName = getColumnName(columnIndex);
 		return TngUtil.getColumnImage(object, colName);
 	}
@@ -397,16 +403,22 @@ public class BreakdownElementItemProvider extends
 		return null;
 	}
 
+	protected Command createInitializeCopyCommand(EditingDomain domain,
+			EObject owner, Helper helper) {
+		return new MethodElementInitializeCopyCommand(domain, owner, helper);
+	}
+
+	protected Command createCreateCopyCommand(EditingDomain domain,
+			EObject owner, Helper helper) {
+		return new MethodElementCreateCopyCommand(domain, owner, helper);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.epf.uma.provider.DescriptorItemProvider#getImage(java.lang.Object)
 	 */
 	public Object getImage(Object object) {
-		Object image = TngUtil.getCustomNodeIcon(object);
-		if(image != null) {
-			return image;
-		}
 		if (delegateItemProvider != null) {
 			return delegateItemProvider.getImage(object);
 		}

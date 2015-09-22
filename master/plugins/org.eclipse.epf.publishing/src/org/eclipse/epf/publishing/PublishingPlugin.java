@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.publishing;
 
-import org.eclipse.epf.common.AbstractActivator;
+import org.eclipse.epf.common.plugin.AbstractPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -20,7 +20,7 @@ import org.osgi.framework.BundleContext;
  * @author Jinhua Xi
  * @since 1.0
  */
-public class PublishingPlugin extends AbstractActivator {
+public class PublishingPlugin extends AbstractPlugin {
 
 	/**
 	 * The plug-in ID.
@@ -41,14 +41,14 @@ public class PublishingPlugin extends AbstractActivator {
 	}
 
 	/**
-	 * @see org.eclipse.epf.common.ui.AbstractPlugin#start(BundleContext)
+	 * @see org.eclipse.epf.common.plugin.AbstractPlugin#start(BundleContext)
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 	}
 
 	/**
-	 * @see org.eclipse.epf.common.ui.AbstractPlugin#stop(BundleContext)
+	 * @see org.eclipse.epf.common.plugin.AbstractPlugin#stop(BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);

@@ -46,6 +46,13 @@ import org.eclipse.epf.uma.UmaPackage;
 public class TeamProfileImpl extends BreakdownElementImpl implements
 		TeamProfile {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The cached value of the '{@link #getTeamRoles() <em>Team Roles</em>}' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -53,7 +60,7 @@ public class TeamProfileImpl extends BreakdownElementImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<RoleDescriptor> teamRoles;
+	protected EList teamRoles = null;
 
 	/**
 	 * The cached value of the '{@link #getSuperTeam() <em>Super Team</em>}' reference.
@@ -63,7 +70,7 @@ public class TeamProfileImpl extends BreakdownElementImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected TeamProfile superTeam;
+	protected TeamProfile superTeam = null;
 
 	/**
 	 * The cached value of the '{@link #getSubTeam() <em>Sub Team</em>}' reference list.
@@ -73,7 +80,7 @@ public class TeamProfileImpl extends BreakdownElementImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<TeamProfile> subTeam;
+	protected EList subTeam = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -85,7 +92,7 @@ public class TeamProfileImpl extends BreakdownElementImpl implements
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -93,7 +100,6 @@ public class TeamProfileImpl extends BreakdownElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.TEAM_PROFILE;
 	}
@@ -103,10 +109,9 @@ public class TeamProfileImpl extends BreakdownElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<RoleDescriptor> getTeamRoles() {
+	public List getTeamRoles() {
 		if (teamRoles == null) {
-			teamRoles = new EObjectResolvingEList<RoleDescriptor>(
-					RoleDescriptor.class, this,
+			teamRoles = new EObjectResolvingEList(RoleDescriptor.class, this,
 					UmaPackage.TEAM_PROFILE__TEAM_ROLES);
 		}
 		return teamRoles;
@@ -191,10 +196,10 @@ public class TeamProfileImpl extends BreakdownElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<TeamProfile> getSubTeam() {
+	public List getSubTeam() {
 		if (subTeam == null) {
-			subTeam = new EObjectWithInverseResolvingEList<TeamProfile>(
-					TeamProfile.class, this, UmaPackage.TEAM_PROFILE__SUB_TEAM,
+			subTeam = new EObjectWithInverseResolvingEList(TeamProfile.class,
+					this, UmaPackage.TEAM_PROFILE__SUB_TEAM,
 					UmaPackage.TEAM_PROFILE__SUPER_TEAM);
 		}
 		return subTeam;
@@ -205,8 +210,6 @@ public class TeamProfileImpl extends BreakdownElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
@@ -217,8 +220,7 @@ public class TeamProfileImpl extends BreakdownElementImpl implements
 						msgs);
 			return basicSetSuperTeam((TeamProfile) otherEnd, msgs);
 		case UmaPackage.TEAM_PROFILE__SUB_TEAM:
-			return ((InternalEList<InternalEObject>) (InternalEList<?>) getSubTeam())
-					.basicAdd(otherEnd, msgs);
+			return ((InternalEList) getSubTeam()).basicAdd(otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
@@ -228,15 +230,13 @@ public class TeamProfileImpl extends BreakdownElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case UmaPackage.TEAM_PROFILE__SUPER_TEAM:
 			return basicSetSuperTeam(null, msgs);
 		case UmaPackage.TEAM_PROFILE__SUB_TEAM:
-			return ((InternalEList<?>) getSubTeam())
-					.basicRemove(otherEnd, msgs);
+			return ((InternalEList) getSubTeam()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -246,7 +246,6 @@ public class TeamProfileImpl extends BreakdownElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.TEAM_PROFILE__TEAM_ROLES:
@@ -266,21 +265,18 @@ public class TeamProfileImpl extends BreakdownElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.TEAM_PROFILE__TEAM_ROLES:
 			getTeamRoles().clear();
-			getTeamRoles().addAll(
-					(Collection<? extends RoleDescriptor>) newValue);
+			getTeamRoles().addAll((Collection) newValue);
 			return;
 		case UmaPackage.TEAM_PROFILE__SUPER_TEAM:
 			setSuperTeam((TeamProfile) newValue);
 			return;
 		case UmaPackage.TEAM_PROFILE__SUB_TEAM:
 			getSubTeam().clear();
-			getSubTeam().addAll((Collection<? extends TeamProfile>) newValue);
+			getSubTeam().addAll((Collection) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -291,7 +287,6 @@ public class TeamProfileImpl extends BreakdownElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.TEAM_PROFILE__TEAM_ROLES:
@@ -312,7 +307,6 @@ public class TeamProfileImpl extends BreakdownElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);

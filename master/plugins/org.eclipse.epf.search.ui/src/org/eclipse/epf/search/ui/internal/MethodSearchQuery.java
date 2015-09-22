@@ -54,19 +54,14 @@ public class MethodSearchQuery implements ISearchQuery {
 			public void accept(Object match) {
 				if (match instanceof MethodElement
 						&& !TngUtil.isPredefined((MethodElement) match)) {
-					Object[] matches = searchResult.getMatches(match);
-					if (matches == null || matches.length == 0) {
-						searchResult.addMatch(new Match(match, Match.UNIT_LINE,
-								1, 1));
-					}
+					searchResult.addMatch(new Match(match, Match.UNIT_LINE, 1,
+							1));
 				}
 			}
 		};
-//		MethodSearchOperation operation = new MethodSearchOperation(
-//				searchInput, result);
-//		operation.execute(processMonitor);
-		IMethodSearchOperation op = MethodSearchHelper.newSearchOperation();
-		op.execute(searchInput, result, processMonitor);
+		MethodSearchOperation operation = new MethodSearchOperation(
+				searchInput, result);
+		operation.execute(processMonitor);
 		processMonitor.done();
 		return Status.OK_STATUS;
 	}

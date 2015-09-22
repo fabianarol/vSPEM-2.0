@@ -117,7 +117,15 @@ public class ItemProviderAdapterFactory extends
 	public Adapter createActivityAdapter() {
 		return new ActivityItemProvider(this);
 	}
+	
+	public Adapter createvpActivityAdapter() {
+		return createActivityAdapter();
+	}
 
+	public Adapter createVarActivityAdapter() {
+		return createActivityAdapter();
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 

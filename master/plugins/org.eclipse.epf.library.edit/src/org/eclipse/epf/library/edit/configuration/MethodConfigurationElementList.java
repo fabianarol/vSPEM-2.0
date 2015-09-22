@@ -20,7 +20,6 @@ import org.eclipse.epf.library.edit.util.ModelStructure;
 import org.eclipse.epf.uma.ContentPackage;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodPlugin;
-import org.eclipse.epf.uma.util.Scope;
 import org.eclipse.epf.uma.util.UmaUtil;
 
 /**
@@ -56,7 +55,7 @@ public class MethodConfigurationElementList {
 				for (int i = 0; i < size; i++) {
 					Object obj = packages.get(i);
 					if (obj instanceof ContentPackage
-							&& (methodConfig instanceof Scope || methodConfig.getMethodPackageSelection().contains(obj))) {
+							&& methodConfig.getMethodPackageSelection().contains(obj)) {
 						children.add(obj);
 					}
 				}

@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: WorkProductDescription.java,v 1.3 2007/04/25 22:30:20 klow Exp $
+ */
 package org.eclipse.epf.xml.uma;
 
 
@@ -44,7 +40,7 @@ public interface WorkProductDescription extends ContentDescription {
 	 * @return the value of the '<em>Impact Of Not Having</em>' attribute.
 	 * @see #setImpactOfNotHaving(String)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getWorkProductDescription_ImpactOfNotHaving()
-	 * @model dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="kind='element' name='ImpactOfNotHaving'"
 	 * @generated
 	 */
@@ -70,7 +66,7 @@ public interface WorkProductDescription extends ContentDescription {
 	 * @return the value of the '<em>Purpose</em>' attribute.
 	 * @see #setPurpose(String)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getWorkProductDescription_Purpose()
-	 * @model dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="kind='element' name='Purpose'"
 	 * @generated
 	 */
@@ -96,7 +92,7 @@ public interface WorkProductDescription extends ContentDescription {
 	 * @return the value of the '<em>Reasons For Not Needing</em>' attribute.
 	 * @see #setReasonsForNotNeeding(String)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getWorkProductDescription_ReasonsForNotNeeding()
-	 * @model dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="kind='element' name='ReasonsForNotNeeding'"
 	 * @generated
 	 */

@@ -63,21 +63,11 @@ implements IResourceAwareCommand
 	 * 
 	 * @see com.ibm.library.edit.command.IResourceAwareCommand#getModifiedResources()
 	 */
-	@SuppressWarnings("unchecked") 
+	@SuppressWarnings("unchecked")
 	public Collection<Resource> getModifiedResources() {
-		modifiedResources = null;	//wlu: Disable cache - cache without update for change would not work
-		
 		if(modifiedResources == null) {
 			if(dropCommand != null) {
 				modifiedResources = TngUtil.getModifiedResources(dropCommand);
-			}
-			if(dragCommand != null) {
-				Set<Resource> resources = TngUtil.getModifiedResources(dragCommand);
-				if (modifiedResources != null) {
-					modifiedResources.addAll(resources);
-				} else {
-					modifiedResources = resources;
-				}
 			}
 			if(modifiedResources == null || modifiedResources.isEmpty()) {
 				modifiedResources = Collections.EMPTY_SET;

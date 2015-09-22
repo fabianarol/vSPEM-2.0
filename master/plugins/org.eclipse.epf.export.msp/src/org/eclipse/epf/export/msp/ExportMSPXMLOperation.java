@@ -13,8 +13,8 @@ package org.eclipse.epf.export.msp;
 import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.epf.library.edit.util.IRunnableWithProgress;
 import org.eclipse.epf.publishing.services.AbstractPublishManager;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 
 /**
  * The Export Microsoft Project XML file operation.

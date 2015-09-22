@@ -20,10 +20,8 @@ import org.eclipse.epf.diagram.ad.edit.policies.StructuredActivityNodeGraphicalN
 import org.eclipse.epf.diagram.ad.edit.policies.StructuredActivityNodeItemSemanticEditPolicy;
 import org.eclipse.epf.diagram.ad.part.UMLVisualIDRegistry;
 import org.eclipse.epf.diagram.core.DiagramCoreResources;
-import org.eclipse.epf.diagram.core.editparts.InternalNodeEditPart;
 import org.eclipse.epf.diagram.core.figures.WidenedWrapLabel;
 import org.eclipse.epf.diagram.core.util.DiagramCoreUtil;
-import org.eclipse.gef.ConnectionEditPart;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.Request;
@@ -43,7 +41,7 @@ import org.eclipse.gmf.runtime.notation.View;
 /**
  * @generated
  */
-public class StructuredActivityNodeEditPart extends ShapeNodeEditPart implements InternalNodeEditPart {
+public class StructuredActivityNodeEditPart extends ShapeNodeEditPart {
 
 	/**
 	 * @generated
@@ -306,15 +304,4 @@ public class StructuredActivityNodeEditPart extends ShapeNodeEditPart implements
 		}
 	}
 
-	@Override
-	public void primAddSourceConnection(ConnectionEditPart connection,
-			int index) {
-		super.primAddSourceConnection(connection, index);
-	}
-	
-	@Override
-	public void primAddTargetConnection(ConnectionEditPart connection,
-			int index) {
-		super.primAddTargetConnection(connection, index);
-	}
 }

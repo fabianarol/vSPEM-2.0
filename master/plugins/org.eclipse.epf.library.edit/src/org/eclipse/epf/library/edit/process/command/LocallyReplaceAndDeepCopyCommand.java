@@ -26,7 +26,6 @@ import org.eclipse.epf.library.edit.util.ActivityHandler;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.uma.Activity;
 import org.eclipse.epf.uma.MethodConfiguration;
-import org.eclipse.epf.uma.MethodPackage;
 import org.eclipse.epf.uma.Process;
 import org.eclipse.epf.uma.ProcessPackage;
 import org.eclipse.epf.uma.ecore.util.OppositeFeature;
@@ -118,6 +117,6 @@ public class LocallyReplaceAndDeepCopyCommand extends ReplaceActivityCommand {
 		
 		// add copy package to the package of super activity
 		//
-		((ProcessPackage)superAct.eContainer()).getChildPackages().add((MethodPackage) copy.eContainer());
+		((ProcessPackage)superAct.eContainer()).getChildPackages().add(copy.eContainer());
 	}
 }

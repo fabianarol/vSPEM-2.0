@@ -31,8 +31,8 @@ import org.eclipse.epf.uma.UmaPackage;
  * The following features are implemented:
  * <ul>
  *   <li>{@link org.eclipse.epf.uma.impl.SemanticModelBridgeImpl#getPresentation <em>Presentation</em>}</li>
- *   <li>{@link org.eclipse.epf.uma.impl.SemanticModelBridgeImpl#getDiagram <em>Diagram</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.impl.SemanticModelBridgeImpl#getGraphElement <em>Graph Element</em>}</li>
+ *   <li>{@link org.eclipse.epf.uma.impl.SemanticModelBridgeImpl#getDiagram <em>Diagram</em>}</li>
  * </ul>
  * </p>
  *
@@ -40,6 +40,13 @@ import org.eclipse.epf.uma.UmaPackage;
  */
 public abstract class SemanticModelBridgeImpl extends DiagramElementImpl
 		implements SemanticModelBridge {
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * The default value of the '{@link #getPresentation() <em>Presentation</em>}' attribute.
 	 * <!-- begin-user-doc -->
@@ -70,7 +77,7 @@ public abstract class SemanticModelBridgeImpl extends DiagramElementImpl
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -78,7 +85,6 @@ public abstract class SemanticModelBridgeImpl extends DiagramElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.SEMANTIC_MODEL_BRIDGE;
 	}
@@ -232,18 +238,17 @@ public abstract class SemanticModelBridgeImpl extends DiagramElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-		case UmaPackage.SEMANTIC_MODEL_BRIDGE__DIAGRAM:
-			if (eInternalContainer() != null)
-				msgs = eBasicRemoveFromContainer(msgs);
-			return basicSetDiagram((Diagram) otherEnd, msgs);
 		case UmaPackage.SEMANTIC_MODEL_BRIDGE__GRAPH_ELEMENT:
 			if (eInternalContainer() != null)
 				msgs = eBasicRemoveFromContainer(msgs);
 			return basicSetGraphElement((GraphElement) otherEnd, msgs);
+		case UmaPackage.SEMANTIC_MODEL_BRIDGE__DIAGRAM:
+			if (eInternalContainer() != null)
+				msgs = eBasicRemoveFromContainer(msgs);
+			return basicSetDiagram((Diagram) otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
@@ -253,14 +258,13 @@ public abstract class SemanticModelBridgeImpl extends DiagramElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-		case UmaPackage.SEMANTIC_MODEL_BRIDGE__DIAGRAM:
-			return basicSetDiagram(null, msgs);
 		case UmaPackage.SEMANTIC_MODEL_BRIDGE__GRAPH_ELEMENT:
 			return basicSetGraphElement(null, msgs);
+		case UmaPackage.SEMANTIC_MODEL_BRIDGE__DIAGRAM:
+			return basicSetDiagram(null, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -270,17 +274,16 @@ public abstract class SemanticModelBridgeImpl extends DiagramElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public NotificationChain eBasicRemoveFromContainerFeature(
 			NotificationChain msgs) {
 		switch (eContainerFeatureID) {
-		case UmaPackage.SEMANTIC_MODEL_BRIDGE__DIAGRAM:
-			return eInternalContainer().eInverseRemove(this,
-					UmaPackage.DIAGRAM__NAMESPACE, Diagram.class, msgs);
 		case UmaPackage.SEMANTIC_MODEL_BRIDGE__GRAPH_ELEMENT:
 			return eInternalContainer().eInverseRemove(this,
 					UmaPackage.GRAPH_ELEMENT__SEMANTIC_MODEL,
 					GraphElement.class, msgs);
+		case UmaPackage.SEMANTIC_MODEL_BRIDGE__DIAGRAM:
+			return eInternalContainer().eInverseRemove(this,
+					UmaPackage.DIAGRAM__NAMESPACE, Diagram.class, msgs);
 		}
 		return super.eBasicRemoveFromContainerFeature(msgs);
 	}
@@ -290,19 +293,18 @@ public abstract class SemanticModelBridgeImpl extends DiagramElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.SEMANTIC_MODEL_BRIDGE__PRESENTATION:
 			return getPresentation();
-		case UmaPackage.SEMANTIC_MODEL_BRIDGE__DIAGRAM:
-			if (resolve)
-				return getDiagram();
-			return basicGetDiagram();
 		case UmaPackage.SEMANTIC_MODEL_BRIDGE__GRAPH_ELEMENT:
 			if (resolve)
 				return getGraphElement();
 			return basicGetGraphElement();
+		case UmaPackage.SEMANTIC_MODEL_BRIDGE__DIAGRAM:
+			if (resolve)
+				return getDiagram();
+			return basicGetDiagram();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -312,17 +314,16 @@ public abstract class SemanticModelBridgeImpl extends DiagramElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.SEMANTIC_MODEL_BRIDGE__PRESENTATION:
 			setPresentation((String) newValue);
 			return;
-		case UmaPackage.SEMANTIC_MODEL_BRIDGE__DIAGRAM:
-			setDiagram((Diagram) newValue);
-			return;
 		case UmaPackage.SEMANTIC_MODEL_BRIDGE__GRAPH_ELEMENT:
 			setGraphElement((GraphElement) newValue);
+			return;
+		case UmaPackage.SEMANTIC_MODEL_BRIDGE__DIAGRAM:
+			setDiagram((Diagram) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -333,17 +334,16 @@ public abstract class SemanticModelBridgeImpl extends DiagramElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.SEMANTIC_MODEL_BRIDGE__PRESENTATION:
 			setPresentation(PRESENTATION_EDEFAULT);
 			return;
-		case UmaPackage.SEMANTIC_MODEL_BRIDGE__DIAGRAM:
-			setDiagram((Diagram) null);
-			return;
 		case UmaPackage.SEMANTIC_MODEL_BRIDGE__GRAPH_ELEMENT:
 			setGraphElement((GraphElement) null);
+			return;
+		case UmaPackage.SEMANTIC_MODEL_BRIDGE__DIAGRAM:
+			setDiagram((Diagram) null);
 			return;
 		}
 		super.eUnset(featureID);
@@ -354,7 +354,6 @@ public abstract class SemanticModelBridgeImpl extends DiagramElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);
@@ -366,10 +365,10 @@ public abstract class SemanticModelBridgeImpl extends DiagramElementImpl
 		case UmaPackage.SEMANTIC_MODEL_BRIDGE__PRESENTATION:
 			return PRESENTATION_EDEFAULT == null ? presentation != null
 					: !PRESENTATION_EDEFAULT.equals(presentation);
-		case UmaPackage.SEMANTIC_MODEL_BRIDGE__DIAGRAM:
-			return basicGetDiagram() != null;
 		case UmaPackage.SEMANTIC_MODEL_BRIDGE__GRAPH_ELEMENT:
 			return basicGetGraphElement() != null;
+		case UmaPackage.SEMANTIC_MODEL_BRIDGE__DIAGRAM:
+			return basicGetDiagram() != null;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -379,7 +378,6 @@ public abstract class SemanticModelBridgeImpl extends DiagramElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy())
 			return super.toString();

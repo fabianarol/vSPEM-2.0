@@ -20,7 +20,6 @@ public final class LibraryResources extends NLS {
 		// Do not instantiate
 	}
 
-	public static String libraryProblemMonitor;
 	public static String libUpgradeRequired_err_msg;
 	public static String oldToolVersion_err_msg;
 	public static String toolVersionMismatch_err_msg;
@@ -62,8 +61,6 @@ public final class LibraryResources extends NLS {
 	public static String reusableAsset_text;
 	public static String ActivityLayout_primaryTasks_text;
 	public static String ActivityLayout_additionalTasks_text;
-	public static String ActivityLayout_assistTasks_text;
-	public static String ActivityLayout_performAs_text;	
 	public static String convertGuidanceError_title;
 	public static String loadResourcesError_title;
 	public static String loadResourcesError_reason;
@@ -114,17 +111,6 @@ public final class LibraryResources extends NLS {
 	public static String ElementError_missing_primary_performer;
 	public static String ElementError_missing_mandatory_input;
 	public static String ElementError_missing_output;
-	public static String ElementError_missing_responsible_for_workProduct;
-	public static String ElementError_having_multiple_replacers;
-	
-	public static String WorkProductSlot_text;
-	public static String references_unresolved_base_txt;
-	public static String configFreeProcessView_title;
-	public static String systemCreatedCustomCategory_brief;
-	
-	public static String UndeclaredDep_MarkerTxt0;
-	public static String UndeclaredDep_MarkerTxt1;
-	public static String UndeclaredDep_MarkerTxt2;
 	
 	static {
 		NLS.initializeMessages(BUNDLE_NAME, LibraryResources.class);

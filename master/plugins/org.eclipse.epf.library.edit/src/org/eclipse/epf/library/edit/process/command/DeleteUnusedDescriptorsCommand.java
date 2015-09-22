@@ -19,18 +19,19 @@ import java.util.List;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.command.CompoundCommand;
+import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.util.AbstractTreeIterator;
-import org.eclipse.emf.edit.provider.IItemLabelProvider;
+import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.epf.library.edit.LibraryEditResources;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
 import org.eclipse.epf.library.edit.command.IInteractive;
 import org.eclipse.epf.library.edit.command.IUserInteractionHandler;
-import org.eclipse.epf.library.edit.util.AdapterFactoryItemLabelProvider;
 import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.uma.Activity;
 import org.eclipse.epf.uma.Descriptor;
 import org.eclipse.epf.uma.RoleDescriptor;
 import org.eclipse.epf.uma.WorkProductDescriptor;
+import org.eclipse.jface.viewers.ILabelProvider;
 
 
 /**
@@ -137,17 +138,22 @@ implements IInteractive
 	
 	private void selectDescriptorsToDelete(List descriptorsToDelete) {
 		if(userInteractionHandler != null) {
-			IItemLabelProvider labelProvider = new AdapterFactoryItemLabelProvider(
+			ILabelProvider labelProvider = new AdapterFactoryLabelProvider(
 					TngAdapterFactory.INSTANCE
 					.getNavigatorView_ComposedAdapterFactory());
 			String title = LibraryEditResources.ui_references;
 			String msg = LibraryEditResources.selectDescriptorsToDelete_msg;			
 			List list = new ArrayList(descriptorsToDelete);
-			Collection selected = userInteractionHandler.select(list, labelProvider, true, list, title, msg);
-			if(selected == null) {
-				throw new OperationCanceledException();
+			try {
+				Collection selected = userInteractionHandler.select(list, labelProvider, true, list, title, msg);
+				if(selected == null) {
+					throw new OperationCanceledException();
+				}
+				descriptorsToDelete.retainAll(selected);
 			}
-			descriptorsToDelete.retainAll(selected);
+			finally {
+				labelProvider.dispose();
+			}
 		}
 	}
 

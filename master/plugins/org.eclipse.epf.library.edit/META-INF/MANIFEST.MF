@@ -2,16 +2,19 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
 Bundle-SymbolicName: org.eclipse.epf.library.edit; singleton:=true
-Bundle-Version: 1.5.0.qualifier
+Bundle-Version: 1.2.0.qualifier
 Bundle-ClassPath: .
 Bundle-Activator: org.eclipse.epf.library.edit.LibraryEditPlugin
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.epf.common;visibility:=reexport,
  org.eclipse.epf.uma.edit;visibility:=reexport,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.emf.common.ui;visibility:=reexport,
+ org.eclipse.emf.edit.ui,
  org.eclipse.epf.services;visibility:=reexport,
- org.eclipse.emf.ecore.xmi,
- org.eclipse.jface
+ org.eclipse.vepf.library.edit
 Eclipse-LazyStart: true
 Export-Package: org.eclipse.epf.library.edit,
  org.eclipse.epf.library.edit.category,
@@ -20,16 +23,12 @@ Export-Package: org.eclipse.epf.library.edit,
  org.eclipse.epf.library.edit.element,
  org.eclipse.epf.library.edit.internal,
  org.eclipse.epf.library.edit.itemsfilter,
- org.eclipse.epf.library.edit.meta,
- org.eclipse.epf.library.edit.meta.internal,
  org.eclipse.epf.library.edit.navigator,
  org.eclipse.epf.library.edit.process,
  org.eclipse.epf.library.edit.process.command,
  org.eclipse.epf.library.edit.process.consolidated,
  org.eclipse.epf.library.edit.process.internal,
- org.eclipse.epf.library.edit.realization,
  org.eclipse.epf.library.edit.ui,
- org.eclipse.epf.library.edit.uma,
  org.eclipse.epf.library.edit.util,
  org.eclipse.epf.library.edit.util.model,
  org.eclipse.epf.library.edit.util.model.impl,

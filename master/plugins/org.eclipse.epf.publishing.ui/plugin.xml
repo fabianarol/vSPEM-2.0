@@ -69,12 +69,7 @@
             id="org.eclipse.epf.publishing.ui.preferences.ActivityDiagramPreferencePage"
 	        class="org.eclipse.epf.publishing.ui.preferences.ActivityDiagramPreferencePage"
 		    category="org.eclipse.epf.publishing.ui.preferences.PublishingPreferencePage"
-		    name="%activityDiagramPageName"/>
-	  <page
-            id="org.eclipse.epf.publishing.ui.preferences.SupportingPluginsPreferencePage"
-	        class="org.eclipse.epf.publishing.ui.preferences.SupportingPluginPreferencePage"
-		    category="org.eclipse.epf.publishing.ui.preferences.PublishingPreferencePage"
-            name="%supportingPluginPageName"/>    
+		    name="%activityDiagramPageName"/>    
    </extension>
 
    <extension

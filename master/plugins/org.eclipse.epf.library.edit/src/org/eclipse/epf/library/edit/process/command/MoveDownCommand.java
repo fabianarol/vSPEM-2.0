@@ -11,10 +11,8 @@
 package org.eclipse.epf.library.edit.process.command;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.emf.common.command.AbstractCommand;
 import org.eclipse.emf.common.util.EList;
@@ -22,7 +20,6 @@ import org.eclipse.epf.library.edit.command.IResourceAwareCommand;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.uma.Activity;
 import org.eclipse.epf.uma.BreakdownElement;
-import org.eclipse.epf.uma.WorkBreakdownElement;
 
 
 /**
@@ -46,8 +43,6 @@ public class MoveDownCommand extends AbstractCommand implements
 	private Collection eClasses;
 	
 	private boolean adjacent = false;
-	
-	private Map<WorkBreakdownElement, WorkBreakdownElement> globalPresentedAfterMap = new HashMap<WorkBreakdownElement, WorkBreakdownElement>();
 
 	/**
 	 * 
@@ -72,14 +67,6 @@ public class MoveDownCommand extends AbstractCommand implements
 	 * @see org.eclipse.emf.common.command.Command#execute()
 	 */
 	public void execute() {
-		if (elementObj instanceof WorkBreakdownElement) {
-			boolean completelyDone = MoveUpCommand.handleWbeGlobalMove(activity,
-					(WorkBreakdownElement) elementObj, false, globalPresentedAfterMap);
-			if (completelyDone) {
-				return;
-			}
-		}
-		
 		List allElements = activity.getBreakdownElements();
 
 		for (int i = 0; i < allElements.size(); i++) {
@@ -90,10 +77,7 @@ public class MoveDownCommand extends AbstractCommand implements
 			}
 		}
 
-		if (allElements.size() > 0) {
-			transferLocation = allElements.size() - 1;
-		}
-		for (int i = elementLocation + 1; i < allElements.size(); i++) {
+		for (int i = elementLocation + 1; i <= allElements.size(); i++) {
 			Object obj = allElements.get(i);
 			if (TngUtil.isEClassInstanceOf(eClasses, obj)) {
 				transferLocation = i;
@@ -126,7 +110,6 @@ public class MoveDownCommand extends AbstractCommand implements
 		}
 		((EList) activity.getBreakdownElements()).move(transferLocation,
 				elementLocation);
-	
 	}
 
 	public void undo() {

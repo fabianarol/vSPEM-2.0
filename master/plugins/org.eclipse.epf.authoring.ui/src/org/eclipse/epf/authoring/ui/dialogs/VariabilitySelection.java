@@ -31,7 +31,6 @@ import org.eclipse.epf.library.edit.itemsfilter.FilterConstants;
 import org.eclipse.epf.library.edit.itemsfilter.ProcessesItemProvider;
 import org.eclipse.epf.library.edit.util.MethodElementUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
-import org.eclipse.epf.uma.Artifact;
 import org.eclipse.epf.uma.ContentElement;
 import org.eclipse.epf.uma.ContentPackage;
 import org.eclipse.epf.uma.CustomCategory;
@@ -182,9 +181,6 @@ public class VariabilitySelection {
 				if ((groupings != null) && (!groupings.isEmpty()))
 					filterElementList.addAll(groupings);
 
-				if (contentElement instanceof Artifact) {
-					filterElementList.addAll(getAllContainerArtifact((Artifact)contentElement));
-				}				
 			}
 
 			IFilter filter = new VariabilityFilter();
@@ -230,19 +226,7 @@ public class VariabilitySelection {
 		}
 		return element;
 	}
-	
-	private List getAllContainerArtifact(Artifact artifact) {
-		List result = new ArrayList();
-		
-		if (artifact.getContainerArtifact() != null) {
-			Artifact parent = artifact.getContainerArtifact();
-			result.add(parent);
-			result.addAll(getAllContainerArtifact(parent));
-		}
-		
-		return result;		
-	}
-	
+
 	/**
 	 * Returns the ancestors for the given Custom Category.
 	 * taken from authoring.ui.CustomCategoryAssignPage

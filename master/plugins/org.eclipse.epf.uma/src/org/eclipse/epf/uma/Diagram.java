@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.uma;
 
+import org.eclipse.emf.common.util.EList;
 import java.util.List;
 
 /**
@@ -20,10 +21,10 @@ import java.util.List;
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link org.eclipse.epf.uma.Diagram#getDiagramLink <em>Diagram Link</em>}</li>
- *   <li>{@link org.eclipse.epf.uma.Diagram#getNamespace <em>Namespace</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.Diagram#getZoom <em>Zoom</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.Diagram#getViewpoint <em>Viewpoint</em>}</li>
+ *   <li>{@link org.eclipse.epf.uma.Diagram#getDiagramLink <em>Diagram Link</em>}</li>
+ *   <li>{@link org.eclipse.epf.uma.Diagram#getNamespace <em>Namespace</em>}</li>
  * </ul>
  * </p>
  *
@@ -43,7 +44,7 @@ public interface Diagram extends GraphNode {
 	 * @return the value of the '<em>Zoom</em>' attribute.
 	 * @see #setZoom(Double)
 	 * @see org.eclipse.epf.uma.UmaPackage#getDiagram_Zoom()
-	 * @model dataType="org.eclipse.epf.uma.Double" ordered="false"
+	 * @model
 	 * @generated
 	 */
 	Double getZoom();
@@ -59,26 +60,26 @@ public interface Diagram extends GraphNode {
 	void setZoom(Double value);
 
 	/**
-	 * Returns the value of the '<em><b>Viewpoint</b></em>' reference.
+	 * Returns the value of the '<em><b>Viewpoint</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Viewpoint</em>' containment reference isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Viewpoint</em>' reference.
+	 * @return the value of the '<em>Viewpoint</em>' containment reference.
 	 * @see #setViewpoint(Point)
 	 * @see org.eclipse.epf.uma.UmaPackage#getDiagram_Viewpoint()
-	 * @model required="true" ordered="false"
+	 * @model containment="true" resolveProxies="true"
 	 * @generated
 	 */
 	Point getViewpoint();
 
 	/**
-	 * Sets the value of the '{@link org.eclipse.epf.uma.Diagram#getViewpoint <em>Viewpoint</em>}' reference.
+	 * Sets the value of the '{@link org.eclipse.epf.uma.Diagram#getViewpoint <em>Viewpoint</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Viewpoint</em>' reference.
+	 * @param value the new value of the '<em>Viewpoint</em>' containment reference.
 	 * @see #getViewpoint()
 	 * @generated
 	 */
@@ -97,10 +98,10 @@ public interface Diagram extends GraphNode {
 	 * @return the value of the '<em>Diagram Link</em>' reference list.
 	 * @see org.eclipse.epf.uma.UmaPackage#getDiagram_DiagramLink()
 	 * @see org.eclipse.epf.uma.DiagramLink#getDiagram
-	 * @model opposite="diagram" ordered="false"
+	 * @model type="org.eclipse.epf.uma.DiagramLink" opposite="diagram" ordered="false"
 	 * @generated
 	 */
-	List<DiagramLink> getDiagramLink();
+	List getDiagramLink();
 
 	/**
 	 * Returns the value of the '<em><b>Namespace</b></em>' containment reference.
@@ -115,7 +116,7 @@ public interface Diagram extends GraphNode {
 	 * @see #setNamespace(SemanticModelBridge)
 	 * @see org.eclipse.epf.uma.UmaPackage#getDiagram_Namespace()
 	 * @see org.eclipse.epf.uma.SemanticModelBridge#getDiagram
-	 * @model opposite="diagram" containment="true" resolveProxies="true" required="true" ordered="false"
+	 * @model opposite="diagram" containment="true" resolveProxies="true" required="true"
 	 * @generated
 	 */
 	SemanticModelBridge getNamespace();

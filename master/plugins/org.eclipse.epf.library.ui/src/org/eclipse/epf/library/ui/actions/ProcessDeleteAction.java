@@ -19,6 +19,7 @@ import java.util.List;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.emf.common.command.BasicCommandStack;
 import org.eclipse.emf.common.command.Command;
+import org.eclipse.emf.common.ui.viewer.IViewerProvider;
 import org.eclipse.emf.edit.command.RemoveCommand;
 import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
 import org.eclipse.emf.edit.domain.EditingDomain;
@@ -35,14 +36,25 @@ import org.eclipse.epf.library.edit.process.command.DeleteWorkProductDescriptor;
 import org.eclipse.epf.library.edit.process.command.ProcessElementDeleteCommand;
 import org.eclipse.epf.library.edit.process.command.RemoveUnusedDescriptorsCommand;
 import org.eclipse.epf.library.ui.LibraryUIResources;
+import org.eclipse.epf.persistence.refresh.RefreshJob;
+import org.eclipse.epf.uma.Dependences;
 import org.eclipse.epf.uma.Descriptor;
 import org.eclipse.epf.uma.RoleDescriptor;
 import org.eclipse.epf.uma.TaskDescriptor;
 import org.eclipse.epf.uma.TeamProfile;
+import org.eclipse.epf.uma.VarElement;
 import org.eclipse.epf.uma.WorkProductDescriptor;
+import org.eclipse.epf.uma.varP2varP;
+import org.eclipse.epf.uma.variant2varP;
+import org.eclipse.epf.uma.variant2variant;
+import org.eclipse.epf.uma.varp2variant;
 import org.eclipse.epf.uma.util.AssociationHelper;
+import org.eclipse.epf.uma.util.UmaUtil;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.Viewer;
 
 /**
  * Implements the delete action for the process elements.
@@ -151,10 +163,23 @@ public class ProcessDeleteAction extends MethodElementDeleteAction {
 			// collection the related descriptors before the elements got
 			// deleted
 			//
+			
+			ArrayList removedResources = new ArrayList();
+			
+			
 			Collection<Descriptor> descriptors = new HashSet<Descriptor>();
 			for (Iterator<?> iter = selection.iterator(); iter.hasNext();) {
 				Object element = iter.next();
 				addRelatedDescriptors(descriptors, element);
+				
+				/**vEPF consistencia en dependencias**/
+				//Si el objeto a eliminar es un objeto de vEPF (VarElement)
+				if(element instanceof VarElement){
+					VarElement varElementDelete = (VarElement) element;
+					removedResources.add(varElementDelete);
+					//Parseo las listas y elimino las referencias al elemento borrado
+					UmaUtil.cleanDependencesElement(varElementDelete);
+				}
 			}
 
 			Command cmd = command;
@@ -186,7 +211,27 @@ public class ProcessDeleteAction extends MethodElementDeleteAction {
 			// save the current editor
 			//
 			saveCurrentEditor();
+			
+			// refresh the current tree
+			//
+//			refreshCurretTree(removedResources);
 		}
+	}
+	
+	private void refreshCurrentTree(ArrayList deletedElements) {
+		
+//		final boolean refreshViews = !RefreshJob.getInstance()
+//		.getReloadedBeforeRefreshResources().isEmpty()
+//		|| !RefreshJob.getInstance().getAddedResources().isEmpty();
+//		
+//				ArrayList removedResources = deletedElements;
+//				
+//				if (!removedResources.isEmpty()) {
+//					RefreshJob.getInstance().getRemovedResources().removeAll(
+//							removedResources);
+//					RefreshJob.getInstance().start();
+//					RefreshJob.getInstance().runInWorkspace(null);
+//				}
 	}
 
 	private static void addRelatedDescriptors(
@@ -195,7 +240,7 @@ public class ProcessDeleteAction extends MethodElementDeleteAction {
 			TaskDescriptor taskDesc = (TaskDescriptor) element;
 			descriptors.addAll(taskDesc.getAdditionallyPerformedBy());
 			descriptors.addAll(taskDesc.getAssistedBy());
-			descriptors.addAll(taskDesc.getPerformedPrimarilyBy());
+			descriptors.add(taskDesc.getPerformedPrimarilyBy());
 			descriptors.addAll(taskDesc.getMandatoryInput());
 			descriptors.addAll(taskDesc.getExternalInput());
 			descriptors.addAll(taskDesc.getOptionalInput());

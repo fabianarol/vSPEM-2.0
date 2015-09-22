@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: MethodElementPropertyImpl.java,v 1.1 2007/05/04 22:46:43 klow Exp $
+ */
 package org.eclipse.epf.xml.uma.impl;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -67,7 +63,6 @@ public class MethodElementPropertyImpl extends PackageableElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.METHOD_ELEMENT_PROPERTY;
 	}
@@ -98,7 +93,6 @@ public class MethodElementPropertyImpl extends PackageableElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 			case UmaPackage.METHOD_ELEMENT_PROPERTY__VALUE:
@@ -112,7 +106,6 @@ public class MethodElementPropertyImpl extends PackageableElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 			case UmaPackage.METHOD_ELEMENT_PROPERTY__VALUE:
@@ -127,7 +120,6 @@ public class MethodElementPropertyImpl extends PackageableElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 			case UmaPackage.METHOD_ELEMENT_PROPERTY__VALUE:
@@ -142,7 +134,6 @@ public class MethodElementPropertyImpl extends PackageableElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 			case UmaPackage.METHOD_ELEMENT_PROPERTY__VALUE:
@@ -156,7 +147,6 @@ public class MethodElementPropertyImpl extends PackageableElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 

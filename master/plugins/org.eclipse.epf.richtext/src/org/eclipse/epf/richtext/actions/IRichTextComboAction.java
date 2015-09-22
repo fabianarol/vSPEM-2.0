@@ -1,13 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
- *******************************************************************************/
 //------------------------------------------------------------------------------
 // Copyright (c) 2005, 2007 IBM Corporation and others.
 // All rights reserved. This program and the accompanying materials
@@ -20,8 +10,8 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.richtext.actions;
 
-import org.eclipse.epf.common.ui.actions.CComboContributionItem;
 import org.eclipse.epf.richtext.IRichText;
+import org.eclipse.epf.ui.actions.CComboContributionItem;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 

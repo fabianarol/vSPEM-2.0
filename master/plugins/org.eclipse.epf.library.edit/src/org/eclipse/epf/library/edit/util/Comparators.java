@@ -103,7 +103,7 @@ public final class Comparators {
 
 	}
 
-	private static int comparePresentationName(MethodElement e1, MethodElement e2) {
+	private static int comparePresentationName(DescribableElement e1, DescribableElement e2) {
 		Collator collator = Collator.getInstance();
 		String name1 = e1 instanceof BreakdownElement ? ProcessUtil.getPresentationName((BreakdownElement)e1)
 				: e1.getPresentationName();
@@ -114,62 +114,38 @@ public final class Comparators {
 		return collator.compare(name1, name2);
 	}
 	
-	private static MethodElement getMethodElement(Object obj) {
+	private static DescribableElement getDescribableElement(Object obj) {
 		Object object = TngUtil.unwrap(obj);
 		if (object instanceof ProcessComponent)
 			object = ((ProcessComponent) object).getProcess();
 		object = TngUtil.unwrap(object);
-		if(object instanceof MethodElement) {
-			return (MethodElement)object;
+		if(object instanceof DescribableElement) {
+			return (DescribableElement)object;
 		}
 		return null;
-		
 	}
 
-	public static final Comparator<Object> PRESENTATION_NAME_COMPARATOR = new Comparator<Object>() {
+	public static final Comparator PRESENTATION_NAME_COMPARATOR = new Comparator() {
 		
 		public int compare(Object o1, Object o2) {
 			if (o1 == o2)
 				return 0;
-			o1 = getMethodElement(o1);
+			o1 = getDescribableElement(o1);
 			if (o1 == null) {
 				return 0;
 			}
 
-			o2 = getMethodElement(o2);
+			o2 = getDescribableElement(o2);
 			if (o2 == null) {
 				return 0;
 			}
 
-			return comparePresentationName((MethodElement) o1, (MethodElement) o2);
+			return comparePresentationName((DescribableElement) o1, (DescribableElement) o2);
 		}
 
 	};
 	
-	public static final Comparator<Object> NAME_GUID_COMPARATOR = new Comparator<Object>() {
-		
-		public int compare(Object o1, Object o2) {
-			if (o1 == o2)
-				return 0;
-			o1 = getMethodElement(o1);
-			if (o1 == null) {
-				return 0;
-			}
-
-			o2 = getMethodElement(o2);
-			if (o2 == null) {
-				return 0;
-			}
-			MethodElement e1 = (MethodElement) o1;
-			MethodElement e2 = (MethodElement) o2;
-
-			Collator collator = Collator.getInstance();;
-			return collator.compare(e1.getName() + e1.getGuid(), e2.getName() + e2.getGuid());
-		}
-
-	};
-	
-	public static final Comparator<Object> REVERSE_PRESENTATION_NAME_COMPARATOR = new Comparator<Object>() {
+	public static final Comparator REVERSE_PRESENTATION_NAME_COMPARATOR = new Comparator() {
 		
 		public int compare(Object o1, Object o2) {
 			if (o1 == o2)
@@ -234,7 +210,7 @@ public final class Comparators {
 		}
 	};
 
-	public static final Comparator<Object> PLUGINPACKAGE_COMPARATOR = new Comparator<Object>() {
+	public static final Comparator PLUGINPACKAGE_COMPARATOR = new Comparator() {
 	
 		public int compare(Object o1, Object o2) {
 			if (o1 == o2)

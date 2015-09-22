@@ -1,0 +1,100 @@
+﻿<html>
+	
+<head>
+	<title>Control de dependencias</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="generator" content="HelpNDoc">
+	<link type="text/css" rel="stylesheet" media="all" href="css/reset.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/base.css" />
+	<link type="text/css" rel="stylesheet" media="all" href="css/hnd.css" />
+	<!--[if lte IE 8]>
+		<link type="text/css" rel="stylesheet" media="all" href="css/ielte8.css" />
+	<![endif]-->
+	<style type="text/css">
+		#topic_header
+		{
+			background-color: #EFEFEF;
+		}
+	</style>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/hnd.js"></script>
+	<script type="text/javascript"><!--
+		if (top.frames.length == 0)
+		{
+			var sTopicUrl = top.location.href.substring(top.location.href.lastIndexOf("/") + 1, top.location.href.length);
+			top.location.href = "Ayuda vEPFC.html?" + sTopicUrl;
+		}
+		else if (top && top.FrameTOC && top.FrameTOC.SelectTocItem)
+		{
+			top.FrameTOC.SelectTocItem("Controldedependencias");
+		}
+	</script>
+</head>
+
+<body>
+
+	<div id="topic_header">
+			<div id="topic_header_content">
+				<h1>Control de dependencias</h1>
+				
+				<div id="topic_breadcrumb">
+					<a href="EmpezandoconvEPFC.html">Empezando con vEPFC</a> &rsaquo;&rsaquo; </div>
+				</div>
+			<div id="topic_header_nav">
+				<a href="EmpezandoconvEPFC.html"><img src="img/arrow_up.png" alt="Parent"/></a>
+				
+				<a href="EmpezandoconvEPFC.html"><img src="img/arrow_left.png" alt="Previous"/></a>
+				
+				</div>
+			<div class="clear"></div>
+		</div>
+	<div id="topic_content">
+		
+<p class="rvps3"><span class="rvts8">La gestión de control de dependencias se realiza de forma automatica a través de las dos estructuras de arbol que contiene la ventana de adaptación de procesos.</span></p>
+<p class="rvps3"><span class="rvts8"><br></span></p>
+<p class="rvps3"><img border="0" alt hspace="1" vspace="1" src="lib/NewItem.png"></p>
+<p class="rvps3"><span class="rvts8"><br></span></p>
+<p class="rvps3"><span class="rvts8">Se deben solucionar todos los posibles conflictos para poder adaptar un proceso, esto implica la solución de:</span></p>
+<p class="rvps3"><span class="rvts8"><br></span></p>
+<p class="rvps3" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts9">Conflictos de cardinalidad:</span></p>
+<p class="rvps3"><span class="rvts9"><br></span></p>
+<p class="rvps3"><span class="rvts9"> &nbsp; &nbsp; &nbsp; &nbsp;</span><span class="rvts8">Los conflictos de cardinalidad aparecen cuando existen Puntos de Variación que necesitan ser completadas por alguna Variante debido a que la cardinalidad del </span><span class="rvts8"> &nbsp; &nbsp; &nbsp; &nbsp;</span><span class="rvts8">Punto de Variación es </span><span class="rvts10">Obligatoria.</span></p>
+<p class="rvps3"><span class="rvts10"><br></span></p>
+<p class="rvps3"><span class="rvts10"> &nbsp; &nbsp; &nbsp; &nbsp;</span><img border="0" alt hspace="1" vspace="1" src="lib/NewItem2.png"><span class="rvts10"> </span><img border="0" alt hspace="1" vspace="1" src="lib/NewItem3.png"></p>
+<p class="rvps3"><span class="rvts9"><br></span></p>
+<p class="rvps3"><span class="rvts9"> &nbsp; &nbsp; &nbsp; &nbsp;</span><span class="rvts8">Para solucionar dichos conflictos hay que añadir una Variante compatible.</span></p>
+<p class="rvps3"><span class="rvts8"><br></span></p>
+<p class="rvps3"><span class="rvts8"><br></span></p>
+<p class="rvps3"><span class="rvts8"><br></span></p>
+<p class="rvps3" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 12pt; font-family: 'Arial Unicode MS', 'Lucida Sans Unicode', 'Arial'; color: #000000;">●</span>
+<span class="rvts9">Conflictos de dependencias:</span></p>
+<p class="rvps3"><span class="rvts9"><br></span></p>
+<p class="rvps3"><span class="rvts9"> &nbsp; &nbsp; &nbsp; &nbsp;</span><span class="rvts8">Los conflictos de dependencias aparecen cuando se producen inconsistencias en las relaciones entre los elementos. vEPFC controla los conflictos que se </span><span class="rvts8"> &nbsp; &nbsp; &nbsp; &nbsp;</span><span class="rvts8"> &nbsp; &nbsp; &nbsp; &nbsp;</span><span class="rvts8">generan de forma automatica, sin embargo deja al usuario que solucione los conflictos de forma manual. vEPFC ofrece una serie de opciones y funcionalidades &nbsp;</span><span class="rvts8"> &nbsp; &nbsp; &nbsp; &nbsp;</span><span class="rvts8">para ayudar en esta tarea como la eliminación de los elementos que provocan un conflicto:</span></p>
+<p class="rvps3"><span class="rvts8"><br></span></p>
+<p class="rvps3"><span class="rvts8"> &nbsp; &nbsp; &nbsp; &nbsp;</span><img border="0" alt hspace="1" vspace="1" src="lib/NewItem4.png"></p>
+<p class="rvps3"><span class="rvts8"><br></span></p>
+<p class="rvps3"><span class="rvts8"> &nbsp; &nbsp; &nbsp; &nbsp;</span><span class="rvts8">También controla los conflictos que pueden generarse entre las Variantes y que contiene los mismos mecanismos para la resolución de estas:</span></p>
+<p class="rvps3"><span class="rvts8"><br></span></p>
+<p class="rvps3"><span class="rvts8"> &nbsp; &nbsp; &nbsp; &nbsp;</span><img border="0" alt hspace="1" vspace="1" src="lib/NewItem5.png"></p>
+<p class="rvps3"><span class="rvts8"><br></span></p>
+<p class="rvps3"><span class="rvts8">vEPFC controla las siguientes colisiones:</span></p>
+<p class="rvps3"><span class="rvts8"><br></span></p>
+<p class="rvps3" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 10pt; font-family: 'Arial'; color: #000000;">1.</span>
+<span class="rvts9">Cardinalidades</span></p>
+<p class="rvps3" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 10pt; font-family: 'Arial'; color: #000000;">2.</span>
+<span class="rvts9">Dependencias entre puntos de variación (Inclusivas y Exclusivas)</span></p>
+<p class="rvps3" style="text-indent: -24px; padding-left: 24px; margin-left: 0px;"><span style="font-size: 10pt; font-family: 'Arial'; color: #000000;">3.</span>
+<span class="rvts9">Dependencias entre variantes (Inclusivas y Exclusivas)</span></p>
+<p class="rvps2"><span class="rvts6">Created with the Personal Edition of HelpNDoc: </span><a class="rvts7" href="http://www.helpndoc.com">Free CHM Help documentation generator</a></p>
+</div>
+	
+	<div id="topic_footer">
+
+			<div id="topic_footer_content">
+				Copyright &copy; 13/03/202 by &lt;Authors&gt;. All Rights Reserved.</div>
+		</div>
+	</body>
+	
+</html>
+

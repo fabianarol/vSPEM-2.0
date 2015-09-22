@@ -43,12 +43,10 @@ import org.eclipse.epf.diagram.model.DiagramResources;
 import org.eclipse.epf.diagram.model.LinkedObject;
 import org.eclipse.epf.diagram.model.NamedNode;
 import org.eclipse.epf.diagram.model.Node;
-import org.eclipse.epf.library.edit.util.DescriptorPropUtil;
 import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.library.edit.util.Suppression;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.persistence.ILibraryResource;
-import org.eclipse.epf.persistence.UnnormalizedURIException;
 import org.eclipse.epf.uma.BreakdownElement;
 import org.eclipse.epf.uma.DescribableElement;
 import org.eclipse.epf.uma.Iteration;
@@ -246,22 +244,20 @@ public final class BridgeHelper {
 	 */
 	public static ActivityNode findNode(Activity container, Object object,
 			boolean checkBase) {
-		if (container != null) {
-			for (Iterator iter = container.getNodes().iterator(); iter.hasNext();) {
-				ActivityNode node = (ActivityNode) iter.next();
-				MethodElement e = BridgeHelper.getMethodElement(node);
-				if (object == e) {
-					return node;
-				} else if (checkBase && e instanceof VariabilityElement) {
-					for (VariabilityElement ve = ((VariabilityElement) e)
-							.getVariabilityBasedOnElement(); ve != null; ve = ve
-							.getVariabilityBasedOnElement()) {
-						if (ve == object) {
-							return node;
-						}
+		for (Iterator iter = container.getNodes().iterator(); iter.hasNext();) {
+			ActivityNode node = (ActivityNode) iter.next();
+			MethodElement e = BridgeHelper.getMethodElement(node);
+			if (object == e) {
+				return node;
+			} else if (checkBase && e instanceof VariabilityElement) {
+				for (VariabilityElement ve = ((VariabilityElement) e)
+						.getVariabilityBasedOnElement(); ve != null; ve = ve
+						.getVariabilityBasedOnElement()) {
+					if (ve == object) {
+						return node;
 					}
 				}
-			}	
+			}
 		}
 		return null;
 	}
@@ -278,23 +274,8 @@ public final class BridgeHelper {
 	public static ActivityNode findNode(Activity container, Object object) {
 		for (Iterator iter = container.getNodes().iterator(); iter.hasNext();) {
 			ActivityNode node = (ActivityNode) iter.next();
-			MethodElement element = BridgeHelper.getMethodElement(node);
-			if (object == element) {
+			if (object == BridgeHelper.getMethodElement(node)) {
 				return node;
-			}
-			if (object instanceof TaskDescriptor) {
-				DescriptorPropUtil propUtil = DescriptorPropUtil
-						.getDesciptorPropUtil();
-				TaskDescriptor greenParent = (TaskDescriptor) propUtil
-						.getGreenParentDescriptor((TaskDescriptor) object);
-				
-				while(greenParent != null) {
-					if (greenParent == element) {
-						return node;
-					}
-					greenParent = (TaskDescriptor) propUtil.getGreenParentDescriptor(greenParent);
-				}
-
 			}
 		}
 		return null;
@@ -443,34 +424,24 @@ public final class BridgeHelper {
 //		return null;
 //	}
 	
-	public static MethodElement getMethodElementFromAnnotation(EModelElement node, ResourceSet resourceSet) { 
-        EAnnotation eAnnotation = node.getEAnnotation(UMA_ELEMENT); 
-        try { 
-            if (eAnnotation != null) { 
-                String uri = (String) eAnnotation.getDetails().get(UMA_URI); 
-                if (uri != null) { 
-                    EObject o = resourceSet.getEObject( 
-                                    URI.createURI(uri), false); 
-                    if (o instanceof MethodElement) { 
-                            return (MethodElement) o; 
-                    } else { 
-                            if(DEBUG) { 
-                                    System.err.println("Not a method element: " + o); //$NON-NLS-1$ 
-                            } 
-                    } 
-                } 
-            } 
-        } catch (Exception e) { 
-        	if (!(e instanceof UnnormalizedURIException)) {
-                DiagramCorePlugin.getDefault().getLogger().logError(e);
-        	}
-        	
-        	return null; 
-        } 
-        
-        return null; 
-	} 
-	
+	public static MethodElement getMethodElementFromAnnotation(EModelElement node, ResourceSet resourceSet) {
+		EAnnotation eAnnotation = node.getEAnnotation(UMA_ELEMENT);
+		if (eAnnotation != null) {
+			String uri = (String) eAnnotation.getDetails().get(UMA_URI);
+			if (uri != null) {
+				EObject o = resourceSet.getEObject(
+						URI.createURI(uri), false);
+				if (o instanceof MethodElement) {
+					return (MethodElement) o;
+				} else {
+					if(DEBUG) {
+						System.err.println("Not a method element: " + o); //$NON-NLS-1$
+					}
+				}
+			}
+		}
+		return null;
+	}
 	
 	/**
 	 * Gets the method element that the given diagram model object represents
@@ -671,9 +642,6 @@ public final class BridgeHelper {
 	}
 	
 	public static void markInherited(EModelElement element) {
-		if(isInherited(element)) {
-			return;
-		}
 		EAnnotation eAnnotation = element.getEAnnotation(ANNOTATION_INHERIRED);
 		if (eAnnotation == null) {
 			eAnnotation = EcoreFactory.eINSTANCE.createEAnnotation();

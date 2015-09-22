@@ -19,7 +19,6 @@ package org.eclipse.epf.uma;
  * Work Order is a Method Element that represents a relationship between two Breakdown Elements in which one Breakdown Elements depends on the start or finish of another Breakdown Elements in order to begin or end.  
  * (Note, Work Order is not modeled as an Association Class to provide a straightforward mapping  to XMI and EMF.)
  * The Work Order class defines predecessor and successor relations amongst Breakdown Elements.  This information is in particular critical for planning applications.  See more details on different types of Work Order relationships at Work Order Type.
- * 
  * <!-- end-model-doc -->
  *
  * <p>
@@ -48,7 +47,7 @@ public interface WorkOrder extends ProcessElement {
 	 * @see org.eclipse.epf.uma.WorkOrderType
 	 * @see #setLinkType(WorkOrderType)
 	 * @see org.eclipse.epf.uma.UmaPackage#getWorkOrder_LinkType()
-	 * @model default="finishToStart" required="true" ordered="false"
+	 * @model default="finishToStart"
 	 * @generated
 	 */
 	WorkOrderType getLinkType();
@@ -75,7 +74,7 @@ public interface WorkOrder extends ProcessElement {
 	 * @return the value of the '<em>Pred</em>' reference.
 	 * @see #setPred(WorkBreakdownElement)
 	 * @see org.eclipse.epf.uma.UmaPackage#getWorkOrder_Pred()
-	 * @model required="true" ordered="false"
+	 * @model required="true"
 	 * @generated
 	 */
 	WorkBreakdownElement getPred();

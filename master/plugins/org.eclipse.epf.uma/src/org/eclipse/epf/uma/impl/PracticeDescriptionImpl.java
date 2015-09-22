@@ -38,6 +38,13 @@ import org.eclipse.epf.uma.UmaPackage;
 public class PracticeDescriptionImpl extends ContentDescriptionImpl implements
 		PracticeDescription {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The default value of the '{@link #getAdditionalInfo() <em>Additional Info</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -167,7 +174,7 @@ public class PracticeDescriptionImpl extends ContentDescriptionImpl implements
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -175,7 +182,6 @@ public class PracticeDescriptionImpl extends ContentDescriptionImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.PRACTICE_DESCRIPTION;
 	}
@@ -322,7 +328,6 @@ public class PracticeDescriptionImpl extends ContentDescriptionImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.PRACTICE_DESCRIPTION__ADDITIONAL_INFO:
@@ -346,7 +351,6 @@ public class PracticeDescriptionImpl extends ContentDescriptionImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.PRACTICE_DESCRIPTION__ADDITIONAL_INFO:
@@ -376,7 +380,6 @@ public class PracticeDescriptionImpl extends ContentDescriptionImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.PRACTICE_DESCRIPTION__ADDITIONAL_INFO:
@@ -406,7 +409,6 @@ public class PracticeDescriptionImpl extends ContentDescriptionImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);
@@ -442,7 +444,6 @@ public class PracticeDescriptionImpl extends ContentDescriptionImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy())
 			return super.toString();

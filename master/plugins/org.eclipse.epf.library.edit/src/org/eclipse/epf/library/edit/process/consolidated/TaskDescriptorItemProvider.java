@@ -25,27 +25,21 @@ import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
 import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 import org.eclipse.emf.edit.provider.ViewerNotification;
 import org.eclipse.emf.edit.provider.WrapperItemProvider;
-import org.eclipse.epf.library.edit.IConfigurator;
 import org.eclipse.epf.library.edit.IFilter;
-import org.eclipse.epf.library.edit.meta.TypeDefUtil;
+import org.eclipse.epf.library.edit.configuration.GuidanceItemProvider.CompareByName;
 import org.eclipse.epf.library.edit.process.BreakdownElementWrapperItemProvider;
 import org.eclipse.epf.library.edit.process.IBSItemProvider;
 import org.eclipse.epf.library.edit.process.IBreakdownElementWrapperItemProviderFactory;
 import org.eclipse.epf.library.edit.util.Comparators;
 import org.eclipse.epf.library.edit.util.ProcessUtil;
-import org.eclipse.epf.library.edit.util.PropUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.uma.Activity;
 import org.eclipse.epf.uma.BreakdownElement;
-import org.eclipse.epf.uma.MethodConfiguration;
-import org.eclipse.epf.uma.Task;
 import org.eclipse.epf.uma.TaskDescriptor;
 import org.eclipse.epf.uma.UmaFactory;
 import org.eclipse.epf.uma.UmaPackage;
 import org.eclipse.epf.uma.VariabilityElement;
 import org.eclipse.epf.uma.VariabilityType;
-import org.eclipse.epf.uma.util.ExtendedReference;
-import org.eclipse.epf.uma.util.ModifiedTypeMeta;
 
 
 /**
@@ -181,11 +175,7 @@ public class TaskDescriptorItemProvider extends
 	 * @see com.ibm.library.edit.process.BreakdownElementItemProvider#notifyChanged(org.eclipse.emf.common.notify.Notification)
 	 */
 	public void notifyChanged(Notification notification) {
-		try {
-			updateChildren(notification);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		updateChildren(notification);
 
 		switch (notification.getFeatureID(TaskDescriptor.class)) {
 		case UmaPackage.TASK_DESCRIPTOR__PERFORMED_PRIMARILY_BY:
@@ -198,11 +188,7 @@ public class TaskDescriptorItemProvider extends
 			refreshChildren(notification);
 		}
 
-		try {
-			super.notifyChanged(notification);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		super.notifyChanged(notification);
 	}
 	
 	static void refreshChildren(ItemProviderAdapter ipa, Notification notification) {		
@@ -229,8 +215,8 @@ public class TaskDescriptorItemProvider extends
 				if(parent instanceof VariabilityElement) {
 					for (Iterator iter = TngUtil.getGeneralizers(parent); iter.hasNext();) {
 						VariabilityElement ve = (VariabilityElement) iter.next();
-						if(ve.getVariabilityType() == VariabilityType.EXTENDS
-								|| ve.getVariabilityType() == VariabilityType.LOCAL_CONTRIBUTION) {
+						if(ve.getVariabilityType() == VariabilityType.EXTENDS_LITERAL
+								|| ve.getVariabilityType() == VariabilityType.LOCAL_CONTRIBUTION_LITERAL) {
 							adapter = TngUtil.getAdapterByType(ve, adapterFactory);
 							if (adapter instanceof ItemProviderAdapter) {
 								((ItemProviderAdapter) adapter)
@@ -262,7 +248,6 @@ public class TaskDescriptorItemProvider extends
 	}
 
 	public Collection getChildren(Object obj) {
-		childrenStoreMap = null;
 		Collection children = super.getChildren(obj);
 		List newChildren = new ArrayList();
 		List primaryPerformers = new ArrayList();
@@ -274,7 +259,6 @@ public class TaskDescriptorItemProvider extends
 		List output = new ArrayList();
 
 		IFilter filter = getFilter(obj);
-		int sz = children.size();
 
 		for (Iterator itor = children.iterator(); itor.hasNext();) {
 			Object o = itor.next();
@@ -335,39 +319,13 @@ public class TaskDescriptorItemProvider extends
 		newChildren.addAll(optionalInput);
 		newChildren.addAll(output);
 		
-		MethodConfiguration config = null;
-		if (filter instanceof IConfigurator) {
-			config = ((IConfigurator) filter).getMethodConfiguration();
-		}
-		newChildren = removeSubartifactsFromChildren(newChildren, true, config);
+		newChildren = removeSubartifactsFromChildren(newChildren, true);
 		updateCachedChildren(newChildren);
-		
-		if (obj instanceof TaskDescriptor) {
-			TaskDescriptor td = (TaskDescriptor) obj;
-			Task task = td.getTask();
-			if (task != null) {
-				ModifiedTypeMeta meta = TypeDefUtil.getMdtMeta(task);
-				if (meta != null) {
-					for (ExtendedReference eRef : meta.getReferences()) {
-						if (ExtendedReference.Roles.equals(eRef.getContributeTo()) ||
-								ExtendedReference.WorkProducts.equals(eRef.getContributeTo())) {
-							List list = PropUtil.getPropUtil().getExtendedReferenceList(td, eRef, false);
-							int ix = 0;
-							for (Object item : list) {
-								 Object wrapped = wrap(td, eRef.getReference(), item, ix++);
-								 newChildren.add(wrapped);
-							}
-						}
-					}
-				}
-			}				
-		}
-		
 		return newChildren;
 	}
 	
-	protected List removeSubartifactsFromChildren(Collection children, boolean unwrap, MethodConfiguration config) {
-		return ProcessUtil.removeSubartifactsFromChildren(null, children, unwrap);
+	protected List removeSubartifactsFromChildren(Collection children, boolean unwrap) {
+		return ProcessUtil.removeSubartifactsFromChildren(children, unwrap);
 	}
 
 	private IFilter getFilter(Object obj) {

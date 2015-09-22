@@ -48,7 +48,6 @@ public class DomainDescriptionPage extends DescriptionFormPage {
 	public void init(IEditorSite site, IEditorInput input) {
 		super.init(site, input);
 		domain = (Domain) contentElement;
-		setExternalIDOn(true);
 	}
 
 	/**

@@ -116,6 +116,59 @@ public class OBSActivityItemProvider extends BSActivityItemProvider {
 		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
 				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
 				.createMilestone()));
+		
+		/********Variation points********/
+		/*Añadimos puntos de variación*/
+		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
+				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
+				.createvpActivity()));
+		
+		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
+				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
+				.createvpPhase()));
+		
+		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
+				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
+				.createvpIteration()));
+		
+		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
+				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
+				.createvpRoleDescriptor()));
+		
+		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
+				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
+				.createvpTeamProfile()));
+		
+		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
+				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
+				.createvpMilestone()));
+		/***/
+		
+		/*******Variants*******/
+		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
+				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
+				.createVarActivity()));//Var Activity
+		
+		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
+				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
+				.createVarPhase()));
+		
+		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
+				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
+				.createVarIteration()));
+		
+		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
+				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
+				.createVarRoleDescriptor()));
+		
+		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
+				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
+				.createVarTeamProfile()));
+		
+		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
+				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
+				.createVarMilestone()));
+		/***/
 
 	}
 
@@ -490,6 +543,4 @@ public class OBSActivityItemProvider extends BSActivityItemProvider {
 		Object wrapper = super.createRollupWrapper(object, owner, adapterFactory);
 		return new RoleDescriptorWrapperItemProvider(wrapper, owner, adapterFactory);
 	}
-	
-
 }

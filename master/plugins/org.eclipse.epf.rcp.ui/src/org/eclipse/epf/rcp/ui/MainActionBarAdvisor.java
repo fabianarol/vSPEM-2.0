@@ -12,7 +12,6 @@ package org.eclipse.epf.rcp.ui;
 
 import org.eclipse.epf.authoring.ui.AuthoringUIHelpContexts;
 import org.eclipse.epf.authoring.ui.views.ViewHelper;
-import org.eclipse.epf.library.LibraryService;
 import org.eclipse.epf.rcp.ui.actions.NewWizardMenu;
 import org.eclipse.epf.rcp.ui.actions.UIActionFactory;
 import org.eclipse.epf.rcp.ui.actions.UIOpenPerspectiveDialogAction;
@@ -341,7 +340,7 @@ public class MainActionBarAdvisor extends ActionBarAdvisor {
 
 		aboutAction = ActionFactory.ABOUT.create(window);
 		register(aboutAction);
-		
+
 		// FIXME! Filter out Project... from the drop-down menu.
 		newWizardDropDownAction = IDEActionFactory.NEW_WIZARD_DROP_DOWN
 				.create(window);
@@ -422,20 +421,16 @@ public class MainActionBarAdvisor extends ActionBarAdvisor {
 		newMenu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		fileMenu.add(newMenu);
 		fileMenu.add(new GroupMarker(IWorkbenchActionConstants.NEW_EXT));
-		
-		//Alex: The below comment out code has nothing with UI, but adding confuse.
-		//The real open menu come from /org.eclipse.epf.library.ui/plugin.xml
-//		
-//		MenuManager openSubMenu = new MenuManager(
-//				RCPUIResources.fileOpenMenuItem_text,
-//				IWorkbenchActionConstants.OPEN_EXT);
-//		openSubMenu
-//				.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
-//		openSubMenu.add(new Separator());
-//		fileMenu.add(openSubMenu);
-//		
 
 		fileMenu.add(new Separator());
+		MenuManager openSubMenu = new MenuManager(
+				RCPUIResources.fileOpenMenuItem_text,
+				IWorkbenchActionConstants.OPEN_EXT);
+		openSubMenu
+				.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
+		openSubMenu.add(new Separator());
+		fileMenu.add(openSubMenu);
+
 		fileMenu.add(closeAction);
 		fileMenu.add(closeAllAction);
 		fileMenu.add(new Separator());
@@ -447,10 +442,6 @@ public class MainActionBarAdvisor extends ActionBarAdvisor {
 		fileMenu.add(moveAction);
 		fileMenu.add(renameAction);
 		fileMenu.add(refreshAction);
-		fileMenu.add(new Separator());
-		fileMenu.add(new GroupMarker("udt")); //$NON-NLS-1$
-		fileMenu.add(new Separator());
-		fileMenu.add(new GroupMarker("report")); //$NON-NLS-1$
 		fileMenu.add(new Separator());
 		fileMenu.add(importAction);
 		fileMenu.add(exportAction);
@@ -549,7 +540,7 @@ public class MainActionBarAdvisor extends ActionBarAdvisor {
 		internalMenu.add(new Action(
 				RCPUIResources.mainActionBarAdvisor_HealthCheck) {
 			public void run() {
-				ViewHelper.checkLibraryHealth(LibraryService.getInstance().getCurrentMethodLibrary());
+				ViewHelper.checkLibraryHealth();
 			}
 		});
 	}

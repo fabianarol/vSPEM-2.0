@@ -10,8 +10,8 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.library.preferences;
 
-import org.eclipse.epf.common.preferences.IPreferenceStoreWrapper;
 import org.eclipse.epf.library.LibraryPlugin;
+import org.eclipse.jface.preference.IPreferenceStore;
 
 /**
  * The Library preferences.
@@ -63,7 +63,7 @@ public class LibraryPreferences {
 
 	private static final boolean DEFAULT_DISCARD_UNRESOLVED_REFERENCES = false;
 
-	private static final boolean DEFAULT_USE_NEW_EXTENDS_SEMANTICS = true;
+	private static final boolean DEFAULT_USE_NEW_EXTENDS_SEMANTICS = false;
 
 	private static final int DEFAULT_ROLE_DIAGRAM_HORIZONTAL_SPACING = 70;
 
@@ -72,7 +72,7 @@ public class LibraryPreferences {
 	private static final int DEFAULT_ROLE_DIAGRAM_MAX_TEXT_LINES = 3;
 
 	// The plug-in specific preference store.
-	private static IPreferenceStoreWrapper prefStore = LibraryPlugin.getDefault()
+	private static IPreferenceStore prefStore = LibraryPlugin.getDefault()
 			.getPreferenceStore();
 
 	static {

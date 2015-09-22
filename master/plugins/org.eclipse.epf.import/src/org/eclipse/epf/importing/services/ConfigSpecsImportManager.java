@@ -22,10 +22,7 @@ import org.eclipse.epf.library.LibraryService;
 import org.eclipse.epf.library.LibraryServiceUtil;
 import org.eclipse.epf.library.util.LibraryUtil;
 import org.eclipse.epf.persistence.MultiFileSaveUtil;
-import org.eclipse.epf.uma.CustomCategory;
 import org.eclipse.epf.uma.MethodConfiguration;
-import org.eclipse.epf.uma.MethodElement;
-import org.eclipse.epf.uma.MethodElementProperty;
 import org.eclipse.epf.uma.MethodLibrary;
 import org.eclipse.epf.uma.UmaFactory;
 import org.w3c.dom.Element;
@@ -109,8 +106,6 @@ public class ConfigSpecsImportManager {
 						List pkgs = entry.existingConfig
 								.getMethodPackageSelection();
 						List views = entry.existingConfig.getProcessViews();
-						List added = entry.existingConfig.getAddedCategory();
-						List substracted = entry.existingConfig.getSubtractedCategory();
 
 						for (Iterator itp = config.getMethodPluginSelection()
 								.iterator(); itp.hasNext();) {
@@ -131,36 +126,10 @@ public class ConfigSpecsImportManager {
 						for (Iterator itp = config.getProcessViews().iterator(); itp
 								.hasNext();) {
 							Object e = itp.next();
-							if (!views.contains(e)) {
+							if (!pkgs.contains(e)) {
 								views.add(e);
 							}
 						}
-						
-						for (Iterator itp = config.getAddedCategory().iterator(); itp
-								.hasNext();) {
-							Object e = itp.next();
-							if (!added.contains(e)) {
-								added.add(e);
-							}
-						}
-						
-						for (Iterator itp = config.getSubtractedCategory()
-								.iterator(); itp.hasNext();) {
-							Object e = itp.next();
-							if (!substracted.contains(e)) {
-								substracted.add(e);
-							}
-						}
-						
-						if (config.getDefaultView() != null && config.getDefaultView() != entry.existingConfig.getDefaultView()) {
-							entry.existingConfig.setDefaultView(config.getDefaultView());
-						}
-						
-						setMepFeatureValue(
-								entry.existingConfig,
-								entry.existingConfig.getMethodElementProperty(),
-								config.getMethodElementProperty());
-						
 					} else {
 						// Add the configuration.
 						lib.getPredefinedConfigurations().add(config);
@@ -184,13 +153,10 @@ public class ConfigSpecsImportManager {
 		config.setName(spec.name);
 		config.setBriefDescription(spec.brief_desc);
 		config.setGuid(spec.guid);
-		config.getMethodElementProperty().addAll(spec.mepList);
 
 		List plugins = config.getMethodPluginSelection();
 		List pkgs = config.getMethodPackageSelection();
 		List views = config.getProcessViews();
-		List added = config.getAddedCategory();
-		List substracted = config.getSubtractedCategory();
 
 		ILibraryManager manager = LibraryService.getInstance()
 				.getCurrentLibraryManager();
@@ -218,56 +184,9 @@ public class ConfigSpecsImportManager {
 					views.add(element);
 				}
 			}
-			
-			for (Iterator it = spec.addedCCIds.iterator(); it.hasNext();) {
-				String guid = (String) it.next();
-				Object element = manager.getMethodElement(guid);
-				if (element != null && !added.contains(element)) {
-					added.add(element);
-				}
-			}
-			
-			for (Iterator it = spec.substractCCIds.iterator(); it.hasNext();) {
-				String guid = (String) it.next();
-				Object element = manager.getMethodElement(guid);
-				if (element != null && !substracted.contains(element)) {
-					substracted.add(element);
-				}
-			}
-			
-			if (spec.defaultView != null) {
-				Object element = manager.getMethodElement(spec.defaultView);
-				if (element instanceof CustomCategory) {
-					config.setDefaultView((CustomCategory) element);
-				}
-			}
 		}
 
 		return config;
-	}
-	
-	private static void setMepFeatureValue(MethodElement element, List oldValue, List newValue) {
-		int sz = newValue.size();
-		if (oldValue.size() == sz) {
-			if (sz == 0) {
-				return;
-			}
-			boolean same = true;
-			for (int i=0; i < sz; i++) {
-				MethodElementProperty oldMep = (MethodElementProperty) oldValue.get(i);
-				MethodElementProperty newMep = (MethodElementProperty) newValue.get(i);
-				if (! oldMep.getName().equals(newMep.getName()) ||
-					! oldMep.getValue().equals(newMep.getValue())) {
-					same = false;
-					break;
-				}
-			}
-			if (same) {
-				return;
-			}					
-		}
-		oldValue.removeAll(oldValue);
-		oldValue.addAll(newValue);		
 	}
 
 }

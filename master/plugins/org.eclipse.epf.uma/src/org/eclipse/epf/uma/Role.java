@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.uma;
 
+import org.eclipse.emf.common.util.EList;
 import java.util.List;
 
 /**
@@ -20,7 +21,6 @@ import java.util.List;
  * <!-- begin-model-doc -->
  * A Role is a content element that defines a set of related skills, competencies, and responsibilities.  Roles are used by Tasks to define who performs them as well as define a set of work products they are responsible for.  
  * A Role defines a set of related skills, competencies, and responsibilities of an individual or a set of individuals.  Roles are not individuals or resources.  Individual members of the development organization will wear different hats, or perform different roles. The mapping from individual to role, performed by the project manager when planning and staffing for a project, allows different individuals to act as several different roles, and for a role to be played by several individuals.
- * 
  * <!-- end-model-doc -->
  *
  * <p>
@@ -35,7 +35,7 @@ import java.util.List;
  * @model
  * @generated
  */
-public interface Role extends ContentElement, FulfillableElement {
+public interface Role extends ContentElement {
 	/**
 	 * Returns the value of the '<em><b>Modifies</b></em>' reference list.
 	 * The list contents are of type {@link org.eclipse.epf.uma.WorkProduct}.
@@ -47,10 +47,10 @@ public interface Role extends ContentElement, FulfillableElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Modifies</em>' reference list.
 	 * @see org.eclipse.epf.uma.UmaPackage#getRole_Modifies()
-	 * @model transient="true" volatile="true" derived="true" ordered="false"
+	 * @model type="org.eclipse.epf.uma.WorkProduct" transient="true" changeable="false" volatile="true" derived="true" ordered="false"
 	 * @generated
 	 */
-	List<WorkProduct> getModifies();
+	List getModifies();
 
 	/**
 	 * Returns the value of the '<em><b>Responsible For</b></em>' reference list.
@@ -63,9 +63,9 @@ public interface Role extends ContentElement, FulfillableElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Responsible For</em>' reference list.
 	 * @see org.eclipse.epf.uma.UmaPackage#getRole_ResponsibleFor()
-	 * @model ordered="false"
+	 * @model type="org.eclipse.epf.uma.WorkProduct" ordered="false"
 	 * @generated
 	 */
-	List<WorkProduct> getResponsibleFor();
+	List getResponsibleFor();
 
 } // Role

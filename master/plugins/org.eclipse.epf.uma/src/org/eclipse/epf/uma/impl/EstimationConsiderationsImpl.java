@@ -30,12 +30,19 @@ public class EstimationConsiderationsImpl extends GuidanceImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	protected EstimationConsiderationsImpl() {
 		super();
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -43,7 +50,6 @@ public class EstimationConsiderationsImpl extends GuidanceImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.ESTIMATION_CONSIDERATIONS;
 	}

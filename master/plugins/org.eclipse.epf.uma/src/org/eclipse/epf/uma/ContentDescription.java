@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.uma;
 
+import org.eclipse.emf.common.util.EList;
 import java.util.List;
 
 /**
@@ -28,7 +29,6 @@ import java.util.List;
  *   <li>{@link org.eclipse.epf.uma.ContentDescription#getSections <em>Sections</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.ContentDescription#getExternalId <em>External Id</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.ContentDescription#getKeyConsiderations <em>Key Considerations</em>}</li>
- *   <li>{@link org.eclipse.epf.uma.ContentDescription#getLongPresentationName <em>Long Presentation Name</em>}</li>
  * </ul>
  * </p>
  *
@@ -48,7 +48,7 @@ public interface ContentDescription extends MethodUnit {
 	 * @return the value of the '<em>Main Description</em>' attribute.
 	 * @see #setMainDescription(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getContentDescription_MainDescription()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getMainDescription();
@@ -74,10 +74,10 @@ public interface ContentDescription extends MethodUnit {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Sections</em>' containment reference list.
 	 * @see org.eclipse.epf.uma.UmaPackage#getContentDescription_Sections()
-	 * @model containment="true" resolveProxies="true" ordered="false"
+	 * @model type="org.eclipse.epf.uma.Section" containment="true" resolveProxies="true" ordered="false"
 	 * @generated
 	 */
-	List<Section> getSections();
+	List getSections();
 
 	/**
 	 * Returns the value of the '<em><b>External Id</b></em>' attribute.
@@ -85,12 +85,12 @@ public interface ContentDescription extends MethodUnit {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
-	 * An external visible number or label that is used to reference this element. Used like a synonym to the name.
+	 * An external visible number that is used to reference this artifact. Used like a synonym.
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>External Id</em>' attribute.
 	 * @see #setExternalId(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getContentDescription_ExternalId()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getExternalId();
@@ -116,7 +116,7 @@ public interface ContentDescription extends MethodUnit {
 	 * @return the value of the '<em>Key Considerations</em>' attribute.
 	 * @see #setKeyConsiderations(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getContentDescription_KeyConsiderations()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getKeyConsiderations();
@@ -130,31 +130,5 @@ public interface ContentDescription extends MethodUnit {
 	 * @generated
 	 */
 	void setKeyConsiderations(String value);
-
-	/**
-	 * Returns the value of the '<em><b>Long Presentation Name</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Long Presentation Name</em>' attribute isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Long Presentation Name</em>' attribute.
-	 * @see #setLongPresentationName(String)
-	 * @see org.eclipse.epf.uma.UmaPackage#getContentDescription_LongPresentationName()
-	 * @model dataType="org.eclipse.epf.uma.String" required="true" ordered="false"
-	 * @generated
-	 */
-	String getLongPresentationName();
-
-	/**
-	 * Sets the value of the '{@link org.eclipse.epf.uma.ContentDescription#getLongPresentationName <em>Long Presentation Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Long Presentation Name</em>' attribute.
-	 * @see #getLongPresentationName()
-	 * @generated
-	 */
-	void setLongPresentationName(String value);
 
 } // ContentDescription

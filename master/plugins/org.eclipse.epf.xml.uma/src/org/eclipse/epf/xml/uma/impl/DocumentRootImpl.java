@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: DocumentRootImpl.java,v 1.4 2007/06/05 21:14:59 klow Exp $
+ */
 package org.eclipse.epf.xml.uma.impl;
 
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -17,11 +13,11 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.EStringToStringMapEntryImpl;
+import org.eclipse.emf.ecore.sdo.impl.EDataObjectImpl;
 import org.eclipse.emf.ecore.util.BasicFeatureMap;
 import org.eclipse.emf.ecore.util.EcoreEMap;
 import org.eclipse.emf.ecore.util.FeatureMap;
 import org.eclipse.emf.ecore.util.InternalEList;
-import org.eclipse.epf.uma.ecore.impl.MultiResourceEObject;
 import org.eclipse.epf.xml.uma.DocumentRoot;
 import org.eclipse.epf.xml.uma.MethodConfiguration;
 import org.eclipse.epf.xml.uma.MethodLibrary;
@@ -46,7 +42,7 @@ import org.eclipse.epf.xml.uma.UmaPackage;
  *
  * @generated
  */
-public class DocumentRootImpl extends MultiResourceEObject implements DocumentRoot {
+public class DocumentRootImpl extends EDataObjectImpl implements DocumentRoot {
 	/**
 	 * The cached value of the '{@link #getMixed() <em>Mixed</em>}' attribute list.
 	 * <!-- begin-user-doc -->
@@ -65,7 +61,7 @@ public class DocumentRootImpl extends MultiResourceEObject implements DocumentRo
 	 * @generated
 	 * @ordered
 	 */
-	protected EMap<String, String> xMLNSPrefixMap;
+	protected EMap xMLNSPrefixMap;
 
 	/**
 	 * The cached value of the '{@link #getXSISchemaLocation() <em>XSI Schema Location</em>}' map.
@@ -75,7 +71,7 @@ public class DocumentRootImpl extends MultiResourceEObject implements DocumentRo
 	 * @generated
 	 * @ordered
 	 */
-	protected EMap<String, String> xSISchemaLocation;
+	protected EMap xSISchemaLocation;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -91,7 +87,6 @@ public class DocumentRootImpl extends MultiResourceEObject implements DocumentRo
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.DOCUMENT_ROOT;
 	}
@@ -113,9 +108,9 @@ public class DocumentRootImpl extends MultiResourceEObject implements DocumentRo
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EMap<String, String> getXMLNSPrefixMap() {
+	public EMap getXMLNSPrefixMap() {
 		if (xMLNSPrefixMap == null) {
-			xMLNSPrefixMap = new EcoreEMap<String,String>(EcorePackage.Literals.ESTRING_TO_STRING_MAP_ENTRY, EStringToStringMapEntryImpl.class, this, UmaPackage.DOCUMENT_ROOT__XMLNS_PREFIX_MAP);
+			xMLNSPrefixMap = new EcoreEMap(EcorePackage.Literals.ESTRING_TO_STRING_MAP_ENTRY, EStringToStringMapEntryImpl.class, this, UmaPackage.DOCUMENT_ROOT__XMLNS_PREFIX_MAP);
 		}
 		return xMLNSPrefixMap;
 	}
@@ -125,9 +120,9 @@ public class DocumentRootImpl extends MultiResourceEObject implements DocumentRo
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EMap<String, String> getXSISchemaLocation() {
+	public EMap getXSISchemaLocation() {
 		if (xSISchemaLocation == null) {
-			xSISchemaLocation = new EcoreEMap<String,String>(EcorePackage.Literals.ESTRING_TO_STRING_MAP_ENTRY, EStringToStringMapEntryImpl.class, this, UmaPackage.DOCUMENT_ROOT__XSI_SCHEMA_LOCATION);
+			xSISchemaLocation = new EcoreEMap(EcorePackage.Literals.ESTRING_TO_STRING_MAP_ENTRY, EStringToStringMapEntryImpl.class, this, UmaPackage.DOCUMENT_ROOT__XSI_SCHEMA_LOCATION);
 		}
 		return xSISchemaLocation;
 	}
@@ -218,15 +213,14 @@ public class DocumentRootImpl extends MultiResourceEObject implements DocumentRo
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 			case UmaPackage.DOCUMENT_ROOT__MIXED:
-				return ((InternalEList<?>)getMixed()).basicRemove(otherEnd, msgs);
+				return ((InternalEList)getMixed()).basicRemove(otherEnd, msgs);
 			case UmaPackage.DOCUMENT_ROOT__XMLNS_PREFIX_MAP:
-				return ((InternalEList<?>)getXMLNSPrefixMap()).basicRemove(otherEnd, msgs);
+				return ((InternalEList)getXMLNSPrefixMap()).basicRemove(otherEnd, msgs);
 			case UmaPackage.DOCUMENT_ROOT__XSI_SCHEMA_LOCATION:
-				return ((InternalEList<?>)getXSISchemaLocation()).basicRemove(otherEnd, msgs);
+				return ((InternalEList)getXSISchemaLocation()).basicRemove(otherEnd, msgs);
 			case UmaPackage.DOCUMENT_ROOT__METHOD_CONFIGURATION:
 				return basicSetMethodConfiguration(null, msgs);
 			case UmaPackage.DOCUMENT_ROOT__METHOD_LIBRARY:
@@ -242,7 +236,6 @@ public class DocumentRootImpl extends MultiResourceEObject implements DocumentRo
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 			case UmaPackage.DOCUMENT_ROOT__MIXED:
@@ -269,7 +262,6 @@ public class DocumentRootImpl extends MultiResourceEObject implements DocumentRo
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 			case UmaPackage.DOCUMENT_ROOT__MIXED:
@@ -299,7 +291,6 @@ public class DocumentRootImpl extends MultiResourceEObject implements DocumentRo
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 			case UmaPackage.DOCUMENT_ROOT__MIXED:
@@ -329,7 +320,6 @@ public class DocumentRootImpl extends MultiResourceEObject implements DocumentRo
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 			case UmaPackage.DOCUMENT_ROOT__MIXED:
@@ -353,7 +343,6 @@ public class DocumentRootImpl extends MultiResourceEObject implements DocumentRo
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 

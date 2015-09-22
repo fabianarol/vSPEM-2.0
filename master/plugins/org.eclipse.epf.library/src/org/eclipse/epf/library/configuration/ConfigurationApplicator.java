@@ -36,7 +36,7 @@ public class ConfigurationApplicator implements IConfigurationApplicator {
 			MethodConfiguration config) {
 		// special handling for presentation name of breakdown element
 		//
-		if(attribute == UmaPackage.eINSTANCE.getMethodElement_PresentationName()) {
+		if(attribute == UmaPackage.eINSTANCE.getDescribableElement_PresentationName()) {
 			if(e instanceof BreakdownElement) {
 				return ProcessUtil.getPresentationName((BreakdownElement) e);
 			}
@@ -52,10 +52,10 @@ public class ConfigurationApplicator implements IConfigurationApplicator {
 			MethodConfiguration config) {
 		if (ConfigurationHelper.is0nFeature(ref)) {
 			return ConfigurationHelper.calc0nFeatureValue(e, ref,
-					DefaultElementRealizer.newElementRealizer(config));
+					new DefaultElementRealizer(config));
 		} else if (ConfigurationHelper.is01Feature(ref)) {
 			return ConfigurationHelper.calc01FeatureValue(e, ref,
-					DefaultElementRealizer.newElementRealizer(config));
+					new DefaultElementRealizer(config));
 		}
 		return null;
 	}
@@ -64,7 +64,7 @@ public class ConfigurationApplicator implements IConfigurationApplicator {
 			DescribableElement owner, EReference ref, MethodConfiguration config) {
 
 		List values = ConfigurationHelper.calc0nFeatureValue(desc, owner, ref,
-				DefaultElementRealizer.newElementRealizer(config));
+				new DefaultElementRealizer(config));
 		if (ref.isMany()) {
 			return values;
 		}
@@ -76,7 +76,7 @@ public class ConfigurationApplicator implements IConfigurationApplicator {
 	public Object getReference(MethodElement element, OppositeFeature feature,
 			MethodConfiguration config) {
 		List values = ConfigurationHelper.calc0nFeatureValue(element, feature,
-				DefaultElementRealizer.newElementRealizer(config));
+				new DefaultElementRealizer(config));
 
 		return values;
 	}

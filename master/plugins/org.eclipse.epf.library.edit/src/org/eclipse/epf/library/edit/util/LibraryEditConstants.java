@@ -82,9 +82,6 @@ public final class LibraryEditConstants {
 	public static final String PREF_INHERIT_SUPPRESSION_STATE = PREF_PREFIX
 			+ "inherit_suppression_state"; //$NON-NLS-1$
 
-	public static final String PREF_SYN_FREE = PREF_PREFIX
-			+ "syn_free"; //$NON-NLS-1$
-
 	public static final String PREF_WBS_COLUMNS = PREF_PREFIX + "wbs_columns"; //$NON-NLS-1$
 
 	public static final String PREF_TBS_COLUMNS = PREF_PREFIX + "tbs_columns"; //$NON-NLS-1$
@@ -98,6 +95,8 @@ public final class LibraryEditConstants {
 	public static final String NEW_DISCIPLINE_GROUPING = "new_discipline_grouping"; //$NON-NLS-1$
 
 	public static final String NEW_DOMAIN = "new_domain"; //$NON-NLS-1$
+	
+	public static final String NEW_VARIANT = "new_variant"; //$NON-NLS-1$
 
 	public static final String NEW_ROLE_SET = "new_role_set"; //$NON-NLS-1$
 
@@ -158,4 +157,6 @@ public final class LibraryEditConstants {
 	public static final String NEW_CONFIGURATION = "new_configuration"; //$NON-NLS-1$
 
 	public static final String NEW_PROCESS_FAMILY = "new_process_family"; //$NON-NLS-1$
+
+	public static  final String NEW_PRUEBASLINEAS = "new_pruebas_lineas";
 }

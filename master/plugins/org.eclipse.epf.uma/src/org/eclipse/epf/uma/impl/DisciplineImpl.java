@@ -43,6 +43,13 @@ import org.eclipse.epf.uma.UmaPackage;
  */
 public class DisciplineImpl extends ContentCategoryImpl implements Discipline {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The cached value of the '{@link #getTasks() <em>Tasks</em>}' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -50,7 +57,7 @@ public class DisciplineImpl extends ContentCategoryImpl implements Discipline {
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Task> tasks;
+	protected EList tasks = null;
 
 	/**
 	 * The cached value of the '{@link #getSubdiscipline() <em>Subdiscipline</em>}' containment reference list.
@@ -60,7 +67,7 @@ public class DisciplineImpl extends ContentCategoryImpl implements Discipline {
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Discipline> subdiscipline;
+	protected EList subdiscipline = null;
 
 	/**
 	 * The cached value of the '{@link #getReferenceWorkflows() <em>Reference Workflows</em>}' reference list.
@@ -70,7 +77,7 @@ public class DisciplineImpl extends ContentCategoryImpl implements Discipline {
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Activity> referenceWorkflows;
+	protected EList referenceWorkflows = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -82,7 +89,7 @@ public class DisciplineImpl extends ContentCategoryImpl implements Discipline {
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -90,7 +97,6 @@ public class DisciplineImpl extends ContentCategoryImpl implements Discipline {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.DISCIPLINE;
 	}
@@ -100,9 +106,9 @@ public class DisciplineImpl extends ContentCategoryImpl implements Discipline {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<Task> getTasks() {
+	public List getTasks() {
 		if (tasks == null) {
-			tasks = new EObjectResolvingEList<Task>(Task.class, this,
+			tasks = new EObjectResolvingEList(Task.class, this,
 					UmaPackage.DISCIPLINE__TASKS);
 		}
 		return tasks;
@@ -113,9 +119,9 @@ public class DisciplineImpl extends ContentCategoryImpl implements Discipline {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<Discipline> getSubdiscipline() {
+	public List getSubdiscipline() {
 		if (subdiscipline == null) {
-			subdiscipline = new EObjectContainmentEList.Resolving<Discipline>(
+			subdiscipline = new EObjectContainmentEList.Resolving(
 					Discipline.class, this,
 					UmaPackage.DISCIPLINE__SUBDISCIPLINE);
 		}
@@ -127,11 +133,10 @@ public class DisciplineImpl extends ContentCategoryImpl implements Discipline {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<Activity> getReferenceWorkflows() {
+	public List getReferenceWorkflows() {
 		if (referenceWorkflows == null) {
-			referenceWorkflows = new EObjectResolvingEList<Activity>(
-					Activity.class, this,
-					UmaPackage.DISCIPLINE__REFERENCE_WORKFLOWS);
+			referenceWorkflows = new EObjectResolvingEList(Activity.class,
+					this, UmaPackage.DISCIPLINE__REFERENCE_WORKFLOWS);
 		}
 		return referenceWorkflows;
 	}
@@ -141,13 +146,12 @@ public class DisciplineImpl extends ContentCategoryImpl implements Discipline {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case UmaPackage.DISCIPLINE__SUBDISCIPLINE:
-			return ((InternalEList<?>) getSubdiscipline()).basicRemove(
-					otherEnd, msgs);
+			return ((InternalEList) getSubdiscipline()).basicRemove(otherEnd,
+					msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -157,7 +161,6 @@ public class DisciplineImpl extends ContentCategoryImpl implements Discipline {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.DISCIPLINE__TASKS:
@@ -175,23 +178,19 @@ public class DisciplineImpl extends ContentCategoryImpl implements Discipline {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.DISCIPLINE__TASKS:
 			getTasks().clear();
-			getTasks().addAll((Collection<? extends Task>) newValue);
+			getTasks().addAll((Collection) newValue);
 			return;
 		case UmaPackage.DISCIPLINE__SUBDISCIPLINE:
 			getSubdiscipline().clear();
-			getSubdiscipline().addAll(
-					(Collection<? extends Discipline>) newValue);
+			getSubdiscipline().addAll((Collection) newValue);
 			return;
 		case UmaPackage.DISCIPLINE__REFERENCE_WORKFLOWS:
 			getReferenceWorkflows().clear();
-			getReferenceWorkflows().addAll(
-					(Collection<? extends Activity>) newValue);
+			getReferenceWorkflows().addAll((Collection) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -202,7 +201,6 @@ public class DisciplineImpl extends ContentCategoryImpl implements Discipline {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.DISCIPLINE__TASKS:
@@ -223,7 +221,6 @@ public class DisciplineImpl extends ContentCategoryImpl implements Discipline {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);

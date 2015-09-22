@@ -11,8 +11,8 @@
 package org.eclipse.epf.common.serviceability;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.epf.common.plugin.AbstractPlugin;
 
 /**
  * Generic logger used for logging status messages, warning messages, error
@@ -23,10 +23,8 @@ import org.eclipse.core.runtime.Status;
  */
 public class Logger {
 
-	public static String SeeLogFileForMoreDetails;
-	
 	// The plug-in instance.
-	private Plugin plugin;
+	private AbstractPlugin plugin;
 
 	// The plug-in ID.
 	private String pluginId;
@@ -37,9 +35,9 @@ public class Logger {
 	 * @param plugin
 	 *            The plugin instance.
 	 */
-	public Logger(Plugin plugin) {
+	public Logger(AbstractPlugin plugin) {
 		this.plugin = plugin;
-		this.pluginId = plugin.getBundle().getSymbolicName(); //plugin.getId();
+		this.pluginId = plugin.getId();
 	}
 
 	/**

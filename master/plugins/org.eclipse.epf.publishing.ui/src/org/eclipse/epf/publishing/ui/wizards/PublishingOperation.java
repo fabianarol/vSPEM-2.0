@@ -17,7 +17,7 @@ import java.net.URL;
 import java.text.MessageFormat;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.epf.common.ui.util.MsgDialog;
+import org.eclipse.epf.common.serviceability.MsgDialog;
 import org.eclipse.epf.library.services.SafeUpdateController;
 import org.eclipse.epf.publishing.PublishingResources;
 import org.eclipse.epf.publishing.services.AbstractPublishManager;
@@ -46,7 +46,7 @@ import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
  * @author Kelvin Low
  * @since 1.0
  */
-public class PublishingOperation implements IRunnableWithProgress, org.eclipse.epf.library.edit.util.IRunnableWithProgress {
+public class PublishingOperation implements IRunnableWithProgress {
 
 	private static final String PUBLISH_CONFIG_ERROR_TITLE = PublishingUIResources.publishConfigDialog_title; //$NON-NLS-1$
 
@@ -135,8 +135,7 @@ public class PublishingOperation implements IRunnableWithProgress, org.eclipse.e
 			monitor
 					.setTaskName(PublishingResources.publishingConfigurationTask_name); //$NON-NLS-1$			
 			publishMgr.publish(monitor);
-			
-			publishMgr.getViewBuilder().setCanceled(monitor.isCanceled());
+
 			published_url = publishMgr.getPublishedUrl();
 			report_url = publishMgr.getPublishReportUrl();
 		} catch (Exception e) {

@@ -32,11 +32,7 @@ public class UMLDiagramPreferenceInitializer extends
 	@Override
 	public void initializeDefaultPreferences() {
 		super.initializeDefaultPreferences();
-		
 		DiagramCoreUtil.setDefaultFontPreference(getPreferenceStore());
 		DiagramCoreUtil.setDefaultLineStyle(getPreferenceStore());
-		
-		// turn off connection handles to show by default
-		DiagramCoreUtil.hideConnectionHandles(getPreferenceStore());
 	}
 }

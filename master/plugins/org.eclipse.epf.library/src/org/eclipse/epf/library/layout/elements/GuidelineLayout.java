@@ -48,11 +48,10 @@ public class GuidelineLayout extends AbstractElementLayout {
 							.getElementRealizer());
 			
 			List activities = ConfigurationHelper.calc0nFeatureValue(super.element,
-					AssociationHelper.Guideline_BreakdownElements, layoutManager
+					AssociationHelper.Guideline_Activities, layoutManager
 							.getElementRealizer());
 
-//			contentElements.addAll(activities);
-			contentElements = addBreakdownElementsToContentElements(contentElements, activities);
+			contentElements.addAll(activities);
 
 			addReferences(AssociationHelper.Guideline_ContentElements, elementXml, "contentElements", contentElements); //$NON-NLS-1$
 		}

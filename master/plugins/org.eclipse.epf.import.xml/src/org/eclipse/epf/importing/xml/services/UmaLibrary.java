@@ -19,7 +19,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EAttribute;
@@ -28,17 +27,15 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.sdo.EDataObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.epf.common.utils.NetUtil;
 import org.eclipse.epf.common.utils.StrUtil;
 import org.eclipse.epf.dataexchange.importing.LibraryService;
 import org.eclipse.epf.dataexchange.util.ContentProcessor;
 import org.eclipse.epf.dataexchange.util.ILogger;
 import org.eclipse.epf.export.xml.services.FeatureManager;
-import org.eclipse.epf.export.xml.services.XMLLibrary;
 import org.eclipse.epf.importing.xml.ImportXMLPlugin;
 import org.eclipse.epf.importing.xml.ImportXMLResources;
-import org.eclipse.epf.library.edit.util.MethodElementPropertyHelper;
 import org.eclipse.epf.library.edit.util.ModelStructure;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.util.LibraryUtil;
@@ -48,7 +45,6 @@ import org.eclipse.epf.services.Services;
 import org.eclipse.epf.uma.Activity;
 import org.eclipse.epf.uma.BreakdownElement;
 import org.eclipse.epf.uma.CapabilityPattern;
-import org.eclipse.epf.uma.ContentCategory;
 import org.eclipse.epf.uma.ContentDescription;
 import org.eclipse.epf.uma.ContentPackage;
 import org.eclipse.epf.uma.CustomCategory;
@@ -64,7 +60,6 @@ import org.eclipse.epf.uma.MethodLibrary;
 import org.eclipse.epf.uma.MethodPackage;
 import org.eclipse.epf.uma.MethodPlugin;
 import org.eclipse.epf.uma.ProcessComponent;
-import org.eclipse.epf.uma.ProcessElement;
 import org.eclipse.epf.uma.ProcessPackage;
 import org.eclipse.epf.uma.RoleSet;
 import org.eclipse.epf.uma.RoleSetGrouping;
@@ -77,7 +72,6 @@ import org.eclipse.epf.uma.WorkBreakdownElement;
 import org.eclipse.epf.uma.WorkOrder;
 import org.eclipse.epf.uma.WorkOrderType;
 import org.eclipse.epf.uma.WorkProductType;
-import org.eclipse.epf.uma.ecore.IModelObject;
 import org.eclipse.epf.uma.util.UmaUtil;
 import org.eclipse.epf.xml.uma.TaskDescriptor;
 import org.eclipse.osgi.util.NLS;
@@ -95,9 +89,7 @@ public class UmaLibrary {
 
 	private boolean debug = ImportXMLPlugin.getDefault().isDebugging();
 
-	private boolean overwrite = false;
-	
-	private int mergeLevel = 0;
+	private boolean overwrite = false;	
 	
 	private ILogger logger;
 
@@ -160,13 +152,13 @@ public class UmaLibrary {
 	 * @param id
 	 * @return
 	 */
-	public IModelObject createContentCategory(String pluginId,
+	public EDataObject createContentCategory(String pluginId,
 			String xmlEClassName, String xmlElementType, String id) {
 
 		setSourceId(id);
 		
 		// make sure the same object created only once
-		IModelObject obj = getElement(id);
+		EDataObject obj = getElement(id);
 		if (obj != null) {
 			return obj;
 		}
@@ -179,11 +171,11 @@ public class UmaLibrary {
 			return null;
 		}
 
-		obj = (IModelObject) EcoreUtil.create(objClass);
+		obj = (EDataObject) EcoreUtil.create(objClass);
 		setElement(id, obj);
 
 		ContentPackage rootPkg = (ContentPackage) getRootPackage(plugin, obj);
-		rootPkg.getContentElements().add((ContentCategory)obj);
+		rootPkg.getContentElements().add(obj);
 		return obj;
 	}
 
@@ -227,15 +219,15 @@ public class UmaLibrary {
 	 * @return
 	 * @throws Exception
 	 */
-	public IModelObject createMethodPlugin(String id, String name)
+	public EDataObject createMethodPlugin(String id, String name)
 			throws Exception {
 		
 		// make sure the same object created only once
-		IModelObject obj = getElement(id);
+		EDataObject obj = getElement(id);
 		boolean isOld = obj != null;
 		if (obj == null) {
 			Map options = new HashMap();
-			options.put("renameElementMap", renameElementMap);//$NON-NLS-1$
+			options.put("renameElementMap", renameElementMap);
 			obj = LibraryService.INSTANCE.createPlugin(name, id, options);
 
 			setElement(id, obj);
@@ -260,7 +252,7 @@ public class UmaLibrary {
 	 * @param plugin
 	 * @return
 	 */
-	public IModelObject getContentRootPackage(IModelObject plugin) {
+	public EDataObject getContentRootPackage(EDataObject plugin) {
 		if (!(plugin instanceof MethodPlugin)) {
 			return null;
 		}
@@ -273,7 +265,7 @@ public class UmaLibrary {
 	 * @param plugin
 	 * @return
 	 */
-	public IModelObject getCapabilityPatternRootPackage(IModelObject plugin) {
+	public EDataObject getCapabilityPatternRootPackage(EDataObject plugin) {
 		if (!(plugin instanceof MethodPlugin)) {
 			return null;
 		}
@@ -286,7 +278,7 @@ public class UmaLibrary {
 	 * @param plugin
 	 * @return
 	 */
-	public IModelObject getDeliveryProcessRootPackage(IModelObject plugin) {
+	public EDataObject getDeliveryProcessRootPackage(EDataObject plugin) {
 		if (!(plugin instanceof MethodPlugin)) {
 			return null;
 		}
@@ -311,14 +303,14 @@ public class UmaLibrary {
 	 * @param id
 	 * @return
 	 */
-	public IModelObject createElement(IModelObject container,
+	public EDataObject createElement(EDataObject container,
 			String xmlFeatureName, String xmlEClassName, String xmlElementType,
 			String id) {
 
 		setSourceId(id);
 
 		// make sure the same object created only once
-		IModelObject obj = getElement(id);
+		EDataObject obj = getElement(id);
 		if (obj != null) {
 			if (obj instanceof Activity) {
 				EObject eobj = obj.eContainer();
@@ -348,7 +340,7 @@ public class UmaLibrary {
 			return null;
 		}
 
-		obj = (IModelObject) EcoreUtil.create(objClass);	
+		obj = (EDataObject) EcoreUtil.create(objClass);	
 
 		if (obj instanceof WorkOrder) {
 			// WorkOrder is not a method element in xml uma, need to create it
@@ -357,7 +349,7 @@ public class UmaLibrary {
 
 			// also need to add the element into the container of the owner
 			((ProcessPackage) container.eContainer()).getProcessElements().add(
-					(WorkOrder)obj);
+					obj);
 		}
 
 		setElement(id, obj);
@@ -371,18 +363,18 @@ public class UmaLibrary {
 					// content package
 					MethodPackage pkg_core_content = UmaUtil.findMethodPackage(
 							plugin, ModelStructure.DEFAULT.coreContentPath);
-					pkg_core_content.getChildPackages().add((ContentPackage)obj);
+					pkg_core_content.getChildPackages().add(obj);
 				} else if (obj instanceof ProcessComponent) {
 					MethodPackage pkg_cp = UmaUtil.findMethodPackage(plugin,
 							ModelStructure.DEFAULT.capabilityPatternPath);
-					pkg_cp.getChildPackages().add((ProcessComponent)obj);
+					pkg_cp.getChildPackages().add(obj);
 
 				} else if (obj instanceof ProcessPackage) {
 					// this is a root process package
 					// put into the root delivery processes package
 					MethodPackage pkg_dp = UmaUtil.findMethodPackage(plugin,
 							ModelStructure.DEFAULT.deliveryProcessPath);
-					pkg_dp.getChildPackages().add((ProcessPackage)obj);
+					pkg_dp.getChildPackages().add(obj);
 				}
 			} else {
 
@@ -422,7 +414,7 @@ public class UmaLibrary {
 						pkg = pp;
 					}
 
-					((ProcessPackage) pkg).getProcessElements().add((ProcessElement)obj);
+					((ProcessPackage) pkg).getProcessElements().add(obj);
 				}
 
 				// note: all element references are string type (id)
@@ -442,7 +434,7 @@ public class UmaLibrary {
 		return obj;
 	}
 
-	private void setElement(String guid, IModelObject obj) {
+	private void setElement(String guid, EDataObject obj) {
 		// addElementToContainer(container, obj);
 				
 		if (!elementsMap.containsKey(guid)) {
@@ -478,8 +470,8 @@ public class UmaLibrary {
 	 * @param guid
 	 * @return
 	 */
-	public IModelObject getElement(String guid) {
-		return (IModelObject) elementsMap.get(guid);
+	public EDataObject getElement(String guid) {
+		return (EDataObject) elementsMap.get(guid);
 	}
 
 	private Date createDate(String dateStr) {
@@ -507,7 +499,7 @@ public class UmaLibrary {
 	 * @param value
 	 * @throws Exception
 	 */
-	public void setAtributeFeatureValue(IModelObject obj, String featureName,
+	public void setAtributeFeatureValue(EDataObject obj, String featureName,
 			Object value) throws Exception {
 		boolean oldNotify = obj.eDeliver();
 		obj.eSetDeliver(false);
@@ -515,13 +507,13 @@ public class UmaLibrary {
 		obj.eSetDeliver(oldNotify);
 	}
 	
-	private void setAtributeFeatureValue_(IModelObject obj, String featureName,
+	private void setAtributeFeatureValue_(EDataObject obj, String featureName,
 			Object value) throws Exception {
 		if (obj == null || featureName == null || value == null) {
 			return;
 		}
 		
-		if (value instanceof List || value instanceof IModelObject) {
+		if (value instanceof List || value instanceof EDataObject) {
 			if (featureName.equals("methodElementProperty")) {		//$NON-NLS-1$
 				setMepFeatureValue(obj, featureName, value);
 				return;
@@ -581,12 +573,7 @@ public class UmaLibrary {
 					MethodPlugin tgtPlugin = UmaUtil.getMethodPlugin((MethodElement) obj);
 					int ix = tgtPlugin.getName().length() + 1;
 										
-					String path = value.toString().substring(ix);
-					try {
-						value = new java.net.URI(path);
-					} catch (Throwable e) {
-						value = new java.net.URI(NetUtil.encodeFileURL(path));
-					}
+					value = new java.net.URI(value.toString().substring(ix));
 
 					// need to copy the resource file to the target library
 					contentProc.copyResource(((java.net.URI) value).getPath(), obj, tgtPlugin);
@@ -610,7 +597,7 @@ public class UmaLibrary {
 
 	}
 
-	private void setMepFeatureValue(IModelObject obj, String featureName, Object value) {
+	private void setMepFeatureValue(EDataObject obj, String featureName, Object value) {
 		List srcList = (List) value;
 		int sz = srcList == null ? 0 : srcList.size();		
 		EStructuralFeature feature = FeatureManager.INSTANCE.getRmcFeature(obj
@@ -677,7 +664,7 @@ public class UmaLibrary {
 	 * @param id
 	 * @throws Exception
 	 */
-	public void setReferenceValue(IModelObject obj, String featureName, String id)
+	public void setReferenceValue(EDataObject obj, String featureName, String id)
 			throws Exception {
 		if (obj == null || featureName == null || id == null) {
 			return;
@@ -728,7 +715,6 @@ public class UmaLibrary {
 	 * Sets work order.
 	 * @param umaWorkOrder
 	 * @param predId
-	 * @deprecated
 	 */
 	public void setWorkOrder(Object umaWorkOrder, String predId) {
 		if (umaWorkOrder instanceof WorkOrder) {
@@ -820,12 +806,12 @@ public class UmaLibrary {
 				if (o instanceof ProcessComponent) {
 					procs.add(o);
 				} else if (o instanceof DescribableElement) {
-/*					String pName = ((DescribableElement) o).getPresentationName();
+					String pName = ((DescribableElement) o).getPresentationName();
 					if (pName == null || pName.length() == 0) {
 						((DescribableElement) o)
 								.setPresentationName(((DescribableElement) o)
 										.getName());
-					}*/
+					}
 				}
 	
 				// fix the name string
@@ -969,10 +955,6 @@ public class UmaLibrary {
 				}
 			}
 			
-			if (!overwrite && mergeLevel == 2) {
-				continue;
-			}			
-			
 			if ( (e instanceof CustomCategory) && TngUtil.isRootCustomCategory( (CustomCategory)e ) ) {
 				continue;
 			}			
@@ -1103,205 +1085,4 @@ public class UmaLibrary {
 	public boolean isNewElement(String guid) {
 		return newElementsMap.containsKey(guid);
 	}
-	
-	public void setMergeLevel(int mergeLevel) {
-		this.mergeLevel = mergeLevel;
-	}
-	
-	private boolean toHandle(IModelObject rmcObj, EStructuralFeature rmcFeature) {
-		EStructuralFeature feature = rmcFeature;
-		if (feature == null || feature.isDerived()) {
-			return false;
-		}
-		
-		EReference eref = null;
-		if (rmcFeature instanceof EReference) {
-			eref = (EReference) rmcFeature;
-			if (eref.isContainment()) {
-				if (mergeLevel != 2) {	//The old delete code would take of it
-					return false;
-				}
-				if (eref.isMany()) {
-					return false;
-				}
-			} else if (rmcObj instanceof ContentCategory) {
-				if (mergeLevel == 2 && eref.isMany()) {
-					return false;
-				}
-			} else if (rmcFeature == UmaPackage.eINSTANCE
-					.getWorkBreakdownElement_LinkToPredecessor()) {
-				return false;
-			}
-		}
-		
-		if (rmcObj instanceof MethodPlugin) {
-			if (feature == UmaPackage.eINSTANCE.getMethodPlugin_MethodPackages()) {
-				return false;
-			}
-		} else if (rmcObj instanceof MethodConfiguration) {
-			if (eref != null) {
-				return false;
-			}
-		} else if (rmcObj instanceof MethodPackage) {
-			if (rmcFeature == UmaPackage.eINSTANCE.getMethodPackage_ChildPackages() &&
-					!(rmcObj instanceof ProcessPackage)) {
-				return false;
-			}
-		} 
-		
-		return true;
-	}
-	
-	private boolean isManyReference(EStructuralFeature rmcFeature) {
-		if (! (rmcFeature instanceof EReference)) {
-			return false;
-		}		
-		return ((EReference) rmcFeature).isMany();
-	}
-	
-	public void handleNullXmlValue(IModelObject xmlObj, IModelObject rmcObj, String xmlFeatureName) throws Exception {		
-		if (rmcObj instanceof MethodLibrary) {
-			return;
-		}
-		
-		EStructuralFeature feature = FeatureManager.INSTANCE.getRmcFeature(
-				rmcObj.eClass(), xmlFeatureName);
-		if (! toHandle(rmcObj, feature)) {
-			return;
-		}
-
-		Object rmcValue = rmcObj.eGet(feature);
-		if (rmcValue == null) {
-			return;
-		}
-
-		if (rmcValue instanceof List) {
-			initRmcList(rmcObj, feature);
-			return;
-		}
-
-		boolean oldNotify = rmcObj.eDeliver();
-		rmcObj.eSet(feature, null);
-		rmcObj.eSetDeliver(oldNotify);
-		setDirty(rmcObj);
-	}
-	
-	public void initListValueMerge(IModelObject xmlObj, IModelObject rmcObj, String xmlFeatureName,
-			List xmlList, Set<EStructuralFeature> seenRmcFeatures) throws Exception {
-		if (rmcObj instanceof MethodLibrary) {
-			return;
-		}
-		
-		if (! (xmlList instanceof List)) {
-			return;
-		}
-		
-		EStructuralFeature feature = FeatureManager.INSTANCE.getRmcFeature(
-				rmcObj.eClass(), xmlFeatureName);
-		if (feature == null || seenRmcFeatures.contains(feature)) {	//feature could be mapped from more than
-			return;													//one xml features
-		}
-		seenRmcFeatures.add(feature);
-		
-		if (! toHandle(rmcObj, feature)) {
-			return;
-		}
-
-		initRmcList(rmcObj, feature);
-	}
-
-	private void initRmcList(IModelObject rmcObj, EStructuralFeature feature) {
-		if (!isManyReference(feature)) {
-			return;
-		}
-
-		Object rmcValue = rmcObj.eGet(feature);
-		if (!(rmcValue instanceof List)) {
-			return;
-		}
-		List rmcList = (List) rmcValue;
-
-		if (rmcList.isEmpty()) {
-			return;
-		}
-
-		boolean oldNotify = rmcObj.eDeliver();
-		rmcObj.eSetDeliver(false);
-		rmcList.clear();
-		rmcObj.eSetDeliver(oldNotify);
-		setDirty(rmcObj);
-	}
-	
-	public void handleWorkOrder(org.eclipse.epf.xml.uma.WorkOrder xmlWorkOrder, WorkOrder umaWorkOrder) {	
-		org.eclipse.epf.xml.uma.WorkOrderType xmlLinkType = xmlWorkOrder.getLinkType();
-		if (xmlLinkType != null) {
-			WorkOrderType umaLinkType = org.eclipse.epf.uma.WorkOrderType
-					.get(xmlLinkType.toString());
-			umaWorkOrder.setLinkType(umaLinkType);
-		}
-						
-		boolean isSuccessor = false;
-		String xmlPropertiesValue = xmlWorkOrder.getProperties();
-		String scopeValue = null;
-		if (xmlPropertiesValue != null) {
-			EClass objClass = FeatureManager.INSTANCE.getRmcEClass("MethodElementProperty");	//$NON-NLS-1$
-			List tgtList = umaWorkOrder.getMethodElementProperty();
-			tgtList.removeAll(tgtList);
-			
-			List<String> propList = TngUtil.convertStringsToList(xmlPropertiesValue, XMLLibrary.WorkOrderPropStringSep);
-			for (String prop : propList) {
-				if (! prop.startsWith("name=")) {		//$NON-NLS-1$
-					continue;
-				}
-				int ix = prop.indexOf(XMLLibrary.WorkOrderPropStringFieldSep + "value=");//$NON-NLS-1$
-				if (ix < 6) {
-					continue;
-				}
-				String name = prop.substring(5, ix).trim();
-				if (name.length() == 0) {
-					continue;
-				}
-				int valueStartingIx = ix + 7;
-				if (prop.length() < valueStartingIx) {
-					continue;
-				}
-				String strFromValueStartingIx = prop.substring(valueStartingIx);
-				String value = strFromValueStartingIx;
-				ix = strFromValueStartingIx.indexOf(XMLLibrary.WorkOrderPropStringFieldSep + "scope=");//$NON-NLS-1$
-				if (ix > 0) {
-					value = strFromValueStartingIx.substring(0, ix);
-					int scopeValueStartingIx = ix + 7;
-					scopeValue = strFromValueStartingIx.substring(scopeValueStartingIx);
-				}
-			
-				MethodElementProperty umaMep = (MethodElementProperty) EcoreUtil.create(objClass);
-				umaMep.setName(name);
-				umaMep.setValue(value);
-				tgtList.add(umaMep);
-				if (name.equals(MethodElementPropertyHelper.WORK_ORDER__SUCCESSOR)) {		//$NON-NLS-1$						 
-					isSuccessor = true;
-				}
-			}
-		}
-
-		WorkBreakdownElement e = (WorkBreakdownElement) getElement(xmlWorkOrder.getValue());
-		
-		if (isSuccessor && scopeValue != null) {			
-			EObject cont = e.eContainer();
-			if (cont instanceof ProcessPackage) {
-				ProcessPackage parent = (ProcessPackage) cont;
-				ProcessElement scopeElement = (ProcessElement) getElement(scopeValue);
-				if (scopeElement != null) {
-					ProcessPackage scopePkg = (ProcessPackage) scopeElement.eContainer();
-					parent.getProcessElements().remove(umaWorkOrder);
-					scopePkg.getProcessElements().add(umaWorkOrder);
-				}
-			}
-			e.getLinkToPredecessor().remove(umaWorkOrder);
-		}
-		
-		umaWorkOrder.setPred(e);
-		setDirty(umaWorkOrder);		
-	}
-	
 }

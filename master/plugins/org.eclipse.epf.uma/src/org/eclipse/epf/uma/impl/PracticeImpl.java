@@ -43,6 +43,13 @@ import org.eclipse.epf.uma.UmaPackage;
  */
 public class PracticeImpl extends GuidanceImpl implements Practice {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The cached value of the '{@link #getSubPractices() <em>Sub Practices</em>}' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -50,7 +57,7 @@ public class PracticeImpl extends GuidanceImpl implements Practice {
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Practice> subPractices;
+	protected EList subPractices = null;
 
 	/**
 	 * The cached value of the '{@link #getContentReferences() <em>Content References</em>}' reference list.
@@ -60,7 +67,7 @@ public class PracticeImpl extends GuidanceImpl implements Practice {
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<ContentElement> contentReferences;
+	protected EList contentReferences = null;
 
 	/**
 	 * The cached value of the '{@link #getActivityReferences() <em>Activity References</em>}' reference list.
@@ -70,7 +77,7 @@ public class PracticeImpl extends GuidanceImpl implements Practice {
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Activity> activityReferences;
+	protected EList activityReferences = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -82,7 +89,7 @@ public class PracticeImpl extends GuidanceImpl implements Practice {
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -90,7 +97,6 @@ public class PracticeImpl extends GuidanceImpl implements Practice {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.PRACTICE;
 	}
@@ -100,9 +106,9 @@ public class PracticeImpl extends GuidanceImpl implements Practice {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<Practice> getSubPractices() {
+	public List getSubPractices() {
 		if (subPractices == null) {
-			subPractices = new EObjectContainmentEList.Resolving<Practice>(
+			subPractices = new EObjectContainmentEList.Resolving(
 					Practice.class, this, UmaPackage.PRACTICE__SUB_PRACTICES);
 		}
 		return subPractices;
@@ -113,11 +119,10 @@ public class PracticeImpl extends GuidanceImpl implements Practice {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<ContentElement> getContentReferences() {
+	public List getContentReferences() {
 		if (contentReferences == null) {
-			contentReferences = new EObjectResolvingEList<ContentElement>(
-					ContentElement.class, this,
-					UmaPackage.PRACTICE__CONTENT_REFERENCES);
+			contentReferences = new EObjectResolvingEList(ContentElement.class,
+					this, UmaPackage.PRACTICE__CONTENT_REFERENCES);
 		}
 		return contentReferences;
 	}
@@ -127,11 +132,10 @@ public class PracticeImpl extends GuidanceImpl implements Practice {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<Activity> getActivityReferences() {
+	public List getActivityReferences() {
 		if (activityReferences == null) {
-			activityReferences = new EObjectResolvingEList<Activity>(
-					Activity.class, this,
-					UmaPackage.PRACTICE__ACTIVITY_REFERENCES);
+			activityReferences = new EObjectResolvingEList(Activity.class,
+					this, UmaPackage.PRACTICE__ACTIVITY_REFERENCES);
 		}
 		return activityReferences;
 	}
@@ -141,12 +145,11 @@ public class PracticeImpl extends GuidanceImpl implements Practice {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case UmaPackage.PRACTICE__SUB_PRACTICES:
-			return ((InternalEList<?>) getSubPractices()).basicRemove(otherEnd,
+			return ((InternalEList) getSubPractices()).basicRemove(otherEnd,
 					msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
@@ -157,7 +160,6 @@ public class PracticeImpl extends GuidanceImpl implements Practice {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.PRACTICE__SUB_PRACTICES:
@@ -175,23 +177,19 @@ public class PracticeImpl extends GuidanceImpl implements Practice {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.PRACTICE__SUB_PRACTICES:
 			getSubPractices().clear();
-			getSubPractices().addAll((Collection<? extends Practice>) newValue);
+			getSubPractices().addAll((Collection) newValue);
 			return;
 		case UmaPackage.PRACTICE__CONTENT_REFERENCES:
 			getContentReferences().clear();
-			getContentReferences().addAll(
-					(Collection<? extends ContentElement>) newValue);
+			getContentReferences().addAll((Collection) newValue);
 			return;
 		case UmaPackage.PRACTICE__ACTIVITY_REFERENCES:
 			getActivityReferences().clear();
-			getActivityReferences().addAll(
-					(Collection<? extends Activity>) newValue);
+			getActivityReferences().addAll((Collection) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -202,7 +200,6 @@ public class PracticeImpl extends GuidanceImpl implements Practice {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.PRACTICE__SUB_PRACTICES:
@@ -223,7 +220,6 @@ public class PracticeImpl extends GuidanceImpl implements Practice {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);

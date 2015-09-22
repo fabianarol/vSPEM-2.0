@@ -1,16 +1,10 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: ProcessComponent.java,v 1.2 2006/06/23 00:01:26 jxi Exp $
+ */
 package org.eclipse.epf.xml.uma;
-
-import javax.xml.datatype.XMLGregorianCalendar;
 
 
 /**
@@ -52,7 +46,7 @@ public interface ProcessComponent extends ProcessPackage {
 	 * @return the value of the '<em>Copyright</em>' attribute.
 	 * @see #setCopyright(String)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getProcessComponent_Copyright()
-	 * @model dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="kind='element' name='Copyright'"
 	 * @generated
 	 */
@@ -132,7 +126,7 @@ public interface ProcessComponent extends ProcessPackage {
 	 * @return the value of the '<em>Authors</em>' attribute.
 	 * @see #setAuthors(String)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getProcessComponent_Authors()
-	 * @model dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="kind='attribute' name='authors'"
 	 * @generated
 	 */
@@ -156,13 +150,13 @@ public interface ProcessComponent extends ProcessPackage {
 	 * The date the last change that resulted into this version has been made.
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Change Date</em>' attribute.
-	 * @see #setChangeDate(XMLGregorianCalendar)
+	 * @see #setChangeDate(Object)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getProcessComponent_ChangeDate()
-	 * @model dataType="org.eclipse.emf.ecore.xml.type.DateTime"
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.DateTime"
 	 *        extendedMetaData="kind='attribute' name='changeDate'"
 	 * @generated
 	 */
-	XMLGregorianCalendar getChangeDate();
+	Object getChangeDate();
 
 	/**
 	 * Sets the value of the '{@link org.eclipse.epf.xml.uma.ProcessComponent#getChangeDate <em>Change Date</em>}' attribute.
@@ -172,7 +166,7 @@ public interface ProcessComponent extends ProcessPackage {
 	 * @see #getChangeDate()
 	 * @generated
 	 */
-	void setChangeDate(XMLGregorianCalendar value);
+	void setChangeDate(Object value);
 
 	/**
 	 * Returns the value of the '<em><b>Change Description</b></em>' attribute.
@@ -184,7 +178,7 @@ public interface ProcessComponent extends ProcessPackage {
 	 * @return the value of the '<em>Change Description</em>' attribute.
 	 * @see #setChangeDescription(String)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getProcessComponent_ChangeDescription()
-	 * @model dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="kind='attribute' name='changeDescription'"
 	 * @generated
 	 */
@@ -210,7 +204,7 @@ public interface ProcessComponent extends ProcessPackage {
 	 * @return the value of the '<em>Version</em>' attribute.
 	 * @see #setVersion(String)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getProcessComponent_Version()
-	 * @model dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="kind='attribute' name='version'"
 	 * @generated
 	 */

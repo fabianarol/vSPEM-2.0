@@ -13,10 +13,7 @@ package org.eclipse.epf.importing.services;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.text.Collator;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -35,8 +32,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.epf.authoring.ui.views.LibraryView;
-import org.eclipse.epf.common.ui.util.MsgDialog;
-import org.eclipse.epf.common.utils.ExtensionHelper;
+import org.eclipse.epf.common.serviceability.MsgDialog;
 import org.eclipse.epf.common.utils.FileUtil;
 import org.eclipse.epf.common.utils.XMLUtil;
 import org.eclipse.epf.export.services.ConfigurationExportService;
@@ -48,8 +44,6 @@ import org.eclipse.epf.importing.services.PluginImportData.PluginInfo;
 import org.eclipse.epf.library.LibraryService;
 import org.eclipse.epf.library.LibraryServiceUtil;
 import org.eclipse.epf.library.edit.util.MethodElementUtil;
-import org.eclipse.epf.library.edit.util.MethodPluginPropUtil;
-import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.library.services.SafeUpdateController;
 import org.eclipse.epf.library.util.LibraryUtil;
 import org.eclipse.epf.library.util.ResourceUtil;
@@ -90,11 +84,9 @@ public class PluginImportingService {
 	
 	private static boolean localDebug = false;
 	
-	protected PluginImportData data;
-	
-	private Object validateHookData;
+	private PluginImportData data;
 
-	protected LibraryDocument importingLibDoc;
+	LibraryDocument importingLibDoc;
 	LibraryDocument targetLibDoc;
 
 	// Flag to indicate the file checkout status.
@@ -110,14 +102,6 @@ public class PluginImportingService {
 	 */
 	public PluginImportingService(PluginImportData data) {
 		this.data = data;
-	}
-	
-	public static PluginImportingService newInstance(PluginImportData data) {
-		Object obj = ExtensionHelper.create(PluginImportingService.class, data);
-		if (obj instanceof PluginImportingService) {
-			return (PluginImportingService) obj;
-		}		
-		return new PluginImportingService(data);
 	}
 
 	/**
@@ -169,8 +153,6 @@ public class PluginImportingService {
 					return;
 				}
 			}
-			
-			validateHook(monitor, importingLibPath, validateHookData);
 
 			importingLibDoc = new LibraryDocument(importingLibPath);
 			
@@ -186,9 +168,6 @@ public class PluginImportingService {
 
 	}
 
-	protected void validateHook(IProgressMonitor monitor, File importingLibPath, Object object) {
-	}
-	
 	/**
 	 * Performs import.
 	 */
@@ -257,30 +236,11 @@ public class PluginImportingService {
 					});
 					return;
 				}
-				
-				
-				boolean toSave = false;
-				if (ProcessUtil.isSynFree() && ! isSynFreeLib()) {
-					MethodPluginPropUtil propUtil = MethodPluginPropUtil.getMethodPluginPropUtil();
-					MethodLibrary lib = LibraryService.getInstance().getCurrentMethodLibrary();
-					for (MethodPlugin plugin : lib.getMethodPlugins()) {
-						if (! propUtil.isSynFree(plugin)) {
-							propUtil.setSynFree(plugin, true);
-						}
-					}					
-					toSave = true;
-				}
-								
 				if (unlockedPlugins.size() > 0) {
 					lockUnlockedPlugins(unlockedPlugins);
-					toSave = true;
-				}
-				
-				if (toSave) {
 					LibraryService.getInstance().saveCurrentMethodLibrary();
-//					LibraryService.getInstance().reopenCurrentMethodLibrary();
+					LibraryService.getInstance().reopenCurrentMethodLibrary();
 				}
-				postImportOperation(monitor);
 				MethodLibrary lib = LibraryService.getInstance().getCurrentMethodLibrary();
 				ResourceUtil.refreshResources(lib, monitor);
 				return;
@@ -322,11 +282,6 @@ public class PluginImportingService {
 		}
 	}
 
-	protected void postImportOperation(IProgressMonitor monitor) throws Exception {
-		// Reopen the library.
-		LibraryService.getInstance().reopenCurrentMethodLibrary();	
-	}
-	
 	private List unlockPlugins() {
 
 		List pluginIds = new ArrayList();
@@ -693,7 +648,7 @@ public class PluginImportingService {
 						Map<String, String> guidToPlugNameMap = importingLibDoc.getGuidToPlugNameMap();
 						String pluginName = guidToPlugNameMap == null ? null : guidToPlugNameMap.get(guid);
 						if (pluginName == null || pluginName.length() == 0) {
-							message = NLS.bind(ImportResources.PluginImportingService_MSG5, guid); 		
+							message = ImportResources.PluginImportingService_MSG6; 
 						} else {
 							message = NLS.bind(ImportResources.PluginImportingService_MSG5, 
 									pluginName + ", " + guid); 		//$NON-NLS-1$
@@ -729,26 +684,6 @@ public class PluginImportingService {
 					}
 				}
 			}
-		}
-		
-		if (data.getPlugins().size() > 1) {
-			Comparator comparator = new Comparator<PluginImportData.PluginInfo>() {
-
-				public int compare(PluginImportData.PluginInfo o1,
-						PluginImportData.PluginInfo o2) {
-					if (o1 == o2) {
-						return 0;
-					}
-					Collator collator = Collator.getInstance();
-
-					return collator.compare(o1.name, o2.name);
-
-				}
-
-			};
-
-			Collections.<PluginImportData.PluginInfo> sort(data.getPlugins(),
-					comparator);
 		}
 	}
 
@@ -1342,18 +1277,5 @@ public class PluginImportingService {
 		URI uri = res.getURI();
 		return new File(uri.toFileString());
 	}
-
-	public Object getValidateHookData() {
-		return validateHookData;
-	}
-
-	public void setValidateHookData(Object validateHookData) {
-		this.validateHookData = validateHookData;
-	}
-	
-	public boolean isSynFreeLib() {
-		return importingLibDoc.isSynFreeLib();
-	}
-	
 	
 }

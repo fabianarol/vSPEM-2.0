@@ -65,8 +65,6 @@ public class LibraryUIResources extends NLS {
 
 	public static String guidance_text;
 
-	public static String UDT_text;
-	
 	public static String guideline_text;
 
 	public static String iteration_text;
@@ -260,8 +258,6 @@ public class LibraryUIResources extends NLS {
 	public static String application_title;
 
 	public static String openLibraryWizard_title;
-	
-	public static String convertToSynProcessLib_msg;
 
 	public static String openLibraryMainWizardPage_title;
 
@@ -418,30 +414,6 @@ public class LibraryUIResources extends NLS {
 	public static String copyLibraryTask_name;
 	
 	public static String copyLibraryDialog_copyButton_text;
-
-	public static String elementTCProvider_methodContent;
-
-	public static String elementTCProvider_contentPackages;
-
-	public static String elementTCProvider_standardCategories;
-
-	public static String elementTCProvider_disciplines;
-
-	public static String elementTCProvider_domains;
-
-	public static String elementTCProvider_workProductTypes;
-
-	public static String elementTCProvider_roleSets;
-
-	public static String elementTCProvider_tools;
-
-	public static String elementTCProvider_customCategories;
-
-	public static String elementTCProvider_processes;
-
-	public static String elementTCProvider_capabilityPatterns;
-
-	public static String elementTCProvider_deliveryProcesses;
 
 	static {
 		NLS.initializeMessages(BUNDLE_NAME, LibraryUIResources.class);

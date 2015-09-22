@@ -35,6 +35,13 @@ import org.eclipse.epf.uma.UmaPackage;
 public class RoleDescriptionImpl extends ContentDescriptionImpl implements
 		RoleDescription {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The default value of the '{@link #getSkills() <em>Skills</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -104,7 +111,7 @@ public class RoleDescriptionImpl extends ContentDescriptionImpl implements
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -112,7 +119,6 @@ public class RoleDescriptionImpl extends ContentDescriptionImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.ROLE_DESCRIPTION;
 	}
@@ -190,7 +196,6 @@ public class RoleDescriptionImpl extends ContentDescriptionImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.ROLE_DESCRIPTION__SKILLS:
@@ -208,7 +213,6 @@ public class RoleDescriptionImpl extends ContentDescriptionImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.ROLE_DESCRIPTION__SKILLS:
@@ -229,7 +233,6 @@ public class RoleDescriptionImpl extends ContentDescriptionImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.ROLE_DESCRIPTION__SKILLS:
@@ -250,7 +253,6 @@ public class RoleDescriptionImpl extends ContentDescriptionImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);
@@ -278,7 +280,6 @@ public class RoleDescriptionImpl extends ContentDescriptionImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy())
 			return super.toString();

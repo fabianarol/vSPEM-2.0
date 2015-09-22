@@ -11,8 +11,6 @@
 package org.eclipse.epf.export.wizards;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.epf.authoring.ui.AuthoringUIText;
@@ -20,7 +18,7 @@ import org.eclipse.epf.export.ExportPlugin;
 import org.eclipse.epf.export.ExportResources;
 import org.eclipse.epf.export.services.ConfigurationExportData;
 import org.eclipse.epf.library.LibraryService;
-import org.eclipse.epf.library.edit.PresentationContext;
+import org.eclipse.epf.library.LibraryServiceUtil;
 import org.eclipse.epf.library.ui.LibraryUIImages;
 import org.eclipse.epf.ui.wizards.BaseWizardPage;
 import org.eclipse.epf.uma.MethodConfiguration;
@@ -58,7 +56,7 @@ public class ExportConfigSelectConfigPage extends BaseWizardPage implements
 
 	private Table table;
 
-	protected TableViewer ctrl_tableViewer;
+	private TableViewer ctrl_tableViewer;
 
 	private Text ctrl_briefDesc;
 
@@ -89,25 +87,13 @@ public class ExportConfigSelectConfigPage extends BaseWizardPage implements
 		ctrl_tableViewer = createTableViewer(container, 360, 120, 1);
 		table = ctrl_tableViewer.getTable();
 
-/*		MethodConfiguration[] configs = LibraryServiceUtil
+		MethodConfiguration[] configs = LibraryServiceUtil
 				.getMethodConfigurations(LibraryService.getInstance()
-						.getCurrentMethodLibrary());*/
-		
-		List<MethodConfiguration> configList = new ArrayList<MethodConfiguration>(
-				LibraryService.getInstance().getCurrentMethodLibrary()
-						.getPredefinedConfigurations());
-		if (configList.size() > 1) {
-			Comparator comparator = PresentationContext.INSTANCE
-					.getComparator();
-			Collections.<MethodConfiguration> sort(configList, comparator);
-		}
-		
-		MethodConfiguration[] a = new MethodConfiguration[configList.size()];
-		MethodConfiguration[] configs = configList.toArray(a);
+						.getCurrentMethodLibrary());
 
 		ILabelProvider labelProvider = new LabelProvider() {
 			public Image getImage(Object element) {
-				return LibraryUIImages.IMG_METHOD_CONFIGURATON;
+				return LibraryUIImages.IMG_METHOD_PLUGIN;
 			}
 
 			public String getText(Object element) {

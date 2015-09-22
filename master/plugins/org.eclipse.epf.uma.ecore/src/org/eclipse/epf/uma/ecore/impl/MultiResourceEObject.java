@@ -11,7 +11,6 @@
 package org.eclipse.epf.uma.ecore.impl;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,7 +24,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.emf.common.CommonPlugin;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
@@ -37,18 +35,16 @@ import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.InternalEObject;
-import org.eclipse.emf.ecore.impl.EObjectImpl;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.Resource.Internal;
 import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.Resource.Internal;
+import org.eclipse.emf.ecore.sdo.impl.EDataObjectImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.util.InternalEList;
 import org.eclipse.epf.uma.ecore.IModelObject;
 import org.eclipse.epf.uma.ecore.IProxyResolutionListener;
 import org.eclipse.epf.uma.ecore.IUmaResourceSet;
-import org.eclipse.epf.uma.ecore.Property;
 import org.eclipse.epf.uma.ecore.ResolveException;
-import org.eclipse.epf.uma.ecore.Type;
 import org.eclipse.epf.uma.ecore.util.DefaultValueManager;
 import org.eclipse.epf.uma.ecore.util.OppositeFeature;
 import org.eclipse.epf.uma.ecore.util.OppositeFeatureResolvingEList;
@@ -66,12 +62,10 @@ import org.eclipse.epf.uma.ecore.util.OppositeFeatureResolvingEList;
  * @author Phong Nguyen Le
  * @since 1.0
  */
-public class MultiResourceEObject extends EObjectImpl implements
+public class MultiResourceEObject extends EDataObjectImpl implements
 		IModelObject {
 
 	private static final long serialVersionUID = 3258126947153097273L;
-	
-	private static final boolean DEBUG = false;
 	
 	private static final DefaultValueManager defaultValueManager = DefaultValueManager.INSTANCE;
 	
@@ -124,16 +118,6 @@ public class MultiResourceEObject extends EObjectImpl implements
 	private Boolean notifyOpposite = null;
 
 	private boolean valid = true;
-	
-	private ExtendObject extendObject;
-	
-	public ExtendObject getExtendObject() {
-		return extendObject;
-	}
-
-	public void setExtendObject(ExtendObject extendObject) {
-		this.extendObject = extendObject;
-	}
 
 	/**
 	 * Checks the validity of this object.
@@ -151,13 +135,7 @@ public class MultiResourceEObject extends EObjectImpl implements
 			getOppositeFeatureMap().put(oppositeFeature, list);
 		}
 		if (!list.contains(object)) {
-			boolean oldDeliver = eDeliver();
-			eSetDeliver(false);
-			try {
-				list.add(object);
-			} finally {
-				eSetDeliver(oldDeliver);
-			}
+			list.add(object);
 		}
 	}
 
@@ -167,13 +145,7 @@ public class MultiResourceEObject extends EObjectImpl implements
 			list = new OppositeFeatureResolvingEList(this, oppositeFeature);
 			getOppositeFeatureMap().put(oppositeFeature, list);
 		}
-		boolean oldDeliver = eDeliver();
-		eSetDeliver(false);
-		try {
-			list.remove(object);
-		} finally {
-			eSetDeliver(oldDeliver);
-		}
+		list.remove(object);
 	}
 
 	/**
@@ -199,15 +171,13 @@ public class MultiResourceEObject extends EObjectImpl implements
 				eSetDeliver(false);
 				EcoreUtil.replace(this, feature, oldValue, newValue);
 			} catch (Exception e) {
-				if (DEBUG) {
-					CommonPlugin.INSTANCE.log(e);
-					e.printStackTrace();
-					System.out.println("MultiResourceEObject.replace():"); //$NON-NLS-1$
-					System.out.println("  object: " + this); //$NON-NLS-1$
-					System.out.println("  feature: " + feature); //$NON-NLS-1$
-					System.out.println("  proxy: " + oldValue); //$NON-NLS-1$
-					System.out.println("  resolved: " + newValue); //$NON-NLS-1$
-				}
+				CommonPlugin.INSTANCE.log(e);
+				e.printStackTrace();
+				System.out.println("MultiResourceEObject.replace():");
+				System.out.println("  object: " + this);
+				System.out.println("  feature: " + feature);
+				System.out.println("  proxy: " + oldValue);
+				System.out.println("  resolved: " + newValue);
 			} finally {
 				eSetDeliver(notify);
 			}
@@ -616,34 +586,15 @@ public class MultiResourceEObject extends EObjectImpl implements
 		return proxy;
 	}
 
-	private Map<InternalEObject, EObject> proxyMap = new HashMap<InternalEObject, EObject>();
 	/**
 	 * @see org.eclipse.emf.ecore.InternalEObject#eResolveProxy(org.eclipse.emf.ecore.InternalEObject)
 	 */
 	public EObject eResolveProxy(InternalEObject proxy) {
-		EObject cachedEObejct = proxyMap.get(proxy);
-		if (cachedEObejct != null) {
-			return cachedEObejct;
-		}
-		EObject ret = null;
-		try {		
-			ret = eResolveProxy_(proxy);
-		} finally {
-			proxyMap.remove(proxy);
-		}
-		
-		return ret;
-	}
-	
-	private EObject eResolveProxy_(InternalEObject proxy) {
 		EObject container = proxy.eContainer();
 		int featureID = proxy.eContainerFeatureID();
 		EObject result = null;
 
 		result = resolveProxy(proxy);
-		if (result != null) {
-			proxyMap.put(proxy, result);
-		}
 
 		if (result != null && result instanceof MultiResourceEObject) {
 			if (proxy.eIsProxy() && result == proxy) {
@@ -762,11 +713,6 @@ public class MultiResourceEObject extends EObjectImpl implements
 	 * @return the value for the opposite feature
 	 */
 	public Object getOppositeFeatureValue(OppositeFeature feature) {
-		ExtendObject extendObject = getExtendObject();
-		if (extendObject != null && extendObject.handleOppostie(feature)) {
-			return extendObject.getOppositeFeatureValue(feature);
-		}
-				
 		Object value = getOppositeFeatureMap().get(feature);
 
 		// System.out.println("MultiResourceEObject.getOppositeFeatureValue():");
@@ -961,92 +907,4 @@ public class MultiResourceEObject extends EObjectImpl implements
 //		//
 //		return true;
 	}
-	
-	
-	//=======================================================
-	// EDataObject methods
-	//=======================================================
-	
-	public Type getType() {
-		return Type.getInstance(eClass());
-	}
-	
-	public IModelObject getContainer() {
-		return (IModelObject) eContainer();
-	}
-
-	public List<Property> getInstanceProperties() {
-		List<Property> list = new ArrayList<Property>();
-		for (EStructuralFeature feature : eClass().getEAllStructuralFeatures()) {
-			list.add(new Property(feature));
-		}
-		return list;
-	}
-	
-	public List getList(int propertyIndex) {
-		EStructuralFeature feature = eClass().getEStructuralFeature(propertyIndex);
-		Object obj = eGet(feature);
-		return obj instanceof List ? (List) obj : null;
-	}
-	
-	public void set(int propertyIndex, Object value) {
-		EStructuralFeature feature = eClass().getEStructuralFeature(propertyIndex);
-		eSet(feature, value);
-	}	
-	
-	public static class ExtendObject {
-		
-		public boolean handleOppostie(OppositeFeature oFeature) {
-			return false;
-		}
-		
-		public Object getOppositeFeatureValue(OppositeFeature feature) {
-			return null;
-		}
-		
-	}
-	
-	//-2: unknown
-	//-1: no debug
-	//0: 		all
-	//1: (0000,0000,0000,0001)
-	//2: (0000,0000,0000,0010)
-	private static int epfDebugIx = -2;
-	private static int getEpfDebugIx() {
-		if (epfDebugIx == -2) {
-			epfDebugIx = -1;
-			String[] appArgs = Platform.getApplicationArgs();
-			if (appArgs == null) {
-				return epfDebugIx;
-			}
-			epfDebugIx = 0;
-			try {
-				for (int i = 0; i < appArgs.length; i++) {
-					String str = appArgs[i].toLowerCase();
-					if (str.startsWith("-epfdebug")) {
-						epfDebugIx = Integer.parseInt(str.substring(9));
-						break;
-					}
-				}
-			} catch (Throwable e) {
-			}
-		}
-
-		return epfDebugIx;
-	}
-	
-	public static boolean epfDebug(int debugIndex) {
-		int ix = getEpfDebugIx();
-		if (ix < 0) {
-			return false;
-		}
-		if (ix == 0) {
-			return true;
-		}
-		if ((ix & debugIndex) > 0) {
-			return true;
-		}		
-		return false;
-	}
-	
 }

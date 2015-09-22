@@ -12,10 +12,6 @@
 package org.eclipse.epf.persistence.migration;
 
 import java.io.File;
-import java.util.List;
-
-import org.eclipse.epf.persistence.MultiFileResourceSetImpl;
-import org.eclipse.epf.uma.MethodLibrary;
 
 /**
  * Class representing caller info for calling library upgrade code.
@@ -32,21 +28,12 @@ public class UpgradeCallerInfo {
 	
 	private int callerType = upgradeLibrary;
 	private String errorMsg;
-	private File libFile;
-	private File copiedLibFile;
-	private List<File> upgradableFiles;
-	private MultiFileResourceSetImpl resourceSet;
-	private boolean converToSynFree = false;
-
+	File libFile;
+	File copiedLibFile;
+	
 	public UpgradeCallerInfo(int callerType, File libFile) {
 		this.callerType = callerType;
 		this.libFile = libFile;
-	}
-	
-	public UpgradeCallerInfo(MultiFileResourceSetImpl resourceSet, List<File> upgradableFiles) {
-		this(upgradeLibrary, null);
-		this.upgradableFiles = upgradableFiles;
-		this.resourceSet = resourceSet;
 	}
 	
 	public static boolean isUpgradeLibrary(UpgradeCallerInfo info) {
@@ -85,26 +72,6 @@ public class UpgradeCallerInfo {
 	}
 	
 	public void removeCopiedLibrary() {
-	}
-
-	public List<File> getUpgradableFiles() {
-		return upgradableFiles;
-	}
-
-	public MultiFileResourceSetImpl getResourceSet() {
-		return resourceSet;
-	}
-	
-	public MethodLibrary loadLibrary(File libFile) throws Exception {
-		return null;
-	}
-	
-	public boolean isConverToSynFree() {
-		return converToSynFree;
-	}
-
-	public void setConverToSynFree(boolean converToSynFree) {
-		this.converToSynFree = converToSynFree;
 	}
 	
 }

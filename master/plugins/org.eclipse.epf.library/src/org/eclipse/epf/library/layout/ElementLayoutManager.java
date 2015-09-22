@@ -13,17 +13,14 @@ package org.eclipse.epf.library.layout;
 import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.emf.edit.provider.ComposedAdapterFactory;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
-import org.eclipse.epf.common.utils.FileUtil;
 import org.eclipse.epf.common.utils.StrUtil;
 import org.eclipse.epf.library.ILibraryManager;
 import org.eclipse.epf.library.LibraryPlugin;
@@ -46,12 +43,9 @@ import org.eclipse.epf.uma.Activity;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.MethodElementProperty;
-import org.eclipse.epf.uma.MethodLibrary;
-import org.eclipse.epf.uma.MethodPlugin;
 import org.eclipse.epf.uma.Process;
 import org.eclipse.epf.uma.TaskDescriptor;
 import org.eclipse.epf.uma.WorkBreakdownElement;
-import org.eclipse.epf.uma.util.UmaUtil;
 
 
 /**
@@ -72,7 +66,7 @@ public class ElementLayoutManager {
 	private MethodConfiguration config = null;
 
 	private IActivityDiagramService diagramService = null;
-	
+
 	// need to seperate the adapter factory form content and diagram
 	// diagram adaptor factory should not be rolled up
 	private LayoutAdapterFactory contentLayoutAdapterFactory = null;
@@ -86,8 +80,6 @@ public class ElementLayoutManager {
 	
 	private ElementRealizer realizer = null;
 	
-	private Map<String, String> toRenamePluginFolderMap;
-	
 	// the layout extensions. each extension is identified by the property id of the configuration
 	private Map<String, LayoutExtension> layoutExtensions = new HashMap<String, LayoutExtension>();
 	
@@ -98,7 +90,6 @@ public class ElementLayoutManager {
 	
 	public ElementLayoutManager() {
 		this(null, null, null, false);
-		buildPublishDir(null);
 	}
 
 	public ElementLayoutManager(MethodConfiguration config) {
@@ -113,24 +104,6 @@ public class ElementLayoutManager {
 			this.config = config;
 		}
 
-		if (isPublishingMode) {
-			buildPublishDir(publishdir);
-		}
-
-		contentLayoutAdapterFactory = new LayoutAdapterFactory(this.config);
-		diagramLayoutAdapterFactory = new LayoutAdapterFactory(this.config);
-		
-		//	load the layout extensions for this configuration
-		loadLayoutExtensions();
-	}
-
-	private boolean publishDirBuilt = false;
-	public void buildPublishDir(String publishdir) {
-		if (publishDirBuilt) {
-			return;
-		}
-		publishDirBuilt = true;
-		
 		if (publishdir == null) {
 			publishdir = LayoutResources.getDefaultPublishDir();
 			if (!publishdir.endsWith(File.separator)) {
@@ -150,6 +123,12 @@ public class ElementLayoutManager {
 		}
 
 		setPublishDir(publishdir);
+
+		contentLayoutAdapterFactory = new LayoutAdapterFactory(this.config);
+		diagramLayoutAdapterFactory = new LayoutAdapterFactory(this.config);
+		
+		//	load the layout extensions for this configuration
+		loadLayoutExtensions();
 	}
 
 	private void loadLayoutExtensions() {
@@ -185,7 +164,7 @@ public class ElementLayoutManager {
 	
 	public ElementRealizer getElementRealizer() {
 		if ( realizer == null ) {
-			realizer = DefaultElementRealizer.newElementRealizer(config);
+			realizer = new DefaultElementRealizer(config);
 			realizer.setFilter(contentLayoutAdapterFactory.getFilter());
 		}
 		
@@ -425,10 +404,10 @@ public class ElementLayoutManager {
 
 	private void init_publishingSite() {
 		if ( BrowsingLayoutSettings.INSTANCE.needUpdate(publish_dir) ) {
-//			if ( LibraryPlugin.getDefault().isDebugging() ) {
+			if ( LibraryPlugin.getDefault().isDebugging() ) {
 				System.out
 						.println("Begin initializing publishing site: " + publish_dir); //$NON-NLS-1$
-//			}
+			}
 			
 			// copy the layout files from plugin layout to publishign site
 			LayoutResources.copyLayoutFiles(publish_dir);
@@ -494,7 +473,6 @@ public class ElementLayoutManager {
 			diagramLayoutAdapterFactory = null;			
 		}
 		 
-		toRenamePluginFolderMap = null;
 	}
 
 	public class LayoutAdapterFactory
@@ -532,18 +510,8 @@ public class ElementLayoutManager {
 			}
 
 			// set configuration filter
-			configurator = new ProcessAdapterFactoryFilter(methodConfig, this) {
-				
-				@Override
-				public ElementRealizer getRealizer() {
-					ElementRealizer realizer = ElementLayoutManager.this.getElementRealizer();
-					if (realizer == null) {
-						realizer = super.getRealizer();
-					}
-					return realizer;
-				}
-			};
-			
+			configurator = new ProcessAdapterFactoryFilter(methodConfig, this);
+
 			wbsAdapterFactory.setFilter(configurator);
 			tbsAdapterFactory.setFilter(configurator);
 			wpbsAdapterFactory.setFilter(configurator);
@@ -556,7 +524,7 @@ public class ElementLayoutManager {
 		
 		public void clear()
 		{
-						
+			
 			if (wbsAdapterFactory != null) {
 				wbsAdapterFactory.setFilter(null);
 				wbsAdapterFactory.dispose();
@@ -601,197 +569,6 @@ public class ElementLayoutManager {
 		}
 		
 		return new Suppression(proc);
-	}
-	
-	public void prepareElementPathAdjustment() {
-		String fChars = BrowsingLayoutSettings.INSTANCE.getForbiddenUrlChars();
-		if (fChars == null || fChars.trim().length() == 0) {			//if flag is not set
-			return;
-		}
-		MethodConfiguration c = getConfiguration();
-		if (c == null) {
-			return;
-		}
-		
-		toRenamePluginFolderMap = new HashMap<String, String>();
-		Set<String> usedNameSet = new HashSet<String>();
-		MethodLibrary lib = UmaUtil.getMethodLibrary(c);
-		for (MethodPlugin p : lib.getMethodPlugins()) {
-			usedNameSet.add(p.getName());
-		}
-		
-		List<MethodPlugin> plugins = c.getMethodPluginSelection();
-		Set<String> forbidenChars = new HashSet<String>();
-		for (int i = 0; i < fChars.length(); i++) {			
-			String str = String.valueOf((fChars.charAt(i)));
-			if (str.trim().length() > 0) {
-				forbidenChars.add(str);
-			}
-		}
-		for (MethodPlugin plugin : plugins) {
-			String name = plugin.getName();
-			String replacingName = getReplacingName(name, forbidenChars);
-			if (! name.equals(replacingName)) {
-				replacingName = getUniqueName(replacingName, usedNameSet);
-				usedNameSet.add(replacingName);
-				toRenamePluginFolderMap.put(plugin.getName(), replacingName);
-			}
-					}
-		if (toRenamePluginFolderMap.isEmpty()) {
-			toRenamePluginFolderMap = null;
-		}
-	}
-	
-	private String getReplacingName(String name, Set<String> forbidenChars) {
-		StringBuffer b = new StringBuffer();
-		boolean modified = false;
-		for (int i = 0; i < name.length(); i++) {			
-			String str = String.valueOf((name.charAt(i)));
-			if (forbidenChars.contains(str)) {
-				b.append("_"); //$NON-NLS-1$ 
-				modified = true;
-			} else {
-				b.append(str);
-			}			
-		}
-		return modified ? b.toString() : name;
-	}
-	
-	public String getAdjustedElementPath(String elementPath) {
-		if (toRenamePluginFolderMap == null) {
-			return elementPath;
-		}
-		String pluginName = getPluginName(elementPath);
-		if (pluginName == null) {
-			return elementPath;
-		}
-		String replacingPluginName = toRenamePluginFolderMap.get(pluginName);
-		if (replacingPluginName == null) {
-			return elementPath;
-		}
-					
-		return elementPath.replaceFirst(pluginName, replacingPluginName);
-	}
-
-	private String getUniqueName(String name, Set<String> usedNameSet) {
-		String uniqueName = name;
-		int i = 0;
-		while(usedNameSet.contains(uniqueName)) {
-			i++;
-			uniqueName = name + i;
-		}
-		
-		return uniqueName;
-	}
-	
-	private String getPluginName(String elementPath) {
-		int ix = elementPath.indexOf("/");
-		if (ix > 0) {
-			return elementPath.substring(0, ix);
-		}		
-		return null;
-	}
-	
-	public String getAdjustedElementPathStringValue(String source) {
-		if (toRenamePluginFolderMap == null) {
-			return source;
-		}
-		
-		boolean localDebug = false;
-		String str = getAdjustedElementPathStringValue(source, ResourceHelper.p_link_ref);
-		str = getAdjustedElementPathStringValue(str, ResourceHelper.p_area_ref);
-		if (localDebug) {
-			if (str != source) {
-				System.out.println("LD> original value: " + source);	//$NON-NLS-1$
-				System.out.println("");	//$NON-NLS-1$
-				System.out.println("LD> modified value: " + str);	//$NON-NLS-1$
-			}
-			System.out.println("");	//$NON-NLS-1$
-		}		
-		
-		return str;
-	}
-		
-	private String getAdjustedElementPathStringValue(String source, Pattern pattern) {
-		boolean localDebug = false;
-		
-		boolean modified = false;
-		StringBuffer sb = new StringBuffer();
-		Matcher m = pattern.matcher(source);
-
-		while (m.find()) {
-			String text = m.group();
-			String replacement = text;			
-			
-			Map attributeMap = ResourceHelper.getAttributesFromLink(pattern, text);
-			
-			if (localDebug) {
-				System.out.println("LD> text:      " + text);					//$NON-NLS-1$
-				System.out.println("LD> attributeMap: " + attributeMap);		//$NON-NLS-1$
-			}
-			
-			String href = attributeMap == null ? null : (String) attributeMap.get(ResourceHelper.TAG_ATTR_HREF);
-			
-			int ix0 = -1;
-			int ix1 = -1;
-			if (href != null) {
-				//example: href="./../../a.b.c.d.e/roles/new_role-1_BA944608.html"
-				//						 |        |
-				//						ix0       |
-				//						         ix1
-				ix0 = href.lastIndexOf("../");		//$NON-NLS-1$
-				if (ix0 > 0) {
-					ix0 += 3;			
-					ix1 = href.substring(ix0).indexOf("/");		//$NON-NLS-1$
-					if (ix1 > 0) {
-						ix1 += ix0;
-					}
-				}
-			}
-			
-			if (ix0 >= 0 && ix1 > ix0) {
-				String replaced = href.substring(ix0, ix1);
-				String replacing = toRenamePluginFolderMap.get(replaced);
-				if (replacing != null) {
-					replacement = text.replace(replaced, replacing);
-					if (localDebug) {
-						System.out.println("LD>  replaced: " + replaced);	//$NON-NLS-1$
-						System.out.println("LD> replacing: " + replacing);	//$NON-NLS-1$
-						System.out.println("");								//$NON-NLS-1$
-					}
-					
-					modified = true;
-				}
-			}			
-			m.appendReplacement(sb, Matcher.quoteReplacement(replacement));				
-		}
-		m.appendTail(sb);
-		
-		return modified ? sb.toString() : source;
-	}
-	
-	public void handlePluginFolderRename() {
-		if (toRenamePluginFolderMap == null) {
-			return;
-		}
-		String topDirStr = getPublishDir();
-	    for (Map.Entry<String, String> entry : toRenamePluginFolderMap.entrySet()) {
-	    	File oldPluginFolder = new File(topDirStr, entry.getKey());
-	    	if (oldPluginFolder.isDirectory()) {
-	    		File newPluginFolder = new File(topDirStr, entry.getValue());
-	    		boolean b = oldPluginFolder.renameTo(newPluginFolder);
-	    		if (! b) {
-	    			FileUtil.copyDir(oldPluginFolder, newPluginFolder);
-	    			FileUtil.deleteAllFiles(oldPluginFolder.getAbsolutePath());
-	    			oldPluginFolder.delete();
-	    		}
-	    	}
-	    }
-	}
-	
-	private Map<String, MethodElement> uriElementMap = new HashMap<String, MethodElement>();
-	public Map<String, MethodElement> getUriElementMap() {
-		return uriElementMap;
 	}
 }
 

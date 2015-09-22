@@ -10,8 +10,8 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.library.configuration.closure;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
@@ -33,7 +33,7 @@ public class ElementReference {
 	MethodElement element, refElement;
 	
 	// save the features relating to this reference
-	private Set<EStructuralFeature> features = new HashSet<EStructuralFeature>();
+	List<EStructuralFeature> features = new ArrayList<EStructuralFeature>();
 	
 
 	/**
@@ -124,14 +124,4 @@ public class ElementReference {
 		return false;
 	}
 
-	
-	public EStructuralFeature getSingleFeature() {
-		if (features != null && features.size() == 1) {
-			for (EStructuralFeature f: features) {
-				return f;
-			}
-		}		
-		return null;
-	}
-	
 }

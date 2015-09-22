@@ -18,12 +18,12 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.epf.authoring.ui.AuthoringPerspective;
-import org.eclipse.epf.common.service.utils.CommandLineRunUtil;
 import org.eclipse.epf.common.serviceability.Logger;
-import org.eclipse.epf.persistence.refresh.RefreshJob;
+import org.eclipse.epf.common.utils.CommandLineRunUtil;
+import org.eclipse.epf.library.LibraryService;
+import org.eclipse.epf.library.ui.LibraryUIManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -184,34 +184,20 @@ public class MainWorkbenchAdvisor extends WorkbenchAdvisor {
 	 * @see org.eclipse.ui.application.WorkbenchAdvisor#postStartup()
 	 */
 	public void postStartup() {
-		super.postStartup();
-	}
-	
-	public void eventLoopIdle(Display display) {
 		CommandLineRunUtil runUtil = CommandLineRunUtil.getInstance();
-		if (runUtil.isNeedToRun() && runUtil.isNeverExcuted()) {
+		if (runUtil.isNeedToRun()) {
 			runUtil.execute(Platform.getApplicationArgs());
 
 			final IWorkbench workbench = getWorkbenchConfigurer()
 					.getWorkbench();
 			workbench.getDisplay().asyncExec(new Runnable() {
 				public void run() {
-					if (! RefreshJob.getInstance().cancel()) {
-						try {
-							RefreshJob.getInstance().join();
-						} catch (Exception e) {							
-						}
-					}
-					RefreshJob.getInstance().setEnabled(false);
-					RefreshJob.getInstance().reset();
 					workbench.close();
 				}
 			});
 		}
 
-		super.eventLoopIdle(display);
+		super.postStartup();
 	}
-
-	
 
 }

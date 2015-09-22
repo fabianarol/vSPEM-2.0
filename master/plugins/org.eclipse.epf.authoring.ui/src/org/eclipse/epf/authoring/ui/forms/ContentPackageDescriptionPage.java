@@ -14,47 +14,59 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.emf.ecore.EObject;
+import org.eclipse.epf.authoring.ui.AuthoringUIHelpContexts;
 import org.eclipse.epf.authoring.ui.AuthoringUIPlugin;
 import org.eclipse.epf.authoring.ui.AuthoringUIResources;
 import org.eclipse.epf.authoring.ui.AuthoringUIText;
-import org.eclipse.epf.library.edit.util.MethodElementPropUtil;
+import org.eclipse.epf.authoring.ui.editors.MethodElementEditor;
+import org.eclipse.epf.authoring.ui.editors.MethodElementEditorInput;
+import org.eclipse.epf.authoring.ui.util.UIHelper;
+import org.eclipse.epf.library.edit.LibraryEditResources;
+import org.eclipse.epf.library.edit.command.IActionManager;
 import org.eclipse.epf.library.edit.util.MethodElementUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.ui.LibraryUIText;
 import org.eclipse.epf.uma.ContentElement;
 import org.eclipse.epf.uma.ContentPackage;
-import org.eclipse.epf.uma.MethodPlugin;
 import org.eclipse.epf.uma.Role;
 import org.eclipse.epf.uma.Task;
+import org.eclipse.epf.uma.UmaPackage;
 import org.eclipse.epf.uma.WorkProduct;
+import org.eclipse.epf.uma.util.AssociationHelper;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormEditor;
+import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.ui.forms.widgets.TableWrapData;
+import org.eclipse.ui.forms.widgets.TableWrapLayout;
 
 
 /**
@@ -64,15 +76,23 @@ import org.eclipse.ui.forms.widgets.Section;
  * @author Kelvin Low
  * @since 1.0
  */
-public class ContentPackageDescriptionPage extends DescriptionFormPage implements IRefreshable {
+public class ContentPackageDescriptionPage extends FormPage implements IRefreshable {
 
 	private static final String FORM_PREFIX = LibraryUIText.TEXT_CONTENT_PACKAGE
 			+ ": "; //$NON-NLS-1$
 
+	private Text ctrl_name;
+
+	private Text ctrl_brief_desc;
+
 	private CheckboxTableViewer ctrl_dependency;
 
+	private ScrolledForm form;
+
 	private ContentPackage contentPackage;
-	protected Button supportingCheckbox;
+
+	private Hashtable aPackageMap = new Hashtable();
+	private org.eclipse.epf.authoring.ui.editors.MethodElementEditor.ModifyListener modelModifyListener;
 
 	/**
 	 * Creates a new instance.
@@ -87,47 +107,100 @@ public class ContentPackageDescriptionPage extends DescriptionFormPage implement
 	 */
 	public void init(IEditorSite site, IEditorInput input) {
 		super.init(site, input);
-		contentPackage = (ContentPackage) methodElement;
-		detailSectionOn = false;
-		fullDescOn = false;
-		keyConsiderationOn = false;
-		variabilitySectionOn = false;
-		versionSectionOn = false;
+
+		// Retrieve the ContentPackage object from the Editor input.
+		MethodElementEditorInput methodElementInput = (MethodElementEditorInput) input;
+		Object obj = methodElementInput.getMethodElement();
+		contentPackage = (ContentPackage) obj;
 	}
 
-	@Override
-	protected void createEditorContent(FormToolkit toolkit) {
-		super.createEditorContent(toolkit);
-		createDependencySection(toolkit);
-		// Set focus on the Name text control.
-		Display display = form.getBody().getDisplay();
-		if (!(display == null || display.isDisposed())) {
-			display.asyncExec(new Runnable() {
-				public void run() {
-					if(ctrl_name.isDisposed()) return;
-					if (isAutoGenName()) {
-						ctrl_presentation_name.setFocus();
-						ctrl_presentation_name.setSelection(0, ctrl_presentation_name.getText().length());
-					} else {
-						ctrl_name.setFocus();
-						ctrl_name.setSelection(0, ctrl_name.getText().length());
-					}
-				}
-			});
+	/**
+	 * @see org.eclipse.ui.forms.editor.createFormContent(IManagedForm)
+	 */
+	protected void createFormContent(IManagedForm managedForm) {
+		// Create the form toolkit.
+		form = managedForm.getForm();
+		FormToolkit toolkit = managedForm.getToolkit();
+		form.setText(FORM_PREFIX + contentPackage.getName());
+		TableWrapLayout layout = new TableWrapLayout();
+		form.getBody().setLayout(layout);
+
+		// Create the General Informaiton section.
+		Section generalSection = toolkit.createSection(form.getBody(),
+				Section.DESCRIPTION | Section.TWISTIE | Section.EXPANDED
+						| Section.TITLE_BAR);
+		TableWrapData td = new TableWrapData(TableWrapData.FILL_GRAB);
+		generalSection.setLayoutData(td);
+		generalSection.setText(AuthoringUIText.GENERAL_INFO_SECTION_NAME);
+		generalSection.setDescription(MessageFormat.format(
+				AuthoringUIText.GENERAL_INFO_SECTION_DESC,
+				new String[] { LibraryUIText.getUITextLower(contentPackage) }));
+		generalSection.setLayout(new GridLayout());
+
+		Composite generalComposite = toolkit.createComposite(generalSection);
+		generalComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		generalComposite.setLayout(new GridLayout(2, false));
+		generalSection.setClient(generalComposite);
+
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(
+				generalComposite.getParent().getParent(),
+				AuthoringUIHelpContexts.CONTENT_PACKAGE_EDITOR_ALL_CONTEXT); 
+
+		// name
+		Label l_name = toolkit.createLabel(generalComposite,
+				AuthoringUIText.NAME_TEXT);
+		{
+			GridData gridData = new GridData(GridData.BEGINNING);
+			l_name.setLayoutData(gridData);
 		}
-	}
 
-	private void createDependencySection(FormToolkit toolkit) {
-		Section dependencySection = createSection(toolkit, sectionComposite, 
-				AuthoringUIText.DEPENDENCIES_SECTION_NAME, 
-				AuthoringUIText.DEPENDENCIES_SECTION_DESC);
-		Composite dependencyComposite = createComposite(toolkit, dependencySection);
+		ctrl_name = toolkit.createText(generalComposite, ""); //$NON-NLS-1$
+		{
+			GridData gridData = new GridData(GridData.FILL_HORIZONTAL
+					| GridData.GRAB_HORIZONTAL);
+			ctrl_name.setLayoutData(gridData);
+		}
 
+		// brief desc
+		Label l_brief_desc = toolkit.createLabel(generalComposite,
+				AuthoringUIText.BRIEF_DESCRIPTION_TEXT);
+		{
+			GridData gridData = new GridData(GridData.BEGINNING);
+			l_brief_desc.setLayoutData(gridData);
+		}
+
+		ctrl_brief_desc = toolkit.createText(generalComposite,
+				"", SWT.MULTI | SWT.WRAP | SWT.V_SCROLL); //$NON-NLS-1$
+		{
+			GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
+			gridData.heightHint = 40;
+			gridData.widthHint = 300;
+			ctrl_brief_desc.setLayoutData(gridData);
+		}
+
+		Section dependencySection = toolkit.createSection(form.getBody(),
+				Section.DESCRIPTION | Section.TWISTIE | Section.EXPANDED
+						| Section.TITLE_BAR);
+		TableWrapData td1 = new TableWrapData(TableWrapData.FILL_GRAB);
+		dependencySection.setLayoutData(td1);
+		dependencySection.setText(AuthoringUIText.DEPENDENCIES_SECTION_NAME);
+		dependencySection
+				.setDescription(AuthoringUIText.DEPENDENCIES_SECTION_DESC);
+		dependencySection.setLayout(new GridLayout());
+
+		Composite dependencyComposite = toolkit
+				.createComposite(dependencySection);
+		dependencyComposite
+				.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		dependencyComposite.setLayout(new GridLayout(2, false));
+		dependencySection.setClient(dependencyComposite);
+
+		
 		Table ctrl_table = toolkit.createTable(dependencyComposite, SWT.V_SCROLL
 				| SWT.CHECK | SWT.READ_ONLY | SWT.COLOR_BLUE);
 		{
 			GridData gridData = new GridData(GridData.BEGINNING
-					| GridData.FILL_HORIZONTAL);
+					| GridData.FILL_BOTH);
 			gridData.heightHint = 100;
 			ctrl_table.setLayoutData(gridData);
 		}
@@ -136,52 +209,153 @@ public class ContentPackageDescriptionPage extends DescriptionFormPage implement
 
 		ILabelProvider labelProvider = new LabelProvider() {
 			public String getText(Object element) {
-				if (element instanceof ContentPackage) {
-					return TngUtil.getLabelWithPath((ContentPackage)element);
-				} else {
-					return element.toString();
-				}
+				return element.toString();
 			}
 		};
 		ctrl_dependency.setLabelProvider(labelProvider);
-		ctrl_dependency.setContentProvider(new IStructuredContentProvider() {
-			public void dispose() {
-			}
-			
-			public void inputChanged(Viewer viewer, Object oldInput,
-					Object newInput) {
-			}
-			
-			public Object[] getElements(Object inputElement) {
-				if (inputElement instanceof ContentPackage) {
-					return getDependenciesPackages(contentPackage).toArray();
-				} else {
-					return Collections.EMPTY_LIST.toArray();
-				}
-			}
-		});
-		ctrl_dependency.setSorter(new ViewerSorter());
-		ctrl_dependency.setInput(contentPackage);
 
+		Hashtable aMap = getDependenciesPackages(contentPackage);
+
+		if (aMap != null) {
+			Iterator it = aMap.keySet().iterator();
+			while (it.hasNext()) {
+				String key = (String) it.next();
+				ctrl_dependency.add(key);
+			}
+		}
 		ctrl_dependency.setAllChecked(true);
 		ctrl_dependency.setAllGrayed(true);
 
+		toolkit.paintBordersFor(generalComposite);
 		toolkit.paintBordersFor(dependencyComposite);
+
+		// load data
+		loadData();
+		addListeners();
+
+		// set focus on the name attribute
+		Display display = form.getBody().getDisplay();
+		if (!(display == null || display.isDisposed())) {
+			display.asyncExec(new Runnable() {
+				public void run() {
+					ctrl_name.setFocus();
+					ctrl_name.setSelection(0, ctrl_name.getText().length());
+				}
+			});
+		}
 	}
 
 	/**
 	 * Add listeners
 	 * 
 	 */
-	protected void addListeners() {
-		super.addListeners();
-		
+	private void addListeners() {
+		final MethodElementEditor editor = (MethodElementEditor) getEditor();
+		modelModifyListener = editor.createModifyListener(contentPackage);
+
 		form.addListener(SWT.Activate, new Listener() {
 			public void handleEvent(Event e) {
 				// refreshViewers();
 				ctrl_dependency.refresh();
+				Hashtable aMap = getDependenciesPackages(contentPackage);
+
+				if (aMap != null) {
+					Iterator it = aMap.keySet().iterator();
+					while (it.hasNext()) {
+						String key = (String) it.next();
+						ctrl_dependency.add(key);
+					}
+				}
 				ctrl_dependency.setAllChecked(true);
 				ctrl_dependency.setAllGrayed(true);
+				if (TngUtil.isLocked(contentPackage)) {
+					enableControls(false);
+				} else {
+					enableControls(true);
+				}
+			}
+		});
+
+		ctrl_name.addModifyListener(modelModifyListener);
+		ctrl_name.addFocusListener(new FocusAdapter() {
+			public void focusGained(FocusEvent e) {
+				((MethodElementEditor) getEditor()).setCurrentFeatureEditor(e.widget,
+						UmaPackage.eINSTANCE.getNamedElement_Name());
+			}
+
+			public void focusLost(FocusEvent e) {
+				final Collection eClasses = Collections
+						.singleton(UmaPackage.eINSTANCE.getMethodPackage());
+				String oldContent = contentPackage.getName();
+				if (((MethodElementEditor) getEditor()).mustRestoreValue(
+						e.widget, oldContent)) {
+					return;
+				}
+				String msg = null ;
+				String newName = ctrl_name.getText();
+				if(newName != null) {
+					newName = newName.trim();					
+					// 178462
+					if (oldContent.indexOf("&") < 0 && newName.indexOf("&") > -1) { //$NON-NLS-1$ //$NON-NLS-2$
+						msg = NLS
+								.bind(
+										LibraryEditResources.invalidElementNameError4_msg,
+										newName);
+					} else {
+						msg = TngUtil.checkName(contentPackage, newName,
+								eClasses);
+					}
+				}
+				if (msg == null) {
+					if (!newName.equals(contentPackage.getName())) {
+						ctrl_name.setText(newName);
+						editor.getActionManager().doAction(IActionManager.SET,
+								contentPackage,
+								UmaPackage.eINSTANCE.getNamedElement_Name(),
+								newName, -1);
+					}
+				} else {
+					AuthoringUIPlugin
+							.getDefault()
+							.getMsgDialog()
+							.displayError(
+									AuthoringUIResources.renameDialog_title, msg); 
+					ctrl_name.setText(contentPackage.getName());
+					ctrl_name.getDisplay().asyncExec(new Runnable() {
+						public void run() {
+							ctrl_name.setFocus();
+							ctrl_name.selectAll();
+						}
+					});
+				}
+			}
+		});
+
+		ctrl_brief_desc.addModifyListener(modelModifyListener);
+		ctrl_brief_desc.addFocusListener(new FocusAdapter() {
+			public void focusGained(FocusEvent e) {
+				((MethodElementEditor) getEditor()).setCurrentFeatureEditor(e.widget,
+						UmaPackage.eINSTANCE.getMethodElement_BriefDescription());
+			}
+
+			public void focusLost(FocusEvent e) {
+				String oldContent = contentPackage.getBriefDescription();
+				if (((MethodElementEditor) getEditor()).mustRestoreValue(
+						e.widget, oldContent)) {
+					return;
+				}
+				String newName = ctrl_brief_desc.getText();
+				if (!newName.equals(contentPackage.getBriefDescription())) {
+					boolean success = editor.getActionManager().doAction(
+							IActionManager.SET,
+							contentPackage,
+							UmaPackage.eINSTANCE
+									.getMethodElement_BriefDescription(),
+							newName, -1);
+					if (success) {
+						ctrl_brief_desc.setText(newName);
+					}
+				}
 			}
 		});
 
@@ -194,12 +368,41 @@ public class ContentPackageDescriptionPage extends DescriptionFormPage implement
 
 	}
 
+	protected void enableControls(boolean editable) {
+		ctrl_name.setEditable(editable);
+		ctrl_brief_desc.setEditable(editable);
+	}
+
+	/**
+	 * Loads initial data from model
+	 */
+	private void loadData() {
+		String name = contentPackage.getName();
+		String desc = contentPackage.getBriefDescription();
+
+		List dependencies = contentPackage.getReusedPackages();
+
+		ctrl_name.setText(name == null ? "" : name); //$NON-NLS-1$
+		ctrl_name.selectAll();
+		ctrl_brief_desc.setText(desc == null ? "" : desc); //$NON-NLS-1$
+
+		for (int i = 0; i < dependencies.size(); i++) {
+			Iterator it = aPackageMap.entrySet().iterator();
+			while (it.hasNext()) {
+				Map.Entry entry = (Map.Entry) it.next();
+				if (dependencies.get(i) == entry.getValue()) {
+					ctrl_dependency.setChecked(entry.getKey(), true);
+				}
+			}
+		}
+	}
+
 	/**
 	 * Get dependency packages for the given content package
 	 * @return
 	 * 		List of dependency packages
 	 */
-	public Collection<ContentPackage> getDependenciesPackages(ContentPackage contentPackage) {
+	public Hashtable getDependenciesPackages(ContentPackage contentPackage) {
 
 		List elements = new ArrayList();
 		for (Iterator iter = contentPackage.getContentElements().iterator(); iter
@@ -229,7 +432,7 @@ public class ContentPackageDescriptionPage extends DescriptionFormPage implement
 			}
 			if (contentElement instanceof Task) {
 				if (((Task) contentElement).getPerformedBy() != null) {
-					elements.addAll(((Task) contentElement).getPerformedBy());
+					elements.add(((Task) contentElement).getPerformedBy());
 				}
 				if (((Task) contentElement).getAdditionallyPerformedBy() != null) {
 					elements.addAll(((Task) contentElement)
@@ -271,112 +474,34 @@ public class ContentPackageDescriptionPage extends DescriptionFormPage implement
 
 		}
 
-		List<ContentPackage> cpList = new ArrayList<ContentPackage>();
 		for (int i = 0; i < elements.size(); i++) {
 			Object object = ((ContentElement) elements.get(i)).eContainer();
+			// Object object = elements.get(i);
+			// System.out.println("Type
+			// "+((ContentPackage)object).getType().getName());
 			if (object instanceof ContentPackage) {
 				if (!contentPackage.equals(object)) {
-					if (!cpList.contains((ContentPackage)object)) {
-						cpList.add((ContentPackage)object);
-					}
+					aPackageMap.put(TngUtil.getLabelWithPath((ContentPackage) object),
+							(ContentPackage) object);
 				}
 			}
-		}
-		return cpList;
-	}
 
-	@Override
-	protected Object getContentElement() {
-		return contentPackage;
-	}
-
-	@Override
-	public void loadSectionDescription() {
-		this.generalSectionDescription = MessageFormat.format(
-				AuthoringUIText.GENERAL_INFO_SECTION_DESC,
-				new String[] { LibraryUIText.getUITextLower(contentPackage) });
-	}
-	
-	@Override
-	protected void refresh(boolean editable) {
-		super.refresh(editable);
-		if(supportingCheckbox != null) {
-			supportingCheckbox.setEnabled(editable);
-			EObject parent = contentPackage.eContainer();
-			if (parent instanceof MethodPlugin
-					&& ((MethodPlugin) parent).isSupporting()) {
-				supportingCheckbox.setEnabled(false);
-			} else if (parent instanceof ContentPackage
-					&& MethodElementPropUtil.getMethodElementPropUtil()
-							.isSupporting((ContentPackage) parent)) {
-				supportingCheckbox.setEnabled(false);
-			}
 		}
-	}
-	
-	public void updateSupportingCheckbox() {
-		if (supportingCheckbox == null) {
-			return;
-		}
-		MethodElementPropUtil propUtil = MethodElementPropUtil.getMethodElementPropUtil();
-		boolean isSupporitng0 = propUtil.ancestorIsSupporting(contentPackage);
-		boolean isSuporting = isSupporitng0 || propUtil.isSupporting(contentPackage);
-		if (supportingCheckbox.getSelection() != isSuporting) {
-			supportingCheckbox.setSelection(isSuporting);
-		}
-		if (isSupporitng0) {
-			supportingCheckbox.setEnabled(false);
-		}
+		return aPackageMap;
 	}	
-	
-	@Override
-	protected void createGeneralSectionContent() {
-		super.createGeneralSectionContent();
-		
-		supportingCheckbox = toolkit
-			.createButton(
-				generalComposite,
-				AuthoringUIResources.contentPackageDescriptionPage_supportingPackageLabel, SWT.CHECK);
-	}
-	
-	@Override
-	protected void addGeneralSectionListeners() {
-		super.addGeneralSectionListeners();
-		
-		supportingCheckbox.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				IStatus status = TngUtil.checkEdit(contentPackage, getSite().getShell());
-				if (status.isOK()) {
-					MethodElementPropUtil propUtil = MethodElementPropUtil
-							.getMethodElementPropUtil(actionMgr);
-					propUtil.setSupporting(contentPackage, supportingCheckbox
-							.getSelection());
-					propUtil.updatePackageSupportingBits(contentPackage
-							.getChildPackages(), supportingCheckbox
-							.getSelection());
-				} else {
-					AuthoringUIPlugin.getDefault().getMsgDialog().displayError(
-							AuthoringUIResources.editDialog_title,
-							AuthoringUIResources.editDialog_msgCannotEdit,
-							status);
-					// restore old value
-					//
-					supportingCheckbox.setSelection(!supportingCheckbox.getSelection());
-					return;
-				}
-			}
 
-			
-		});
+	/**
+	 * @see org.eclipse.epf.authoring.ui.forms.IRefreshable#refreshName(java.lang.String)
+	 */
+	public void refreshName(String newName) {
+		if (newName != null) {
+			if ((ctrl_name != null) && !(ctrl_name.isDisposed())) {
+				ctrl_name.removeModifyListener(modelModifyListener);
+				ctrl_name.setText(newName);
+				ctrl_name.addModifyListener(modelModifyListener);
+				UIHelper.setFormText(form, contentPackage);
+			}
+		}
 	}
-	
-	@Override
-	protected void loadGeneralSectionData() {
-		super.loadGeneralSectionData();
-		boolean isSuporting = MethodElementPropUtil.getMethodElementPropUtil().isSupporting(contentPackage);
-		supportingCheckbox
-			.setSelection(isSuporting);
-	}
-	
 
 }

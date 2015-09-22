@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: CompositeRole.java,v 1.4 2007/05/04 22:46:43 klow Exp $
+ */
 package org.eclipse.epf.xml.uma;
 
 import org.eclipse.emf.common.util.EList;
@@ -26,7 +22,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link org.eclipse.epf.xml.uma.CompositeRole#getGroup2 <em>Group2</em>}</li>
+ *   <li>{@link org.eclipse.epf.xml.uma.CompositeRole#getGroup1 <em>Group1</em>}</li>
  *   <li>{@link org.eclipse.epf.xml.uma.CompositeRole#getAggregatedRole <em>Aggregated Role</em>}</li>
  * </ul>
  * </p>
@@ -37,21 +33,21 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  */
 public interface CompositeRole extends RoleDescriptor {
 	/**
-	 * Returns the value of the '<em><b>Group2</b></em>' attribute list.
+	 * Returns the value of the '<em><b>Group1</b></em>' attribute list.
 	 * The list contents are of type {@link org.eclipse.emf.ecore.util.FeatureMap.Entry}.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Group2</em>' attribute list isn't clear,
+	 * If the meaning of the '<em>Group1</em>' attribute list isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Group2</em>' attribute list.
-	 * @see org.eclipse.epf.xml.uma.UmaPackage#getCompositeRole_Group2()
+	 * @return the value of the '<em>Group1</em>' attribute list.
+	 * @see org.eclipse.epf.xml.uma.UmaPackage#getCompositeRole_Group1()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
-	 *        extendedMetaData="kind='group' name='group:33'"
+	 *        extendedMetaData="kind='group' name='group:23'"
 	 * @generated
 	 */
-	FeatureMap getGroup2();
+	FeatureMap getGroup1();
 
 	/**
 	 * Returns the value of the '<em><b>Aggregated Role</b></em>' containment reference list.
@@ -64,10 +60,10 @@ public interface CompositeRole extends RoleDescriptor {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Aggregated Role</em>' containment reference list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getCompositeRole_AggregatedRole()
-	 * @model containment="true" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='AggregatedRole' group='#group:33'"
+	 * @model type="org.eclipse.epf.xml.uma.Role" containment="true" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='AggregatedRole' group='#group:23'"
 	 * @generated
 	 */
-	EList<Role> getAggregatedRole();
+	EList getAggregatedRole();
 
 } // CompositeRole

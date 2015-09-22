@@ -1,13 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
- *******************************************************************************/
 //------------------------------------------------------------------------------
 // Copyright (c) 2005, 2006 IBM Corporation and others.
 // All rights reserved. This program and the accompanying materials
@@ -22,9 +12,7 @@ package org.eclipse.epf.richtext.actions;
 
 import java.io.UnsupportedEncodingException;
 
-import org.eclipse.epf.common.CommonPlugin;
-import org.eclipse.epf.common.IHTMLFormatter;
-import org.eclipse.epf.common.utils.ExtensionHelper;
+import org.eclipse.epf.common.html.HTMLFormatter;
 import org.eclipse.epf.richtext.IRichText;
 import org.eclipse.epf.richtext.RichTextEditor;
 import org.eclipse.epf.richtext.RichTextImages;
@@ -44,7 +32,7 @@ public class TidyAction extends RichTextAction {
 	boolean word2000 = false;
 	
 	// The HTML source formatter.
-	protected IHTMLFormatter htmlFormatter;
+	protected HTMLFormatter htmlFormatter;
 
 	
 
@@ -58,9 +46,7 @@ public class TidyAction extends RichTextAction {
 		this.word2000 = word2000;
 		setImageDescriptor(RichTextImages.IMG_DESC_TIDY);
 		setDisabledImageDescriptor(RichTextImages.DISABLED_IMG_DESC_TIDY);
-//		htmlFormatter = new HTMLFormatter();
-		htmlFormatter = (IHTMLFormatter) ExtensionHelper.createExtensionForJTidy(
-				CommonPlugin.getDefault().getId(), "htmlFormatter");  //$NON-NLS-1$
+		htmlFormatter = new HTMLFormatter();
 	}
 	
 	@Override

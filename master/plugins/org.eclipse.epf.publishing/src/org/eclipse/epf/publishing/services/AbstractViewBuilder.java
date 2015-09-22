@@ -20,30 +20,24 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.edit.provider.ItemProviderAdapter;
-import org.eclipse.epf.common.serviceability.Logger;
 import org.eclipse.epf.common.utils.FileUtil;
-import org.eclipse.epf.common.utils.NetUtil;
+import org.eclipse.epf.common.utils.Timer;
 import org.eclipse.epf.library.configuration.ConfigurationHelper;
-import org.eclipse.epf.library.edit.configuration.PracticeSubgroupItemProvider;
-import org.eclipse.epf.library.edit.util.MethodElementPropUtil;
-import org.eclipse.epf.library.edit.util.PracticePropUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.layout.Bookmark;
 import org.eclipse.epf.library.layout.ElementLayoutManager;
 import org.eclipse.epf.library.layout.HtmlBuilder;
 import org.eclipse.epf.library.layout.IElementLayout;
 import org.eclipse.epf.library.util.IconUtil;
+import org.eclipse.epf.library.util.LibraryUtil;
 import org.eclipse.epf.publishing.PublishingPlugin;
 import org.eclipse.epf.publishing.PublishingResources;
+import org.eclipse.epf.uma.Activity;
 import org.eclipse.epf.uma.ContentCategory;
-import org.eclipse.epf.uma.CustomCategory;
 import org.eclipse.epf.uma.DescribableElement;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodElement;
-import org.eclipse.epf.uma.Practice;
-import org.eclipse.epf.uma.VariabilityElement;
 import org.eclipse.epf.uma.ecore.util.OppositeFeature;
-import org.eclipse.epf.uma.util.UserDefinedTypeMeta;
 import org.eclipse.osgi.util.NLS;
 
 /**
@@ -51,7 +45,6 @@ import org.eclipse.osgi.util.NLS;
  * 
  * @author Jinhua Xi
  * @author Kelvin Low
- * @author Weiping Lu
  * @since 1.0
  */
 public abstract class AbstractViewBuilder {
@@ -70,19 +63,6 @@ public abstract class AbstractViewBuilder {
 	protected Bookmark defaultView;
 
 	PublishingRunnable runnable = null;
-	
-	/**
-	 * user cancel publishing will be record here
-	 */
-	private boolean isCanceled = false;
-	
-	public boolean isCanceled() {
-		return isCanceled;
-	}
-
-	public void setCanceled(boolean isCanceled) {
-		this.isCanceled = isCanceled;
-	}
 
 	/**
 	 * Creates a new instance.
@@ -308,46 +288,29 @@ public abstract class AbstractViewBuilder {
 	protected void elementPublished(IElementLayout layout, String htmlfile) {
 	}
 
-	private String copyNodeIcon(File source,boolean isCustomized) {
+	private void copyNodeIcon(File source) {
 		String name = source.getName();
 
-		File dest = null;
-		if(isCustomized){
-			dest = new File(siteGenerator.getCustomizedNodeIconPath(), name);
-		}else{
-			dest = new File(siteGenerator.getNodeIconPath(), name);
-		}
+		File dest = new File(siteGenerator.getNodeIconPath(), name);
 		if (FileUtil.copyFile(source, dest) == false) {
 			getHtmlBuilder().getValidator().logWarning(
 					NLS.bind(PublishingResources.copyFileWarning_msg, source
 							.getAbsolutePath(), dest.getAbsolutePath()));
 		}
 
-		if(isCustomized){
-			name = AbstractSiteGenerator.customizedName + "/" + name; 
-		}
-		return name;
 	}
 
-	protected String getNodeIconName(Object obj) {
+	private String getNodeIconName(Object obj) {
 		File iconFile = null;
 		String iconName = null;
-		boolean isCustomized = true;
 
 		if (obj instanceof DescribableElement) {
 			URI uri = ((DescribableElement) obj).getNodeicon();
-			
-			VariabilityElement uriInheritingBase = null;
-			if (uri == null && config != null && obj instanceof VariabilityElement) {
-				VariabilityElement[] uriInheritingBases = new VariabilityElement[1];
-				uri = ConfigurationHelper.getInheritingUri((DescribableElement) obj, uri, uriInheritingBases, config, 0);
-				uriInheritingBase = uriInheritingBases[0];
-			}
 
 			String elementName = ((DescribableElement) obj).getType().getName()
 					.toLowerCase();
-/*			if (DefaultElementTypeResources.useDefaultIcon(elementName))
-				uri = null;*/
+			if (DefaultElementTypeResources.useDefaultIcon(elementName))
+				uri = null;
 
 			if (uri != null) {
 				// try if this is a valid URL or not
@@ -371,7 +334,7 @@ public abstract class AbstractViewBuilder {
 					// is relative to plugin path.
 					iconFile = new File(
 							TngUtil.getFullPathofNodeorShapeIconURI(
-									uriInheritingBase == null ? (EObject) obj : uriInheritingBase, uri));
+									(EObject) obj, uri));
 				}
 			}
 		}
@@ -381,59 +344,11 @@ public abstract class AbstractViewBuilder {
 		}
 
 		if (iconFile == null) {
-			isCustomized = false;
 			// get the default icon name
 			if (obj instanceof MethodElement) {
 				String type = ((MethodElement) obj).getType().getName()
 						.toLowerCase();
-				if (obj instanceof CustomCategory) {
-					CustomCategory cc = (CustomCategory) obj;
-					MethodElementPropUtil propUtil = MethodElementPropUtil
-							.getMethodElementPropUtil();
-					if (propUtil.isTransientElement(cc)) {
-						if (cc.getName().equals("Roles")) {//$NON-NLS-1$
-							type = "roleset";//$NON-NLS-1$
-						} else if (cc.getName().equals("Tasks")) {//$NON-NLS-1$
-							type = "discipline";//$NON-NLS-1$
-						} else if (cc.getName().equals("Work Products")) {//$NON-NLS-1$
-							type = "domain";//$NON-NLS-1$
-						} else if (cc.getName().equals("Guidance")) {//$NON-NLS-1$
-							type = "guidances";//$NON-NLS-1$
-						} else if (cc.getName().equals("Processes")) {//$NON-NLS-1$
-							type = "processes";//$NON-NLS-1$
-						}
-					}
-				}
-				
-				if ((obj instanceof Practice) && (PracticePropUtil.getPracticePropUtil().isUdtType((Practice)obj))) {
-					type = "UDT"; //$NON-NLS-1$
-					//for user defined type
-					try {
-						boolean debug = PublishingPlugin.getDefault().isDebugging();
-						Logger logger = PublishingPlugin.getDefault().getLogger();
-						
-						UserDefinedTypeMeta udtMeta = PracticePropUtil.getPracticePropUtil().getUtdData((Practice)obj);
-						String icon = udtMeta.getRteNameMap().get(UserDefinedTypeMeta._icon);
-						if (debug) {
-							logger.logInfo("The udt node icon get from meta: " + icon); //$NON-NLS-1$
-						}
-						if (icon != null) {
-							iconFile = new File(NetUtil.decodedFileUrl(new URL(icon).getFile()));
-							if (debug) {
-								logger.logInfo("The udt node icon file: " + iconFile); //$NON-NLS-1$
-							}
-						}
-					} catch (Exception e) {
-						getHtmlBuilder().getValidator().logError("", e); //$NON-NLS-1$
-						iconFile = null;
-					}			
-				}
-				
-				if (iconFile == null) {				
-					iconFile = IconUtil.getNodeIconFile(type);
-				}
-			} else if (obj instanceof PracticeSubgroupItemProvider) {
-				iconFile = IconUtil.getNodeIconFile((PracticeSubgroupItemProvider) obj);
+				iconFile = IconUtil.getNodeIconFile(type);
 			}
 		}
 
@@ -460,7 +375,8 @@ public abstract class AbstractViewBuilder {
 				}
 			}
 
-			iconName = copyNodeIcon(iconFile,isCustomized);
+			copyNodeIcon(iconFile);
+			iconName = iconFile.getName();
 		}
 
 		if (iconName == null || iconName.length() == 0) {

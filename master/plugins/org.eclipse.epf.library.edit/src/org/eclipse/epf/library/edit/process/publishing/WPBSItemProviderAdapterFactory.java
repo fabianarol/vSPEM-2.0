@@ -33,6 +33,14 @@ public class WPBSItemProviderAdapterFactory extends
 		return new WPBSActivityItemProvider(this);
 	}
 	
+	public Adapter createvpActivityAdapter() {
+		return new WPBSActivityItemProvider(this);
+	}
+	
+	public Adapter createVarActivityAdapter() {
+		return new WPBSActivityItemProvider(this);
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.epf.library.edit.process.ItemProviderAdapterFactory#createWorkProductDescriptorAdapter()
 	 */
@@ -40,6 +48,22 @@ public class WPBSItemProviderAdapterFactory extends
 		return new WPBSWorkProductDescriptorItemProvider(this,
 				(ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
 						.createWorkProductDescriptorAdapter());
+	}
+	
+	public Adapter createVarWorkProductDescriptorAdapter() {
+		return new WPBSWorkProductDescriptorItemProvider(this,
+				(ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
+						.createVarWorkProductDescriptorAdapter());
+		
+//		return createWorkProductDescriptorAdapter();
+	}
+	
+	public Adapter createvpWorkProductDescriptorAdapter() {
+		return new WPBSWorkProductDescriptorItemProvider(this,
+				(ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
+						.createvpWorkProductDescriptorAdapter());
+		
+//		return createWorkProductDescriptorAdapter();
 	}
 	
 	public Adapter createCapabilityPatternAdapter() {

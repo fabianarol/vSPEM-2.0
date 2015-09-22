@@ -38,7 +38,7 @@ public interface DescriptorDescription extends BreakdownElementDescription {
 	 * @return the value of the '<em>Refined Description</em>' attribute.
 	 * @see #setRefinedDescription(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getDescriptorDescription_RefinedDescription()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getRefinedDescription();

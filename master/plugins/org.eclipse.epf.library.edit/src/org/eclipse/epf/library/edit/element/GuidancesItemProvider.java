@@ -22,8 +22,6 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.epf.library.edit.LibraryEditPlugin;
 import org.eclipse.epf.library.edit.PresentationContext;
 import org.eclipse.epf.library.edit.util.LibraryEditConstants;
-import org.eclipse.epf.library.edit.util.LibraryEditUtil;
-import org.eclipse.epf.library.edit.util.PracticePropUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.uma.Checklist;
 import org.eclipse.epf.uma.Concept;
@@ -45,7 +43,6 @@ import org.eclipse.epf.uma.UmaFactory;
 import org.eclipse.epf.uma.UmaPackage;
 import org.eclipse.epf.uma.Whitepaper;
 import org.eclipse.epf.uma.util.UmaUtil;
-import org.eclipse.epf.uma.util.UserDefinedTypeMeta;
 
 /**
  * The item provider adapter for the "Guidance" folder in the Library view.
@@ -58,8 +55,6 @@ import org.eclipse.epf.uma.util.UserDefinedTypeMeta;
  */
 public class GuidancesItemProvider extends TransientContentPackageItemProvider {
 
-	public static boolean showUDTElements = false;
-	
 	/**
 	 * Creates a new instance.
 	 */
@@ -76,11 +71,6 @@ public class GuidancesItemProvider extends TransientContentPackageItemProvider {
 	protected boolean acceptAsChild(Object obj) {
 		if (!super.acceptAsChild(obj))
 			return false;
-		if (! showUDTElements) {
-			if (obj instanceof Practice) {
-				return ! PracticePropUtil.getPracticePropUtil().isUdtType((Practice) obj);
-			}
-		}
 		return obj instanceof Guidance;
 	}
 
@@ -210,9 +200,7 @@ public class GuidancesItemProvider extends TransientContentPackageItemProvider {
 		// newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
 		// .getContentPackage_ContentElements(), UmaFactory.eINSTANCE
 		// .createWorkProductGuideline()));
-		if (showUDTElements) {
-			LibraryEditUtil.getInstance().createUserDefinedTypeContextMenuOnGuidanceNode(newChildDescriptors);
-		}
+
 	}
 
 	/*
@@ -248,7 +236,7 @@ public class GuidancesItemProvider extends TransientContentPackageItemProvider {
 		} else if (obj instanceof Example) {
 			baseName = LibraryEditConstants.NEW_EXAMPLE;
 		} else if (obj instanceof Practice) {
-			baseName = getDefaultNameForPractice((Practice)obj);
+			baseName = LibraryEditConstants.NEW_PRACTICE;
 		} else if (obj instanceof Report) {
 			baseName = LibraryEditConstants.NEW_REPORT;
 		} else if (obj instanceof Roadmap) {
@@ -275,34 +263,7 @@ public class GuidancesItemProvider extends TransientContentPackageItemProvider {
 					.getContentElements(), (MethodElement) obj, baseName);
 		}
 	}
-	
-	public static String getDefaultNameForPractice(Practice prac) {
-		try {
-			UserDefinedTypeMeta udtMeta = PracticePropUtil.getPracticePropUtil().getUtdData(prac);
-			if (udtMeta != null) {
-				String rawName = udtMeta.getRteNameMap().get(UserDefinedTypeMeta._typeName);
-				return buildDefaultNameForUdt(rawName);
-			}	
-		} catch (Exception e) {
-			LibraryEditPlugin.getDefault().getLogger().logError(e);
-		}	
-		
-		return LibraryEditConstants.NEW_PRACTICE;
-	}
-	
-	public static String buildDefaultNameForUdt(String rawName) {
-		StringBuffer buf = new StringBuffer();
-		buf.append("new_"); //$NON-NLS-1$
-		
-		String[] nameParts = rawName.split(" "); //$NON-NLS-1$		
-		for (String namePart : nameParts) {
-			buf.append(namePart).append("_"); //$NON-NLS-1$
-		}		
-		buf.deleteCharAt(buf.length() -1);
-		
-		return buf.toString().toLowerCase();
-	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 

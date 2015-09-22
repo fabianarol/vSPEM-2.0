@@ -186,8 +186,4 @@ public class GuidanceItemProvider extends ItemProviderAdapter implements
 	public Collection getChildrenFeatures(Object object) {
 		return super.getChildrenFeatures(object);
 	}
-	
-	public IFilter getGuidanceFilter() {
-		return guidanceFilter;
-	}
 }

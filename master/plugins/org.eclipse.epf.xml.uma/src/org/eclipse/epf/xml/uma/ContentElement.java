@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: ContentElement.java,v 1.4 2007/05/04 22:46:43 klow Exp $
+ */
 package org.eclipse.epf.xml.uma;
 
 import org.eclipse.emf.common.util.EList;
@@ -56,7 +52,7 @@ public interface ContentElement extends DescribableElement {
 	 * @return the value of the '<em>Group1</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getContentElement_Group1()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
-	 *        extendedMetaData="kind='group' name='group:14'"
+	 *        extendedMetaData="kind='group' name='group:12'"
 	 * @generated
 	 */
 	FeatureMap getGroup1();
@@ -72,11 +68,11 @@ public interface ContentElement extends DescribableElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Checklist</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getContentElement_Checklist()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='Checklist' group='#group:14'"
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='Checklist' group='#group:12'"
 	 * @generated
 	 */
-	EList<String> getChecklist();
+	EList getChecklist();
 
 	/**
 	 * Returns the value of the '<em><b>Concept</b></em>' attribute list.
@@ -89,11 +85,11 @@ public interface ContentElement extends DescribableElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Concept</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getContentElement_Concept()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='Concept' group='#group:14'"
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='Concept' group='#group:12'"
 	 * @generated
 	 */
-	EList<String> getConcept();
+	EList getConcept();
 
 	/**
 	 * Returns the value of the '<em><b>Example</b></em>' attribute list.
@@ -106,11 +102,11 @@ public interface ContentElement extends DescribableElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Example</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getContentElement_Example()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='Example' group='#group:14'"
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='Example' group='#group:12'"
 	 * @generated
 	 */
-	EList<String> getExample();
+	EList getExample();
 
 	/**
 	 * Returns the value of the '<em><b>Guideline</b></em>' attribute list.
@@ -123,11 +119,11 @@ public interface ContentElement extends DescribableElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Guideline</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getContentElement_Guideline()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='Guideline' group='#group:14'"
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='Guideline' group='#group:12'"
 	 * @generated
 	 */
-	EList<String> getGuideline();
+	EList getGuideline();
 
 	/**
 	 * Returns the value of the '<em><b>Reusable Asset</b></em>' attribute list.
@@ -140,11 +136,11 @@ public interface ContentElement extends DescribableElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Reusable Asset</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getContentElement_ReusableAsset()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='ReusableAsset' group='#group:14'"
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='ReusableAsset' group='#group:12'"
 	 * @generated
 	 */
-	EList<String> getReusableAsset();
+	EList getReusableAsset();
 
 	/**
 	 * Returns the value of the '<em><b>Supporting Material</b></em>' attribute list.
@@ -157,11 +153,11 @@ public interface ContentElement extends DescribableElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Supporting Material</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getContentElement_SupportingMaterial()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='SupportingMaterial' group='#group:14'"
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='SupportingMaterial' group='#group:12'"
 	 * @generated
 	 */
-	EList<String> getSupportingMaterial();
+	EList getSupportingMaterial();
 
 	/**
 	 * Returns the value of the '<em><b>Whitepaper</b></em>' attribute list.
@@ -174,11 +170,11 @@ public interface ContentElement extends DescribableElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Whitepaper</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getContentElement_Whitepaper()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='Whitepaper' group='#group:14'"
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='Whitepaper' group='#group:12'"
 	 * @generated
 	 */
-	EList<String> getWhitepaper();
+	EList getWhitepaper();
 
 	/**
 	 * Returns the value of the '<em><b>Variability Based On Element</b></em>' attribute.
@@ -191,7 +187,7 @@ public interface ContentElement extends DescribableElement {
 	 * @return the value of the '<em>Variability Based On Element</em>' attribute.
 	 * @see #setVariabilityBasedOnElement(String)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getContentElement_VariabilityBasedOnElement()
-	 * @model dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="kind='attribute' name='variabilityBasedOnElement'"
 	 * @generated
 	 */
@@ -223,7 +219,7 @@ public interface ContentElement extends DescribableElement {
 	 * @see #unsetVariabilityType()
 	 * @see #setVariabilityType(VariabilityType)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getContentElement_VariabilityType()
-	 * @model default="na" unsettable="true"
+	 * @model default="na" unique="false" unsettable="true"
 	 *        extendedMetaData="kind='attribute' name='variabilityType'"
 	 * @generated
 	 */

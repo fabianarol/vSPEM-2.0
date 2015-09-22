@@ -11,6 +11,7 @@
 package org.eclipse.epf.authoring.ui.forms;
 
 import java.text.MessageFormat;
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -20,12 +21,14 @@ import org.eclipse.emf.edit.provider.IStructuredItemContentProvider;
 import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryContentProvider;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
+import org.eclipse.epf.authoring.ui.AuthoringUIHelpContexts;
+import org.eclipse.epf.authoring.ui.AuthoringUIImages;
 import org.eclipse.epf.authoring.ui.AuthoringUIPlugin;
 import org.eclipse.epf.authoring.ui.AuthoringUIResources;
 import org.eclipse.epf.authoring.ui.AuthoringUIText;
 import org.eclipse.epf.authoring.ui.editors.MethodElementEditor;
-import org.eclipse.epf.authoring.ui.preferences.AuthoringUIPreferences;
 import org.eclipse.epf.authoring.ui.richtext.IMethodRichText;
+import org.eclipse.epf.authoring.ui.richtext.IMethodRichTextEditor;
 import org.eclipse.epf.authoring.ui.util.EditorsContextHelper;
 import org.eclipse.epf.authoring.ui.util.UIHelper;
 import org.eclipse.epf.diagram.core.services.DiagramManager;
@@ -33,11 +36,11 @@ import org.eclipse.epf.library.edit.LibraryEditResources;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
 import org.eclipse.epf.library.edit.command.IActionManager;
 import org.eclipse.epf.library.edit.navigator.ConfigurationsItemProvider;
-import org.eclipse.epf.library.edit.util.ProcessScopeUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.edit.validation.IValidator;
 import org.eclipse.epf.library.edit.validation.IValidatorFactory;
 import org.eclipse.epf.library.ui.LibraryUIText;
+import org.eclipse.epf.richtext.RichTextListener;
 import org.eclipse.epf.services.ILibraryPersister;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodLibrary;
@@ -74,12 +77,17 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ListSelectionDialog;
+import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormEditor;
+import org.eclipse.ui.forms.events.HyperlinkAdapter;
+import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.eclipse.ui.forms.widgets.ImageHyperlink;
 import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.ui.forms.widgets.TableWrapData;
+import org.eclipse.ui.forms.widgets.TableWrapLayout;
 
 
 /**
@@ -98,6 +106,10 @@ public class ProcessDescription extends ProcessFormPage {
 
 	private static final int DEFAULT_VERTICAL_INDENT = 2;
 
+	protected static final int GENERAL_SECTION_ID = 1;
+
+	protected static final int DETAIL_SECTION_ID = 2;
+
 	private IStructuredContentProvider contentProvider = new AdapterFactoryContentProvider(
 			TngAdapterFactory.INSTANCE
 					.getNavigatorView_ComposedAdapterFactory()) {
@@ -107,16 +119,50 @@ public class ProcessDescription extends ProcessFormPage {
 			TngAdapterFactory.INSTANCE
 					.getNavigatorView_ComposedAdapterFactory());
 
+	protected Section formSection;
+
+	protected Composite sectionComposite;
+
+	private Composite expandedComposite;
+
+	private Text ctrl_name;
+
+	private Text ctrl_presentation_name;
+
+	private Text ctrl_brief_desc, ctrl_external_id;
+
+	private IMethodRichText ctrl_purpose;
+
+	private IMethodRichText ctrl_full_desc;
+
 	private IMethodRichText ctrl_scope, ctrl_usage_notes;
 
 	private IMethodRichText ctrl_alternatives, ctrl_how_to_staff,
 			ctrl_key_consideration;
 
-	private Section configSection;
+	private IMethodRichText activeControl;
 
-	protected Composite configComposite;
+	private Section generalSection, detailSection, configSection;
+
+	protected Composite generalComposite, detailComposite, configComposite;
+
+	protected boolean descExpandFlag = false;
+
+	protected boolean generalSectionExpandFlag = false;
+
+	protected boolean detailSectionExpandFlag = false;
 
 	protected boolean configSectionExpandFlag = false;
+
+	protected IMethodRichTextEditor ctrl_expanded;
+
+	private ImageHyperlink expandLink;
+
+	private Label expandLabel;
+
+	// private String[] variabilityTypes = new String[] {"N/A", "Contributes",
+	// "Extends", "Replaces"};
+	// private HashMap variabilityElementMap = new HashMap();
 
 	private org.eclipse.swt.widgets.List list_configurations;
 
@@ -135,7 +181,7 @@ public class ProcessDescription extends ProcessFormPage {
 
 	protected ModifyListener modifyListener;
 
-//	protected ModifyListener contentModifyListener;
+	protected ModifyListener contentModifyListener;
 
 //	private Adapter processListener;
 
@@ -146,8 +192,6 @@ public class ProcessDescription extends ProcessFormPage {
 	private ModifyListener nameModifyListener;
 
 	private boolean disposed;
-	
-	private ProcessScopeUtil processUtil = ProcessScopeUtil.getInstance();
 
 	/**
 	 * Creates a new instance.
@@ -155,15 +199,38 @@ public class ProcessDescription extends ProcessFormPage {
 	public ProcessDescription(FormEditor editor) {
 		super(editor, FORM_PAGE_ID, AuthoringUIResources.descriptionPage_title); 
 	}
-	
-	@Override
-	public void init(IEditorSite site, IEditorInput input) {
-		super.init(site, input);
+
+	/**
+	 * @see org.eclipse.ui.forms.editor.createFormContent(IManagedForm)
+	 */
+	protected void createFormContent(IManagedForm managedForm) {
+		// create form toolkit
+		super.createFormContent(managedForm);
+
 		processType = LibraryUIText.getUITextLower(process);
-		versionSectionOn = false;
-		variabilitySectionOn = false;
-		externalIdOn = true;
-		purposeOn = true;
+		setFormText();
+
+		// create editor content
+		createEditorContent(toolkit);
+
+//		// add listener to listen to change in process's data
+//		if (processListener == null) {
+//			processListener = new AdapterImpl() {
+//				public void notifyChanged(Notification msg) {
+//					switch (msg.getFeatureID(Process.class)) {
+//					case UmaPackage.PROCESS__NAME:
+//						refreshElementName(msg.getNewStringValue());
+//						break;
+//					}
+//				}
+//			};
+//		}
+//		process.eAdapters().add(processListener);
+
+		loadData();
+		addListeners();
+
+		EditorsContextHelper.setHelp(getPartControl(), processType);
 	}
 
 	/**
@@ -173,37 +240,78 @@ public class ProcessDescription extends ProcessFormPage {
 	 *            The form toolkit.
 	 */
 	protected void createEditorContent(FormToolkit toolkit) {
-		super.createEditorContent(toolkit);
-		createConfigurationSection(toolkit);
-		// Set focus on the Name text control.
-		Display display = form.getBody().getDisplay();
-		if (!(display == null || display.isDisposed())) {
-			display.asyncExec(new Runnable() {
-				public void run() {
-					if(ctrl_name.isDisposed()) return;
-					if (isAutoGenName()) {
-						ctrl_presentation_name.setFocus();
-						ctrl_presentation_name.setSelection(0, ctrl_presentation_name.getText().length());
-					} else {
-						ctrl_name.setFocus();
-						ctrl_name.setSelection(0, ctrl_name.getText().length());
-					}
-				}
-			});
+		createFormComposites();
+		createGeneralSection();
+		createDetailSection();
+		createConfigurationSection();
+
+		toolkit.paintBordersFor(generalComposite);
+		toolkit.paintBordersFor(detailComposite);
+		toolkit.paintBordersFor(configComposite);
+		toolkit.paintBordersFor(expandedComposite);
+	}
+
+	private void createFormComposites() {
+		formSection = toolkit.createSection(form.getBody(), Section.NO_TITLE);
+		{
+			TableWrapData td = new TableWrapData(TableWrapData.FILL_GRAB);
+			formSection.setLayoutData(td);
+			formSection.setLayout(new TableWrapLayout());
 		}
+
+		// create the composite for the sections
+		sectionComposite = toolkit.createComposite(formSection, SWT.NONE);
+		sectionComposite.setLayoutData(new TableWrapData());
+		sectionComposite.setLayout(new TableWrapLayout());
+		formSection.setClient(sectionComposite);
+
+		expandedComposite = toolkit.createComposite(formSection, SWT.NONE);
+		{
+			TableWrapData td = new TableWrapData(TableWrapData.FILL_GRAB);
+			expandedComposite.setLayoutData(td);
+			expandedComposite.setLayout(new GridLayout(2, false));
+			expandedComposite.setVisible(false);
+		}
+
+		PlatformUI.getWorkbench().getHelpSystem().setHelp(expandedComposite,
+				AuthoringUIHelpContexts.RICH_TEXT_EDITOR_CONTEXT_ID);
+
+		// Add the expand/collapse hyperlink image.
+		expandLink = toolkit.createImageHyperlink(expandedComposite, SWT.NONE);
+		expandLink.setImage(AuthoringUIImages.IMG_EXPANDED);
+		expandLink.setToolTipText(AuthoringUIResources.closeRTE);
+		expandLink.setUnderlined(false);
+		expandLink.addHyperlinkListener(new HyperlinkAdapter() {
+			public void linkActivated(HyperlinkEvent e) {
+				toggle(e);
+			}
+		});
+
+		// Add the expand/collapse hyperlink text.
+		expandLabel = createDecoratedLabel(toolkit, expandedComposite, ""); //$NON-NLS-1$
+
 	}
 
 	/**
 	 * Create general section
 	 */
-	protected void createGeneralSection(FormToolkit toolkit) {
+	protected void createGeneralSection() {
 		// create General Information section
-		generalSection = createSection(toolkit, sectionComposite, 
-				AuthoringUIText.GENERAL_INFO_SECTION_NAME, 
-				MessageFormat.format(
-						AuthoringUIText.GENERAL_INFO_SECTION_DESC,
-						new String[] { processType }));
-		generalComposite = createComposite(toolkit, generalSection);
+		generalSection = toolkit.createSection(form.getBody(),
+				Section.DESCRIPTION | Section.TWISTIE | Section.EXPANDED
+						| Section.TITLE_BAR);
+		TableWrapData td = new TableWrapData(TableWrapData.FILL_GRAB);
+		generalSection.setLayoutData(td);
+		generalSection.setText(AuthoringUIText.GENERAL_INFO_SECTION_NAME);
+		generalSection.setDescription(MessageFormat.format(
+				AuthoringUIText.GENERAL_INFO_SECTION_DESC,
+				new String[] { processType }));
+		generalSection.setLayout(new GridLayout());
+
+		generalComposite = toolkit.createComposite(generalSection);
+		generalComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+		generalComposite.setLayout(new GridLayout(3, false));
+		generalSection.setClient(generalComposite);
 
 		// name
 		ctrl_name = createTextEditWithLabel(toolkit, generalComposite,
@@ -212,44 +320,77 @@ public class ProcessDescription extends ProcessFormPage {
 		// Presentation name
 		ctrl_presentation_name = createTextEditWithLabel(toolkit,
 				generalComposite, AuthoringUIText.PRESENTATION_NAME_TEXT);
-		
-		// Long Presentation name
-		if (longPresentationNameOn && AuthoringUIPreferences.getEnableUIFields()) {
-			ctrl_long_presentation_name = createTextEditWithLabel(toolkit,
-					generalComposite, AuthoringUIText.LONG_PRESENTATION_NAME_TEXT);
-		}
 
 		// brief desc
 		ctrl_brief_desc = createTextEditWithLabel2(toolkit, generalComposite,
 				AuthoringUIText.BRIEF_DESCRIPTION_TEXT);
 
 		// External Id
-		if (AuthoringUIPreferences.getEnableUIFields()) {
-			ctrl_external_id = createTextEditWithLabel(toolkit, generalComposite,
-					AuthoringUIResources.Process_ExternalID);
-		}
+		ctrl_external_id = createTextEditWithLabel(toolkit, generalComposite,
+				AuthoringUIResources.Process_ExternalID); 
 
 		// Purpose
 		ctrl_purpose = createRichTextEditWithLinkForSection(
 				toolkit,
 				generalComposite,
 				AuthoringUIResources.Process_Purpose, 40, 400, GENERAL_SECTION_ID); 
-		
-		toolkit.paintBordersFor(generalComposite);
+
+		// // create expanded composite
+		// expandGeneralComposite = toolkit.createComposite(generalSection);
+		// expandGeneralComposite.setLayoutData(new
+		// GridData(GridData.FILL_HORIZONTAL));
+		// expandGeneralComposite.setLayout(new GridLayout(2, false));
+		// expandGeneralComposite.setVisible(false);
+		//		
+		// // Hyperlink desc
+		// expandGeneralLink =
+		// toolkit.createImageHyperlink(expandGeneralComposite, SWT.NONE);
+		// expandGeneralLink.setImage(AuthoringUIImages.IMG_EXPANDED);
+		// expandGeneralLink.setUnderlined(false);
+		// expandGeneralLink.addHyperlinkListener(new HyperlinkAdapter()
+		// {
+		// public void linkActivated(HyperlinkEvent e)
+		// {
+		// toggle(e, GENERAL_SECTION_ID);
+		// }
+		// });
+		//		
+		// expandGeneralLabel = createLabel(toolkit, expandGeneralComposite,
+		// "");
+
+		// set focus on the name attribute
+		Display display = form.getBody().getDisplay();
+		if (!(display == null || display.isDisposed())) {
+			display.asyncExec(new Runnable() {
+				public void run() {
+					ctrl_name.setFocus();
+				}
+			});
+		}
+
 	}
 
 	/**
 	 * Create detail section
 	 *
 	 */
-	protected void createDetailSection(FormToolkit toolkit) {
+	protected void createDetailSection() {
 		// create detail section
-		detailSection = createSection(toolkit, sectionComposite, 
-				AuthoringUIText.DETAIL_SECTION_NAME, 
-				MessageFormat.format(
-						AuthoringUIText.DETAIL_SECTION_DESC,
-						new String[] { processType }));
-		detailComposite = createComposite(toolkit, detailSection);
+		detailSection = toolkit.createSection(form.getBody(),
+				Section.DESCRIPTION | Section.TWISTIE | Section.EXPANDED
+						| Section.TITLE_BAR);
+		TableWrapData td = new TableWrapData(TableWrapData.FILL_GRAB);
+		detailSection.setLayoutData(td);
+		detailSection.setText(AuthoringUIText.DETAIL_SECTION_NAME);
+		detailSection.setDescription(MessageFormat.format(
+				AuthoringUIText.DETAIL_SECTION_DESC,
+				new String[] { processType }));
+		detailSection.setLayout(new GridLayout());
+
+		detailComposite = toolkit.createComposite(detailSection);
+		detailComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+		detailComposite.setLayout(new GridLayout(3, false));
+		detailSection.setClient(detailComposite);
 
 		// full description
 		ctrl_full_desc = createRichTextEditWithLinkForSection(toolkit,
@@ -284,19 +425,50 @@ public class ProcessDescription extends ProcessFormPage {
 				detailComposite,
 				AuthoringUIResources.Process_KeyConsideration, 40, 400, DETAIL_SECTION_ID); 
 
-		toolkit.paintBordersFor(detailComposite);
+		// // create expanded composite
+		// expandDetailComposite = toolkit.createComposite(detailSection);
+		// expandDetailComposite.setLayoutData(new
+		// GridData(GridData.FILL_HORIZONTAL));
+		// expandDetailComposite.setLayout(new GridLayout(2, false));
+		// expandDetailComposite.setVisible(false);
+		//		
+		// // Hyperlink desc
+		// expandDetailLink =
+		// toolkit.createImageHyperlink(expandDetailComposite, SWT.NONE);
+		// expandDetailLink.setImage(AuthoringUIImages.IMG_EXPANDED);
+		// expandDetailLink.setUnderlined(false);
+		// expandDetailLink.addHyperlinkListener(new HyperlinkAdapter()
+		// {
+		// public void linkActivated(HyperlinkEvent e)
+		// {
+		// toggle(e, DETAIL_SECTION_ID);
+		// }
+		// });
+		//		
+		// expandDetailLabel = createLabel(toolkit, expandDetailComposite, "");
+
 	}
 
 	/**
 	 * Create configuration section
 	 */
-	protected void createConfigurationSection(FormToolkit toolkit) {
+	protected void createConfigurationSection() {
 		// create Configuration section
-		configSection = createSection(toolkit, sectionComposite, 
-				AuthoringUIResources.processDescription_configurationSectionTitle, 
-				AuthoringUIResources.processDescription_configurationSectionMessage);		
-		configComposite = createComposite(toolkit, configSection);
-		((GridLayout) configComposite.getLayout()).numColumns = 2;
+		configSection = toolkit.createSection(form.getBody(),
+				Section.DESCRIPTION | Section.TWISTIE | Section.EXPANDED
+						| Section.TITLE_BAR);
+		TableWrapData td1 = new TableWrapData(TableWrapData.FILL_GRAB);
+		configSection.setLayoutData(td1);
+		configSection
+				.setText(AuthoringUIResources.processDescription_configurationSectionTitle); 
+		configSection
+				.setDescription(AuthoringUIResources.processDescription_configurationSectionMessage); 
+		configSection.setLayout(new GridLayout());
+
+		configComposite = toolkit.createComposite(configSection);
+		configComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+		configComposite.setLayout(new GridLayout(2, false));
+		configSection.setClient(configComposite);
 
 		Label l_element = toolkit
 				.createLabel(
@@ -402,7 +574,6 @@ public class ProcessDescription extends ProcessFormPage {
 			textConfigDescription.setLayoutData(gridData);
 		}
 		textConfigDescription.setEditable(false);
-		toolkit.paintBordersFor(configComposite);
 	}
 
 	/**
@@ -493,13 +664,6 @@ public class ProcessDescription extends ProcessFormPage {
 				&& (!ctrl_presentation_name.isDisposed())) {
 			updateControl(ctrl_presentation_name, process.getPresentationName());
 		}
-		if (longPresentationNameOn && AuthoringUIPreferences.getEnableUIFields()) {
-			if ((ctrl_long_presentation_name != null)
-					&& (!ctrl_long_presentation_name.isDisposed())) {
-				updateControl(ctrl_long_presentation_name, process
-						.getPresentation().getLongPresentationName());
-			}
-		}
 	}
 
 	/**
@@ -547,12 +711,7 @@ public class ProcessDescription extends ProcessFormPage {
 
 		updateModelControls();
 
-		if (AuthoringUIPreferences.getEnableUIFields()) {
-			if ((ctrl_external_id != null) && (!ctrl_external_id.isDisposed())) {
-				updateControl(ctrl_external_id, externalID);
-			}
-		}
-		
+		updateControl(ctrl_external_id, externalID);
 		updateControl(ctrl_purpose, purpose);
 		updateControl(ctrl_full_desc, fullDesc);
 		updateControl(ctrl_scope, scope);
@@ -575,7 +734,6 @@ public class ProcessDescription extends ProcessFormPage {
 	 * 
 	 */
 	protected void addListeners() {
-//		super.addListeners();
 		this.editor = ((MethodElementEditor) getEditor());
 		final IActionManager actionMgr = editor.getActionManager();
 		final org.eclipse.epf.uma.ProcessDescription content = (org.eclipse.epf.uma.ProcessDescription) process
@@ -640,7 +798,67 @@ public class ProcessDescription extends ProcessFormPage {
 				}
 				
 				if (msg == null) {
-					if (!changeProcessName(actionMgr, e, procComp)) {
+					String title = AuthoringUIResources.processDescriptionNameChangeConfirm_title; 
+					String message = AuthoringUIResources.processDescriptionNameChangeConfirm_message; 
+					if (AuthoringUIPlugin.getDefault().getMsgDialog()
+							.displayConfirmation(title, message)) {
+						e.doit = true;
+
+						boolean status = actionMgr.doAction(IActionManager.SET,
+								process, UmaPackage.eINSTANCE
+										.getNamedElement_Name(), ctrl_name
+										.getText(), -1);
+						if (!status) {
+							ctrl_name.setText(process.getName());
+							return;
+						}
+						actionMgr.doAction(IActionManager.SET, procComp,
+								UmaPackage.eINSTANCE.getNamedElement_Name(),
+								ctrl_name.getText(), -1);
+
+						setFormText();
+
+						// adjust plugin location and save the editor
+						//
+						BusyIndicator.showWhile(getSite().getShell()
+								.getDisplay(), new Runnable() {
+							public void run() {
+								MethodElementEditor editor = (MethodElementEditor) getEditor();
+								editor
+										.doSave(new NullProgressMonitor());
+								if(editor.isDirty()) {
+									// save failed
+									//
+									return;
+								}
+								ILibraryPersister.FailSafeMethodLibraryPersister persister = editor
+										.getPersister();
+								try {
+									persister.adjustLocation(process
+													.eResource());
+									persister.commit();
+								} catch (RuntimeException e) {
+									persister.rollback();
+									throw e;
+								}
+								// adjust diagram resource as well
+								//
+								DiagramManager mgr = DiagramManager.getInstance(process, this);
+								if(mgr != null) {
+									try {
+										mgr.updateResourceURI();
+									}
+									catch(Exception e) {
+										AuthoringUIPlugin.getDefault().getLogger().logError(e);
+									}
+									finally {
+										mgr.removeConsumer(this);
+									}
+								}
+							}
+						});
+					} else {
+						ctrl_name.setText(process.getName());
 						return;
 					}
 				} else {
@@ -659,7 +877,6 @@ public class ProcessDescription extends ProcessFormPage {
 					});
 				}
 			}
-		
 		});
 		ctrl_name.addFocusListener(new FocusAdapter() {
 			public void focusGained(FocusEvent e) {
@@ -669,7 +886,6 @@ public class ProcessDescription extends ProcessFormPage {
 		});
 		
 		ctrl_presentation_name.addModifyListener(modifyListener);
-		ctrl_presentation_name.addModifyListener(newNameTackingPNameListener());
 		ctrl_presentation_name.addListener(SWT.Deactivate, new Listener() {
 			public void handleEvent(Event e) {
 				String oldContent = process.getPresentationName();
@@ -688,7 +904,7 @@ public class ProcessDescription extends ProcessFormPage {
 										IActionManager.SET,
 										process,
 										UmaPackage.eINSTANCE
-												.getMethodElement_PresentationName(),
+												.getDescribableElement_PresentationName(),
 										ctrl_presentation_name.getText(), -1);
 						if (!status) {
 							ctrl_presentation_name.setText(oldContent);
@@ -722,50 +938,10 @@ public class ProcessDescription extends ProcessFormPage {
 		ctrl_presentation_name.addFocusListener(new FocusAdapter() {
 			public void focusGained(FocusEvent e) {
 				((MethodElementEditor) getEditor()).setCurrentFeatureEditor(e.widget,
-						UmaPackage.eINSTANCE.getMethodElement_PresentationName());
-				// when user tab to this field, select all text
-				ctrl_presentation_name.selectAll();
-
-			}
-			public void focusLost(FocusEvent e) {
-				// clear the selection when the focus of the component is lost 
-				if(ctrl_presentation_name.getSelectionCount() > 0){
-					ctrl_presentation_name.clearSelection();
-				} 
-				if (isAutoGenName()) {
-					changeElementName();
-				}	
+						UmaPackage.eINSTANCE.getDescribableElement_PresentationName());
 			}
 		});
 
-		if (longPresentationNameOn && AuthoringUIPreferences.getEnableUIFields()) { 
-			ctrl_long_presentation_name.addModifyListener(modifyListener);
-			ctrl_long_presentation_name.addFocusListener(new FocusAdapter() {
-				public void focusGained(FocusEvent e) {
-					((MethodElementEditor) getEditor()).setCurrentFeatureEditor(e.widget,
-							UmaPackage.eINSTANCE.getContentDescription_LongPresentationName());
-				}
-	
-				public void focusLost(FocusEvent e) {
-					String oldContent = content.getLongPresentationName();
-					if (((MethodElementEditor) getEditor()).mustRestoreValue(
-							ctrl_long_presentation_name, oldContent)) {
-						return;
-					}
-					String newContent = ctrl_long_presentation_name.getText();
-					if (!newContent.equals(oldContent)) {
-						boolean success = actionMgr.doAction(IActionManager.SET,
-								process.getPresentation(), UmaPackage.eINSTANCE
-										.getContentDescription_LongPresentationName(),
-								newContent, -1);
-						if (success) {
-							ctrl_long_presentation_name.setText(newContent);
-						}
-					}
-				}
-			});
-		}
-		
 		ctrl_brief_desc.addModifyListener(modifyListener);
 		ctrl_brief_desc.addFocusListener(new FocusAdapter() {
 			public void focusGained(FocusEvent e) {
@@ -792,33 +968,32 @@ public class ProcessDescription extends ProcessFormPage {
 			}
 		});
 
-		if (AuthoringUIPreferences.getEnableUIFields())  {
-			ctrl_external_id.addModifyListener(contentModifyListener);
-			ctrl_external_id.addFocusListener(new FocusAdapter() {
-				public void focusGained(FocusEvent e) {
-					((MethodElementEditor) getEditor()).setCurrentFeatureEditor(e.widget,
-							UmaPackage.eINSTANCE.getContentDescription_ExternalId());
+		ctrl_external_id.addModifyListener(contentModifyListener);
+		ctrl_external_id.addFocusListener(new FocusAdapter() {
+			public void focusGained(FocusEvent e) {
+				((MethodElementEditor) getEditor()).setCurrentFeatureEditor(e.widget,
+						UmaPackage.eINSTANCE.getContentDescription_ExternalId());
+			}
+
+			public void focusLost(FocusEvent e) {
+				String oldContent = content.getExternalId();
+				if (((MethodElementEditor) getEditor()).mustRestoreValue(
+						ctrl_external_id, oldContent)) {
+					return;
 				}
-	
-				public void focusLost(FocusEvent e) {
-					String oldContent = content.getExternalId();
-					if (((MethodElementEditor) getEditor()).mustRestoreValue(
-							ctrl_external_id, oldContent)) {
-						return;
-					}
-					String newContent = ctrl_external_id.getText();
-					if (!newContent.equals(oldContent)) {
-						boolean success = actionMgr.doAction(IActionManager.SET,
-								process.getPresentation(), UmaPackage.eINSTANCE
-										.getContentDescription_ExternalId(),
-								newContent, -1);
-						if (success) {
-							ctrl_external_id.setText(newContent);
-						}
+				String newContent = ctrl_external_id.getText();
+				if (!newContent.equals(oldContent)) {
+					boolean success = actionMgr.doAction(IActionManager.SET,
+							process.getPresentation(), UmaPackage.eINSTANCE
+									.getContentDescription_ExternalId(),
+							newContent, -1);
+					if (success) {
+						ctrl_external_id.setText(newContent);
 					}
 				}
-			});
-		}
+			}
+
+		});
 
 		ctrl_purpose.setModalObject(process.getPresentation());
 		ctrl_purpose.setModalObjectFeature(UmaPackage.eINSTANCE
@@ -1009,12 +1184,10 @@ public class ProcessDescription extends ProcessFormPage {
 						if (selection.size() == 1) {
 							MethodConfiguration config = ((MethodConfiguration) selection
 									.getFirstElement());
-							if (!TngUtil.isLocked(methodElement)) {
-								if (config == process.getDefaultContext()) {
-									buttonRemove.setEnabled(false);
-								} else {
-									buttonRemove.setEnabled(true);
-								}
+							if (config == process.getDefaultContext()) {
+								buttonRemove.setEnabled(false);
+							} else {
+								buttonRemove.setEnabled(true);
 							}
 							String desc = config.getBriefDescription();
 							if (desc == null) {
@@ -1114,20 +1287,20 @@ public class ProcessDescription extends ProcessFormPage {
 							.getDefaultContext();
 
 					if (currentConfig != selection.getFirstElement()) {
-//						boolean isValid = true;
-//						List validContext = process.getValidContext();
-//						for (Iterator itor = validContext.iterator(); itor
-//								.hasNext();) {
-//							MethodConfiguration config = (MethodConfiguration) itor
-//									.next();
-//							if (!(checkValidityForSuperSet(
-//									(MethodConfiguration) selection
-//											.getFirstElement(), config))) {
-//								isValid = false;
-//								break;
-//							}
-//						}
-//						if (isValid) {
+						boolean isValid = true;
+						List validContext = process.getValidContext();
+						for (Iterator itor = validContext.iterator(); itor
+								.hasNext();) {
+							MethodConfiguration config = (MethodConfiguration) itor
+									.next();
+							if (!(checkValidityForSuperSet(
+									(MethodConfiguration) selection
+											.getFirstElement(), config))) {
+								isValid = false;
+								break;
+							}
+						}
+						if (isValid) {
 							boolean status = actionMgr.doAction(
 									IActionManager.SET, process,
 									UmaPackage.eINSTANCE
@@ -1136,16 +1309,16 @@ public class ProcessDescription extends ProcessFormPage {
 							if (!status)
 								return;
 							buttonRemove.setEnabled(false);
-//						} else {
-//							String selectedConfigName = ((MethodConfiguration) selection
-//									.getFirstElement()).getName();
-//							AuthoringUIPlugin
-//									.getDefault()
-//									.getMsgDialog()
-//									.displayError(
-//											AuthoringUIResources.setDefaultConfigErrorDialog_title, 
-//											AuthoringUIResources.bind(AuthoringUIResources.setDefaultConfigError_msg, selectedConfigName)); 
-//						}
+						} else {
+							String selectedConfigName = ((MethodConfiguration) selection
+									.getFirstElement()).getName();
+							AuthoringUIPlugin
+									.getDefault()
+									.getMsgDialog()
+									.displayError(
+											AuthoringUIResources.setDefaultConfigErrorDialog_title, 
+											AuthoringUIResources.bind(AuthoringUIResources.setDefaultConfigError_msg, selectedConfigName)); 
+						}
 					}
 				}
 			}
@@ -1164,11 +1337,6 @@ public class ProcessDescription extends ProcessFormPage {
 		if (!ctrl_presentation_name.isDisposed()) {
 			ctrl_presentation_name.setEditable(editable);
 		}
-		if (longPresentationNameOn && AuthoringUIPreferences.getEnableUIFields()) {
-			if (!ctrl_long_presentation_name.isDisposed()) {
-				ctrl_long_presentation_name.setEditable(editable);
-			}
-		}
 		if (!ctrl_brief_desc.isDisposed()) {
 			ctrl_brief_desc.setEditable(editable);
 		}
@@ -1181,10 +1349,8 @@ public class ProcessDescription extends ProcessFormPage {
 		if (!ctrl_alternatives.isDisposed()) {
 			ctrl_alternatives.setEditable(editable);
 		}
-		if (AuthoringUIPreferences.getEnableUIFields()) {
-			if (!ctrl_external_id.isDisposed())
-				ctrl_external_id.setEditable(editable);
-		}
+		if (!ctrl_external_id.isDisposed())
+			ctrl_external_id.setEditable(editable);
 		if (!ctrl_key_consideration.isDisposed())
 			ctrl_key_consideration.setEditable(editable);
 		if (!ctrl_how_to_staff.isDisposed())
@@ -1196,46 +1362,88 @@ public class ProcessDescription extends ProcessFormPage {
 		if (ctrl_expanded != null && !ctrl_expanded.isDisposed()) {
 			ctrl_expanded.setEditable(editable);
 		}
-		
-		IStructuredSelection selection = (IStructuredSelection) configListViewer
-				.getSelection();
-		if (selection.size() == 1) {
-			MethodConfiguration config = ((MethodConfiguration) selection
-					.getFirstElement());
-			if (config == process.getDefaultContext()) {
-				if (!buttonRemove.isDisposed())
-					buttonRemove.setEnabled(false);
-			} else {
-				if (!buttonRemove.isDisposed())
-					buttonRemove.setEnabled(editable);
-			}
-			String desc = config.getBriefDescription();
-			if (desc == null) {
-				desc = ""; //$NON-NLS-1$
-			}
-			textConfigDescription.setText(desc);
-		}
 		if (!buttonAdd.isDisposed())
 			buttonAdd.setEnabled(editable);
 		if (!buttonMakeDefault.isDisposed())
 			buttonMakeDefault.setEnabled(editable);
-		if (!buttonRemove.isDisposed() && !editable)
+		if (!buttonRemove.isDisposed())
 			buttonRemove.setEnabled(editable);
-		
-		if (processUtil.isConfigFree(process)) {
-			if (!configSection.isDisposed()) {
-				configSection.setEnabled(false);
-			}
-			if (!buttonAdd.isDisposed()) {
-				buttonAdd.setEnabled(false);
-			}
-			if (!buttonRemove.isDisposed()) {
-				buttonRemove.setEnabled(false);
-			}
-			if (!buttonMakeDefault.isDisposed()) {
-				buttonMakeDefault.setEnabled(false);
-			}
+	}
+
+	/**
+	 * Toggle Description control to expand and control state
+	 * 
+	 */
+	protected void toggle(HyperlinkEvent e, int id) {
+		// TODO- we should combine these methods into one. One way to do it,
+		// dispoing
+		// ctrl_expanded every time it collapses and creating it when we expand.
+		// At present, there is no method to dispose
+		toggle(e);
+		// if (id == GENERAL_SECTION_ID)
+		// {
+		// toggleGeneralSection(e);
+		// }
+		// if (id == DETAIL_SECTION_ID)
+		// {
+		// toggleDetailSection(e);
+		// }
+	}
+
+	protected void toggle(HyperlinkEvent e) {
+		if (ctrl_expanded == null) {
+			ctrl_expanded = createRichTextEditor(toolkit, expandedComposite,
+					SWT.MULTI | SWT.WRAP | SWT.V_SCROLL,
+					GridData.FILL_VERTICAL, getRichTextEditorHeight(),
+					getRichTextEditorWidth(), 2,
+					expandLabel);
+			ctrl_expanded.addModifyListener(contentModifyListener);
 		}
+
+		if (descExpandFlag) {
+			expandedComposite.setVisible(false);
+			sectionComposite.setVisible(true);
+			formSection.setClient(sectionComposite);
+			enableSections(true);
+			IMethodRichText richText = getActiveRichTextControl();
+			richText.setText(ctrl_expanded.getText());
+			for (Iterator i = richText.getListeners(); i.hasNext();) {
+				RichTextListener listener = (RichTextListener) i.next();
+				ctrl_expanded.removeListener(listener.getEventType(), listener
+						.getListener());
+			}
+			if (ctrl_expanded.getModified()) {
+				((MethodElementEditor) getEditor())
+						.saveModifiedRichText(ctrl_expanded);
+			}
+			editor.setFocus();
+		} else {
+			sectionComposite.setVisible(false);
+			expandedComposite.setVisible(true);
+			formSection.setClient(expandedComposite);
+			enableSections(false);
+			expandLabel.setText((String) ((ImageHyperlink) e.getSource())
+					.getData("Title")); //$NON-NLS-1$
+			IMethodRichText richText = (IMethodRichText) e.getHref();
+			ctrl_expanded.setInitialText(richText.getText());
+			ctrl_expanded.setModalObject(richText.getModalObject());
+			ctrl_expanded.setModalObjectFeature(richText
+					.getModalObjectFeature());
+			ctrl_expanded.setFindReplaceAction(richText.getFindReplaceAction());
+			for (Iterator i = richText.getListeners(); i.hasNext();) {
+				RichTextListener listener = (RichTextListener) i.next();
+				ctrl_expanded.addListener(listener.getEventType(), listener
+						.getListener());
+			}
+			boolean editable = !TngUtil.isLocked(process);
+			ctrl_expanded.setEditable(editable);
+			if (editable) {
+				ctrl_expanded.setFocus();
+			}
+			setActiveRichTextControl(richText);
+		}
+		form.getBody().layout(true, true);
+		descExpandFlag = !descExpandFlag;
 	}
 
 	/**
@@ -1264,6 +1472,25 @@ public class ProcessDescription extends ProcessFormPage {
 		}
 
 		return (pluginContains) && (packageContains);
+	}
+
+	/**
+	 * Set active rich text control
+	 * 
+	 * @param ctrl
+	 */
+	private void setActiveRichTextControl(IMethodRichText ctrl) {
+		activeControl = ctrl;
+	}
+
+	/**
+	 * Get Active Rich text control
+	 * 
+	 * @return
+	 * 		Rich text control
+	 */
+	private IMethodRichText getActiveRichTextControl() {
+		return activeControl;
 	}
 
 	protected void enableSections(boolean enable) {
@@ -1311,11 +1538,7 @@ public class ProcessDescription extends ProcessFormPage {
 
 					public void run() {
 						ctrl_name.removeModifyListener(nameModifyListener);
-						if (isAutoGenName()) {
-							ctrl_name.setText(ctrl_name.getText());
-						} else {
-							ctrl_name.setText(newName);
-						}
+						ctrl_name.setText(newName);
 						ctrl_name.addModifyListener(nameModifyListener);
 						setFormText();
 					}
@@ -1330,92 +1553,4 @@ public class ProcessDescription extends ProcessFormPage {
 			}
 		}
 	}
-
-	@Override
-	protected void setContextHelp() {
-		super.setContextHelp();
-		EditorsContextHelper.setHelp(getPartControl(), processType);
-	}
-	
-	private boolean changeProcessName(final IActionManager actionMgr,
-			Event e, ProcessComponent procComp) {
-		String title = AuthoringUIResources.processDescriptionNameChangeConfirm_title; 
-		String message = AuthoringUIResources.processDescriptionNameChangeConfirm_message; 
-		if (AuthoringUIPlugin.getDefault().getMsgDialog()
-				.displayConfirmation(title, message)) {
-			if (e != null) {
-				e.doit = true;
-			}
-
-			boolean status = actionMgr.doAction(IActionManager.SET,
-					process, UmaPackage.eINSTANCE
-							.getNamedElement_Name(), ctrl_name
-							.getText(), -1);
-			if (!status) {
-				ctrl_name.setText(process.getName());
-				return false;
-			}
-			actionMgr.doAction(IActionManager.SET, procComp,
-					UmaPackage.eINSTANCE.getNamedElement_Name(),
-					ctrl_name.getText(), -1);
-
-			setFormText();
-
-			// adjust plugin location and save the editor
-			//
-			BusyIndicator.showWhile(getSite().getShell()
-					.getDisplay(), new Runnable() {
-				public void run() {
-					MethodElementEditor editor = (MethodElementEditor) getEditor();
-					editor
-							.doSave(new NullProgressMonitor());
-					if(editor.isDirty()) {
-						// save failed
-						//
-						return;
-					}
-					ILibraryPersister.FailSafeMethodLibraryPersister persister = editor
-							.getPersister();
-					try {
-						persister.adjustLocation(process
-										.eResource());
-						persister.commit();
-					} catch (RuntimeException e) {
-						persister.rollback();
-						throw e;
-					}
-					// adjust diagram resource as well
-					//
-					DiagramManager mgr = DiagramManager.getInstance(process, this);
-					if(mgr != null) {
-						try {
-							mgr.updateResourceURI();
-						}
-						catch(Exception e) {
-							AuthoringUIPlugin.getDefault().getLogger().logError(e);
-						}
-						finally {
-							mgr.removeConsumer(this);
-						}
-					}
-				}
-			});
-		} else {
-			ctrl_name.setText(process.getName());
-			return false;
-		}
-		
-		return true;
-	}
-
-	protected boolean changeElementName(String name) {
-		if (! ctrl_name.getText().equals(name)) {
-			ctrl_name.setText(name);
-		}
-		if (name.equals(process.getName())) {
-			return true;
-		}
-		return changeProcessName(editor.getActionManager(), null, (ProcessComponent) process.eContainer());
-	}
-	
 }

@@ -33,6 +33,14 @@ public class TBSItemProviderAdapterFactory extends
 		return new TBSActivityItemProvider(this);
 	}
 	
+	public Adapter createvpActivityAdapter() {
+		return new TBSActivityItemProvider(this);
+	}
+	
+	public Adapter createVarActivityAdapter() {
+		return new TBSActivityItemProvider(this);
+	}
+	
 	public Adapter createCapabilityPatternAdapter() {
 		return new TBSProcessItemProvider(this, (ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory.createCapabilityPatternAdapter());
 	}

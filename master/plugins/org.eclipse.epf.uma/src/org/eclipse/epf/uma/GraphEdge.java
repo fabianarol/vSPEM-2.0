@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.uma;
 
+import org.eclipse.emf.common.util.EList;
 import java.util.List;
 
 /**
@@ -20,8 +21,8 @@ import java.util.List;
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link org.eclipse.epf.uma.GraphEdge#getWaypoints <em>Waypoints</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.GraphEdge#getAnchor <em>Anchor</em>}</li>
+ *   <li>{@link org.eclipse.epf.uma.GraphEdge#getWaypoints <em>Waypoints</em>}</li>
  * </ul>
  * </p>
  *
@@ -43,10 +44,10 @@ public interface GraphEdge extends GraphElement {
 	 * @return the value of the '<em>Anchor</em>' reference list.
 	 * @see org.eclipse.epf.uma.UmaPackage#getGraphEdge_Anchor()
 	 * @see org.eclipse.epf.uma.GraphConnector#getGraphEdge
-	 * @model opposite="graphEdge" lower="2" upper="2" ordered="false"
+	 * @model type="org.eclipse.epf.uma.GraphConnector" opposite="graphEdge" lower="2" upper="2" ordered="false"
 	 * @generated
 	 */
-	List<GraphConnector> getAnchor();
+	List getAnchor();
 
 	/**
 	 * Returns the value of the '<em><b>Waypoints</b></em>' containment reference list.
@@ -59,9 +60,9 @@ public interface GraphEdge extends GraphElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Waypoints</em>' containment reference list.
 	 * @see org.eclipse.epf.uma.UmaPackage#getGraphEdge_Waypoints()
-	 * @model containment="true" resolveProxies="true" lower="2" ordered="false"
+	 * @model type="org.eclipse.epf.uma.Point" containment="true" resolveProxies="true" lower="2" ordered="false"
 	 * @generated
 	 */
-	List<Point> getWaypoints();
+	List getWaypoints();
 
 } // GraphEdge

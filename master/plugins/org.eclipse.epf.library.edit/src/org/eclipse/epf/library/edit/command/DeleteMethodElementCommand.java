@@ -30,7 +30,6 @@ import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.command.CommandWrapper;
 import org.eclipse.emf.common.command.CompoundCommand;
 import org.eclipse.emf.common.notify.AdapterFactory;
-import org.eclipse.emf.common.util.AbstractTreeIterator;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.common.util.WrappedException;
 import org.eclipse.emf.ecore.EObject;
@@ -41,6 +40,7 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EContentsEList;
 import org.eclipse.emf.edit.command.RemoveCommand;
 import org.eclipse.emf.edit.provider.ItemProviderAdapter;
+import org.eclipse.epf.common.serviceability.MsgBox;
 import org.eclipse.epf.common.utils.StrUtil;
 import org.eclipse.epf.library.edit.ICommandListener;
 import org.eclipse.epf.library.edit.IReferencer;
@@ -50,8 +50,6 @@ import org.eclipse.epf.library.edit.LibraryEditResources;
 import org.eclipse.epf.library.edit.Providers;
 import org.eclipse.epf.library.edit.ui.UserInteractionHelper;
 import org.eclipse.epf.library.edit.util.ExtensionManager;
-import org.eclipse.epf.library.edit.util.IRunnableWithProgress;
-import org.eclipse.epf.library.edit.util.LibraryEditUtil;
 import org.eclipse.epf.library.edit.util.Messenger;
 import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
@@ -60,16 +58,17 @@ import org.eclipse.epf.services.Services;
 import org.eclipse.epf.services.ILibraryPersister.FailSafeMethodLibraryPersister;
 import org.eclipse.epf.uma.Activity;
 import org.eclipse.epf.uma.CustomCategory;
-import org.eclipse.epf.uma.DescribableElement;
 import org.eclipse.epf.uma.Descriptor;
 import org.eclipse.epf.uma.MethodElement;
-import org.eclipse.epf.uma.MethodPlugin;
 import org.eclipse.epf.uma.UmaPackage;
 import org.eclipse.epf.uma.VariabilityType;
 import org.eclipse.epf.uma.ecore.impl.MultiResourceEObject;
 import org.eclipse.epf.uma.util.AssociationHelper;
 import org.eclipse.epf.uma.util.UmaUtil;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * This command is used to delete a method element permanently. This involves
@@ -114,8 +113,6 @@ public class DeleteMethodElementCommand extends CommandWrapper {
 	private ArrayList<Command> nestedCommands;
 
 	private HashSet<Descriptor> descriptors;
-	
-	private Set<MethodPlugin> plugins;
 
 	/**
 	 * @param command
@@ -170,9 +167,6 @@ public class DeleteMethodElementCommand extends CommandWrapper {
 		if(descriptors != null) {
 			descriptors.clear();
 		}
-		if (plugins != null) {
-			plugins.clear();
-		}
 		
 		super.dispose();
 	}
@@ -212,95 +206,38 @@ public class DeleteMethodElementCommand extends CommandWrapper {
 	}
 
 	protected void prepareElements() {
-		plugins = new HashSet<MethodPlugin>();
 		ArrayList newElements = new ArrayList();
-		Collection<CustomCategory> customCategoriesToDelete = new HashSet<CustomCategory>();
-		RemoveCommand cmd = null;
 		for (Iterator iter = elements.iterator(); iter.hasNext();) {
 			Object element = iter.next();
 			if (element instanceof CustomCategory) {
-				cmd = getRemoveCommand(element);
+				RemoveCommand cmd = getRemoveCommand(element);
 				if (cmd.getFeature() instanceof EReference
 						&& ((EReference) cmd.getFeature()).isContainment()
 						&& cmd.getOwnerList().contains(element)) {
-					customCategoriesToDelete.add((CustomCategory) element);
-				}
-				MethodPlugin plugin = UmaUtil.getMethodPlugin((CustomCategory) element);
-				if (plugin != null) {
-					plugins.add(plugin);
-				}
-			}
-		}
-		
-		boolean newDeleteRule = true;
-		if (newDeleteRule) {
-			return;
-		}
-		
-		//The following code is no longer in used, keep it for future reference
-		if (!customCategoriesToDelete.isEmpty()) {
-			ArrayList<CustomCategory> topCustomCategoriesToDelete = new ArrayList<CustomCategory>(
-					customCategoriesToDelete);
-			// find all subcategories in the same plug-in that are not
-			// referenced by
-			// any other custom category to delete them as well
-			//
-			Iterator<CustomCategory> iter = new AbstractTreeIterator<CustomCategory>(
-					new ArrayList<CustomCategory>(
-							topCustomCategoriesToDelete), false) {
-
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				protected Iterator<? extends CustomCategory> getChildren(
-						Object object) {
-					if (object instanceof Collection) {
-						return ((Collection) object).iterator();
-					}
-					ArrayList<CustomCategory> children = new ArrayList<CustomCategory>();
-					CustomCategory cc = ((CustomCategory) object);
-					MethodPlugin plugin = UmaUtil.getMethodPlugin(cc);
-					for (DescribableElement element : cc
-							.getCategorizedElements()) {
-						if (element instanceof CustomCategory
-								&& UmaUtil.getMethodPlugin(element) == plugin) {
-							children.add((CustomCategory) element);
-						}
-					}
-					return children.iterator();
-				}
-
-			};
-			HashSet<CustomCategory> allCustomCategories = new HashSet<CustomCategory>();
-			while(iter.hasNext()) {
-				allCustomCategories.add(iter.next());
-			}
-			int size;
-			do {
-				size = customCategoriesToDelete.size();
-				check_cc:
-				for (CustomCategory cc : allCustomCategories) {
-					if (!customCategoriesToDelete.contains(cc)) {
-						List parents = AssociationHelper
-								.getCustomCategories(cc);
-						for (Object parent : parents) {
-							if (!customCategoriesToDelete.contains(parent)) {
-								// parent is not in the collection of custom
-								// categories to be deleted
-								// cannot delete the sub custom category for now
-								//
-								continue check_cc;
+					// custom category will be deleted permanently
+					// find all subcategory that are not referenced by any other
+					// custom category
+					// in the same plugin to delete them as well
+					//
+					Collection collection = TngUtil
+							.getExclusiveSubCustomCategories((CustomCategory) element);
+					if (!collection.isEmpty()) {
+						for (Iterator iterator = collection.iterator(); iterator
+								.hasNext();) {
+							Object subCat = iterator.next();
+							if (!elements.contains(subCat)
+									&& !newElements.contains(subCat)) {
+//								cmd.getCollection().add(subCat);
+								Collection col = cmd.getCollection();
+								col.add(subCat);								
+								newElements.add(subCat);
 							}
 						}
-						customCategoriesToDelete.add(cc);
 					}
 				}
-			} while (size != customCategoriesToDelete.size());
-			customCategoriesToDelete.removeAll(topCustomCategoriesToDelete);
-			elements.addAll(customCategoriesToDelete);
-			Collection collection = cmd.getCollection();
-			collection.addAll(customCategoriesToDelete);
+			}
 		}
+		elements.addAll(newElements);
 	}
 
 	/**
@@ -358,7 +295,6 @@ public class DeleteMethodElementCommand extends CommandWrapper {
 
 
 		if(!confirmRemovingReferences()) {
-			descriptors.clear();
 			return;
 		}
 		
@@ -385,7 +321,7 @@ public class DeleteMethodElementCommand extends CommandWrapper {
 		modifiedResources.removeAll(unmodifiedResources);
 
 		final Exception[] exceptions = new Exception[1];
-		UserInteractionHelper.getUIHelper().runWithBusyIndicator(new Runnable() {
+		BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
 
 			public void run() {
 				try {
@@ -451,7 +387,7 @@ public class DeleteMethodElementCommand extends CommandWrapper {
 		// check affected resources for unmodifiable
 		//
 		IStatus status = UserInteractionHelper.checkModify(modifiedResources,
-				LibraryEditPlugin.getDefault().getContext());
+				MsgBox.getDefaultShell());
 		if (!status.isOK()) {
 			Messenger.INSTANCE.showError(
 					LibraryEditResources.deleteDialog_title,
@@ -549,12 +485,6 @@ public class DeleteMethodElementCommand extends CommandWrapper {
 			}
 			
 			notifyExecuted();
-			if (plugins != null && !plugins.isEmpty()) {
-				for (MethodPlugin p : plugins) {
-					LibraryEditUtil.getInstance().fixUpDanglingCustomCategories(p);
-				}
-			}
-			
 		} else {
 			if (failed) {
 				notifyFailure();
@@ -683,7 +613,7 @@ public class DeleteMethodElementCommand extends CommandWrapper {
 			// check if the referencers can be changed
 			//
 			for (EObject e : referencers) {
-				IStatus status = UserInteractionHelper.checkModify(e, LibraryEditPlugin.getDefault().getContext());
+				IStatus status = UserInteractionHelper.checkModify(e, MsgBox.getDefaultShell());
 				if (!status.isOK()) {
 					Messenger.INSTANCE
 							.showError(
@@ -1205,7 +1135,6 @@ public class DeleteMethodElementCommand extends CommandWrapper {
 								list.remove(index);
 								removedReferences.add(new Reference(referencer,
 										feature, referenced, index));
-								removeReferenceFollowUp(referencer, referenced, feature);
 							} else {
 								if (TngUtil.DEBUG) {
 									System.out
@@ -1263,13 +1192,13 @@ public class DeleteMethodElementCommand extends CommandWrapper {
 					//
 					Activity act = (Activity) ref.getOwner();
 					VariabilityType vType = act.getVariabilityType();
-					if ((vType == VariabilityType.EXTENDS || vType == VariabilityType.LOCAL_CONTRIBUTION)
+					if ((vType == VariabilityType.EXTENDS_LITERAL || vType == VariabilityType.LOCAL_CONTRIBUTION_LITERAL)
 							&& StrUtil.isNull(act.getPresentationName())) {
 						Activity base = (Activity) ref.getValue();
 						batchCommand
 								.addFeatureValue(
 										act,
-										UmaPackage.Literals.METHOD_ELEMENT__PRESENTATION_NAME,
+										UmaPackage.Literals.DESCRIBABLE_ELEMENT__PRESENTATION_NAME,
 										ProcessUtil.getPresentationName(base));
 					}
 				}
@@ -1433,8 +1362,5 @@ public class DeleteMethodElementCommand extends CommandWrapper {
 		return executed;
 	}
 	
-	protected void removeReferenceFollowUp(EObject referencer,
-			EObject referenced, EStructuralFeature feature) {
-	}
 	
 }

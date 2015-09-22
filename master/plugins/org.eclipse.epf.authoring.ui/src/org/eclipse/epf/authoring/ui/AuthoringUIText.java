@@ -52,8 +52,6 @@ public class AuthoringUIText {
 	public static final String TOOL_MENTORS_PAGE_TITLE = AuthoringUIResources.toolMentorsPage_title; 
 
 	public static final String WORK_PRODUCTS_PAGE_TITLE = AuthoringUIResources.workProductsPage_title; 
-	
-	public static final String WORK_PRODUCT_STATES_PAGE_TITLE = AuthoringUIResources.workProductStatesPage_title;
 
 	/**
 	 * Editor section names and description.
@@ -104,16 +102,8 @@ public class AuthoringUIText {
 
 	public static final String VERSION_INFO_SECTION_NAME = AuthoringUIResources.versionInfoSection_name; 
 
-	public static final String VERSION_INFO_SECTION_DESC = AuthoringUIResources.versionInfoSection_desc;
-	
-	public static final String SLOT_SECTION_NAME = AuthoringUIResources.slotSection_name;
+	public static final String VERSION_INFO_SECTION_DESC = AuthoringUIResources.versionInfoSection_desc; 
 
-	public static final String SLOT_SECTION_DESC = AuthoringUIResources.slotSection_desc;
-	
-	public static final String STATES_SECTION_NAME = AuthoringUIResources.statesSection_name;
-	
-	public static final String STATES_SECTION_DESC = AuthoringUIResources.statesSection_desc;
-	
 	/**
 	 * UI and element attribute labels.
 	 */
@@ -180,8 +170,6 @@ public class AuthoringUIText {
 	public static final String PACKAGING_GUIDANCE_TEXT = AuthoringUIResources.packagingGuidance_text; 
 
 	public static final String PRESENTATION_NAME_TEXT = AuthoringUIResources.presentationName_text; 
-	
-	public static final String LONG_PRESENTATION_NAME_TEXT = AuthoringUIResources.long_presentationName_text;
 
 	public static final String PROBLEM_TEXT = AuthoringUIResources.problem_text; 
 
@@ -207,19 +195,11 @@ public class AuthoringUIText {
 
 	public static final String TYPE_TEXT = AuthoringUIResources.type_text; 
 
+	public static final String UNIQUE_ID_TEXT = AuthoringUIResources.uniqueId_text; 
+
 	public static final String VARIABILITY_TYPE_TEXT = AuthoringUIResources.variabilityType_text; 
 
 	public static final String VERSION_TEXT = AuthoringUIResources.version_text; 
-	
-	public static final String STATES_NAME_TEXT = AuthoringUIResources.states_name_text;
-	
-	public static final String STATES_WP_STATE_TEXT = AuthoringUIResources.states_wp_state_text;
-	
-	public static final String STATES_GLOBAL_STATE_TEXT = AuthoringUIResources.states_global_state_text;
-	
-	public static final String STATES_GLOBAL_NOTES_TEXT = AuthoringUIResources.states_global_notes_text;
-	
-	public static final String STATES_DES_TEXT = AuthoringUIResources.states_des_text;
 
 	/**
 	 * Button labels.
@@ -263,19 +243,4 @@ public class AuthoringUIText {
 	public static final String PROMPT_BUTTON_TEXT = MessageDialogWithToggle.PROMPT;
 
 	public static final String PUBLISH_CATEGORIES_TEXT = AuthoringUIResources.publish_categories_text;
-	
-	public static final String PUBLISH_PRACTICES_TEXT = AuthoringUIResources.publish_practices_text;
-	
-	public static final String PUBLISH_PRACTICES_FOR_UDT_TEXT = AuthoringUIResources.publish_practices_for_udt_text;
-	
-	public static final String STATES_ADD_TEXT = AuthoringUIResources.states_add_text;
-	
-	public static final String STATES_DELETE_TEXT = AuthoringUIResources.states_delete_text;
-	
-	public static final String STATES_MANAGE_TEXT = AuthoringUIResources.states_manage_text;
-	
-	public static final String STATES_ASSIGN_TEXT = AuthoringUIResources.states_assign_text;
-	
-	public static final String STATES_UNASSIGN_TEXT= AuthoringUIResources.states_unassign_text;
-	
 }

@@ -10,31 +10,19 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.authoring.ui.preferences;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.epf.authoring.ui.AuthoringUIPlugin;
 import org.eclipse.epf.authoring.ui.AuthoringUIResources;
 import org.eclipse.epf.authoring.ui.AuthoringUIText;
 import org.eclipse.epf.authoring.ui.editors.ColumnDescriptor;
-import org.eclipse.epf.authoring.ui.editors.EditorChooser;
 import org.eclipse.epf.authoring.ui.editors.ProcessEditor;
-import org.eclipse.epf.common.preferences.IPreferenceStoreWrapper;
-import org.eclipse.epf.common.ui.PreferenceStoreWrapper;
 import org.eclipse.epf.library.LibraryPlugin;
-import org.eclipse.epf.library.LibraryService;
-import org.eclipse.epf.library.edit.util.MethodLibraryPropUtil;
 import org.eclipse.epf.library.ui.LibraryUIResources;
 import org.eclipse.epf.library.ui.preferences.LibraryUIPreferences;
-import org.eclipse.epf.library.ui.wizards.LibraryBackupUtil;
-import org.eclipse.epf.library.util.SynFreeProcessConverter;
-import org.eclipse.epf.uma.MethodLibrary;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
-import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -124,10 +112,6 @@ public class ProcessEditorPreferencePage extends PreferencePage implements
 	private Button configSwitchPromptButton;
 
 	private Button inheritSuppressionButton;
-	
-	private Button synFreeButton;
-	
-	private boolean toConvertToSynFree = false;
 
 	private static class ColumnDescriptorProvider implements
 			ITreeContentProvider, ILabelProvider {
@@ -248,11 +232,7 @@ public class ProcessEditorPreferencePage extends PreferencePage implements
 	 * @see org.eclipse.jface.preference.PreferencePage#doGetPreferenceStore()
 	 */
 	protected IPreferenceStore doGetPreferenceStore() {
-		IPreferenceStoreWrapper wrapper = LibraryPlugin.getDefault().getPreferenceStore();
-		if ( wrapper instanceof PreferenceStoreWrapper ) {
-			return ((PreferenceStoreWrapper)wrapper).getStore();
-		}
-		return null;
+		return LibraryPlugin.getDefault().getPreferenceStore();
 	}
 
 	/**
@@ -524,68 +504,7 @@ public class ProcessEditorPreferencePage extends PreferencePage implements
 
 		inheritSuppressionButton.setSelection(getPreferenceStore().getBoolean(
 				ApplicationPreferenceConstants.PREF_INHERIT_SUPPRESSION_STATE));
-		
-		// synFreeButton states
-		Group synFreeGroup = new Group(composite, SWT.SHADOW_OUT);
-		synFreeGroup.setLayout(new GridLayout());
-		synFreeGroup.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		synFreeGroup
-				.setText(AuthoringUIResources.ProcessEditorPreferencePage_synchronizationGroupTitle); 
-
-		synFreeButton = new Button(synFreeGroup, SWT.CHECK);
-		
-		synFreeButton
-				.setText(AuthoringUIResources.ProcessEditorPreferencePage_synchronizationFree); 
-
-		boolean isSynFree = getPreferenceStore().getBoolean(
-				ApplicationPreferenceConstants.PREF_SYN_FREE);
-		
-		MethodLibrary lib = LibraryService.getInstance().getCurrentMethodLibrary();
-		if (lib != null) {
-			if (MethodLibraryPropUtil.getMethodLibraryPropUtil().isSynFree(lib)) {
-				isSynFree = true;
-				synFreeButton.setEnabled(false);
-				
-			} else {
-				isSynFree = false;
-				
-			}
-		}				
-		setSynFreeButtonSelection(isSynFree);
-		
-		synFreeButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				toConvertToSynFree = false;
-
-				if (synFreeButton.getSelection()) {
-					MethodLibrary lib = LibraryService.getInstance()
-							.getCurrentMethodLibrary();
-
-					if (lib != null
-							&& !MethodLibraryPropUtil
-									.getMethodLibraryPropUtil().isSynFree(lib)) {
-						toConvertToSynFree = AuthoringUIPlugin
-								.getDefault()
-								.getMsgDialog()
-								.displayConfirmation(
-										AuthoringUIResources.ProcessEditorPreferencePage_conversionDialogTitle,
-										AuthoringUIResources.ProcessEditorPreferencePage_conversionDialogText);
-						if (! toConvertToSynFree) {
-							synFreeButton.setSelection(false);
-							synFreeButton.setEnabled(true);
-							return;
-						}
-
-					}
-				}
-			}
-		});
-		
 		return composite;
-	}
-	
-	private void setSynFreeButtonSelection(boolean selected) {
-		synFreeButton.setSelection(selected);
 	}
 
 	/**
@@ -660,10 +579,7 @@ public class ProcessEditorPreferencePage extends PreferencePage implements
 				.setSelection(getPreferenceStore()
 						.getDefaultBoolean(
 								ApplicationPreferenceConstants.PREF_INHERIT_SUPPRESSION_STATE));
-		
-//		setSynFreeButtonSelection(getPreferenceStore().getDefaultBoolean(
-//				ApplicationPreferenceConstants.PREF_SYN_FREE));
-				
+
 		setSwitchConfigButton(MessageDialogWithToggle.PROMPT);
 	}
 
@@ -682,56 +598,9 @@ public class ProcessEditorPreferencePage extends PreferencePage implements
 		store.setValue(
 				ApplicationPreferenceConstants.PREF_INHERIT_SUPPRESSION_STATE,
 				inheritSuppressionButton.getSelection());
-		store.setValue(
-				ApplicationPreferenceConstants.PREF_SYN_FREE,
-				synFreeButton.getSelection());
 		// switch config preference is in library.ui
 		LibraryUIPreferences.setSwitchConfig(getSwitchConfigValue());
 
-		if (toConvertToSynFree) {
-			synFreeButton.setEnabled(false);
-			toConvertToSynFree = false;
-
-			EditorChooser.getInstance().closeAllMethodEditorsWithSaving();
-			final MethodLibrary lib = LibraryService.getInstance()
-					.getCurrentMethodLibrary();
-			LibraryBackupUtil.promptBackupCurrentLibrary(Display.getCurrent()
-					.getActiveShell(), LibraryService.getInstance());
-
-			IRunnableWithProgress op = new IRunnableWithProgress() {
-				public void run(IProgressMonitor monitor)
-						throws InvocationTargetException {
-					try {
-						monitor
-								.beginTask(
-										AuthoringUIResources.ProcessEditorPreferencePage_conversionProgressText,
-										IProgressMonitor.UNKNOWN);
-
-						SynFreeProcessConverter converter = new SynFreeProcessConverter();
-						converter.convertLibrary(lib);
-
-					} catch (Exception e) {						
-						throw new InvocationTargetException(e);
-					} finally {
-						monitor.done();
-					}
-				}
-			};
-
-			try {
-				new ProgressMonitorDialog(Display.getCurrent().getActiveShell())
-						.run(true, false, op);
-			} catch (Exception e) {
-				AuthoringUIPlugin.getDefault().getLogger().logError(e);
-				AuthoringUIPlugin
-						.getDefault()
-						.getMsgDialog()
-						.displayError(AuthoringUIResources.ProcessEditorPreferencePage_conversionDialogTitle,
-								AuthoringUIResources.ProcessEditorPreferencePage_conversionProgressFailText);
-			}
-
-		}
-		
 		return true;
 	}
 
@@ -807,11 +676,6 @@ public class ProcessEditorPreferencePage extends PreferencePage implements
 		// change to use LibraryPlugin store
 		// we need to share the preference in Library browsing and publishing
 		// Jinhua Xi 08/19/2006
-		// changed to use CommonUIPlugin store
-		IPreferenceStoreWrapper wrapper = LibraryPlugin.getDefault().getPreferenceStore();
-		if ( wrapper instanceof PreferenceStoreWrapper ) {
-			return ((PreferenceStoreWrapper)wrapper).getStore();
-		}
-		return null;
+		return LibraryPlugin.getDefault().getPreferenceStore();
 	}
 }

@@ -13,11 +13,9 @@ package org.eclipse.epf.importing.xml.services;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -28,10 +26,10 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.epf.common.service.versioning.VersionUtil;
-import org.eclipse.epf.common.ui.util.MsgBox;
-import org.eclipse.epf.common.ui.util.MsgDialog;
-import org.eclipse.epf.common.utils.ExtensionHelper;
+import org.eclipse.emf.ecore.sdo.EDataObject;
+import org.eclipse.epf.common.serviceability.MsgBox;
+import org.eclipse.epf.common.serviceability.MsgDialog;
+import org.eclipse.epf.common.serviceability.VersionUtil;
 import org.eclipse.epf.dataexchange.util.ContentProcessor;
 import org.eclipse.epf.dataexchange.util.IResourceHandler;
 import org.eclipse.epf.export.services.DiagramHandler;
@@ -48,9 +46,6 @@ import org.eclipse.epf.importing.wizards.SelectImportConfigurationSource;
 import org.eclipse.epf.importing.xml.ImportXMLPlugin;
 import org.eclipse.epf.importing.xml.ImportXMLResources;
 import org.eclipse.epf.library.LibraryService;
-import org.eclipse.epf.library.edit.util.DescriptorPropUtil;
-import org.eclipse.epf.library.edit.util.MethodLibraryPropUtil;
-import org.eclipse.epf.library.edit.util.MethodPluginPropUtil;
 import org.eclipse.epf.library.services.SafeUpdateController;
 import org.eclipse.epf.library.util.LibraryUtil;
 import org.eclipse.epf.persistence.MultiFileResourceSetImpl;
@@ -60,9 +55,7 @@ import org.eclipse.epf.persistence.refresh.RefreshJob;
 import org.eclipse.epf.services.IFileBasedLibraryPersister;
 import org.eclipse.epf.services.ILibraryPersister;
 import org.eclipse.epf.uma.UmaFactory;
-import org.eclipse.epf.uma.ecore.IModelObject;
 import org.eclipse.epf.xml.uma.Activity;
-import org.eclipse.epf.xml.uma.BreakdownElement;
 import org.eclipse.epf.xml.uma.CapabilityPattern;
 import org.eclipse.epf.xml.uma.ContentCategory;
 import org.eclipse.epf.xml.uma.ContentCategoryPackage;
@@ -100,13 +93,11 @@ public class ImportXMLService {
 	
 	private boolean overwrite = false;
 	
-	private int mergeLevel = 0;
-	
 	private IStatus fileCheckedOutStatus = null;
 	
 	private String xmlPath;
 
-	protected XMLLibrary xmlLib;
+	private XMLLibrary xmlLib;
 
 	private UmaLibrary umaLib;
 
@@ -125,8 +116,6 @@ public class ImportXMLService {
 	private IMigrator migrator;
 	
 	private boolean checkBasePlugins = true;
-	
-	private boolean isBaseLibSynFree = false;
 
 	/**
 	 * The constructor
@@ -135,14 +124,6 @@ public class ImportXMLService {
 
 	}
 
-	public static ImportXMLService newInstance() {
-		Object obj = ExtensionHelper.create(ImportXMLService.class, null);
-		if (obj instanceof ImportXMLService) {
-			return (ImportXMLService) obj;
-		}		
-		return new ImportXMLService();
-	}
-	
 	/**
 	 * Loads the xml file.
 	 * @param xmlPath
@@ -288,10 +269,6 @@ public class ImportXMLService {
 	 * @throws Exception
 	 */
 	public void doImport(IProgressMonitor monitor) throws Exception {
-		isBaseLibSynFree = MethodLibraryPropUtil.getMethodLibraryPropUtil()
-				.isSynFree(
-						LibraryService.getInstance().getCurrentMethodLibrary());
-		
 		boolean refresh = RefreshJob.getInstance().isEnabled();
 		try {
 			if (refresh) {
@@ -317,7 +294,7 @@ public class ImportXMLService {
 				protected File[] getFiles(org.eclipse.epf.uma.MethodElement elem) {
 					File[] files = super.getFiles(elem, false);
 										
-					IModelObject xmlObj = xmlLib.getElement(elem.getGuid());
+					EDataObject xmlObj = xmlLib.getElement(elem.getGuid());
 					if (xmlObj instanceof org.eclipse.epf.xml.uma.Process) {
 						org.eclipse.epf.xml.uma.Process proc = 
 								(org.eclipse.epf.xml.uma.Process) xmlObj;
@@ -377,10 +354,9 @@ public class ImportXMLService {
 			}
 
 			this.umaLib = new UmaLibrary(renameElementMap, contentProc, logger, overwrite);
-			this.umaLib.setMergeLevel(mergeLevel);
 
-			IModelObject xmlRoot = this.xmlLib.getRoot();
-			IModelObject umaRoot = this.umaLib.getRoot();
+			EDataObject xmlRoot = this.xmlLib.getRoot();
+			EDataObject umaRoot = this.umaLib.getRoot();
 			
 			logger.logMessage("create target library elements ..."); //$NON-NLS-1$
 			creatEDataObjectTree(xmlRoot, umaRoot);
@@ -438,33 +414,12 @@ public class ImportXMLService {
 				if (unlockedPlugins != null && ! unlockedPlugins.isEmpty()) {
 					LibraryImportManager.lockUnlockedPlugins(unlockedPlugins);
 				}
-
-				if (isBaseLibSynFree && !isSynFreeLib()) {
-					MethodLibraryPropUtil libPropUtil = MethodLibraryPropUtil
-							.getMethodLibraryPropUtil();
-					org.eclipse.epf.uma.MethodLibrary lib = LibraryService
-							.getInstance().getCurrentMethodLibrary();
-					if (!libPropUtil.isSynFree(lib)) {
-						libPropUtil.setSynFree(lib, true);
-					}
-					MethodPluginPropUtil pluginPropUtil = MethodPluginPropUtil
-							.getMethodPluginPropUtil();
-					for (org.eclipse.epf.uma.MethodPlugin p : lib
-							.getMethodPlugins()) {
-						if (!pluginPropUtil.isSynFree(p)) {
-							pluginPropUtil.setSynFree(p, true);
-						}
-					}
-				}		
-				
 				LibraryUtil.saveLibrary(LibraryService.getInstance()
 						.getCurrentMethodLibrary(), false, false);
 				diagramHandler.execute();				
 	
 				logger.logMessage("re-open target library ..."); //$NON-NLS-1$
-//				LibraryService.getInstance().reopenCurrentMethodLibrary();
-				postImportOperation(monitor);
-				
+				LibraryService.getInstance().reopenCurrentMethodLibrary();
 				if (migrator != null) {
 					org.eclipse.epf.uma.MethodLibrary lib = LibraryService.getInstance().getCurrentMethodLibrary();
 					migrator.migrateXmlImportedLib(lib, monitor);					
@@ -500,21 +455,16 @@ public class ImportXMLService {
 		}
 	}
 
-	protected void postImportOperation(IProgressMonitor monitor) throws Exception {
-		// Reopen the library.
-		LibraryService.getInstance().reopenCurrentMethodLibrary();	
-	}
-	
-	private void creatEDataObjectTree(IModelObject xmlObj, IModelObject umaObj) {
+	private void creatEDataObjectTree(EDataObject xmlObj, EDataObject umaObj) {
 
 		for (Iterator it = xmlObj.eContents().iterator(); it.hasNext();) {
-			IModelObject child = (IModelObject) it.next();
+			EDataObject child = (EDataObject) it.next();
 			createRmcObject(child, umaObj);
 		}
 	}
 
-	private void createRmcObject(IModelObject xmlElement,
-			IModelObject targetContainer) {
+	private void createRmcObject(EDataObject xmlElement,
+			EDataObject targetContainer) {
 		if (xmlElement instanceof MethodElementProperty) {
 			return;
 		}
@@ -523,15 +473,15 @@ public class ImportXMLService {
 		createRmcObject(xmlElement, targetContainer, feature.getName());
 	}
 
-	private void createRmcObject(IModelObject xmlElement,
-			IModelObject targetContainer, String containmentXmlFeature) {
+	private void createRmcObject(EDataObject xmlElement,
+			EDataObject targetContainer, String containmentXmlFeature) {
 
 		try {
 			if (xmlElement == null) {
 				return;
 			}
 
-			IModelObject umaElement = null;
+			EDataObject umaElement = null;
 
 			// don't create content category package since in uma, it's
 			// seperated based on type
@@ -640,7 +590,7 @@ public class ImportXMLService {
 		return (MethodPlugin) element;
 	}
 
-	private IModelObject getRmcObject(MethodElement xmlObj) {
+	private EDataObject getRmcObject(MethodElement xmlObj) {
 		if (xmlObj instanceof MethodLibrary) {
 			return umaLib.getRoot();
 		} else {
@@ -651,7 +601,7 @@ public class ImportXMLService {
 
 	private void iteratEDataObject(MethodElement srcObj) {
 		iteratEDataObject_(srcObj);
-		IModelObject targetObj = getRmcObject(srcObj);
+		EDataObject targetObj = getRmcObject(srcObj);
 		if (targetObj instanceof org.eclipse.epf.uma.MethodElement) {
 			diagramHandler.registerElement((org.eclipse.epf.uma.MethodElement) targetObj); 
 		}
@@ -678,16 +628,13 @@ public class ImportXMLService {
 			return;
 		}
 
-		IModelObject targetObj = getRmcObject(srcObj);
+		EDataObject targetObj = getRmcObject(srcObj);
 		EClass eClass = srcObj.eClass();
 
-		handleDescriptorExtraReferences(srcObj, targetObj);
-		
 		EList features = eClass.getEAllStructuralFeatures();
 		boolean isNewElement = umaLib.isNewElement(srcObj.getId()) || srcObj instanceof MethodLibrary;
 		boolean isOldPlugin = !isNewElement && (srcObj instanceof MethodPlugin);
 		
-		Set<EStructuralFeature> seenRmcFeatures = new HashSet<EStructuralFeature>();
 		for (Iterator it = features.iterator(); it.hasNext();) {
 			EStructuralFeature feature = (EStructuralFeature) it.next();
 						
@@ -699,21 +646,16 @@ public class ImportXMLService {
 			}
 
 			Object value = srcObj.eGet(feature);
+			if (value == null) {
+				continue;
+			}
 
 			try {
-				if (value == null) {
-					umaLib.handleNullXmlValue(srcObj, targetObj, feature.getName());
-					continue;
-				}
-				
 				boolean isMep = feature.getName().equals("methodElementProperty"); //$NON-NLS-1$	
 				if (value instanceof List && ! isMep) {
-					umaLib.initListValueMerge(srcObj, targetObj, feature.getName(), 
-							(List) value, seenRmcFeatures);
-					
 					for (Iterator itv = ((List) value).iterator(); itv
 							.hasNext();) {
-						Object src_value = itv.next();						
+						Object src_value = itv.next();
 
 						if (src_value instanceof String) {
 
@@ -739,11 +681,8 @@ public class ImportXMLService {
 							// an id, need special handling
 							// set the prede
 							WorkOrder wr = (WorkOrder) src_value;
-							Object umaWr = workOrderMap.get(wr);							
-							//umaLib.setWorkOrder(umaWr, wr.getValue());
-							if (umaWr instanceof org.eclipse.epf.uma.WorkOrder) {
-								umaLib.handleWorkOrder(wr, (org.eclipse.epf.uma.WorkOrder) umaWr);
-							}
+							Object umaWr = workOrderMap.get(wr);
+							umaLib.setWorkOrder(umaWr, wr.getValue());
 						} else {
 							logger
 									.logMessage(NLS.bind(ImportXMLResources.importXMLService_element_not_handled, src_value));
@@ -930,83 +869,6 @@ public class ImportXMLService {
 
 	public void setCheckBasePlugins(boolean checkBasePlugins) {
 		this.checkBasePlugins = checkBasePlugins;
-	}
-
-	public void setMergeLevel(int mergeLevel) {
-		this.mergeLevel = mergeLevel;
-	}
-	
-	public boolean isSynFreeLib() {
-		return xmlLib == null ? false : xmlLib.isSynFreeLib();
-	}
-	
-	private void handleDescriptorExtraReferences(MethodElement srcObj,
-			IModelObject targetObj) {
-		try {
-			handleDescriptorExtraReferences_(srcObj, targetObj);
-		} catch (Exception e) {
-			logger.logError(e.getMessage(), e);
-		}
-	}
-	
-	private void handleDescriptorExtraReferences_(MethodElement srcObj,
-			IModelObject targetObj) {
-		if (!(targetObj instanceof org.eclipse.epf.uma.Descriptor)) {
-			return;
-		}
-
-		boolean ok = srcObj instanceof org.eclipse.epf.xml.uma.RoleDescriptor
-				|| srcObj instanceof org.eclipse.epf.xml.uma.WorkProductDescriptor
-				|| srcObj instanceof org.eclipse.epf.xml.uma.TaskDescriptor;
-
-		if (!ok) {
-			return;
-		}
-
-		org.eclipse.epf.uma.Descriptor tgtDes = (org.eclipse.epf.uma.Descriptor) targetObj;
-		BreakdownElement srcDes = (BreakdownElement) srcObj;
-
-		EList<MethodElementProperty> mepPropList = srcDes.getMethodElementProperty();
-		if (mepPropList == null || mepPropList.isEmpty()) {
-			return;
-		}
-
-		for (int i = mepPropList.size() - 1; i >=0; i--) {
-			MethodElementProperty mep = mepPropList.get(i);
-			if (mep.getName().startsWith("XML_")) {		//$NON-NLS-1$
-				handleExtraRef(srcDes, tgtDes, mep);
-				mepPropList.remove(i);
-			}
-		}				
-
-	}
-	
-	private void handleExtraRef(BreakdownElement srcDes,
-			org.eclipse.epf.uma.Descriptor tgtDes, MethodElementProperty mep) {
-		String refName = mep.getName().substring(4);
-		EStructuralFeature feature = tgtDes.eClass().getEStructuralFeature(
-				refName);
-		if (feature instanceof EReference) {
-			EReference ref = (EReference) feature;
-			if (ref.isMany()) {
-				List<org.eclipse.epf.uma.MethodElement> list = (List<org.eclipse.epf.uma.MethodElement>) tgtDes
-						.eGet(ref);
-				list.clear();
-				String[] guidStrList = mep.getValue().split(
-						DescriptorPropUtil.infoSeperator);
-				if (guidStrList == null || guidStrList.length == 0) {
-					return;
-				}
-				for (String guid : guidStrList) {
-					org.eclipse.epf.uma.MethodElement element = (org.eclipse.epf.uma.MethodElement) umaLib
-							.getElement(guid);
-					if (element != null) {
-						list.add(element);
-					}
-				}
-
-			}
-		}
 	}
 	
 }

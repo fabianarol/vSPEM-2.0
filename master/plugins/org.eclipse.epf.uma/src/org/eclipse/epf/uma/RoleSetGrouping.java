@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.uma;
 
+import org.eclipse.emf.common.util.EList;
 import java.util.List;
 
 /**
@@ -44,9 +45,9 @@ public interface RoleSetGrouping extends ContentCategory {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Role Sets</em>' reference list.
 	 * @see org.eclipse.epf.uma.UmaPackage#getRoleSetGrouping_RoleSets()
-	 * @model ordered="false"
+	 * @model type="org.eclipse.epf.uma.RoleSet" ordered="false"
 	 * @generated
 	 */
-	List<RoleSet> getRoleSets();
+	List getRoleSets();
 
 } // RoleSetGrouping

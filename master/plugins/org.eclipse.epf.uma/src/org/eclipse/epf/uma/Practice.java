@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.uma;
 
+import org.eclipse.emf.common.util.EList;
 import java.util.List;
 
 /**
@@ -19,7 +20,6 @@ import java.util.List;
  *
  * <!-- begin-model-doc -->
  * A Practice represents a proven way or strategy of doing work to achieve a goal that has a positive impact on work product or process quality.  Practices are defined orthogonal to methods and processes.  They could summarize aspects that impact many different parts of a method or specific processes.  Examples for practices would be "Manage Risks", "Continuously verify quality", "Architecture-centric and component-based development", etc.
- * 
  * <!-- end-model-doc -->
  *
  * <p>
@@ -47,10 +47,10 @@ public interface Practice extends Guidance {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Sub Practices</em>' containment reference list.
 	 * @see org.eclipse.epf.uma.UmaPackage#getPractice_SubPractices()
-	 * @model containment="true" resolveProxies="true" ordered="false"
+	 * @model type="org.eclipse.epf.uma.Practice" containment="true" resolveProxies="true" ordered="false"
 	 * @generated
 	 */
-	List<Practice> getSubPractices();
+	List getSubPractices();
 
 	/**
 	 * Returns the value of the '<em><b>Content References</b></em>' reference list.
@@ -63,10 +63,10 @@ public interface Practice extends Guidance {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Content References</em>' reference list.
 	 * @see org.eclipse.epf.uma.UmaPackage#getPractice_ContentReferences()
-	 * @model ordered="false"
+	 * @model type="org.eclipse.epf.uma.ContentElement" ordered="false"
 	 * @generated
 	 */
-	List<ContentElement> getContentReferences();
+	List getContentReferences();
 
 	/**
 	 * Returns the value of the '<em><b>Activity References</b></em>' reference list.
@@ -79,9 +79,9 @@ public interface Practice extends Guidance {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Activity References</em>' reference list.
 	 * @see org.eclipse.epf.uma.UmaPackage#getPractice_ActivityReferences()
-	 * @model ordered="false"
+	 * @model type="org.eclipse.epf.uma.Activity" ordered="false"
 	 * @generated
 	 */
-	List<Activity> getActivityReferences();
+	List getActivityReferences();
 
 } // Practice

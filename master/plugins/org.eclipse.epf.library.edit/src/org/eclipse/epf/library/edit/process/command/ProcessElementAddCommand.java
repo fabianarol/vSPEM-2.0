@@ -53,7 +53,7 @@ implements IResourceAwareCommand
 		if (featuresToCheck == null) {
 			super.getFeaturesToCheck().add(
 					UmaPackage.eINSTANCE
-							.getMethodElement_PresentationName());
+							.getDescribableElement_PresentationName());
 		}
 		return featuresToCheck;
 	}

@@ -12,7 +12,6 @@ package org.eclipse.epf.library.edit.command;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -24,7 +23,6 @@ import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.uma.ContentElement;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.MethodPlugin;
-import org.eclipse.epf.uma.Section;
 import org.eclipse.epf.uma.VariabilityElement;
 import org.eclipse.epf.uma.util.UmaUtil;
 
@@ -41,7 +39,7 @@ public class MoveInSectionListCommand extends AbstractCommand implements
 
 	private SectionList sectionList;
 
-	private List<? extends Section> elementsList;
+	private List elementsList;
 
 	private ContentElement usedContentElement = null;
 
@@ -63,7 +61,7 @@ public class MoveInSectionListCommand extends AbstractCommand implements
 	}
 
 	public MoveInSectionListCommand(ContentElement contentElement,
-			List<? extends Section> elementsList, SectionList sectionList, int direction) {
+			List elementsList, SectionList sectionList, int direction) {
 		this.contentElement = contentElement;
 		this.sectionList = sectionList;
 		this.elementsList = elementsList;
@@ -97,13 +95,7 @@ public class MoveInSectionListCommand extends AbstractCommand implements
 	 * @see com.ibm.library.edit.command.IResourceAwareCommand#getModifiedResources()
 	 */
 	public Collection getModifiedResources() {
-		String orderingGuide = contentElement.getOrderingGuide();
-		if (orderingGuide != null && orderingGuide.length() > 0) {
-			modifiedResources.add(contentElement.eResource());
-		}
-		if (contentElement.getPresentation() != null) {
-			modifiedResources.add(contentElement.getPresentation().eResource());
-		}
+		modifiedResources.add(contentElement.eResource());
 		return modifiedResources;
 	}
 
@@ -118,7 +110,7 @@ public class MoveInSectionListCommand extends AbstractCommand implements
 				.getMethodPlugin((MethodElement) elementsList.get(0));
 
 		if (taskPlugin != elementPlugin
-				&& Misc.isBaseOf(taskPlugin, elementPlugin, new HashMap<String, Boolean>())) {
+				&& Misc.isBaseOf(taskPlugin, elementPlugin)) {
 			for (Iterator iter = TngUtil.getContributors(contentElement); iter
 					.hasNext();) {
 				VariabilityElement ve = (VariabilityElement) iter.next();
@@ -144,15 +136,15 @@ public class MoveInSectionListCommand extends AbstractCommand implements
 	public void redo() {
 		if (usedContentElement == null)
 			return;
-		int size = elementsList.size();
-		for (Section object : elementsList) {
+		for (Iterator it = elementsList.iterator(); it.hasNext();) {
+			Object object = it.next();
 			int index = sectionList.indexOf(object);
 			if (direction == UP) {
 				if (index > 0)
 					sectionList.move(index - 1, object);
 			} else if (direction == Down) {
 				if (index < sectionList.size())
-					sectionList.move(index + size, object);
+					sectionList.move(index + elementsList.size(), object);
 			}
 			moved = true;
 		}
@@ -162,12 +154,12 @@ public class MoveInSectionListCommand extends AbstractCommand implements
 
 	public void undo() {
 		if (moved) {
-			int size = elementsList.size();
-			for (Section object : elementsList) {
+			for (Iterator it = elementsList.iterator(); it.hasNext();) {
+				Object object = it.next();
 				int index = sectionList.indexOf(object);
 				if (direction == UP) {
 					if (index < sectionList.size())
-						sectionList.move(index + size, object);
+						sectionList.move(index + elementsList.size(), object);
 				} else if (direction == Down) {
 					if (index > 0)
 						sectionList.move(index - 1, object);

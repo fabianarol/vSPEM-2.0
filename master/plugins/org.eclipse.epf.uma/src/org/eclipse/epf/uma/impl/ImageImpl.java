@@ -17,7 +17,6 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.epf.uma.Image;
-import org.eclipse.epf.uma.UmaFactory;
 import org.eclipse.epf.uma.UmaPackage;
 
 /**
@@ -35,6 +34,13 @@ import org.eclipse.epf.uma.UmaPackage;
  * @generated
  */
 public class ImageImpl extends LeafElementImpl implements Image {
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * The default value of the '{@link #getUri() <em>Uri</em>}' attribute.
 	 * <!-- begin-user-doc -->
@@ -85,7 +91,7 @@ public class ImageImpl extends LeafElementImpl implements Image {
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -93,7 +99,6 @@ public class ImageImpl extends LeafElementImpl implements Image {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.IMAGE;
 	}
@@ -147,7 +152,6 @@ public class ImageImpl extends LeafElementImpl implements Image {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.IMAGE__URI:
@@ -163,7 +167,6 @@ public class ImageImpl extends LeafElementImpl implements Image {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.IMAGE__URI:
@@ -181,7 +184,6 @@ public class ImageImpl extends LeafElementImpl implements Image {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.IMAGE__URI:
@@ -199,7 +201,6 @@ public class ImageImpl extends LeafElementImpl implements Image {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);
@@ -223,7 +224,6 @@ public class ImageImpl extends LeafElementImpl implements Image {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy())
 			return super.toString();

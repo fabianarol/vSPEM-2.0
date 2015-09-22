@@ -21,21 +21,20 @@ import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Properties;
 
 import org.eclipse.epf.common.utils.I18nUtil;
 import org.eclipse.epf.common.utils.Timer;
 import org.eclipse.epf.common.xml.XSLTProcessor;
+import org.eclipse.epf.library.ILibraryResourceManager;
 import org.eclipse.epf.library.LibraryPlugin;
 import org.eclipse.epf.library.LibraryResources;
-import org.eclipse.epf.library.layout.elements.DescriptorLayout;
 import org.eclipse.epf.library.layout.util.XmlElement;
 import org.eclipse.epf.library.layout.util.XmlHelper;
 import org.eclipse.epf.library.prefs.PreferenceUtil;
+import org.eclipse.epf.library.util.ContentResourceScanner;
 import org.eclipse.epf.library.util.LibraryUtil;
 import org.eclipse.epf.library.util.ResourceHelper;
-import org.eclipse.epf.publish.layout.LayoutPlugin;
 import org.eclipse.epf.uma.MethodElement;
 
 import com.ibm.icu.util.Calendar;
@@ -69,10 +68,8 @@ public class HtmlBuilder {
 	//private IContentValidator validator = null;
 
 	// override this path to specify xsl path
-	private String layoutXslRootPath = LayoutPlugin.getDefault().getLayoutXslPath();
+	private String layoutXslRootPath = LibraryPlugin.getDefault().getLayoutXslPath();
 	
-	private Map<MethodElement, String> elementContentMap;
-
 	/**
 	 * Creates a new instance.
 	 */
@@ -86,10 +83,6 @@ public class HtmlBuilder {
 	public HtmlBuilder(ElementLayoutManager mgr) {
 		init();
 		setLayoutManager(mgr);
-	}
-		
-	public void setElementContentMap(Map<MethodElement, String> elementContentMap) {
-		this.elementContentMap = elementContentMap;
 	}
 	
 	public void setLayoutXslRootPath(String path) {
@@ -127,14 +120,10 @@ public class HtmlBuilder {
 		loadDefaultLayoutXsl();
 	}
 
-	public void addParam(String key, String value) {
-		xslParams.put(key, value);
-	}
-	
 	public void loadDefaultLayoutXsl() {
-		layoutXslRootPath = LayoutPlugin.getDefault().getLayoutXslPath();
+		layoutXslRootPath = LibraryPlugin.getDefault().getLayoutXslPath();
 		try {
-			xslParams = LayoutPlugin.getDefault().getProperties(
+			xslParams = LibraryPlugin.getDefault().getProperties(
 					"/layout/xsl/resources.properties"); //$NON-NLS-1$
 			
 			// add the colon property, 
@@ -191,22 +180,22 @@ public class HtmlBuilder {
 		return this.mgr.getValidator();
 	}
 
-//	/**
-//	 * Returns the content resource scanner for the element.
-//	 */
-//	private ContentResourceScanner getScanner(MethodElement owner) {
-//		ILibraryResourceManager resMgr = ResourceHelper.getResourceMgr(owner);
-//		if ( resMgr == null ) {
-//			return null;
-//		}
-//		
-//		String rootContentPath = resMgr.getLogicalPluginPath(owner);
-//		File src_root = new File(resMgr.getPhysicalPluginPath(owner));
-//		File tgt_root = new File(getPublishDir(), rootContentPath);
-//		ContentResourceScanner scanner = new ContentResourceScanner(src_root, tgt_root, rootContentPath, getValidator());
-//
-//		return scanner;
-//	}
+	/**
+	 * Returns the content resource scanner for the element.
+	 */
+	private ContentResourceScanner getScanner(MethodElement owner) {
+		ILibraryResourceManager resMgr = ResourceHelper.getResourceMgr(owner);
+		if ( resMgr == null ) {
+			return null;
+		}
+		
+		String rootContentPath = resMgr.getLogicalPluginPath(owner);
+		File src_root = new File(resMgr.getPhysicalPluginPath(owner));
+		File tgt_root = new File(getPublishDir(), rootContentPath);
+		ContentResourceScanner scanner = new ContentResourceScanner(src_root, tgt_root, rootContentPath, getValidator());
+
+		return scanner;
+	}
 
 	/**
 	 * Sets the flag to display the "Show tree browser" image/link.
@@ -323,7 +312,7 @@ public class HtmlBuilder {
 		
 		// add time logging when publishing element
 		long time_start = Calendar.getInstance().getTimeInMillis();
-		String elementPath = layout.getNoAdjustedElementPath().replace('/',
+		String elementPath = layout.getFilePath().replace('/',
 				File.separatorChar);
 		String elementPathName = elementPath
 				+ layout.getFileName(ResourceHelper.FILE_EXT_HTML);
@@ -406,20 +395,6 @@ public class HtmlBuilder {
 		
 		try {
 			StringWriter sw = new StringWriter();
-			
-			if (getValidator()
-					.showLinkedPageForDescriptor()
-					&& layout instanceof DescriptorLayout) {
-
-				DescriptorLayout dLayout = (DescriptorLayout) layout;
-				MethodElement linedElement = dLayout.getLinkedElement();
-				if (linedElement != null) {
-					getValidator().addReferencedElement(dLayout.getElement(),
-							linedElement);
-					return;
-				}
-			}		
-			
 			XSLTProcessor.transform(xsl_uri, xml.toString(), xslParams, sw);
 			sw.flush();
 			String content = sw.getBuffer().toString();
@@ -430,22 +405,14 @@ public class HtmlBuilder {
 				timer.start();
 			}
 			// Always validate and fix the content before publishing.
-			
 			content = ResourceHelper.validateContent(layout.getElement(),
 					content, getValidator(), layout.getLayoutMgr()
-							.getConfiguration(), this.layoutXslRootPath);
-						
+							.getConfiguration());
 			if (contentScanEnabled()) {
-//				scanContentForResources(layout.getElement(), content, layout
-//						.getFilePath());
-				getValidator().scanContent(layout, content);
+				scanContentForResources(layout.getElement(), content, layout
+						.getFilePath());
 			}
-			
-			content = getLayoutManager().getAdjustedElementPathStringValue(content);		
-			if (elementContentMap != null) {
-				elementContentMap.put(layout.getElement(), content);
-			}
-						
+
 			if ( debug) {
 				timer.stop();
 				System.out.println(timer.getTime() + " mini seconds scanning content"); //$NON-NLS-1$
@@ -499,8 +466,7 @@ public class HtmlBuilder {
 
 		xml.append(XmlHelper.XML_HEADER).append(xmlElement.toXml());
 
-//		if ( debug || CommandLineRunUtil.getInstance().isNeedToRun()) {
-		if ( debug) {			
+		if ( debug ) {
 			try {
 				String xml_file = this.getPublishDir() + "xml" + File.separator; //$NON-NLS-1$
 				xml_file += layout.getType() + "." + layout.getFileName(".xml"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -529,16 +495,16 @@ public class HtmlBuilder {
 		return xml;
 	}
 
-//	/**
-//	 * Scans the content for resource references.
-//	 */
-//	private void scanContentForResources(MethodElement owner, String content,
-//			String contentPath) {
-//		ContentResourceScanner scanner = getScanner(owner);
-//		if ( scanner != null ) {
-//			scanner.resolveResources(owner, content, contentPath);
-//		}
-//	}
+	/**
+	 * Scans the content for resource references.
+	 */
+	private void scanContentForResources(MethodElement owner, String content,
+			String contentPath) {
+		ContentResourceScanner scanner = getScanner(owner);
+		if ( scanner != null ) {
+			scanner.resolveResources(owner, content, contentPath);
+		}
+	}
 
 	public void dispose() {
 //		if (validator != null) {

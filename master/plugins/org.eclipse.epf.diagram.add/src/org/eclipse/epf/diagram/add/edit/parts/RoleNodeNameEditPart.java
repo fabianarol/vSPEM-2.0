@@ -23,7 +23,6 @@ import org.eclipse.emf.transaction.RunnableWithResult;
 import org.eclipse.epf.diagram.add.edit.policies.DiagramTextSelectionEditPolicy;
 import org.eclipse.epf.diagram.add.part.ActivityDetailDiagramEditorPlugin;
 import org.eclipse.epf.diagram.add.providers.DiagramElementTypes;
-import org.eclipse.epf.diagram.core.providers.DiagramIconProviderManager;
 import org.eclipse.epf.diagram.core.util.DiagramConstants;
 import org.eclipse.epf.diagram.core.util.DiagramCoreUtil;
 import org.eclipse.gef.AccessibleEditPart;
@@ -210,13 +209,8 @@ public class RoleNodeNameEditPart extends CompartmentEditPart implements
 	 * @modified
 	 */
 	protected Image getLabelIcon() {
-		Image image = DiagramIconProviderManager.getInstance().getIcon(resolveSemanticElement(), true);
-		if (image == null) {
-			image =  ActivityDetailDiagramEditorPlugin.getInstance().getSharedImage(
-				"diagram/RoleDescriptor.gif");	//$NON-NLS-1$
-		}
-
-		return image;
+		return ActivityDetailDiagramEditorPlugin.getInstance().getSharedImage(
+				"diagram/RoleDescriptor.gif"); //$NON-NLS-1$
 	}
 
 	/**

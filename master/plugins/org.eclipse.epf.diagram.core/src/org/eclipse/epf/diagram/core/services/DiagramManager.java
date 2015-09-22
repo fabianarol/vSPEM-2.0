@@ -52,14 +52,13 @@ import org.eclipse.emf.ecore.xmi.XMIResource;
 import org.eclipse.emf.ecore.xmi.XMLHelper;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.emf.transaction.impl.InternalTransactionalEditingDomain;
-import org.eclipse.emf.transaction.impl.TransactionChangeRecorder;
-import org.eclipse.emf.transaction.util.ValidateEditSupport;
 import org.eclipse.emf.workspace.AbstractEMFOperation;
 import org.eclipse.emf.workspace.util.WorkspaceSynchronizer;
 import org.eclipse.epf.common.CommonPlugin;
 import org.eclipse.epf.diagram.core.DiagramCorePlugin;
 import org.eclipse.epf.diagram.core.bridge.BridgeHelper;
 import org.eclipse.epf.diagram.core.providers.AccessibleDiagramModificationListener;
+import org.eclipse.epf.diagram.core.services.FileSynchronizer.FileInfo;
 import org.eclipse.epf.diagram.model.ActivityDetailDiagram;
 import org.eclipse.epf.diagram.model.ModelFactory;
 import org.eclipse.epf.diagram.model.WorkProductDependencyDiagram;
@@ -75,7 +74,6 @@ import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.persistence.ILibraryResource;
 import org.eclipse.epf.library.persistence.internal.IFailSafeSavable;
 import org.eclipse.epf.library.persistence.util.ExtendedResourceSet;
-import org.eclipse.epf.library.persistence.util.FileSynchronizer.FileInfo;
 import org.eclipse.epf.persistence.FailSafePersistenceHelper;
 import org.eclipse.epf.persistence.FileManager;
 import org.eclipse.epf.persistence.MultiFileSaveUtil;
@@ -151,7 +149,7 @@ public class DiagramManager {
 		}
 		
 		@Override
-		protected Collection<IFile> handleMovedFiles(Map<IFile, IPath> movedFileToNewPathMap) {
+		protected Map<IFile, IPath> handleMovedFiles(Map<IFile, IPath> movedFileToNewPathMap) {
 			for (Map.Entry<IFile, IPath> entry : movedFileToNewPathMap.entrySet()) {
 				IFile iFile = entry.getKey();
 				if(DIAGRAM_FILENAME.equals(iFile.getName())) {
@@ -163,11 +161,12 @@ public class DiagramManager {
 					}
 				}
 			}
-			return movedFileToNewPathMap.keySet();
+			return super.handleMovedFiles(movedFileToNewPathMap);
 		}
 		
 		@Override
-		protected Collection<IFile> handleDeletedFiles(Collection<IFile> deletedFiles) {
+		protected Collection handleDeletedFiles(Collection<IFile> deletedFiles) {
+			// TODO Auto-generated method stub
 			return super.handleDeletedFiles(deletedFiles);
 		}
 	};
@@ -246,7 +245,7 @@ public class DiagramManager {
 				if(mgr == null) {
 					mgr = new DiagramManager(process);
 					processToDiagramManagerMap.put(process, mgr);
-					if(!fileSynchronizer.isInstalled()) {
+					if(!fileSynchronizer.fIsInstalled) {
 						fileSynchronizer.install();
 					}
 				}
@@ -367,19 +366,7 @@ public class DiagramManager {
 						{
 							Adapter adapter = adapters[i];
 							if(!(adapter instanceof AccessibleDiagramModificationListener)) {
-								TransactionChangeRecorder recorder = null;
-								ValidateEditSupport support = null;
-								if (adapter instanceof TransactionChangeRecorder) {
-									recorder = (TransactionChangeRecorder) adapter;
-									support = recorder.getValidateEditSupport();
-									if (support != null) {
-										recorder.setValidateEditSupport(null);
-									}
-								}
 								adapter.notifyChanged(notification);
-								if (support != null) {
-									recorder.setValidateEditSupport(support);
-								}
 							}
 						}
 					}
@@ -749,21 +736,14 @@ public class DiagramManager {
 	public Diagram createDiagram(final Activity act, final int type, final PreferencesHint hint) throws CoreException {
 		checkActivity(act);
 		// check if this activity contributes/extends other activity and try
-		// copy the existing diagram from the base
+		// copy
+		// the existing diagram from the base
 		//
 		if (ProcessUtil.isExtendingOrLocallyContributing(act)) {
-			Activity baseAct = (Activity) act;
-			DiagramManager mgr = null;
-			List<?> baseDiagrams = null;
+			Activity baseAct = (Activity) act.getVariabilityBasedOnElement();
+			DiagramManager mgr = DiagramManager.getInstance(TngUtil.getOwningProcess(baseAct), this);
 			try {
-				do {
-					baseAct = (Activity) baseAct.getVariabilityBasedOnElement();
-					if(mgr != null) {
-						mgr.removeConsumer(this);
-					}
-					mgr = DiagramManager.getInstance(TngUtil.getOwningProcess(baseAct), this);
-					baseDiagrams = mgr.getDiagrams(baseAct, type);
-				} while(baseDiagrams.isEmpty() && ProcessUtil.isExtendingOrLocallyContributing(baseAct));
+				List baseDiagrams = mgr.getDiagrams(baseAct, type);
 				if(!baseDiagrams.isEmpty()) {
 					Diagram baseDiagram = (Diagram) baseDiagrams.get(0);
 					if (baseDiagram != null) {
@@ -1067,14 +1047,7 @@ public class DiagramManager {
 	private void checkActivity(Activity act) {		
 		Process proc = TngUtil.getOwningProcess(act);
 		if(proc != process) {
-			String msg = "The specified activity does not belong to the process of this diagram manager.";
-			String str = process == null ? "null" : TngUtil.getLabelWithPath(process) + ", " + process.getGuid();
-			msg += "\nProcess of this diagram manager: " + str;
-			str = act == null ? "null" : TngUtil.getLabelWithPath(act) + ", " + act.getGuid();
-			msg += "\nActivity of the diagram        : " + str;
-			str = proc == null ? "null" : TngUtil.getLabelWithPath(proc) + ", " + proc.getGuid();
-			msg += "\nActivity's process             : " + str;
-			throw new IllegalArgumentException(msg); //$NON-NLS-1$
+			throw new IllegalArgumentException("The specified activity does not belong to the process of this diagram manager."); //$NON-NLS-1$
 		}
 	}	
 	
@@ -1111,9 +1084,6 @@ public class DiagramManager {
 	}
 	
 	public static boolean isSynchronized(Resource resource) {
-		if(resource == null) {
-			return false;
-		}
 		IFile file = WorkspaceSynchronizer.getFile(resource);
 		if(file != null) {
 			// don't refresh to prevent resource from automatically reloaded

@@ -43,7 +43,7 @@ public interface DeliveryProcessDescription extends ProcessDescription {
 	 * @return the value of the '<em>Scale</em>' attribute.
 	 * @see #setScale(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getDeliveryProcessDescription_Scale()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getScale();
@@ -69,7 +69,7 @@ public interface DeliveryProcessDescription extends ProcessDescription {
 	 * @return the value of the '<em>Project Characteristics</em>' attribute.
 	 * @see #setProjectCharacteristics(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getDeliveryProcessDescription_ProjectCharacteristics()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getProjectCharacteristics();
@@ -95,7 +95,7 @@ public interface DeliveryProcessDescription extends ProcessDescription {
 	 * @return the value of the '<em>Risk Level</em>' attribute.
 	 * @see #setRiskLevel(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getDeliveryProcessDescription_RiskLevel()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getRiskLevel();
@@ -121,7 +121,7 @@ public interface DeliveryProcessDescription extends ProcessDescription {
 	 * @return the value of the '<em>Estimating Technique</em>' attribute.
 	 * @see #setEstimatingTechnique(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getDeliveryProcessDescription_EstimatingTechnique()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getEstimatingTechnique();
@@ -147,7 +147,7 @@ public interface DeliveryProcessDescription extends ProcessDescription {
 	 * @return the value of the '<em>Project Member Expertise</em>' attribute.
 	 * @see #setProjectMemberExpertise(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getDeliveryProcessDescription_ProjectMemberExpertise()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getProjectMemberExpertise();
@@ -173,7 +173,7 @@ public interface DeliveryProcessDescription extends ProcessDescription {
 	 * @return the value of the '<em>Type Of Contract</em>' attribute.
 	 * @see #setTypeOfContract(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getDeliveryProcessDescription_TypeOfContract()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getTypeOfContract();

@@ -16,7 +16,7 @@ import org.eclipse.epf.authoring.ui.AuthoringUIPlugin;
 import org.eclipse.epf.authoring.ui.dialogs.MethodAddImageDialog;
 import org.eclipse.epf.authoring.ui.richtext.IMethodRichText;
 import org.eclipse.epf.common.utils.NetUtil;
-import org.eclipse.epf.library.ui.LibraryUIUtil;
+import org.eclipse.epf.library.util.ResourceHelper;
 import org.eclipse.epf.richtext.IRichText;
 import org.eclipse.epf.richtext.RichTextCommand;
 import org.eclipse.epf.richtext.RichTextEditor;
@@ -63,7 +63,7 @@ public class MethodAddImageAction extends RichTextAction {
 				if (dialog.getFileToCopy() != null) {
 					// Copy the image to the resource folder if necessary.
 					try {
-						String imageLink = NetUtil.decodedFileUrl(LibraryUIUtil.getURLForAttachment(Display
+						String imageLink = NetUtil.decodedFileUrl(ResourceHelper.getURLForAttachment(Display
 								.getCurrent().getActiveShell(), dialog
 								.getFileToCopy(),
 								((IMethodRichText) richText)

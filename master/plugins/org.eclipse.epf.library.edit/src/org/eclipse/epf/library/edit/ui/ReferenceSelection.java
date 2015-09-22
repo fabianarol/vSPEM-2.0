@@ -10,16 +10,18 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.library.edit.ui;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.emf.edit.provider.IItemLabelProvider;
+import org.eclipse.emf.common.notify.AdapterFactory;
+import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.epf.library.edit.LibraryEditResources;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
 import org.eclipse.epf.library.edit.command.IUserInteractionHandler;
-import org.eclipse.epf.library.edit.util.AdapterFactoryItemLabelProvider;
 import org.eclipse.epf.library.edit.util.ExtensionManager;
 import org.eclipse.epf.uma.Descriptor;
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.osgi.util.NLS;
 
 /**
@@ -96,16 +98,20 @@ public class ReferenceSelection {
 		IUserInteractionHandler uiHandler = ExtensionManager
 				.getDefaultUserInteractionHandler();
 		if (uiHandler != null) {
-			IItemLabelProvider labelProvider = new AdapterFactoryItemLabelProvider(
+			ILabelProvider labelProvider = new AdapterFactoryLabelProvider(
 					TngAdapterFactory.INSTANCE
 							.getNavigatorView_ComposedAdapterFactory());
 			String title = LibraryEditResources.ui_references;
-			List selected = uiHandler.select(ref, labelProvider, true, ref,
-					title, msg);
-			if (selected == null) {
-				throw new OperationCanceledException();
+			try {
+				List selected = uiHandler.select(ref, labelProvider, true, ref,
+						title, msg);
+				if (selected == null) {
+					throw new OperationCanceledException();
+				}
+				return selected.toArray();
+			} finally {
+				labelProvider.dispose();
 			}
-			return selected.toArray();
 		}
 
 		// no user interaction handler available

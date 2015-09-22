@@ -37,6 +37,13 @@ import org.eclipse.epf.uma.UmaPackage;
  */
 public class ReferenceImpl extends DiagramElementImpl implements Reference {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The default value of the '{@link #getIsIndividualRepresentation() <em>Is Individual Representation</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -44,7 +51,7 @@ public class ReferenceImpl extends DiagramElementImpl implements Reference {
 	 * @generated
 	 * @ordered
 	 */
-	protected static final Boolean IS_INDIVIDUAL_REPRESENTATION_EDEFAULT = Boolean.FALSE;
+	protected static final Boolean IS_INDIVIDUAL_REPRESENTATION_EDEFAULT = null;
 
 	/**
 	 * The cached value of the '{@link #getIsIndividualRepresentation() <em>Is Individual Representation</em>}' attribute.
@@ -64,7 +71,7 @@ public class ReferenceImpl extends DiagramElementImpl implements Reference {
 	 * @generated
 	 * @ordered
 	 */
-	protected DiagramElement referenced;
+	protected DiagramElement referenced = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -76,7 +83,7 @@ public class ReferenceImpl extends DiagramElementImpl implements Reference {
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -84,7 +91,6 @@ public class ReferenceImpl extends DiagramElementImpl implements Reference {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.REFERENCE;
 	}
@@ -192,7 +198,6 @@ public class ReferenceImpl extends DiagramElementImpl implements Reference {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
@@ -211,7 +216,6 @@ public class ReferenceImpl extends DiagramElementImpl implements Reference {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
@@ -226,7 +230,6 @@ public class ReferenceImpl extends DiagramElementImpl implements Reference {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.REFERENCE__IS_INDIVIDUAL_REPRESENTATION:
@@ -244,7 +247,6 @@ public class ReferenceImpl extends DiagramElementImpl implements Reference {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.REFERENCE__IS_INDIVIDUAL_REPRESENTATION:
@@ -262,7 +264,6 @@ public class ReferenceImpl extends DiagramElementImpl implements Reference {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.REFERENCE__IS_INDIVIDUAL_REPRESENTATION:
@@ -280,7 +281,6 @@ public class ReferenceImpl extends DiagramElementImpl implements Reference {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);
@@ -304,7 +304,6 @@ public class ReferenceImpl extends DiagramElementImpl implements Reference {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy())
 			return super.toString();

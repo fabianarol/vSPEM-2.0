@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: Activity.java,v 1.4 2007/05/04 22:46:43 klow Exp $
+ */
 package org.eclipse.epf.xml.uma;
 
 import org.eclipse.emf.common.util.EList;
@@ -28,9 +24,16 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * <ul>
  *   <li>{@link org.eclipse.epf.xml.uma.Activity#getPrecondition <em>Precondition</em>}</li>
  *   <li>{@link org.eclipse.epf.xml.uma.Activity#getPostcondition <em>Postcondition</em>}</li>
- *   <li>{@link org.eclipse.epf.xml.uma.Activity#getGroup3 <em>Group3</em>}</li>
+ *   <li>{@link org.eclipse.epf.xml.uma.Activity#getGroup2 <em>Group2</em>}</li>
  *   <li>{@link org.eclipse.epf.xml.uma.Activity#getBreakdownElement <em>Breakdown Element</em>}</li>
+ *   <li>{@link org.eclipse.epf.xml.uma.Activity#getChecklist <em>Checklist</em>}</li>
+ *   <li>{@link org.eclipse.epf.xml.uma.Activity#getConcept <em>Concept</em>}</li>
+ *   <li>{@link org.eclipse.epf.xml.uma.Activity#getExample <em>Example</em>}</li>
+ *   <li>{@link org.eclipse.epf.xml.uma.Activity#getGuideline <em>Guideline</em>}</li>
  *   <li>{@link org.eclipse.epf.xml.uma.Activity#getRoadmap <em>Roadmap</em>}</li>
+ *   <li>{@link org.eclipse.epf.xml.uma.Activity#getReusableAsset <em>Reusable Asset</em>}</li>
+ *   <li>{@link org.eclipse.epf.xml.uma.Activity#getSupportingMaterial <em>Supporting Material</em>}</li>
+ *   <li>{@link org.eclipse.epf.xml.uma.Activity#getWhitepaper <em>Whitepaper</em>}</li>
  *   <li>{@link org.eclipse.epf.xml.uma.Activity#isIsEnactable <em>Is Enactable</em>}</li>
  *   <li>{@link org.eclipse.epf.xml.uma.Activity#getVariabilityBasedOnElement <em>Variability Based On Element</em>}</li>
  *   <li>{@link org.eclipse.epf.xml.uma.Activity#getVariabilityType <em>Variability Type</em>}</li>
@@ -53,7 +56,7 @@ public interface Activity extends WorkBreakdownElement {
 	 * @return the value of the '<em>Precondition</em>' attribute.
 	 * @see #setPrecondition(String)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getActivity_Precondition()
-	 * @model dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="kind='element' name='Precondition'"
 	 * @generated
 	 */
@@ -80,7 +83,7 @@ public interface Activity extends WorkBreakdownElement {
 	 * @return the value of the '<em>Postcondition</em>' attribute.
 	 * @see #setPostcondition(String)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getActivity_Postcondition()
-	 * @model dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="kind='element' name='Postcondition'"
 	 * @generated
 	 */
@@ -97,21 +100,21 @@ public interface Activity extends WorkBreakdownElement {
 	void setPostcondition(String value);
 
 	/**
-	 * Returns the value of the '<em><b>Group3</b></em>' attribute list.
+	 * Returns the value of the '<em><b>Group2</b></em>' attribute list.
 	 * The list contents are of type {@link org.eclipse.emf.ecore.util.FeatureMap.Entry}.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Group3</em>' attribute list isn't clear,
+	 * If the meaning of the '<em>Group2</em>' attribute list isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Group3</em>' attribute list.
-	 * @see org.eclipse.epf.xml.uma.UmaPackage#getActivity_Group3()
+	 * @return the value of the '<em>Group2</em>' attribute list.
+	 * @see org.eclipse.epf.xml.uma.UmaPackage#getActivity_Group2()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
-	 *        extendedMetaData="kind='group' name='group:37'"
+	 *        extendedMetaData="kind='group' name='group:27'"
 	 * @generated
 	 */
-	FeatureMap getGroup3();
+	FeatureMap getGroup2();
 
 	/**
 	 * Returns the value of the '<em><b>Breakdown Element</b></em>' containment reference list.
@@ -124,11 +127,79 @@ public interface Activity extends WorkBreakdownElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Breakdown Element</em>' containment reference list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getActivity_BreakdownElement()
-	 * @model containment="true" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='BreakdownElement' group='#group:37'"
+	 * @model type="org.eclipse.epf.xml.uma.BreakdownElement" containment="true" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='BreakdownElement' group='#group:27'"
 	 * @generated
 	 */
-	EList<BreakdownElement> getBreakdownElement();
+	EList getBreakdownElement();
+
+	/**
+	 * Returns the value of the '<em><b>Checklist</b></em>' attribute list.
+	 * The list contents are of type {@link java.lang.String}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Checklist</em>' attribute list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Checklist</em>' attribute list.
+	 * @see org.eclipse.epf.xml.uma.UmaPackage#getActivity_Checklist()
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='Checklist' group='#group:27'"
+	 * @generated
+	 */
+	EList getChecklist();
+
+	/**
+	 * Returns the value of the '<em><b>Concept</b></em>' attribute list.
+	 * The list contents are of type {@link java.lang.String}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Concept</em>' attribute list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Concept</em>' attribute list.
+	 * @see org.eclipse.epf.xml.uma.UmaPackage#getActivity_Concept()
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='Concept' group='#group:27'"
+	 * @generated
+	 */
+	EList getConcept();
+
+	/**
+	 * Returns the value of the '<em><b>Example</b></em>' attribute list.
+	 * The list contents are of type {@link java.lang.String}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Example</em>' attribute list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Example</em>' attribute list.
+	 * @see org.eclipse.epf.xml.uma.UmaPackage#getActivity_Example()
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='Example' group='#group:27'"
+	 * @generated
+	 */
+	EList getExample();
+
+	/**
+	 * Returns the value of the '<em><b>Guideline</b></em>' attribute list.
+	 * The list contents are of type {@link java.lang.String}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Guideline</em>' attribute list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Guideline</em>' attribute list.
+	 * @see org.eclipse.epf.xml.uma.UmaPackage#getActivity_Guideline()
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='Guideline' group='#group:27'"
+	 * @generated
+	 */
+	EList getGuideline();
 
 	/**
 	 * Returns the value of the '<em><b>Roadmap</b></em>' attribute list.
@@ -141,11 +212,62 @@ public interface Activity extends WorkBreakdownElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Roadmap</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getActivity_Roadmap()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='Roadmap' group='#group:37'"
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='Roadmap' group='#group:27'"
 	 * @generated
 	 */
-	EList<String> getRoadmap();
+	EList getRoadmap();
+
+	/**
+	 * Returns the value of the '<em><b>Reusable Asset</b></em>' attribute list.
+	 * The list contents are of type {@link java.lang.String}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Reusable Asset</em>' attribute list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Reusable Asset</em>' attribute list.
+	 * @see org.eclipse.epf.xml.uma.UmaPackage#getActivity_ReusableAsset()
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='ReusableAsset' group='#group:27'"
+	 * @generated
+	 */
+	EList getReusableAsset();
+
+	/**
+	 * Returns the value of the '<em><b>Supporting Material</b></em>' attribute list.
+	 * The list contents are of type {@link java.lang.String}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Supporting Material</em>' attribute list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Supporting Material</em>' attribute list.
+	 * @see org.eclipse.epf.xml.uma.UmaPackage#getActivity_SupportingMaterial()
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='SupportingMaterial' group='#group:27'"
+	 * @generated
+	 */
+	EList getSupportingMaterial();
+
+	/**
+	 * Returns the value of the '<em><b>Whitepaper</b></em>' attribute list.
+	 * The list contents are of type {@link java.lang.String}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Whitepaper</em>' attribute list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Whitepaper</em>' attribute list.
+	 * @see org.eclipse.epf.xml.uma.UmaPackage#getActivity_Whitepaper()
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='Whitepaper' group='#group:27'"
+	 * @generated
+	 */
+	EList getWhitepaper();
 
 	/**
 	 * Returns the value of the '<em><b>Is Enactable</b></em>' attribute.
@@ -160,7 +282,7 @@ public interface Activity extends WorkBreakdownElement {
 	 * @see #unsetIsEnactable()
 	 * @see #setIsEnactable(boolean)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getActivity_IsEnactable()
-	 * @model unsettable="true" dataType="org.eclipse.emf.ecore.xml.type.Boolean"
+	 * @model unique="false" unsettable="true" dataType="org.eclipse.emf.ecore.xml.type.Boolean"
 	 *        extendedMetaData="kind='attribute' name='IsEnactable'"
 	 * @generated
 	 */
@@ -212,7 +334,7 @@ public interface Activity extends WorkBreakdownElement {
 	 * @return the value of the '<em>Variability Based On Element</em>' attribute.
 	 * @see #setVariabilityBasedOnElement(String)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getActivity_VariabilityBasedOnElement()
-	 * @model dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="kind='attribute' name='variabilityBasedOnElement'"
 	 * @generated
 	 */
@@ -244,7 +366,7 @@ public interface Activity extends WorkBreakdownElement {
 	 * @see #unsetVariabilityType()
 	 * @see #setVariabilityType(VariabilityType)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getActivity_VariabilityType()
-	 * @model default="na" unsettable="true"
+	 * @model default="na" unique="false" unsettable="true"
 	 *        extendedMetaData="kind='attribute' name='variabilityType'"
 	 * @generated
 	 */

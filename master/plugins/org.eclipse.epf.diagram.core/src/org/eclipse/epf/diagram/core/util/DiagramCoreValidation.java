@@ -16,7 +16,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.core.internal.localstore.IsSynchronizedVisitor;
 import org.eclipse.emf.common.notify.AdapterFactory;
+import org.eclipse.emf.ecore.EModelElement;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.edit.provider.AdapterFactoryTreeIterator;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
@@ -35,13 +37,11 @@ import org.eclipse.epf.diagram.model.util.GraphicalDataHelper;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
 import org.eclipse.epf.library.edit.process.IBSItemProvider;
 import org.eclipse.epf.library.edit.util.IDiagramManager;
-import org.eclipse.epf.library.edit.util.MethodElementPropertyHelper;
 import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.uma.Activity;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.WorkBreakdownElement;
-import org.eclipse.epf.uma.WorkOrder;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.DiagramEditPart;
 import org.eclipse.gmf.runtime.notation.Diagram;
@@ -71,10 +71,6 @@ public class DiagramCoreValidation {
 
 	private static final String errMsg_CanNotDelete = DiagramCoreResources.DiagramValidation_err_cannot_delete_text; //$NON-NLS-1$
 
-	public static boolean isConnectionToReadOnlyTargetAllowed() {
-//		return DiagramPreferences.getADAllowConnectionToReadOnlyElements();
-		return true;
-	}
 	
 	public static String isTargetReadonly(EditPart part){
 		View view = (View)part.getModel();
@@ -152,15 +148,14 @@ public class DiagramCoreValidation {
 								(WorkBreakdownElement) source, allElements))
 							return errMsg_SamePredAndSucc;
 
-						if (!isConnectionToReadOnlyTargetAllowed() && targetAdapter.isTargetReadOnly())
+						if (targetAdapter.isTargetReadOnly())
 							return errMsg_CanNotConnect;
 					} else {
-						// target node might be control node
 						Collection<ActivityNode> actNodes = new ArrayList<ActivityNode>();
 						BridgeHelper.getSuccessorNodes(actNodes,
 								(ActivityNode) targetElement);
 						for (ActivityNode node : actNodes) {
-							if (BridgeHelper.getNodeAdapter(node).isTargetReadOnly() && !isConnectionToReadOnlyTargetAllowed())
+							if (BridgeHelper.getNodeAdapter(node).isTargetReadOnly())
 								return errMsg_CanNotConnect;
 							if (ProcessUtil.checkCircular(
 									(WorkBreakdownElement) BridgeHelper
@@ -176,7 +171,7 @@ public class DiagramCoreValidation {
 						BridgeHelper.getPredecessorNodes(srcNodes,
 								(ActivityNode) sourceElement);
 						if (!srcNodes.isEmpty()) {
-							if (targetAdapter.isTargetReadOnly() && !isConnectionToReadOnlyTargetAllowed())
+							if (targetAdapter.isTargetReadOnly())
 								return errMsg_CanNotConnect;
 							for (ActivityNode predNode : srcNodes) {
 								MethodElement pred = BridgeHelper
@@ -210,7 +205,7 @@ public class DiagramCoreValidation {
 							for (ActivityNode node : targetNodes) {
 								NodeAdapter nodeAdapter = BridgeHelper
 										.getNodeAdapter(node);
-								if (nodeAdapter.isTargetReadOnly() && !isConnectionToReadOnlyTargetAllowed())
+								if (nodeAdapter.isTargetReadOnly())
 									return errMsg_CanNotConnect;
 								WorkBreakdownElement succ = (WorkBreakdownElement) nodeAdapter
 										.getElement();
@@ -395,17 +390,8 @@ public class DiagramCoreValidation {
 		|| (targetElement instanceof ControlNode && !BridgeHelper.isSynchBar((ControlNode)targetElement));
 	}
 	
-	/*
-	 * Checks if the given edge is a regular edge, means, it is not a special
-	 * edge that is created in extended diagram with a inherited, read-only
-	 * target.
-	 */
-	private static boolean isRegularEdge(Edge edge) {
-		MethodElement workOrder = BridgeHelper.getMethodElement(edge);
-		return workOrder == null || MethodElementPropertyHelper.getProperty(workOrder, MethodElementPropertyHelper.WORK_ORDER__SUCCESSOR) == null;
-	}
-	
 	public static String checkDelete(Edge edge) {
+
 		View source = edge.getSource();
 		View target = edge.getTarget();
 
@@ -418,70 +404,42 @@ public class DiagramCoreValidation {
 				if(alwaysAllowed(sourceElement, targetElement)) {
 					return null;
 				}
-				if(BridgeHelper.isInherited(edge)) {
-					return errMsg_CanNotDelete;
-				} else if(BridgeHelper.isReadOnly(source) && BridgeHelper.isReadOnly(target)) {
-					// check if this edge is a custom one
-					//
-					MethodElement me = BridgeHelper.getMethodElement(edge);
-					if(me instanceof WorkOrder && ProcessUtil.isCustomWorkOrder((WorkOrder) me)) {
+				// check if this edge is representing any work order
+				//
+				if (sourceElement instanceof ActivityNode
+						&& BridgeHelper.getMethodElement(sourceElement) == null) {
+					Collection<ActivityNode> actNodes = new ArrayList<ActivityNode>();
+					BridgeHelper.getSourceNodes(actNodes,
+							(ActivityNode) sourceElement,
+							WorkBreakdownElement.class);
+					if (actNodes.isEmpty()) {
 						return null;
-					} else {
-						// edge is automatically created for 2 inherited
-						// predecessor/successor and cannot be deleted
-						//
-						return errMsg_CanNotDelete;
 					}
 				}
 				
-				// Since making connection to a inherited, read-only target is
-				// allowed now, the check logic below is no longer needed. We
-				// only need to prevented inherited connections and nodes from
-				// deletion.
+				// the edge does represent a work order
 				
-//				// check if this edge is representing any work order
-//				//
-//				if (sourceElement instanceof ActivityNode
-//						&& BridgeHelper.getMethodElement(sourceElement) == null) {
-//					Collection<ActivityNode> actNodes = new ArrayList<ActivityNode>();
-//					BridgeHelper.getSourceNodes(actNodes,
-//							(ActivityNode) sourceElement,
-//							WorkBreakdownElement.class);
-//					if (actNodes.isEmpty()) {
-//						return null;
-//					}
-//				}
-//				
-//				// the edge does represent a work order
-//				
-//				if(BridgeHelper.isReadOnly(target)) {
-//					if(BridgeHelper.getMethodElement(sourceElement) instanceof WorkBreakdownElement)
-//					return errMsg_CanNotDelete;
-//				}
-//				
-//				if(targetElement instanceof ActivityNode) {
-//					NodeAdapter adapter = BridgeHelper.getNodeAdapter(targetElement);
-//					if(adapter != null && adapter.getElement() instanceof WorkBreakdownElement) {
-//						return null;
-//					}
-////					// target does not represent a work breakdown element
-////					// disallow deletion of the edge if one of the target nodes of the target is read-only or inherited
-////					//
-////					Collection<ActivityNode> actNodes = new ArrayList<ActivityNode>();
-////					BridgeHelper.getSuccessorNodes(actNodes, (ActivityNode) targetElement);
-////					for (ActivityNode activityNode : actNodes) {
-////						View view = BridgeHelper.getView(diagram, activityNode);
-////						if(view != null && BridgeHelper.isReadOnly(view)) {
-////							return errMsg_CanNotDelete;
-////						}
-////					}
-//					
-//					if(BridgeHelper.isSynchBar((ActivityNode)targetElement)) {
-//						return checkSyncBarOutgoingLinks((ActivityNode)targetElement);
-//					}
-//
-//				}
+				if(BridgeHelper.isReadOnly(target)){
+					return errMsg_CanNotDelete;
+				}
 				
+				if(targetElement instanceof ActivityNode){
+					// target does not represent a work breakdown element
+					// disallow deletion of the edge if one of the target nodes of the target is read-only or inherited
+					//
+					Collection<ActivityNode> actNodes = new ArrayList<ActivityNode>();
+					BridgeHelper.getSuccessorNodes(actNodes, (ActivityNode) targetElement);
+					for (ActivityNode activityNode : actNodes) {
+						View view = BridgeHelper.getView(diagram, activityNode);
+						if(view != null && BridgeHelper.isReadOnly(view)) {
+							return errMsg_CanNotDelete;
+						}
+					}
+				}
+				
+				if(targetElement instanceof ActivityNode && BridgeHelper.isSynchBar((ActivityNode)targetElement)){
+					return checkSyncBarOutgoingLinks((ActivityNode)targetElement);
+				}
 				return null;
 			case IDiagramManager.ACTIVITY_DETAIL_DIAGRAM:
 				return errMsg_CanNotDelete;
@@ -518,7 +476,7 @@ public class DiagramCoreValidation {
 					return true;
 				}
 			}
-		} else {
+		}else{
 			return checkDelete(edge) != null;
 		}
 		return false;
@@ -538,44 +496,6 @@ public class DiagramCoreValidation {
 				if ((element.getSource() == source)
 						&& element.getTarget() == target) {
 					return true;
-				}
-			}
-		}
-		return false;
-	}
-	
-	public static boolean hasVisibleTarget(ActivityNode source) {
-		List<ActivityEdge> list = source.getOutgoings();
-		if (list != null && list.size() >= 1) {
-			// ignore outgoing connections from invisible nodes
-			//
-			for (ActivityEdge edge : list) {
-				ActivityNode node = edge.getTarget();
-				NodeAdapter nodeAdapter = BridgeHelper.getNodeAdapter(node);
-				if(nodeAdapter != null) {
-					View view = nodeAdapter.getView();
-					if(view != null && view.isVisible()) {
-						return true;
-					}
-				}
-			}
-		}
-		return false;
-	}
-	
-	public static boolean hasVisibleSource(ActivityNode target) {
-		List<ActivityEdge> list = target.getIncomings();
-		if (list != null && list.size() >= 1) {
-			// ignore incoming connection from invisible nodes
-			//
-			for (ActivityEdge conn : list) {
-				ActivityNode node = conn.getSource();
-				NodeAdapter nodeAdapter = BridgeHelper.getNodeAdapter(node);
-				if(nodeAdapter != null) {
-					View view = nodeAdapter.getView();
-					if(view != null && view.isVisible()) {
-						return true;
-					}
 				}
 			}
 		}

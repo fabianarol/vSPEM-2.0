@@ -40,7 +40,7 @@ public interface ActivityDescription extends BreakdownElementDescription {
 	 * @return the value of the '<em>Purpose</em>' attribute.
 	 * @see #setPurpose(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getActivityDescription_Purpose()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getPurpose();
@@ -66,7 +66,7 @@ public interface ActivityDescription extends BreakdownElementDescription {
 	 * @return the value of the '<em>Alternatives</em>' attribute.
 	 * @see #setAlternatives(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getActivityDescription_Alternatives()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getAlternatives();
@@ -92,7 +92,7 @@ public interface ActivityDescription extends BreakdownElementDescription {
 	 * @return the value of the '<em>Howto Staff</em>' attribute.
 	 * @see #setHowtoStaff(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getActivityDescription_HowtoStaff()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getHowtoStaff();

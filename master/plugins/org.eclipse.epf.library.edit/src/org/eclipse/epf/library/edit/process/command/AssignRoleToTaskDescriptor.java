@@ -19,13 +19,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.emf.common.notify.AdapterFactory;
-import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
 import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
 import org.eclipse.epf.library.edit.ui.UserInteractionHelper;
-import org.eclipse.epf.library.edit.util.DescriptorPropUtil;
-import org.eclipse.epf.library.edit.util.LibraryEditUtil;
 import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.uma.Activity;
@@ -34,11 +31,10 @@ import org.eclipse.epf.uma.Role;
 import org.eclipse.epf.uma.RoleDescriptor;
 import org.eclipse.epf.uma.TaskDescriptor;
 import org.eclipse.epf.uma.TeamProfile;
-import org.eclipse.epf.uma.UmaPackage;
 
 
 /**
- * Command for assign roles to task descriptor. It will assign primary, additional
+ * Command for assign roles to task descriptor. It will assign additional
  * performers and assisted by to a task descriptor
  * 
  * @author Shilpa Toraskar
@@ -54,8 +50,6 @@ public class AssignRoleToTaskDescriptor extends AddMethodElementCommand {
 
 	private Collection modifiedResources;
 
-	private Collection affectedObjects;
-	
 	private int action;
 
 	List existingRoleDescList = new ArrayList();
@@ -68,33 +62,19 @@ public class AssignRoleToTaskDescriptor extends AddMethodElementCommand {
 
 	private boolean isNewRoleDescriptor = false;
 
-	private boolean calledForExculded = false;
-	
-	private DescriptorPropUtil propUtil;
-	
 	/**
 	 * Assign role to task descriptor Used for both additionally performed by
 	 * and assisted by
 	 */
 	public AssignRoleToTaskDescriptor(TaskDescriptor taskDesc, List roles,
 			int action, MethodConfiguration config) {
-		this(taskDesc, roles, action, config, false);
-	}
-	
-	/**
-	 * Assign role to task descriptor Used for both additionally performed by
-	 * and assisted by
-	 */
-	public AssignRoleToTaskDescriptor(TaskDescriptor taskDesc, List roles,
-			int action, MethodConfiguration config, boolean calledForExculded) {
+
 		super(TngUtil.getOwningProcess(taskDesc));
 
-		this.calledForExculded = calledForExculded;
 		this.roles = roles;
 		this.taskDesc = taskDesc;
 		this.action = action;
 		this.config = config;
-		this.propUtil = DescriptorPropUtil.getDesciptorPropUtil();
 
 		AdapterFactory aFactory = TngAdapterFactory.INSTANCE
 				.getWBS_ComposedAdapterFactory();
@@ -106,7 +86,6 @@ public class AssignRoleToTaskDescriptor extends AddMethodElementCommand {
 		}
 
 		this.modifiedResources = new HashSet();
-		this.affectedObjects = new HashSet();
 	}
 
 	/*
@@ -161,52 +140,12 @@ public class AssignRoleToTaskDescriptor extends AddMethodElementCommand {
 	 */
 	public void redo() {
 
-		if (action == IActionTypeConstants.ADD_PRIMARY_PERFORMER) {
-			taskDesc.getPerformedPrimarilyBy().addAll(existingRoleDescList);
-			taskDesc.getPerformedPrimarilyBy().addAll(newRoleDescList);
-		} else if (action == IActionTypeConstants.ADD_ADDITIONAL_PERFORMER) {
+		if (action == IActionTypeConstants.ADD_ADDITIONAL_PERFORMER) {
 			taskDesc.getAdditionallyPerformedBy().addAll(existingRoleDescList);
 			taskDesc.getAdditionallyPerformedBy().addAll(newRoleDescList);
 		} else if (action == IActionTypeConstants.ADD_ASSISTED_BY) {
 			taskDesc.getAssistedBy().addAll(existingRoleDescList);
 			taskDesc.getAssistedBy().addAll(newRoleDescList);
-		}
-
-		if (ProcessUtil.isSynFree()) {
-			if (calledForExculded) {
-				List excludedList = null;
-				EReference ref = null;
-				if (action == IActionTypeConstants.ADD_PRIMARY_PERFORMER) {
-					excludedList = taskDesc.getPerformedPrimarilyByExcluded();
-					ref = UmaPackage.eINSTANCE.getTaskDescriptor_PerformedPrimarilyBy();
-				} else if (action == IActionTypeConstants.ADD_ADDITIONAL_PERFORMER) {
-					excludedList = taskDesc.getAdditionallyPerformedByExclude();
-					ref = UmaPackage.eINSTANCE.getTaskDescriptor_AdditionallyPerformedBy();
-				}
-				if (excludedList != null) {
-					excludedList.removeAll(roles);
-				}
-				
-				TaskDescriptor greenParent = (TaskDescriptor) propUtil.getGreenParentDescriptor(taskDesc);
-				if (greenParent != null) {
-					EReference eRef = LibraryEditUtil.getInstance().getExcludeFeature(ref);
-					List<Role> parentExecludeList = (List<Role>) greenParent.eGet(eRef);
-					for (Role role : (List<Role>) roles) {
-						propUtil.removeGreenRefDelta(taskDesc, role, eRef, true);
-						if (parentExecludeList != null && parentExecludeList.contains(role)) {
-							propUtil.addGreenRefDelta(taskDesc, role, eRef, false);
-						}
-					}
-				}							
-			} else {
-				propUtil.addLocalUsingInfo(existingRoleDescList, taskDesc, getFeature(action));
-				propUtil.addLocalUsingInfo(newRoleDescList, taskDesc, getFeature(action));		
-			}
-			
-			for (RoleDescriptor rd : (List<RoleDescriptor>) newRoleDescList) {
-				propUtil.setCreatedByReference(rd, true);
-			}
-			
 		}
 
 		activity.getBreakdownElements().addAll(newRoleDescList);
@@ -224,35 +163,13 @@ public class AssignRoleToTaskDescriptor extends AddMethodElementCommand {
 
 		
 	}
-	
-	private EReference getFeature(int action) {
-		UmaPackage up = UmaPackage.eINSTANCE;
-		
-		if (action == IActionTypeConstants.ADD_PRIMARY_PERFORMER) {
-			return up.getTaskDescriptor_PerformedPrimarilyBy();		
-		} 
-		
-		if (action == IActionTypeConstants.ADD_ADDITIONAL_PERFORMER) {
-			return up.getTaskDescriptor_AdditionallyPerformedBy();	
-		}
 
-		if (action == IActionTypeConstants.ADD_ASSISTED_BY) {
-			return up.getTaskDescriptor_AssistedBy();	
-		}
-		
-		return null;
-	}
-	
 	public void undo() {
 
 		// basically remove from configuration if anything was added
 		super.undo();
 
 		if (action == IActionTypeConstants.ADD_ADDITIONAL_PERFORMER) {
-			taskDesc.getPerformedPrimarilyBy().removeAll(
-					existingRoleDescList);
-			taskDesc.getPerformedPrimarilyBy().removeAll(newRoleDescList);
-		} else	if (action == IActionTypeConstants.ADD_ADDITIONAL_PERFORMER) {
 			taskDesc.getAdditionallyPerformedBy().removeAll(
 					existingRoleDescList);
 			taskDesc.getAdditionallyPerformedBy().removeAll(newRoleDescList);
@@ -260,39 +177,6 @@ public class AssignRoleToTaskDescriptor extends AddMethodElementCommand {
 			taskDesc.getAssistedBy().removeAll(existingRoleDescList);
 			taskDesc.getAssistedBy().removeAll(newRoleDescList);
 		}
-		
-		if (ProcessUtil.isSynFree()) {
-			if (calledForExculded) {
-				List excludedList = null;
-				EReference ref = null;
-				if (action == IActionTypeConstants.ADD_PRIMARY_PERFORMER) {
-					excludedList = taskDesc.getPerformedPrimarilyByExcluded();
-					ref = UmaPackage.eINSTANCE.getTaskDescriptor_PerformedPrimarilyBy();
-				} else if (action == IActionTypeConstants.ADD_ADDITIONAL_PERFORMER) {
-					excludedList = taskDesc.getAdditionallyPerformedByExclude();
-					ref = UmaPackage.eINSTANCE.getTaskDescriptor_AdditionallyPerformedBy();
-				}
-				if (excludedList != null) {
-					excludedList.addAll(roles);
-				}
-				
-				TaskDescriptor greenParent = (TaskDescriptor) propUtil.getGreenParentDescriptor(taskDesc);
-				if (greenParent != null) {
-					EReference eRef = LibraryEditUtil.getInstance().getExcludeFeature(ref);
-					List<Role> parentExecludeList = (List<Role>) greenParent.eGet(eRef);
-					for (Role role : (List<Role>) roles) {
-						propUtil.addGreenRefDelta(taskDesc, role, eRef, true);
-						if (parentExecludeList != null && parentExecludeList.contains(role)) {
-							propUtil.removeGreenRefDelta(taskDesc, role, eRef, false);
-						}
-					}
-				}
-			} else {
-				propUtil.removeLocalUsingInfo(existingRoleDescList, taskDesc, getFeature(action));
-				propUtil.removeLocalUsingInfo(newRoleDescList, taskDesc, getFeature(action));
-			}
-		}
-		
 		activity.getBreakdownElements().removeAll(newRoleDescList);
 
 		if (map != null) {
@@ -322,15 +206,6 @@ public class AssignRoleToTaskDescriptor extends AddMethodElementCommand {
 			}
 		}
 		return modifiedResources;
-	}
-	
-	public Collection getAffectedObjects() {
-		if (roles != null && !roles.isEmpty()) {
-			affectedObjects.add(activity);
-			affectedObjects.add(taskDesc);
-			return affectedObjects;
-		}
-		return super.getAffectedObjects();
 	}
 
 }

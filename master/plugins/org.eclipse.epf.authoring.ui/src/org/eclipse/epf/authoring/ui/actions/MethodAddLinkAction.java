@@ -17,7 +17,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.epf.authoring.ui.dialogs.MethodAddLinkDialog;
 import org.eclipse.epf.authoring.ui.richtext.IMethodRichText;
 import org.eclipse.epf.common.utils.NetUtil;
-import org.eclipse.epf.library.ui.LibraryUIUtil;
+import org.eclipse.epf.library.util.ResourceHelper;
 import org.eclipse.epf.richtext.IRichText;
 import org.eclipse.epf.richtext.RichTextCommand;
 import org.eclipse.epf.richtext.RichTextEditor;
@@ -60,7 +60,7 @@ public class MethodAddLinkAction extends AddLinkAction {
 						if (dialog.getFileToCopy() != null) {
 							// link to a file, create the URL
 							try {
-								linkURL = LibraryUIUtil.getURLForAttachment(Display
+								linkURL = ResourceHelper.getURLForAttachment(Display
 										.getCurrent().getActiveShell(), dialog
 										.getFileToCopy(),
 										((IMethodRichText) richText)

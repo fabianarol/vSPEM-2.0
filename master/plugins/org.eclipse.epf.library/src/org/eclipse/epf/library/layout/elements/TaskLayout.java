@@ -13,16 +13,12 @@ package org.eclipse.epf.library.layout.elements;
 import java.util.List;
 
 import org.eclipse.epf.library.configuration.ConfigurationHelper;
-import org.eclipse.epf.library.configuration.ElementRealizer;
 import org.eclipse.epf.library.layout.ElementLayoutManager;
-import org.eclipse.epf.library.layout.IElementLayout;
 import org.eclipse.epf.library.layout.util.XmlElement;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.Role;
 import org.eclipse.epf.uma.Task;
 import org.eclipse.epf.uma.UmaPackage;
-import org.eclipse.epf.uma.WorkProduct;
-import org.eclipse.epf.uma.ecore.util.OppositeFeature;
 import org.eclipse.epf.uma.util.AssociationHelper;
 
 
@@ -31,7 +27,6 @@ import org.eclipse.epf.uma.util.AssociationHelper;
  * 
  * @author Kelvin Low
  * @author Jinhua Xi
- * @author Weiping Lu
  * @since 1.0
  */
 public class TaskLayout extends AbstractElementLayout {
@@ -51,24 +46,20 @@ public class TaskLayout extends AbstractElementLayout {
 		XmlElement elementXml = super.getXmlElement(includeReferences);
 		if (includeReferences) {
 			Task task = (Task) super.element;
-			List performingRoles = task.getPerformedBy();
-			for (java.util.Iterator itor = performingRoles.iterator(); itor.hasNext();) {
-				Role performingRole = (Role) itor.next();
-				if (performingRole != null) {
-					MethodElement role = ConfigurationHelper.getCalculatedElement(
-							(MethodElement) performingRole, layoutManager
-									.getConfiguration());
-					if (role != null) {
-						String roleName = ((Role) role).getPresentationName();
-						if (roleName == null || roleName.length() == 0) {
-							roleName = role.getName();
-						}
-						elementXml.setAttribute("performingRoleName", roleName); //$NON-NLS-1$
-						addReference(UmaPackage.eINSTANCE.getTask_PerformedBy(), elementXml, "performingRole", role); //$NON-NLS-1$
+			Role performingRole = task.getPerformedBy();
+			if (performingRole != null) {
+				MethodElement role = ConfigurationHelper.getCalculatedElement(
+						(MethodElement) performingRole, layoutManager
+								.getConfiguration());
+				if (role != null) {
+					String roleName = ((Role) role).getPresentationName();
+					if (roleName == null || roleName.length() == 0) {
+						roleName = role.getName();
 					}
+					elementXml.setAttribute("performingRoleName", roleName); //$NON-NLS-1$
+					addReference(UmaPackage.eINSTANCE.getTask_PerformedBy(), elementXml, "performingRole", role); //$NON-NLS-1$
 				}
 			}
-			
 
 			// calculate the categories opposite feature
 			// multiplicity change for opposite features
@@ -93,32 +84,5 @@ public class TaskLayout extends AbstractElementLayout {
 		
 		return elementXml;
 	}
-	
-	protected void processGrandChild(Object feature,
-			MethodElement childElememt, IElementLayout childLayout,
-			XmlElement childXmlElement) {
-		if (!(childLayout instanceof WorkProductLayout)
-				|| childXmlElement == null
-				|| !(childElememt instanceof WorkProduct)) {
-			return;
-		}
-		if (! ((WorkProduct)childElememt).getIsAbstract()) {
-			return;
-		}
-		
-		WorkProductLayout wpChildLayout = (WorkProductLayout) childLayout;
-		ElementRealizer realizer = wpChildLayout.layoutManager
-				.getElementRealizer();
 
-		if (feature == UmaPackage.eINSTANCE.getTask_MandatoryInput() ||
-			feature == UmaPackage.eINSTANCE.getTask_OptionalInput() ||
-			feature == UmaPackage.eINSTANCE.getTask_Output()) {
-			OppositeFeature oFulfillingFeature = AssociationHelper.FulFills_FullFillableElements;
-			List items = wpChildLayout.calc0nFeatureValue(childElememt, oFulfillingFeature, realizer);
-			items = getTagQualifiedList(realizer.getConfiguration(), items);
-			wpChildLayout.addReferences(oFulfillingFeature, childXmlElement, oFulfillingFeature
-					.getName(), items);
-		}
-	}
-	
 }

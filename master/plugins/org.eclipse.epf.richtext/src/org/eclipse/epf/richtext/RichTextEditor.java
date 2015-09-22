@@ -1,13 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
- *******************************************************************************/
 //------------------------------------------------------------------------------
 // Copyright (c) 2005, 2007 IBM Corporation and others.
 // All rights reserved. This program and the accompanying materials
@@ -57,7 +47,6 @@ import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.custom.VerifyKeyListener;
 import org.eclipse.swt.custom.ViewForm;
-import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DropTarget;
 import org.eclipse.swt.dnd.DropTargetEvent;
@@ -582,7 +571,7 @@ public class RichTextEditor implements IRichTextEditor {
 	 */
 	public Object getData(String key) {
 		if (richText != null) {
-			return richText.getData(key);
+			richText.getData(key);
 		}
 		return null;
 	}
@@ -1029,8 +1018,6 @@ public class RichTextEditor implements IRichTextEditor {
 		if (text == null || text.length() == 0) 
 			return;
 		if (tabFolder.getSelection() == richTextTab) {
-			//To avoid encoding of javascript
-			text = text.replaceAll("&", "&amp;");  //$NON-NLS-1$//$NON-NLS-2$
 			executeCommand(RichTextCommand.ADD_HTML, text);
 		} else if (tabFolder.getSelection() == htmlTab) {
 			String oldHTML = getSourceEdit().getText();
@@ -1103,7 +1090,6 @@ public class RichTextEditor implements IRichTextEditor {
 	protected void fillContextMenu(Menu contextMenu) {
 		final MenuItem cutItem = new MenuItem(contextMenu, SWT.PUSH);
 		cutItem.setText(RichTextResources.cutAction_text);
-		cutItem.setImage(RichTextImages.IMG_CUT);
 		cutItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				CutAction action = new CutAction(RichTextEditor.this);
@@ -1112,7 +1098,6 @@ public class RichTextEditor implements IRichTextEditor {
 		});
 		final MenuItem copyItem = new MenuItem(contextMenu, SWT.PUSH);
 		copyItem.setText(RichTextResources.copyAction_text); 
-		copyItem.setImage(RichTextImages.IMG_COPY);
 		copyItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				CopyAction action = new CopyAction(RichTextEditor.this);
@@ -1121,7 +1106,6 @@ public class RichTextEditor implements IRichTextEditor {
 		});
 		final MenuItem pasteItem = new MenuItem(contextMenu, SWT.PUSH);
 		pasteItem.setText(RichTextResources.pasteAction_text); 
-		pasteItem.setImage(RichTextImages.IMG_PASTE);
 		pasteItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				PasteAction action = new PasteAction(RichTextEditor.this);
@@ -1131,7 +1115,6 @@ public class RichTextEditor implements IRichTextEditor {
 		
 		final MenuItem pastePlainTextItem = new MenuItem(contextMenu, SWT.PUSH);
 		pastePlainTextItem.setText(RichTextResources.pastePlainTextAction_text);
-		pastePlainTextItem.setImage(RichTextImages.IMG_PASTE_PLAIN_TEXT);
 		pastePlainTextItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				PastePlainTextAction action = new PastePlainTextAction(RichTextEditor.this);
@@ -1144,17 +1127,12 @@ public class RichTextEditor implements IRichTextEditor {
 			}
 
 			public void menuShown(MenuEvent e) {
-				Clipboard clipboard = new Clipboard(Display.getCurrent());
-				String html = (String) clipboard.getContents(HTMLTransfer
-						.getInstance());
-				String text = (String) clipboard.getContents(TextTransfer
-						.getInstance());
 				String selectedText = getSelected().getText();
 				boolean selection = selectedText.length() > 0;
 				cutItem.setEnabled(editable && selection);
 				copyItem.setEnabled(selection);
-				pasteItem.setEnabled(editable && (html != null));
-				pastePlainTextItem.setEnabled(editable && (text != null));
+				pasteItem.setEnabled(editable);
+				pastePlainTextItem.setEnabled(editable);
 			}
 		});
 	}

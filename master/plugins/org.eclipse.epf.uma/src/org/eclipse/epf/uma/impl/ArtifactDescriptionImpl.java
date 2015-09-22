@@ -36,6 +36,13 @@ import org.eclipse.epf.uma.UmaPackage;
 public class ArtifactDescriptionImpl extends WorkProductDescriptionImpl
 		implements ArtifactDescription {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The default value of the '{@link #getBriefOutline() <em>Brief Outline</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -125,7 +132,7 @@ public class ArtifactDescriptionImpl extends WorkProductDescriptionImpl
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -133,7 +140,6 @@ public class ArtifactDescriptionImpl extends WorkProductDescriptionImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.ARTIFACT_DESCRIPTION;
 	}
@@ -235,7 +241,6 @@ public class ArtifactDescriptionImpl extends WorkProductDescriptionImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.ARTIFACT_DESCRIPTION__BRIEF_OUTLINE:
@@ -255,7 +260,6 @@ public class ArtifactDescriptionImpl extends WorkProductDescriptionImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.ARTIFACT_DESCRIPTION__BRIEF_OUTLINE:
@@ -279,7 +283,6 @@ public class ArtifactDescriptionImpl extends WorkProductDescriptionImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.ARTIFACT_DESCRIPTION__BRIEF_OUTLINE:
@@ -303,7 +306,6 @@ public class ArtifactDescriptionImpl extends WorkProductDescriptionImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);
@@ -334,7 +336,6 @@ public class ArtifactDescriptionImpl extends WorkProductDescriptionImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy())
 			return super.toString();

@@ -15,11 +15,8 @@ import java.util.List;
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryContentProvider;
 import org.eclipse.epf.library.configuration.ConfigurationData;
-import org.eclipse.epf.library.configuration.ConfigurationProperties;
-import org.eclipse.epf.library.configuration.SupportingElementData;
 import org.eclipse.epf.library.configuration.closure.ConfigurationClosure;
 import org.eclipse.epf.library.configuration.closure.DependencyManager;
-import org.eclipse.epf.library.edit.realization.IRealizationManager;
 import org.eclipse.epf.library.layout.ElementLayoutManager;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodLibrary;
@@ -45,20 +42,6 @@ public interface IConfigurationManager {
 	 * @return a ConfigurationData object
 	 */
 	public ConfigurationData getConfigurationData();
-	
-	/**
-	 * Gets SupportingElementData object managed by this configuration manager.
-	 * 
-	 * @return a SupportingElementData object
-	 */
-	public SupportingElementData getSupportingElementData();
-	
-	/**
-	 * Gets ConfigurationProperties object managed by this configuration manager.
-	 * 
-	 * @return a ConfigurationProperties object
-	 */
-	public ConfigurationProperties getConfigurationProperties();
 
 	/**
 	 * Gets the containing method library for the managed method configuration.
@@ -113,12 +96,6 @@ public interface IConfigurationManager {
 	 * @return a list of method plug-ins
 	 */
 	public List getMethodPlugins();
-	
-	/**
-	 * @return an IRealizationManager instance
-	 */
-	IRealizationManager getRealizationManager();
-
 	
 	/**
 	 * Disposes all resources allocated by this configuration manager.

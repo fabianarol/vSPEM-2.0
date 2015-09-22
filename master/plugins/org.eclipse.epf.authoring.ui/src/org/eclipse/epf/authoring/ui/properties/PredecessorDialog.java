@@ -179,13 +179,13 @@ public class PredecessorDialog extends Dialog {
 		dependency.setItems(dependencyList);
 
 		String depedencyName = wo.getLinkType().getName();
-		if (wo.getLinkType() == WorkOrderType.FINISH_TO_FINISH) {
+		if (wo.getLinkType().getValue() == WorkOrderType.FINISH_TO_FINISH) {
 			depedencyName = FINISH_TO_FINISH;
-		} else if (wo.getLinkType() == WorkOrderType.FINISH_TO_START) {
+		} else if (wo.getLinkType().getValue() == WorkOrderType.FINISH_TO_START) {
 			depedencyName = FINISH_TO_START;
-		} else if (wo.getLinkType() == WorkOrderType.START_TO_FINISH) {
+		} else if (wo.getLinkType().getValue() == WorkOrderType.START_TO_FINISH) {
 			depedencyName = START_TO_FINISH;
-		} else if (wo.getLinkType() == WorkOrderType.START_TO_START) {
+		} else if (wo.getLinkType().getValue() == WorkOrderType.START_TO_START) {
 			depedencyName = START_TO_START;
 		}
 		dependency.setText(depedencyName);
@@ -413,13 +413,13 @@ public class PredecessorDialog extends Dialog {
 		int index = dependency.getSelectionIndex();
 		WorkOrderType type;
 		if (index == 0) {
-			type = WorkOrderType.FINISH_TO_START;
+			type = WorkOrderType.FINISH_TO_START_LITERAL;
 		} else if (index == 1) {
-			type = WorkOrderType.FINISH_TO_FINISH;
+			type = WorkOrderType.FINISH_TO_FINISH_LITERAL;
 		} else if (index == 2) {
-			type = WorkOrderType.START_TO_START;
+			type = WorkOrderType.START_TO_START_LITERAL;
 		} else {
-			type = WorkOrderType.START_TO_FINISH;
+			type = WorkOrderType.START_TO_FINISH_LITERAL;
 		}
 
 		return type;

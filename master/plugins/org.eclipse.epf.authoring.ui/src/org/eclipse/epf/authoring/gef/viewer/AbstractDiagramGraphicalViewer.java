@@ -42,7 +42,6 @@ import org.eclipse.gef.LayerConstants;
 import org.eclipse.gef.editparts.LayerManager;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
@@ -260,17 +259,8 @@ public abstract class AbstractDiagramGraphicalViewer {
 			// create a new image and repaint the graph
 			final Display display = Display.getDefault();
 			image = new Image(display, width, height);
-
 			gc = new GC(image);
-			gc.setAntialias(SWT.ON);
-			gc.setTextAntialias(SWT.OFF);
-			gc.setAdvanced(true);
-
 			graphics = new SWTGraphics(gc);
-			graphics.setAntialias(SWT.ON);
-			graphics.setTextAntialias(SWT.OFF);
-			graphics.setAdvanced(true);
-
 			figure.paint(graphics);
 
 		} catch (Exception ex) {

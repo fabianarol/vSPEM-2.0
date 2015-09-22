@@ -1,0 +1,47 @@
+/ActivityItemProvider.java/1.7/Wed Jul 12 22:52:02 2006/-kk/
+/ActivityWrapperItemProvider.java/1.6/Thu Aug 16 23:25:00 2007//
+/BSActivityItemProvider.java/1.29/Mon Jun 18 22:08:25 2007//
+/BreakdownElementItemProvider.java/1.9/Mon Jun 18 22:08:25 2007//
+/BreakdownElementWrapperItemProvider.java/1.9/Tue Feb 27 20:33:27 2007//
+/ComposedBreakdownElementWrapperItemProvider.java/1.2/Wed Feb 28 00:25:28 2007//
+/ComposedWPDescriptorWrapperItemProvider.java/1.4/Mon Apr 16 23:15:12 2007//
+/CompositeRoleItemProvider.java/1.2/Thu Jun  8 02:16:08 2006//
+/CompositeRoleWrapperItemProvider.java/1.2/Thu Jun  8 02:16:08 2006//
+/DeliverableDescriptorWrapperItemProvider.java/1.2/Thu Jun  8 02:16:08 2006//
+/DescribableElementWrapperItemProvider.java/1.5/Fri Sep 28 01:40:27 2007//
+/DescriptorItemProvider.java/1.8/Wed Jul 11 21:45:07 2007//
+/IBSItemProvider.java/1.4/Wed Mar  7 22:28:35 2007//
+/IBreakdownElementWrapperItemProviderFactory.java/1.2/Wed Aug  2 23:15:04 2006//
+/IColumnAware.java/1.1/Tue Feb  7 00:56:08 2006//
+/IProcessItemProvider.java/1.1/Tue Feb  7 00:56:09 2006//
+/ItemProviderAdapterFactory.java/1.5/Wed Jul 12 22:52:02 2006//
+/MilestoneWrapperItemProvider.java/1.2/Thu Jun  8 02:16:08 2006//
+/OBSActivityItemProvider.java/1.4/Tue Feb 27 20:33:28 2007//
+/OBSItemProviderAdapterFactory.java/1.3/Thu Jun  8 02:16:08 2006//
+/OBSMilestoneItemProvider.java/1.1/Tue Feb  7 00:56:09 2006//
+/OBSProcessItemProvider.java/1.2/Thu Jun  8 02:16:08 2006//
+/PBSActivityItemProvider.java/1.5/Wed May 23 18:12:37 2007//
+/PBSItemProviderAdapterFactory.java/1.3/Thu Jun  8 02:16:08 2006//
+/PBSMilestoneItemProvider.java/1.1/Tue Feb  7 00:56:09 2006//
+/PBSProcessItemProvider.java/1.2/Thu Jun  8 02:16:08 2006//
+/ProcessComponentItemProvider.java/1.3/Thu Jun  8 02:16:08 2006//
+/ProcessPackageItemProvider.java/1.2/Thu Jun  8 02:16:08 2006//
+/RoleDescriptorItemProvider.java/1.1/Tue Feb  7 00:56:09 2006//
+/RoleDescriptorWrapperItemProvider.java/1.3/Tue Feb 27 20:33:28 2007//
+/RoleItemProvider.java/1.2/Thu Jun  8 02:16:08 2006//
+/TaskDescriptorItemProvider.java/1.2/Thu Jun  8 02:16:08 2006//
+/TaskDescriptorWrapperItemProvider.java/1.3/Tue Feb 27 20:33:28 2007//
+/TeamProfileItemProvider.java/1.4/Fri Aug 25 01:56:35 2006//
+/TeamProfileWrapperItemProvider.java/1.2/Thu Jun  8 02:16:08 2006//
+/WBSActivityItemProvider.java/1.6/Wed May 23 00:58:45 2007//
+/WBSItemProviderAdapterFactory.java/1.3/Thu Jun  8 02:16:08 2006//
+/WBSMilestoneItemProvider.java/1.2/Wed Oct 11 18:47:44 2006//
+/WBSProcessItemProvider.java/1.2/Thu Jun  8 02:16:08 2006//
+/WorkOrderItemProvider.java/1.2/Thu Jun  8 02:16:08 2006//
+/WorkProductDescriptorItemProvider.java/1.9/Wed Jul 11 21:45:07 2007//
+/WorkProductDescriptorWrapperItemProvider.java/1.4/Tue Feb 27 20:33:28 2007//
+D/command////
+D/consolidated////
+D/internal////
+/package.html/1.3/Sun Oct 29 18:39:11 2006//
+D/publishing////

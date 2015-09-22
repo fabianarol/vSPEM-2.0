@@ -48,14 +48,10 @@ public class ToolMentorLayout extends AbstractElementLayout {
 							.getElementRealizer());
 			addReferences(AssociationHelper.ToolMentor_Tasks, elementXml, "contentElements", contentElements); //$NON-NLS-1$
 
-			List<MethodElement> tools = ConfigurationHelper.calc0nFeatureValue(
-					super.element, AssociationHelper.ToolMentor_Tools,
+			MethodElement tool = ConfigurationHelper.calc01FeatureValue(
+					super.element, AssociationHelper.ToolMentor_Tool,
 					layoutManager.getElementRealizer());
-			int sz = tools == null ? 0 : tools.size();
-			for (int i = 0; i < sz; i++) {
-				MethodElement tool = tools.get(i);
-				addReference(AssociationHelper.ToolMentor_Tools, elementXml, "tool", tool); //$NON-NLS-1$
-			}
+			addReference(AssociationHelper.ToolMentor_Tool, elementXml, "tool", tool); //$NON-NLS-1$			
 		}
 
 		return elementXml;

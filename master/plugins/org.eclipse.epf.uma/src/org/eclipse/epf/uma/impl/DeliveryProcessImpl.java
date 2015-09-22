@@ -37,6 +37,13 @@ import org.eclipse.epf.uma.UmaPackage;
  */
 public class DeliveryProcessImpl extends ProcessImpl implements DeliveryProcess {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The cached value of the '{@link #getEducationMaterials() <em>Education Materials</em>}' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -44,7 +51,7 @@ public class DeliveryProcessImpl extends ProcessImpl implements DeliveryProcess 
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<SupportingMaterial> educationMaterials;
+	protected EList educationMaterials = null;
 
 	/**
 	 * The cached value of the '{@link #getCommunicationsMaterials() <em>Communications Materials</em>}' reference list.
@@ -54,7 +61,7 @@ public class DeliveryProcessImpl extends ProcessImpl implements DeliveryProcess 
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<SupportingMaterial> communicationsMaterials;
+	protected EList communicationsMaterials = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -66,7 +73,7 @@ public class DeliveryProcessImpl extends ProcessImpl implements DeliveryProcess 
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -74,7 +81,6 @@ public class DeliveryProcessImpl extends ProcessImpl implements DeliveryProcess 
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.DELIVERY_PROCESS;
 	}
@@ -84,9 +90,9 @@ public class DeliveryProcessImpl extends ProcessImpl implements DeliveryProcess 
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<SupportingMaterial> getEducationMaterials() {
+	public List getEducationMaterials() {
 		if (educationMaterials == null) {
-			educationMaterials = new EObjectResolvingEList<SupportingMaterial>(
+			educationMaterials = new EObjectResolvingEList(
 					SupportingMaterial.class, this,
 					UmaPackage.DELIVERY_PROCESS__EDUCATION_MATERIALS);
 		}
@@ -98,9 +104,9 @@ public class DeliveryProcessImpl extends ProcessImpl implements DeliveryProcess 
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<SupportingMaterial> getCommunicationsMaterials() {
+	public List getCommunicationsMaterials() {
 		if (communicationsMaterials == null) {
-			communicationsMaterials = new EObjectResolvingEList<SupportingMaterial>(
+			communicationsMaterials = new EObjectResolvingEList(
 					SupportingMaterial.class, this,
 					UmaPackage.DELIVERY_PROCESS__COMMUNICATIONS_MATERIALS);
 		}
@@ -112,7 +118,6 @@ public class DeliveryProcessImpl extends ProcessImpl implements DeliveryProcess 
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.DELIVERY_PROCESS__EDUCATION_MATERIALS:
@@ -128,19 +133,15 @@ public class DeliveryProcessImpl extends ProcessImpl implements DeliveryProcess 
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.DELIVERY_PROCESS__EDUCATION_MATERIALS:
 			getEducationMaterials().clear();
-			getEducationMaterials().addAll(
-					(Collection<? extends SupportingMaterial>) newValue);
+			getEducationMaterials().addAll((Collection) newValue);
 			return;
 		case UmaPackage.DELIVERY_PROCESS__COMMUNICATIONS_MATERIALS:
 			getCommunicationsMaterials().clear();
-			getCommunicationsMaterials().addAll(
-					(Collection<? extends SupportingMaterial>) newValue);
+			getCommunicationsMaterials().addAll((Collection) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -151,7 +152,6 @@ public class DeliveryProcessImpl extends ProcessImpl implements DeliveryProcess 
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.DELIVERY_PROCESS__EDUCATION_MATERIALS:
@@ -169,7 +169,6 @@ public class DeliveryProcessImpl extends ProcessImpl implements DeliveryProcess 
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);

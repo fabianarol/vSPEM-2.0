@@ -14,32 +14,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.emf.common.notify.AdapterFactory;
-import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
 import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryContentProvider;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
-import org.eclipse.epf.authoring.ui.filters.DescriptorConfigurationFilter;
 import org.eclipse.epf.authoring.ui.filters.DescriptorProcessFilter;
 import org.eclipse.epf.authoring.ui.filters.ProcessRoleFilter;
 import org.eclipse.epf.library.edit.IFilter;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
 import org.eclipse.epf.library.edit.command.IActionManager;
 import org.eclipse.epf.library.edit.itemsfilter.FilterConstants;
+import org.eclipse.epf.library.edit.process.command.AssignPrimaryPerformerToTaskDescriptor;
 import org.eclipse.epf.library.edit.process.command.AssignRoleToTaskDescriptor;
 import org.eclipse.epf.library.edit.process.command.IActionTypeConstants;
-import org.eclipse.epf.library.edit.util.DescriptorPropUtil;
 import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.uma.Activity;
-import org.eclipse.epf.uma.Descriptor;
-import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.Process;
 import org.eclipse.epf.uma.Role;
 import org.eclipse.epf.uma.RoleDescriptor;
 import org.eclipse.epf.uma.TaskDescriptor;
 import org.eclipse.epf.uma.UmaPackage;
-import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
@@ -61,8 +55,6 @@ public class TaskDescriptorRoleSection extends RelationSection {
 		if (roleFilter == null) {
 			roleFilter = new ProcessRoleFilter(getConfiguration(), null,
 					FilterConstants.ROLES);
-		} else if (roleFilter instanceof DescriptorConfigurationFilter) {
-			((DescriptorConfigurationFilter) roleFilter).setMethodConfiguration(getConfiguration());
 		}
 		return roleFilter;
 	}
@@ -83,20 +75,12 @@ public class TaskDescriptorRoleSection extends RelationSection {
 	protected void initContentProvider1() {
 		contentProvider = new AdapterFactoryContentProvider(getAdapterFactory()) {
 			public Object[] getElements(Object object) {
-				TaskDescriptor td = (TaskDescriptor) element;
-				List<MethodElement> elements = new ArrayList<MethodElement>();
-				elements.addAll(td.getPerformedPrimarilyBy());
-				
-				if (isSyncFree()
-						&& ! DescriptorPropUtil.getDesciptorPropUtil()
-								.isNoAutoSyn(td)) {
-//					elements.addAll(td.getPerformedPrimarilyByExcluded());
-					
-					mixWithExcluded(td, elements, UmaPackage.eINSTANCE.getTask_PerformedBy(),
-							UmaPackage.eINSTANCE.getTaskDescriptor_PerformedPrimarilyByExcluded(), UmaPackage.eINSTANCE.getTaskDescriptor_PerformedPrimarilyBy());
-				}
-				
-				return getFilteredList(elements).toArray();
+				List list = new ArrayList();
+				RoleDescriptor role = ((TaskDescriptor) element)
+						.getPerformedPrimarilyBy();
+				if (role != null)
+					list.add(role);
+				return getFilteredList(list).toArray();
 			}
 		};
 		tableViewer1.setContentProvider(contentProvider);
@@ -108,20 +92,9 @@ public class TaskDescriptorRoleSection extends RelationSection {
 	protected void initContentProvider2() {
 		contentProvider = new AdapterFactoryContentProvider(getAdapterFactory()) {
 			public Object[] getElements(Object object) {
-				TaskDescriptor td = (TaskDescriptor) element;
-				List<MethodElement> elements = new ArrayList<MethodElement>();
-				elements.addAll(td.getAdditionallyPerformedBy());
-				
-				if (isSyncFree()
-						&& ! DescriptorPropUtil.getDesciptorPropUtil()
-								.isNoAutoSyn(td)) {
-//					elements.addAll(td.getAdditionallyPerformedByExclude());
-					
-					mixWithExcluded(td, elements, UmaPackage.eINSTANCE.getTask_AdditionallyPerformedBy(),
-							UmaPackage.eINSTANCE.getTaskDescriptor_AdditionallyPerformedByExclude(), UmaPackage.eINSTANCE.getTaskDescriptor_AdditionallyPerformedBy());
-				}
-				
-				return getFilteredList(elements).toArray();
+				return getFilteredList(
+						((TaskDescriptor) element).getAdditionallyPerformedBy())
+						.toArray();
 			}
 		};
 		tableViewer2.setContentProvider(contentProvider);
@@ -139,54 +112,15 @@ public class TaskDescriptorRoleSection extends RelationSection {
 		};
 		tableViewer3.setContentProvider(contentProvider);
 	}
-	
-	protected void initLabelProvider1() {
-		ILabelProvider provider = null; 
-			
-		if (isSyncFree()) {
-			provider = new SyncFreeLabelProvider(
-				TngAdapterFactory.INSTANCE.getOBS_ComposedAdapterFactory(),
-				(Descriptor)element,
-				UmaPackage.eINSTANCE.getTaskDescriptor_PerformedPrimarilyBy(), getConfiguration());
-		} else {
-			provider = new AdapterFactoryLabelProvider(
-					TngAdapterFactory.INSTANCE.getOBS_ComposedAdapterFactory());
-		}
-		
-		tableViewer1.setLabelProvider(provider);
-	}
-	
-	protected void initLabelProvider2() {
-		ILabelProvider provider = null;
-		
-		if (isSyncFree()) {
-			provider = new SyncFreeLabelProvider(
-				TngAdapterFactory.INSTANCE.getOBS_ComposedAdapterFactory(),
-				(Descriptor)element,
-				UmaPackage.eINSTANCE.getTaskDescriptor_AdditionallyPerformedBy(), getConfiguration());
-		} else {
-			provider = new AdapterFactoryLabelProvider(
-					TngAdapterFactory.INSTANCE.getOBS_ComposedAdapterFactory());
-		}
-		
-		tableViewer2.setLabelProvider(provider);
-	}
-	
-	protected void initLabelProvider3() {
-		ILabelProvider provider = new AdapterFactoryLabelProvider(
-				TngAdapterFactory.INSTANCE.getOBS_ComposedAdapterFactory());
-		
-		tableViewer3.setLabelProvider(provider);
-	}
-	
+
 	/**
 	 * @see org.eclipse.epf.authoring.ui.properties.RelationSection#init()
 	 */
 	protected void init() {
 		super.init();
 
-//		labelProvider = new AdapterFactoryLabelProvider(
-//				TngAdapterFactory.INSTANCE.getOBS_ComposedAdapterFactory());
+		labelProvider = new AdapterFactoryLabelProvider(
+				TngAdapterFactory.INSTANCE.getOBS_ComposedAdapterFactory());
 
 		int numOfTables = 3;
 		
@@ -208,6 +142,7 @@ public class TaskDescriptorRoleSection extends RelationSection {
 	 * @see org.eclipse.epf.authoring.ui.properties.RelationSection#refresh()
 	 */
 	public void refresh() {
+		// System.out.println("Refreshing TaskDescriptor ROLES Section");
 		if (getElement() instanceof TaskDescriptor) {
 			element = (TaskDescriptor) getElement();
 		}
@@ -235,14 +170,10 @@ public class TaskDescriptorRoleSection extends RelationSection {
 		return roleList;
 	}
 
-	protected void addItems1(List items) {
-		addItems1(items, false);
-	}
-	
 	/**
 	 * @see org.eclipse.epf.authoring.ui.properties.RelationSection#addItems1(java.util.List)
 	 */
-	protected void addItems1(List items, boolean calledForExculded) {
+	protected void addItems1(List items) {
 		if (!items.isEmpty()) {
 			List elementList = getRoles(((TaskDescriptor) element)
 					.getAdditionallyPerformedBy());
@@ -258,30 +189,25 @@ public class TaskDescriptorRoleSection extends RelationSection {
 						newList.add(role);
 				}
 			}
-
 			if (newList.size() > 0) {
-				AssignRoleToTaskDescriptor cmd = new AssignRoleToTaskDescriptor(
-						(TaskDescriptor) element, newList,
-						IActionTypeConstants.ADD_PRIMARY_PERFORMER, getConfiguration(), calledForExculded);
+				AssignPrimaryPerformerToTaskDescriptor cmd = new AssignPrimaryPerformerToTaskDescriptor(
+						(TaskDescriptor) element, (Role) newList.get(0), getConfiguration());
 				actionMgr.execute(cmd);
 			}
 		}
 	};
 
-	protected void addItems2(List items) {
-		addItems2(items, false);
-	}
-	
 	/**
 	 * @see org.eclipse.epf.authoring.ui.properties.RelationSection#addItems2(java.util.List)
 	 */
-	protected void addItems2(List items, boolean calledForExculded) {
+	protected void addItems2(List items) {
 		if (!items.isEmpty()) {
+			RoleDescriptor roleDesc = ((TaskDescriptor) element)
+					.getPerformedPrimarilyBy();
 			List elementList = getRoles(((TaskDescriptor) element)
-					.getPerformedPrimarilyBy());
-			elementList.addAll(getRoles(((TaskDescriptor) element)
-					.getAssistedBy()));
-		
+					.getAssistedBy());
+			if (roleDesc != null)
+				elementList.add(roleDesc.getRole());
 
 			List newList = new ArrayList();
 			for (int i = 0; i < items.size(); i++) {
@@ -295,7 +221,7 @@ public class TaskDescriptorRoleSection extends RelationSection {
 			if (newList.size() > 0) {
 				AssignRoleToTaskDescriptor cmd = new AssignRoleToTaskDescriptor(
 						(TaskDescriptor) element, newList,
-						IActionTypeConstants.ADD_ADDITIONAL_PERFORMER, getConfiguration(), calledForExculded);
+						IActionTypeConstants.ADD_ADDITIONAL_PERFORMER, getConfiguration());
 				actionMgr.execute(cmd);
 			}
 		}
@@ -306,10 +232,12 @@ public class TaskDescriptorRoleSection extends RelationSection {
 	 */
 	protected void addItems3(List items) {
 		if (!items.isEmpty()) {
+			RoleDescriptor roleDesc = ((TaskDescriptor) element)
+					.getPerformedPrimarilyBy();
 			List elementList = getRoles(((TaskDescriptor) element)
-					.getPerformedPrimarilyBy());
-			elementList.addAll(getRoles(((TaskDescriptor) element)
-					.getAdditionallyPerformedBy()));
+					.getAdditionallyPerformedBy());
+			if (roleDesc != null)
+				elementList.add(roleDesc.getRole());
 
 			List newList = new ArrayList();
 			for (int i = 0; i < items.size(); i++) {
@@ -337,20 +265,12 @@ public class TaskDescriptorRoleSection extends RelationSection {
 			items.removeAll(((TaskDescriptor) element)
 					.getAdditionallyPerformedBy());
 			items.removeAll(((TaskDescriptor) element).getAssistedBy());
-			
-			actionMgr.doAction(IActionManager.ADD_MANY, element,
-					UmaPackage.eINSTANCE
-							.getTaskDescriptor_PerformedPrimarilyBy(),
-					items, -1);
-			
-			if (isSyncFree()) {
-				for (Object item : items) {
-					if (item instanceof Descriptor) {
-						Descriptor des = (Descriptor) item;
-						propUtil.addLocalUse(des, (Descriptor)element,
-								UmaPackage.eINSTANCE.getTaskDescriptor_PerformedPrimarilyBy());
-					}
-				}
+
+			if (items.size() > 0) {
+				actionMgr.doAction(IActionManager.SET, element,
+						UmaPackage.eINSTANCE
+								.getTaskDescriptor_PerformedPrimarilyBy(),
+						items.get(0), -1);
 			}
 		}
 	}
@@ -361,22 +281,12 @@ public class TaskDescriptorRoleSection extends RelationSection {
 	protected void addFromProcessItems2(List items) {
 		if (!items.isEmpty()) {
 			items.removeAll(((TaskDescriptor) element).getAssistedBy());
-			items.removeAll(((TaskDescriptor) element).getPerformedPrimarilyBy());
+			items.remove(((TaskDescriptor) element).getPerformedPrimarilyBy());
 
 			actionMgr.doAction(IActionManager.ADD_MANY, element,
 					UmaPackage.eINSTANCE
 							.getTaskDescriptor_AdditionallyPerformedBy(),
 					items, -1);
-			
-			if (isSyncFree()) {
-				for (Object item : items) {
-					if (item instanceof Descriptor) {
-						Descriptor des = (Descriptor) item;
-						propUtil.addLocalUse(des, (Descriptor)element,
-								UmaPackage.eINSTANCE.getTaskDescriptor_AdditionallyPerformedBy());
-					}
-				}
-			}
 		}
 	}
 
@@ -387,7 +297,7 @@ public class TaskDescriptorRoleSection extends RelationSection {
 		if (!items.isEmpty()) {
 			items.removeAll(((TaskDescriptor) element)
 					.getAdditionallyPerformedBy());
-			items.removeAll(((TaskDescriptor) element).getPerformedPrimarilyBy());
+			items.remove(((TaskDescriptor) element).getPerformedPrimarilyBy());
 
 			actionMgr.doAction(IActionManager.ADD_MANY, element,
 					UmaPackage.eINSTANCE.getTaskDescriptor_AssistedBy(), items,
@@ -400,7 +310,7 @@ public class TaskDescriptorRoleSection extends RelationSection {
 	 */
 	protected void removeItems1(List items) {
 		if (!items.isEmpty()) {
-			RemoveDescriptorCommand cmd = new RemoveDescriptorCommand((Descriptor)element,
+			RemoveDescriptorCommand cmd = new RemoveDescriptorCommand(element,
 					items, UmaPackage.TASK_DESCRIPTOR__PERFORMED_PRIMARILY_BY);
 			actionMgr.execute(cmd);
 		}
@@ -411,7 +321,7 @@ public class TaskDescriptorRoleSection extends RelationSection {
 	 */
 	protected void removeItems2(List items) {
 		if (!items.isEmpty()) {
-			RemoveDescriptorCommand cmd = new RemoveDescriptorCommand((Descriptor)element,
+			RemoveDescriptorCommand cmd = new RemoveDescriptorCommand(element,
 					items,
 					UmaPackage.TASK_DESCRIPTOR__ADDITIONALLY_PERFORMED_BY);
 			actionMgr.execute(cmd);
@@ -423,7 +333,7 @@ public class TaskDescriptorRoleSection extends RelationSection {
 	 */
 	protected void removeItems3(List items) {
 		if (!items.isEmpty()) {
-			RemoveDescriptorCommand cmd = new RemoveDescriptorCommand((Descriptor)element,
+			RemoveDescriptorCommand cmd = new RemoveDescriptorCommand(element,
 					items, UmaPackage.TASK_DESCRIPTOR__ASSISTED_BY);
 			actionMgr.execute(cmd);
 		}
@@ -433,21 +343,12 @@ public class TaskDescriptorRoleSection extends RelationSection {
 	 * @see org.eclipse.epf.authoring.ui.properties.RelationSection#getExistingElements1()
 	 */
 	protected List getExistingElements1() {
-		return ((TaskDescriptor) element).getPerformedPrimarilyBy();
-	};
-	
-	protected List getExistingContentElements1() {		
-		List<MethodElement> list = ProcessUtil.getAssociatedElementList(getExistingElements1());
-		
-		TaskDescriptor td = (TaskDescriptor) element;
-		if (isSyncFree()
-				&& ! DescriptorPropUtil.getDesciptorPropUtil()
-						.isNoAutoSyn(td)) {
-//			list.addAll(td.getPerformedPrimarilyByExcluded());
-			
-			mixWithExcluded(td, list, UmaPackage.eINSTANCE.getTask_PerformedBy(),
-					UmaPackage.eINSTANCE.getTaskDescriptor_PerformedPrimarilyByExcluded(), UmaPackage.eINSTANCE.getTaskDescriptor_PerformedPrimarilyBy());
-		}
+		List list = new ArrayList();
+		RoleDescriptor roleDesc = ((TaskDescriptor) element)
+				.getPerformedPrimarilyBy();
+		if (roleDesc != null)
+			list.add(roleDesc);
+
 		return list;
 	};
 
@@ -456,21 +357,6 @@ public class TaskDescriptorRoleSection extends RelationSection {
 	 */
 	protected List getExistingElements2() {
 		return ((TaskDescriptor) element).getAdditionallyPerformedBy();
-	};
-	
-	protected List getExistingContentElements2() {		
-		List<MethodElement> list = ProcessUtil.getAssociatedElementList(getExistingElements2());
-		
-		TaskDescriptor td = (TaskDescriptor) element;
-		if (isSyncFree()
-				&& ! DescriptorPropUtil.getDesciptorPropUtil()
-						.isNoAutoSyn(td)) {
-//			list.addAll(td.getAdditionallyPerformedByExclude());
-			
-			mixWithExcluded(td, list, UmaPackage.eINSTANCE.getTask_AdditionallyPerformedBy(),
-					UmaPackage.eINSTANCE.getTaskDescriptor_AdditionallyPerformedByExclude(), UmaPackage.eINSTANCE.getTaskDescriptor_AdditionallyPerformedBy());
-		}
-		return list;
 	};
 
 	/**
@@ -519,152 +405,6 @@ public class TaskDescriptorRoleSection extends RelationSection {
 	 */
 	protected String getDescriptorTabName() {
 		return FilterConstants.ROLE_DESCRIPTORS;
-	}
-	
-	//Return true if handled in this method
-	protected boolean syncFreeAdd1(IStructuredSelection selection) {
-		if (selection.size() == 0) {
-			return false;			
-		} 
-		
-		EReference ref = UmaPackage.eINSTANCE.getTaskDescriptor_PerformedPrimarilyBy();
-		
-		boolean result = propUtil.checkSelection(selection.toList(), (Descriptor)element, ref, getConfiguration());	
-		
-		if (! result) {
-			return true;
-		}
-		
-		Object testObj = selection.getFirstElement();
-		if (propUtil.isDynamicAndExclude(testObj, (Descriptor)element, ref, getConfiguration())) {				
-			addItems1(selection.toList(), true);
-			return true;
-		} 
-		
-		return false;
-	}
-	
-	protected boolean syncFreeAdd2(IStructuredSelection selection) {
-		if (selection.size() == 0) {
-			return false;			
-		} 
-		
-		EReference ref = UmaPackage.eINSTANCE.getTaskDescriptor_AdditionallyPerformedBy();
-		
-		boolean result = propUtil.checkSelection(selection.toList(), (Descriptor)element, ref, getConfiguration());	
-		
-		if (! result) {
-			return true;
-		}
-		
-		Object testObj = selection.getFirstElement();
-		if (propUtil.isDynamicAndExclude(testObj, (Descriptor)element, ref, getConfiguration())) {				
-			addItems2(selection.toList(), true);
-			return true;
-		} 
-		
-		return false;
-	}
-	
-	//Return true if handled in this method
-	protected boolean syncFreeRemove1(IStructuredSelection selection) {
-		if (selection.size() == 0) {
-			return true;			
-		} 
-		
-		EReference ref = UmaPackage.eINSTANCE.getTaskDescriptor_PerformedPrimarilyBy();
-		
-		boolean result = propUtil.checkSelection(selection.toList(), (Descriptor)element, ref, getConfiguration());
-		if (! result) {
-			return true;
-		}
-
-		Object testObj = selection.getFirstElement();
-		if (propUtil.isDynamicAndExclude(testObj, (Descriptor)element, ref, getConfiguration())) {
-			return true;
-		} 
-		
-		if (propUtil.isDynamic(testObj, (Descriptor)element, ref)) {
-			MoveDescriptorCommand cmd = new MoveDescriptorCommand((Descriptor)element, selection.toList(),
-					UmaPackage.TASK_DESCRIPTOR__PERFORMED_PRIMARILY_BY,
-					UmaPackage.TASK_DESCRIPTOR__PERFORMED_PRIMARILY_BY_EXCLUDED);
-			actionMgr.execute(cmd);
-			return true;
-		} 
-				
-		return false;
-	}
-	
-	protected boolean syncFreeRemove2(IStructuredSelection selection) {
-		if (selection.size() == 0) {
-			return true;			
-		} 
-		
-		EReference ref = UmaPackage.eINSTANCE.getTaskDescriptor_AdditionallyPerformedBy();
-		
-		boolean result = propUtil.checkSelection(selection.toList(), (Descriptor)element, ref, getConfiguration());
-		if (! result) {
-			return true;
-		}
-
-		Object testObj = selection.getFirstElement();
-		if (propUtil.isDynamicAndExclude(testObj, (Descriptor)element, ref, getConfiguration())) {
-			return true;
-		} 
-		
-		if (propUtil.isDynamic(testObj, (Descriptor)element, ref)) {
-			MoveDescriptorCommand cmd = new MoveDescriptorCommand((Descriptor)element, selection.toList(),
-					UmaPackage.TASK_DESCRIPTOR__ADDITIONALLY_PERFORMED_BY,
-					UmaPackage.TASK_DESCRIPTOR__ADDITIONALLY_PERFORMED_BY_EXCLUDE);
-			actionMgr.execute(cmd);
-			return true;
-		} 
-				
-		return false;
-	}
-	
-	protected void syncFreeUpdateBtnStatus1(IStructuredSelection selection) {
-		EReference ref = UmaPackage.eINSTANCE.getTaskDescriptor_PerformedPrimarilyBy();
-		
-		boolean result = propUtil.checkSelection(selection.toList(), (Descriptor)element, ref, getConfiguration());
-		
-		if (!result) {
-			ctrl_add_1.setEnabled(false);
-			ctrl_remove_1.setEnabled(false);
-		} else {
-			Object testObj = selection.getFirstElement();
-			if (propUtil.isDynamicAndExclude(testObj, (Descriptor)element, ref, getConfiguration())) {
-				ctrl_add_1.setEnabled(true);
-				ctrl_remove_1.setEnabled(false);
-			} else {
-				ctrl_add_1.setEnabled(true);
-				ctrl_remove_1.setEnabled(true);
-			}
-		}		
-	}
-	
-	protected void syncFreeUpdateBtnStatus2(IStructuredSelection selection) {
-		EReference ref = UmaPackage.eINSTANCE.getTaskDescriptor_AdditionallyPerformedBy();
-		
-		boolean result = propUtil.checkSelection(selection.toList(), (Descriptor)element, ref, getConfiguration());
-		
-		if (!result) {
-			ctrl_add_2.setEnabled(false);
-			ctrl_remove_2.setEnabled(false);
-		} else {
-			Object testObj = selection.getFirstElement();
-			if (propUtil.isDynamicAndExclude(testObj, (Descriptor)element, ref, getConfiguration())) {
-				ctrl_add_2.setEnabled(true);
-				ctrl_remove_2.setEnabled(false);
-			} else {
-				ctrl_add_2.setEnabled(true);
-				ctrl_remove_2.setEnabled(true);
-			}
-		}		
-	}
-	
-	protected boolean isSyncFree() {
-		return ProcessUtil.isSynFree();
 	}
 
 }

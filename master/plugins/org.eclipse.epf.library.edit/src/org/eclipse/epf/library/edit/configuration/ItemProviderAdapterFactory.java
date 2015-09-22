@@ -87,7 +87,16 @@ public class ItemProviderAdapterFactory extends
 		Adapter adapter = new ActivityItemProvider(this);
 		return adapter;
 	}
+	
+	public Adapter createvpActivityAdapter() {
+		return createActivityAdapter();
+	}
 
+	public Adapter createVarActivityAdapter() {
+		return createActivityAdapter();
+	}
+	
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -146,10 +155,5 @@ public class ItemProviderAdapterFactory extends
 	@Override
 	public Adapter createMilestoneAdapter() {
 		return new MilestoneItemProvider(this);
-	}
-	
-	@Override
-	public Adapter createPracticeAdapter() {
-		return new PracticeItemProvider(this);
 	}
 }

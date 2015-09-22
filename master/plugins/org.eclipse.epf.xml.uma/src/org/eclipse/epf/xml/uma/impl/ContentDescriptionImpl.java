@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: ContentDescriptionImpl.java,v 1.5 2007/06/05 21:14:59 klow Exp $
+ */
 package org.eclipse.epf.xml.uma.impl;
 
 import java.util.Collection;
@@ -89,7 +85,7 @@ public class ContentDescriptionImpl extends MethodUnitImpl implements ContentDes
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Section> section;
+	protected EList section;
 
 	/**
 	 * The default value of the '{@link #getExternalId() <em>External Id</em>}' attribute.
@@ -125,7 +121,6 @@ public class ContentDescriptionImpl extends MethodUnitImpl implements ContentDes
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.CONTENT_DESCRIPTION;
 	}
@@ -177,9 +172,9 @@ public class ContentDescriptionImpl extends MethodUnitImpl implements ContentDes
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Section> getSection() {
+	public EList getSection() {
 		if (section == null) {
-			section = new EObjectContainmentEList<Section>(Section.class, this, UmaPackage.CONTENT_DESCRIPTION__SECTION);
+			section = new EObjectContainmentEList(Section.class, this, UmaPackage.CONTENT_DESCRIPTION__SECTION);
 		}
 		return section;
 	}
@@ -210,11 +205,10 @@ public class ContentDescriptionImpl extends MethodUnitImpl implements ContentDes
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 			case UmaPackage.CONTENT_DESCRIPTION__SECTION:
-				return ((InternalEList<?>)getSection()).basicRemove(otherEnd, msgs);
+				return ((InternalEList)getSection()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -224,7 +218,6 @@ public class ContentDescriptionImpl extends MethodUnitImpl implements ContentDes
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 			case UmaPackage.CONTENT_DESCRIPTION__MAIN_DESCRIPTION:
@@ -244,8 +237,6 @@ public class ContentDescriptionImpl extends MethodUnitImpl implements ContentDes
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-		@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 			case UmaPackage.CONTENT_DESCRIPTION__MAIN_DESCRIPTION:
@@ -256,7 +247,7 @@ public class ContentDescriptionImpl extends MethodUnitImpl implements ContentDes
 				return;
 			case UmaPackage.CONTENT_DESCRIPTION__SECTION:
 				getSection().clear();
-				getSection().addAll((Collection<? extends Section>)newValue);
+				getSection().addAll((Collection)newValue);
 				return;
 			case UmaPackage.CONTENT_DESCRIPTION__EXTERNAL_ID:
 				setExternalId((String)newValue);
@@ -270,7 +261,6 @@ public class ContentDescriptionImpl extends MethodUnitImpl implements ContentDes
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 			case UmaPackage.CONTENT_DESCRIPTION__MAIN_DESCRIPTION:
@@ -294,7 +284,6 @@ public class ContentDescriptionImpl extends MethodUnitImpl implements ContentDes
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 			case UmaPackage.CONTENT_DESCRIPTION__MAIN_DESCRIPTION:
@@ -314,7 +303,6 @@ public class ContentDescriptionImpl extends MethodUnitImpl implements ContentDes
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 

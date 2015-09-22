@@ -34,7 +34,7 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.workspace.util.WorkspaceSynchronizer;
 import org.eclipse.epf.common.CommonPlugin;
-import org.eclipse.epf.common.ui.util.MsgBox;
+import org.eclipse.epf.common.serviceability.MsgBox;
 import org.eclipse.epf.diagram.core.DiagramCorePlugin;
 import org.eclipse.epf.diagram.core.part.DiagramEditorInputProxy;
 import org.eclipse.epf.diagram.core.part.IDiagramFileEditorInputProxy;
@@ -183,15 +183,12 @@ public class SharedResourceDiagramDocumentProvider extends StorageDiagramDocumen
 		// if overwrite allowed, this diagram should replace the diagram in the reloaded resource.
 		//
 		Resource resource = diagram.eResource();
-		if (resource != null) {
-			if (!overwrite) {
-				DiagramManager.checkSynchronizationState(resource);
-			}
-			IStatus status = Services.getAccessController().checkModify(
-					new Resource[] { resource }, MsgBox.getDefaultShell());
-			if (!status.isOK()) {
-				throw new CoreException(status);
-			}
+		if (!overwrite) {
+			DiagramManager.checkSynchronizationState(resource);
+		}		
+		IStatus status = Services.getAccessController().checkModify(new Resource[] {resource}, MsgBox.getDefaultShell());
+		if(!status.isOK()) {
+			throw new CoreException(status);
 		}
 		
 		// inform about the upcoming content change
@@ -252,16 +249,14 @@ public class SharedResourceDiagramDocumentProvider extends StorageDiagramDocumen
 	}
 	
 	private static void logResourceErrorsAndWarnings(Resource resource) {
-		if (resource != null)  {
-			for (Iterator iter = resource.getErrors().iterator(); iter.hasNext();) {
-				Resource.Diagnostic diagnostic = (Resource.Diagnostic) iter.next();
-				Log.error(EditorPlugin.getInstance(), EditorStatusCodes.ERROR, diagnostic.getMessage());				
-			}
-	
-			for (Iterator iter = resource.getWarnings().iterator(); iter.hasNext();) {
-				Resource.Diagnostic diagnostic = (Resource.Diagnostic) iter.next();
-				Log.warning(EditorPlugin.getInstance(), EditorStatusCodes.WARNING, diagnostic.getMessage());				
-			}
+		for (Iterator iter = resource.getErrors().iterator(); iter.hasNext();) {
+			Resource.Diagnostic diagnostic = (Resource.Diagnostic) iter.next();
+			Log.error(EditorPlugin.getInstance(), EditorStatusCodes.ERROR, diagnostic.getMessage());				
+		}
+
+		for (Iterator iter = resource.getWarnings().iterator(); iter.hasNext();) {
+			Resource.Diagnostic diagnostic = (Resource.Diagnostic) iter.next();
+			Log.warning(EditorPlugin.getInstance(), EditorStatusCodes.WARNING, diagnostic.getMessage());				
 		}
 	}
 

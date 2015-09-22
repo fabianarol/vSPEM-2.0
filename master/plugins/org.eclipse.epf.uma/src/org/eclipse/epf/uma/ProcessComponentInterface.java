@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.uma;
 
+import org.eclipse.emf.common.util.EList;
 import java.util.List;
 
 /**
@@ -45,10 +46,10 @@ public interface ProcessComponentInterface extends BreakdownElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Interface Specifications</em>' containment reference list.
 	 * @see org.eclipse.epf.uma.UmaPackage#getProcessComponentInterface_InterfaceSpecifications()
-	 * @model containment="true" resolveProxies="true" ordered="false"
+	 * @model type="org.eclipse.epf.uma.TaskDescriptor" containment="true" resolveProxies="true" ordered="false"
 	 * @generated
 	 */
-	List<TaskDescriptor> getInterfaceSpecifications();
+	List getInterfaceSpecifications();
 
 	/**
 	 * Returns the value of the '<em><b>Interface IO</b></em>' containment reference list.
@@ -61,9 +62,9 @@ public interface ProcessComponentInterface extends BreakdownElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Interface IO</em>' containment reference list.
 	 * @see org.eclipse.epf.uma.UmaPackage#getProcessComponentInterface_InterfaceIO()
-	 * @model containment="true" resolveProxies="true" ordered="false"
+	 * @model type="org.eclipse.epf.uma.WorkProductDescriptor" containment="true" resolveProxies="true" ordered="false"
 	 * @generated
 	 */
-	List<WorkProductDescriptor> getInterfaceIO();
+	List getInterfaceIO();
 
 } // ProcessComponentInterface

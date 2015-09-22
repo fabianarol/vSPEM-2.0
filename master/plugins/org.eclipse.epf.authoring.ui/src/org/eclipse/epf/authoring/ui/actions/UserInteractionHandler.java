@@ -15,17 +15,15 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.emf.edit.provider.IItemLabelProvider;
 import org.eclipse.epf.authoring.ui.wizards.NewConfigurationWizard;
-import org.eclipse.epf.common.ui.util.ErrorDialogNoReason;
-import org.eclipse.epf.common.ui.util.MsgBox;
+import org.eclipse.epf.common.serviceability.ErrorDialogNoReason;
+import org.eclipse.epf.common.serviceability.MsgBox;
 import org.eclipse.epf.library.edit.command.IUserInteractionHandler;
 import org.eclipse.epf.library.edit.command.MethodElementCreateChildCommand;
 import org.eclipse.epf.library.edit.command.UserInput;
 import org.eclipse.epf.library.ui.LibraryUIPlugin;
 import org.eclipse.epf.library.ui.dialogs.UncancelableListSelectionDialog;
 import org.eclipse.epf.library.ui.dialogs.UserInputsDialog;
-import org.eclipse.epf.library.ui.providers.DelegateLabelProvider;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.UmaPackage;
 import org.eclipse.jface.dialogs.Dialog;
@@ -253,13 +251,12 @@ public class UserInteractionHandler implements IUserInteractionHandler {
 	 *      org.eclipse.jface.viewers.ILabelProvider, boolean, java.util.List,
 	 *      java.lang.String, java.lang.String)
 	 */
-	public List select(List objectsToSelect, final IItemLabelProvider labelProvider,
+	public List select(List objectsToSelect, ILabelProvider labelProvider,
 			boolean multiple, List intitialSelection, String title, String msg) {
-		ILabelProvider lp = new DelegateLabelProvider(labelProvider);
 		if (multiple) {
 			IStructuredContentProvider contentProvider = new ArrayContentProvider();
 			UncancelableListSelectionDialog dlg = new UncancelableListSelectionDialog(
-					shell, objectsToSelect, contentProvider, lp, msg);
+					shell, objectsToSelect, contentProvider, labelProvider, msg);
 			dlg.setTitle(title);
 			dlg.setBlockOnOpen(true);
 			dlg.open();
@@ -274,7 +271,7 @@ public class UserInteractionHandler implements IUserInteractionHandler {
 			}
 		} else {
 			ElementListSelectionDialog dlg = new ElementListSelectionDialog(
-					shell, lp);
+					shell, labelProvider);
 
 			dlg.setBlockOnOpen(true);
 			dlg.setElements(objectsToSelect.toArray());
@@ -459,4 +456,19 @@ public class UserInteractionHandler implements IUserInteractionHandler {
 		return dialog.getResult();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.epf.library.edit.command.IUserInteractionHandler#getRunnableContext()
+	 */
+	public IRunnableContext getRunnableContext() {
+		Shell shell;
+		Object uiCtx = getUIContext();
+		if (uiCtx instanceof Shell) {
+			shell = (Shell) uiCtx;
+		} else {
+			shell = MsgBox.getDefaultShell();
+		}
+		return new ProgressMonitorDialog(shell);
+	}
 }

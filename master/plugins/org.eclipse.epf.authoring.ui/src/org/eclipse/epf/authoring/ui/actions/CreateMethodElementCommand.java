@@ -11,7 +11,6 @@
 package org.eclipse.epf.authoring.ui.actions;
 
 import java.util.Collection;
-import java.util.Collections;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.emf.common.command.Command;
@@ -21,20 +20,13 @@ import org.eclipse.emf.edit.command.CommandActionDelegate;
 import org.eclipse.epf.authoring.ui.AuthoringUIPlugin;
 import org.eclipse.epf.authoring.ui.AuthoringUIResources;
 import org.eclipse.epf.authoring.ui.editors.IEditorKeeper;
-import org.eclipse.epf.authoring.ui.preferences.AuthoringUIPreferences;
 import org.eclipse.epf.authoring.ui.views.ViewHelper;
-import org.eclipse.epf.library.LibraryService;
-import org.eclipse.epf.library.LibraryServiceException;
+import org.eclipse.epf.common.serviceability.MsgBox;
 import org.eclipse.epf.library.edit.command.CommandStatusChecker;
 import org.eclipse.epf.library.edit.command.MethodElementAddCommand;
 import org.eclipse.epf.library.edit.process.command.CreateProcessComponentCommand;
-import org.eclipse.epf.library.edit.util.LibraryEditUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
-import org.eclipse.epf.library.util.LibraryUtil;
-import org.eclipse.epf.uma.MethodElement;
-import org.eclipse.epf.uma.MethodElementProperty;
-import org.eclipse.epf.uma.Practice;
-import org.eclipse.epf.uma.UmaFactory;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * Creates a new Method element.
@@ -103,20 +95,6 @@ public class CreateMethodElementCommand extends CommandWrapper implements
 			Object obj = TngUtil.unwrap(o);
 			if (obj instanceof EObject && ((EObject) obj).eContainer() != null) {
 				// Open the editor for the newly created element.
-				if (AuthoringUIPreferences.getEnableAutoNameGen() && obj instanceof MethodElement) {
-					LibraryUtil.addNameTrackPresentationNameMark((MethodElement) obj);				
-				}
-				
-				//Set the publish back link for Practice and UDT before opening editor
-				if (obj instanceof Practice) {
-					Practice prac = (Practice)obj;
-					MethodElementProperty prop = UmaFactory.eINSTANCE.createMethodElementProperty();
-					prop.setName(TngUtil.PUBLISH_CATEGORY_PROPERTY);
-					prop.setValue(new Boolean(true).toString());
-					prac.getMethodElementProperty().add(prop);
-					LibraryEditUtil.save(Collections.singleton(prac.eResource()));
-				}
-				
 				IEditorKeeper.REFERENCE.getEditorKeeper().openEditor(obj);
 			}
 		}

@@ -14,7 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.MessageFormat;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.epf.common.ui.util.MsgDialog;
+import org.eclipse.epf.common.serviceability.MsgDialog;
 import org.eclipse.epf.library.services.SafeUpdateController;
 import org.eclipse.epf.publishing.PublishingResources;
 import org.eclipse.epf.publishing.services.AbstractPublishManager;

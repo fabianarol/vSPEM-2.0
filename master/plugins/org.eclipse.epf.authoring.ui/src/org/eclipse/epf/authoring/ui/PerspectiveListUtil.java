@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.authoring.ui;
 
-import org.eclipse.epf.common.ui.util.PerspectiveUtil;
+import org.eclipse.epf.common.utils.PerspectiveUtil;
 import org.eclipse.ui.IPageLayout;
 
 /**

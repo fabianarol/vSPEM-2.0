@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.draw2d.GridData;
-import org.eclipse.draw2d.GridLayout;
+//import org.eclipse.draw2d.GridData;
+//import org.eclipse.draw2d.GridLayout;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.draw2d.RectangleFigure;
@@ -321,7 +321,7 @@ public class TaskNodeEditPart extends ShapeNodeEditPart {
 	 * @generated
 	 */
 	public static final Font TASKNODENAMEFIGURE_FONT = new Font(Display
-			.getCurrent(), "Arial", 8, SWT.NORMAL);	//$NON-NLS-1$
+			.getCurrent(), "Arial", 8, SWT.NORMAL);
 
 	/**
 	 * @generated

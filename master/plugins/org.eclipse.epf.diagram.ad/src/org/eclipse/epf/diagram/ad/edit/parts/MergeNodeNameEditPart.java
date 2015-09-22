@@ -636,7 +636,7 @@ public class MergeNodeNameEditPart extends CompartmentEditPart implements
 		 */
 		public NodeNameFigure() {
 
-			this.setText("");	//$NON-NLS-1$
+			this.setText("");
 			createContents();
 		}
 

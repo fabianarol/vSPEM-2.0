@@ -29,7 +29,6 @@ import org.eclipse.epf.uma.ContentCategory;
 import org.eclipse.epf.uma.CustomCategory;
 import org.eclipse.epf.uma.Discipline;
 import org.eclipse.epf.uma.Domain;
-import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.MethodElementProperty;
 import org.eclipse.epf.uma.RoleSet;
@@ -143,18 +142,7 @@ public class CategorySortHelper {
 	 * @return
 	 */
 	public static List<Object> sortCategoryElements(MethodElement element, Object[] elements) {
-		return sortCategoryElements(element, elements, false, null, null);
-	}
-	
-	/**
-	 * Returns a sorted category element list based on the category's sort type
-	 * Respects the Name/PresName toggle
-	 * @param element 
-	 * @param elements array to sort
-	 * @return
-	 */
-	public static List<Object> sortCategoryElements(MethodElement element, Object[] elements, MethodConfiguration config) {
-		return sortCategoryElements(element, elements, false, null, config);
+		return sortCategoryElements(element, elements, false);
 	}
 
 	/**
@@ -164,8 +152,7 @@ public class CategorySortHelper {
 	 * @param forcePresNameSort true to always sort by presName. false will respect the toggle
 	 * @return
 	 */
-	public static List<Object> sortCategoryElements(MethodElement element, Object[] elements, 
-			boolean forcePresNameSort, EStructuralFeature feature, MethodConfiguration config) {
+	public static List<Object> sortCategoryElements(MethodElement element, Object[] elements, boolean forcePresNameSort) {
 		/*
 		 * TODO: can't use generics here because EMF doesn't use them yet - the elements param
 		 * usually comes from ContentElementsOrderList class which extends EMF's BasicEList and so
@@ -175,7 +162,7 @@ public class CategorySortHelper {
 		String sortType = getCategorySortValue(element);
 		if (V_CATEGORY_ELEMENTS__SORT_TYPE_MANUAL.equals(sortType)) {
 			if (element instanceof ContentCategory) {
-				return findManualSortOrderInContributors((ContentCategory)element, returnList, feature, config);
+				return findManualSortOrderInContributors((ContentCategory)element, returnList);
 			}
 			return returnList;
 		} else if (V_CATEGORY_ELEMENTS__SORT_TYPE_ALPHA.equals(sortType)) {
@@ -197,21 +184,6 @@ public class CategorySortHelper {
 		return returnList;
 	}
 	
-	private static List<Object> findManualSortOrderInContributors(ContentCategory cc, List<Object> elementList,
-			EStructuralFeature feature, MethodConfiguration config) {
-		if (feature == null) {
-			return elementList;
-		}
-		String sortType = getCategorySortValue(cc);
-		if (! V_CATEGORY_ELEMENTS__SORT_TYPE_MANUAL.equals(sortType)) {
-			return elementList;
-		}
-		
-		ManualSort manualSort = new ManualSort();
-		return manualSort.sort(cc, elementList, feature, config);
-	}
-	
-	//Keep this old code for reference
 	private static List<Object> findManualSortOrderInContributors(ContentCategory cc, List<Object> elementList) {
 		OrderInfo latestInfo = null;
 		Map<String, MethodElement> guidMap = new HashMap<String, MethodElement>();
@@ -231,9 +203,6 @@ public class CategorySortHelper {
 				if (obj instanceof ContentCategory) {
 					ContentCategory contributor = (ContentCategory)obj;
 					OrderInfo orderInfo = TngUtil.getOrderInfo(contributor, ContentElementOrderList.ORDER_INFO_NAME);
-					if (orderInfo == null) {
-						continue;
-					}
 					// find latest OrderInfo that contains all these elements
 					if (latestInfo == null || orderInfo.getTimestamp() > latestInfo.getTimestamp()) {
 						latestInfo = orderInfo;
@@ -251,17 +220,16 @@ public class CategorySortHelper {
 						returnList.add(element);
 						guidMap.remove(guid);
 					} else {
-						// try to find element in the guidMap that has a variable element with "guid"
-						MethodElement me = findElementInVariableElementList(guidMap, guid);
+						// try to find element in the guidMap that has a generalizer with "guid"
+						MethodElement me = findElementInGeneralizerList(guidMap, guid);
 						if (me != null) {
 							returnList.add(me);
-							guidMap.remove(me.getGuid());
+							guidMap.remove(guid);
 						} else {
 							// could not locate, will return original list
-						} 
+						}
 					}
 				}
-				
 				if (elementList.size() == returnList.size())
 					return returnList;
 			}
@@ -269,20 +237,15 @@ public class CategorySortHelper {
 		return elementList;
 	}
 	
-	private static MethodElement findElementInVariableElementList(Map<String, MethodElement> guidMap, String guid) {
+	private static MethodElement findElementInGeneralizerList(Map<String, MethodElement> guidMap, String guid) {
 		for (Iterator<MethodElement> iter = guidMap.values().iterator();iter.hasNext();) {
 			MethodElement value = iter.next();
 			if (value instanceof VariabilityElement) {
-				Set set = new HashSet();
-				set.add(value);
-				Set varElements = AssociationHelper.getVariabilityElements(set, true, true);
-				if(varElements != null && varElements.size() > 0){
-					for (Iterator varIter = varElements.iterator();varIter.hasNext();) {
-						Object variableElement = varIter.next();
-						if (variableElement instanceof MethodElement) {
-							if (((MethodElement)variableElement).getGuid().equals(guid)) {
-								return value;
-							}
+				for (Iterator genIter = TngUtil.getGeneralizers((VariabilityElement)value);genIter.hasNext();) {
+					Object generalizer = genIter.next();
+					if (generalizer instanceof MethodElement) {
+						if (((MethodElement)generalizer).getGuid().equals(guid)) {
+							return (MethodElement)generalizer;
 						}
 					}
 				}

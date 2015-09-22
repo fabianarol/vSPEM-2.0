@@ -50,5 +50,5 @@ public class OBSActivityItemProvider extends BSActivityItemProvider {
 	public Collection getEClasses() {
 		return null;
 	}
-	
+
 }

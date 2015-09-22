@@ -34,13 +34,11 @@ import org.eclipse.epf.diagram.add.edit.parts.ActivityDetailDiagramEditPart;
 import org.eclipse.epf.diagram.add.service.DiagramResetService;
 import org.eclipse.epf.diagram.core.DiagramCoreResources;
 import org.eclipse.epf.diagram.core.actions.DiagramActionsService;
-import org.eclipse.epf.diagram.core.bridge.BridgeHelper;
 import org.eclipse.epf.diagram.core.part.AbstractDiagramEditor;
 import org.eclipse.epf.diagram.core.part.util.DiagramEditorUtil;
 import org.eclipse.epf.diagram.core.util.DiagramConstants;
 import org.eclipse.epf.diagram.model.ActivityDetailDiagram;
 import org.eclipse.epf.diagram.model.Diagram;
-import org.eclipse.epf.diagram.model.Node;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.uma.Activity;
 import org.eclipse.gef.EditPart;
@@ -219,10 +217,5 @@ public class ADDiagramEditor extends AbstractDiagramEditor {
 			IAction action = getActionRegistry().getAction(DiagramConstants.RESET_DIAGRAM_LAYOUT);
 			action.run();
 		}
-	}
-	
-	@Override
-	protected boolean isOrphan(EObject modelElement) {
-		return modelElement instanceof Node && BridgeHelper.getMethodElement(modelElement) == null;
 	}
 }

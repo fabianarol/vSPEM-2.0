@@ -32,6 +32,14 @@ public class WBSItemProviderAdapterFactory extends
 		return new WBSActivityItemProvider(this);
 	}
 	
+	public Adapter createvpActivityAdapter() {
+		return new WBSActivityItemProvider(this);
+	}
+	
+	public Adapter createVarActivityAdapter() {
+		return new WBSActivityItemProvider(this);
+	}
+	
 	public Adapter createCapabilityPatternAdapter() {
 		return new WBSProcessItemProvider(this, (ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
 				.createCapabilityPatternAdapter());

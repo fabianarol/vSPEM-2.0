@@ -35,6 +35,7 @@ import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
 import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryContentProvider;
 import org.eclipse.epf.common.utils.FileUtil;
+import org.eclipse.epf.common.utils.XMLUtil;
 import org.eclipse.epf.library.configuration.ConfigurationHelper;
 import org.eclipse.epf.library.configuration.ProcessConfigurator;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
@@ -43,17 +44,13 @@ import org.eclipse.epf.library.edit.process.BreakdownElementWrapperItemProvider;
 import org.eclipse.epf.library.edit.process.IBSItemProvider;
 import org.eclipse.epf.library.edit.process.RoleDescriptorWrapperItemProvider;
 import org.eclipse.epf.library.edit.process.TaskDescriptorWrapperItemProvider;
-import org.eclipse.epf.library.edit.realization.IRealizationManager;
-import org.eclipse.epf.library.edit.ui.UIHelper;
+import org.eclipse.epf.library.edit.ui.UserInteractionHelper;
 import org.eclipse.epf.library.edit.util.ConfigurableComposedAdapterFactory;
 import org.eclipse.epf.library.edit.util.PredecessorList;
-import org.eclipse.epf.library.edit.util.ProcessScopeUtil;
 import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.library.edit.util.Suppression;
 import org.eclipse.epf.library.edit.util.TngUtil;
-import org.eclipse.epf.library.util.LibraryUtil;
 import org.eclipse.epf.library.util.ResourceHelper;
-import org.eclipse.epf.library.util.LibraryUtil.ConfigAndPlugin;
 import org.eclipse.epf.msproject.Assignment;
 import org.eclipse.epf.msproject.DocumentRoot;
 import org.eclipse.epf.msproject.MsprojectFactory;
@@ -84,7 +81,6 @@ import org.eclipse.epf.uma.WorkBreakdownElement;
 import org.eclipse.epf.uma.WorkOrder;
 import org.eclipse.epf.uma.WorkOrderType;
 import org.eclipse.epf.uma.WorkProductDescriptor;
-import org.eclipse.epf.uma.util.Scope;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -135,7 +131,7 @@ public class ExportMSPXMLService {
 
 	// If true, only export breakdown elements with 'isPlanned' attributes set
 	// to true.
-	protected boolean exportOnlyPlannedElements;
+	private boolean exportOnlyPlannedElements;
 
 	private boolean publishContentSite = false;
 
@@ -184,7 +180,6 @@ public class ExportMSPXMLService {
 		super();
 	}
 
-	ConfigAndPlugin tempConfigAndPlugin;
 	/**
 	 * Export a process to a Microsoft Project XML file.
 	 * 
@@ -197,41 +192,11 @@ public class ExportMSPXMLService {
 	 */
 	public boolean export(Process process, ExportMSPOptions exportOptions)
 			throws ExportMSPServiceException {
-		
-		tempConfigAndPlugin = null;
-		boolean result = false;
-		try {
-			Scope scope = ProcessScopeUtil.getInstance().getScope(process);
-			MethodConfiguration config = exportOptions.getMethodConfiguration();
-			if (config == scope) {
-				List<Process> list = new ArrayList<Process>();
-				list.add(process);
-				tempConfigAndPlugin = LibraryUtil.addTempConfigAndPluginToCurrentLibrary(list);
-				if (tempConfigAndPlugin != null && tempConfigAndPlugin.config != null) {
-					config = tempConfigAndPlugin.config;					
-				}
-			}
-			IRealizationManager mgr = ConfigurationHelper.getDelegate().getRealizationManager(config);
-			if (mgr != null) {
-				mgr.updateProcessModel(process);
-			}
-			
-			result =  export_(process, exportOptions, config);
-		} finally {
-			LibraryUtil.removeTempConfigAndPluginFromCurrentLibrary(tempConfigAndPlugin);
-			tempConfigAndPlugin = null;
-		}
-		
-		return result;
-	}
-	
-	private boolean export_(Process process, ExportMSPOptions exportOptions, MethodConfiguration config)
-			throws ExportMSPServiceException {
 		String msprojectName = exportOptions.getMSProjectName();
 		File exportDir = exportOptions.getExportDir();
 		publishContentSite = exportOptions.getPublishWebSite();
 		PublishOptions publishingOptions = exportOptions.getPublishingOptions();
-		processConfig = config;
+		processConfig = exportOptions.getMethodConfiguration();
 		if (debug) {
 			System.out.println("$$$ exporting to Microsoft Project!"); //$NON-NLS-1$
 			System.out.println("$$$ process          = " + process); //$NON-NLS-1$
@@ -338,9 +303,7 @@ public class ExportMSPXMLService {
 		}
 
 		try {
-			MethodConfiguration config = tempConfigAndPlugin == null ? exportOptions
-					.getMethodConfiguration()
-					: tempConfigAndPlugin.config;
+			MethodConfiguration config = exportOptions.getMethodConfiguration();
 			if (config == null) {
 				// Get the default method configuration associated with the
 				// process.
@@ -468,7 +431,7 @@ public class ExportMSPXMLService {
 					.createTBSComposedAdapterFactory();
 			if (adapterFactory instanceof ConfigurableComposedAdapterFactory) {
 				((ConfigurableComposedAdapterFactory) adapterFactory)
-						.setFilter(new ProcessConfigurator(config));
+						.setFilter(new ProcessConfigurator(config, null));
 			}
 			IStructuredContentProvider contentProvider = new AdapterFactoryContentProvider(
 					adapterFactory);
@@ -629,7 +592,7 @@ public class ExportMSPXMLService {
 
 			wbsAdapterFactory = (ConfigurableComposedAdapterFactory) TngAdapterFactory.INSTANCE
 					.createWBSComposedAdapterFactory();
-			breakdownElementFilter = new ProcessConfigurator(config);
+			breakdownElementFilter = new ProcessConfigurator(config, null);
 			wbsAdapterFactory.setFilter(breakdownElementFilter);
 
 			wbsContentProvider = new AdapterFactoryContentProvider(
@@ -643,11 +606,11 @@ public class ExportMSPXMLService {
 				generateProjectTask(wbsContentProvider,
 						(BreakdownElement) process, 1, project);
 			} else {
-//				List breakdownElements = process.getBreakdownElements();
-//				if (breakdownElements.size() > 0) {
+				List breakdownElements = process.getBreakdownElements();
+				if (breakdownElements.size() > 0) {
 					generateProjectTask(wbsContentProvider,
 							(BreakdownElement) process, 1, project);
-//				}
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -925,9 +888,6 @@ public class ExportMSPXMLService {
 		if (element instanceof Milestone) {
 			task.setMilestone(true);
 			task.setDurationFormat(BigInteger.valueOf(7));
-			task.setDuration("PT0H0M0S");
-		} else {
-			task.setMilestone(false);
 		}
 
 		// Assign the task to all the associated roles.
@@ -1053,27 +1013,21 @@ public class ExportMSPXMLService {
 	private List getRolesForTaskD(TaskDescriptor taskDescriptor) {
 		ArrayList rolesList = new ArrayList();
 
-		for (RoleDescriptor rd : taskDescriptor.getPerformedPrimarilyBy()) {
+		// RoleDescriptor roleDescrp = taskDescriptor.getPerformedPrimarilyBy();
+		RoleDescriptor roleDescrp = (RoleDescriptor) ConfigurationHelper
+				.getCalculatedElement(taskDescriptor.getPerformedPrimarilyBy(),
+						breakdownElementFilter.getMethodConfiguration());
 
-			// RoleDescriptor roleDescrp =
-			// taskDescriptor.getPerformedPrimarilyBy();
-			RoleDescriptor roleDescrp = (RoleDescriptor) ConfigurationHelper
-					.getCalculatedElement(rd, breakdownElementFilter
-							.getMethodConfiguration());
-
-			if (roleDescrp != null) {
-				rolesList.add(getDisplayName(roleDescrp));
-			}
+		if (roleDescrp != null) {
+			rolesList.add(getDisplayName(roleDescrp));
 		}
-
-		// List roleDescrpList =
-		// taskDescriptor.getAdditionallyPerformedBy();
+		// List roleDescrpList = taskDescriptor.getAdditionallyPerformedBy();
 		List roleDescrpList = ConfigurationHelper.getCalculatedElements(
 				taskDescriptor.getAdditionallyPerformedBy(),
 				breakdownElementFilter.getMethodConfiguration());
 
 		for (Iterator iter = roleDescrpList.iterator(); iter.hasNext();) {
-			RoleDescriptor roleDescrp = (RoleDescriptor) iter.next();
+			roleDescrp = (RoleDescriptor) iter.next();
 			rolesList.add(getDisplayName(roleDescrp));
 		}
 
@@ -1083,15 +1037,13 @@ public class ExportMSPXMLService {
 	private List getRolesForTask(org.eclipse.epf.uma.Task umaTask) {
 		ArrayList rolesList = new ArrayList();
 
-		for (Role role: umaTask.getPerformedBy()) {
-			if (role != null) {
-				rolesList.add(getDisplayName(role));
-			}
+		Role role = umaTask.getPerformedBy();
+		if (role != null) {
+			rolesList.add(getDisplayName(role));
 		}
-
 		List list = umaTask.getAdditionallyPerformedBy();
 		for (Iterator iter = list.iterator(); iter.hasNext();) {
-			Role role = (Role) iter.next();
+			role = (Role) iter.next();
 			rolesList.add(getDisplayName(role));
 		}
 
@@ -1260,21 +1212,21 @@ public class ExportMSPXMLService {
 	private BigInteger getLinkTypeInt(WorkOrder wo) {
 		if (wo == null) {
 			if (debug) {
-				System.out.println("Warning> getLinkTypeInt, wo == null.");//$NON-NLS-1$
+				System.out.println("Warning> getLinkTypeInt, wo == null.");
 			}
 			return null;
 		}
 		WorkOrderType woType = wo.getLinkType();
-		if (woType == WorkOrderType.FINISH_TO_START) {
+		if (woType == WorkOrderType.FINISH_TO_START_LITERAL) {
 			return new BigInteger("1"); //$NON-NLS-1$
 		} 
-		if (woType == WorkOrderType.START_TO_START) {
+		if (woType == WorkOrderType.START_TO_START_LITERAL) {
 			return new BigInteger("3"); //$NON-NLS-1$
 		} 
-		if (woType == WorkOrderType.FINISH_TO_FINISH) {
+		if (woType == WorkOrderType.FINISH_TO_FINISH_LITERAL) {
 			return new BigInteger("0"); //$NON-NLS-1$
 		}
-		if (woType == WorkOrderType.START_TO_FINISH) {
+		if (woType == WorkOrderType.START_TO_FINISH_LITERAL) {
 			return new BigInteger("2"); //$NON-NLS-1$
 		}
 		return null;
@@ -1345,14 +1297,7 @@ public class ExportMSPXMLService {
 		if (name == null || name.length() == 0) {
 			name = element.getName();
 		}
-		if (name.indexOf("\n") >= 0) {//$NON-NLS-1$
-			name = name.replaceAll("\r\n", " ");//$NON-NLS-1$ //$NON-NLS-2$
-		}
-		return name;
-		
-		//This is not needed since EMF would take care of encoding
-		//suring save
-		//return XMLUtil.escapeAttr(name);
+		return XMLUtil.escapeAttr(name);
 	}
 
 	/**
@@ -1384,7 +1329,7 @@ public class ExportMSPXMLService {
 			PublishProgressMonitorDialog dlg = new PublishProgressMonitorDialog(
 					Display.getCurrent().getActiveShell(), publishMgr
 							.getViewBuilder());
-			boolean success = UIHelper.runWithProgress(operation,
+			boolean success = UserInteractionHelper.runWithProgress(operation,
 					dlg, true, ExportMSPResources.exportMSPWizard_title);
 			if (operation.getException() != null) {
 				throw operation.getException();

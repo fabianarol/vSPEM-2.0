@@ -11,6 +11,10 @@
 package org.eclipse.epf.library.ui.wizards;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -19,22 +23,24 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.epf.common.service.utils.CommandLineRunUtil;
-import org.eclipse.epf.common.service.versioning.VersionUtil;
-import org.eclipse.epf.common.ui.util.MsgDialog;
-import org.eclipse.epf.common.utils.FileUtil;
-import org.eclipse.epf.library.LibraryService;
-import org.eclipse.epf.library.edit.util.LibraryEditUtil;
+import org.eclipse.epf.common.serviceability.MsgDialog;
+import org.eclipse.epf.common.serviceability.VersionUtil;
+import org.eclipse.epf.common.utils.NetUtil;
+import org.eclipse.epf.library.edit.ui.UserInteractionHelper;
+import org.eclipse.epf.library.layout.LayoutResources;
 import org.eclipse.epf.library.ui.LibraryUIManager;
 import org.eclipse.epf.library.ui.LibraryUIPlugin;
 import org.eclipse.epf.library.ui.LibraryUIResources;
+import org.eclipse.epf.library.ui.dialogs.CopyLibraryDialog;
 import org.eclipse.epf.library.ui.preferences.LibraryUIPreferences;
 import org.eclipse.epf.library.xmi.XMILibraryManager;
 import org.eclipse.epf.library.xmi.XMILibraryUtil;
 import org.eclipse.epf.persistence.migration.UpgradeCallerInfo;
 import org.eclipse.epf.ui.wizards.BaseWizard;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.INewWizard;
@@ -138,16 +144,6 @@ public class OpenLibraryWizard extends BaseWizard implements INewWizard {
 	 * @see org.eclipse.jface.wizard.Wizard#performFinish()
 	 */
 	public boolean performFinish() {
-		boolean b = performFinish_();
-		if (b) {
-			FileUtil.getValidateEdit().sychnConneciton();
-		}
-		return b;
-	}
-	private boolean performFinish_() {
-		if (LibraryService.getInstance().getCurrentMethodConfiguration() != null) {
-			LibraryService.getInstance().setCurrentMethodConfiguration(null);
-		}		
 		if (wizardExtender != null) {
 			return wizardExtender.doFinish();
 		} else {
@@ -164,9 +160,6 @@ public class OpenLibraryWizard extends BaseWizard implements INewWizard {
 	 *            the method library type
 	 */
 	public boolean openMethodLibrary(String path, String type) {
-		return openMethodLibrary(path, type, true);
-	}
-	public boolean openMethodLibrary(String path, String type, boolean addOpenLibraryPath) {
 		try {
 			Map<String, String> options = new HashMap<String, String>();
 			File libraryPath = new File(path);
@@ -178,10 +171,8 @@ public class OpenLibraryWizard extends BaseWizard implements INewWizard {
 					return false;
 				}
 				if (LibraryUIManager.getInstance().openLibrary(path)) {
-					if (addOpenLibraryPath) {
-						LibraryUIPreferences.addOpenLibraryPath(libraryPath
-								.getAbsolutePath());
-					}
+					LibraryUIPreferences.addOpenLibraryPath(libraryPath
+							.getAbsolutePath());
 					return true;
 				}
 			} else if (XMILibraryUtil
@@ -231,10 +222,6 @@ public class OpenLibraryWizard extends BaseWizard implements INewWizard {
 	 */
 	public static boolean handleToolVersion(String path,
 			UpgradeCallerInfo callerInfo) {
-		if (callerInfo == null) {
-			callerInfo = new UpgradeCallerInfo(UpgradeCallerInfo.upgradeLibrary, null);
-		}
-		
 		String libXmi = XMILibraryManager.LIBRARY_XMI;
 		if (callerInfo != null && callerInfo.getIsExportedPluginLib()) {
 			libXmi = XMILibraryManager.exportFile;
@@ -262,31 +249,15 @@ public class OpenLibraryWizard extends BaseWizard implements INewWizard {
 			return false;
 		}
 		if (XMILibraryUtil.isMethodLibraryUpgradeRequired(path, libXmi, info)) {
-//			if (!CommandLineRunUtil.getInstance().isNeedToRun() 
-//					&& isUpgradeLibrary(callerInfo)
-//					&& !LibraryUIPlugin
-//							.getDefault()
-//							.getMsgDialog()
-//							.displayConfirmation(
-//									LibraryUIResources.openLibraryWizard_title,
-//									LibraryUIResources.upgradeLibraryDialog_text)) {
-			int confirmationIx = 0;
-			if (!CommandLineRunUtil.getInstance().isNeedToRun()
-					&& isUpgradeLibrary(callerInfo)) {
-				confirmationIx = LibraryUIPlugin.getDefault().getMsgDialog()
-						.displayConfirmationWithCheckBox(
-								LibraryUIResources.openLibraryWizard_title,
-								LibraryUIResources.upgradeLibraryDialog_text,
-								LibraryUIResources.convertToSynProcessLib_msg);
-				if (confirmationIx == 0) {
-					return false;
-				}
+			if (isUpgradeLibrary(callerInfo)
+					&& !LibraryUIPlugin
+							.getDefault()
+							.getMsgDialog()
+							.displayConfirmation(
+									LibraryUIResources.openLibraryWizard_title,
+									LibraryUIResources.upgradeLibraryDialog_text)) {
+				return false;
 			}
-			
-			if (! LibraryEditUtil.getInstance().isJunitTest()) {
-				callerInfo.setConverToSynFree(confirmationIx == 1);
-			}
-			
 			if (!isUpgradeLibrary(callerInfo)) {
 				callerInfo.copyLibrary();
 				if (callerInfo.getCopiedLibFile() != null) {

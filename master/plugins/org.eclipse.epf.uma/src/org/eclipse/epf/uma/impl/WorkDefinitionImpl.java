@@ -38,6 +38,13 @@ import org.eclipse.epf.uma.WorkDefinition;
 public abstract class WorkDefinitionImpl extends MethodElementImpl implements
 		WorkDefinition {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The cached value of the '{@link #getPrecondition() <em>Precondition</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -45,7 +52,7 @@ public abstract class WorkDefinitionImpl extends MethodElementImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected Constraint precondition;
+	protected Constraint precondition = null;
 
 	/**
 	 * The cached value of the '{@link #getPostcondition() <em>Postcondition</em>}' containment reference.
@@ -55,7 +62,7 @@ public abstract class WorkDefinitionImpl extends MethodElementImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected Constraint postcondition;
+	protected Constraint postcondition = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -67,7 +74,7 @@ public abstract class WorkDefinitionImpl extends MethodElementImpl implements
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -75,7 +82,6 @@ public abstract class WorkDefinitionImpl extends MethodElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.WORK_DEFINITION;
 	}
@@ -266,7 +272,6 @@ public abstract class WorkDefinitionImpl extends MethodElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
@@ -283,7 +288,6 @@ public abstract class WorkDefinitionImpl extends MethodElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.WORK_DEFINITION__PRECONDITION:
@@ -303,7 +307,6 @@ public abstract class WorkDefinitionImpl extends MethodElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.WORK_DEFINITION__PRECONDITION:
@@ -321,7 +324,6 @@ public abstract class WorkDefinitionImpl extends MethodElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.WORK_DEFINITION__PRECONDITION:
@@ -339,7 +341,6 @@ public abstract class WorkDefinitionImpl extends MethodElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);

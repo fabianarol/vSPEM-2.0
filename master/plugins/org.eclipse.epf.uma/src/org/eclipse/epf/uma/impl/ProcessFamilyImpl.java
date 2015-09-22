@@ -37,6 +37,13 @@ import org.eclipse.epf.uma.UmaPackage;
 public class ProcessFamilyImpl extends MethodConfigurationImpl implements
 		ProcessFamily {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The cached value of the '{@link #getDeliveryProcesses() <em>Delivery Processes</em>}' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -44,7 +51,7 @@ public class ProcessFamilyImpl extends MethodConfigurationImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<DeliveryProcess> deliveryProcesses;
+	protected EList deliveryProcesses = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -56,7 +63,7 @@ public class ProcessFamilyImpl extends MethodConfigurationImpl implements
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -64,7 +71,6 @@ public class ProcessFamilyImpl extends MethodConfigurationImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.PROCESS_FAMILY;
 	}
@@ -74,9 +80,9 @@ public class ProcessFamilyImpl extends MethodConfigurationImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<DeliveryProcess> getDeliveryProcesses() {
+	public List getDeliveryProcesses() {
 		if (deliveryProcesses == null) {
-			deliveryProcesses = new EObjectResolvingEList<DeliveryProcess>(
+			deliveryProcesses = new EObjectResolvingEList(
 					DeliveryProcess.class, this,
 					UmaPackage.PROCESS_FAMILY__DELIVERY_PROCESSES);
 		}
@@ -88,7 +94,6 @@ public class ProcessFamilyImpl extends MethodConfigurationImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.PROCESS_FAMILY__DELIVERY_PROCESSES:
@@ -102,14 +107,11 @@ public class ProcessFamilyImpl extends MethodConfigurationImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.PROCESS_FAMILY__DELIVERY_PROCESSES:
 			getDeliveryProcesses().clear();
-			getDeliveryProcesses().addAll(
-					(Collection<? extends DeliveryProcess>) newValue);
+			getDeliveryProcesses().addAll((Collection) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -120,7 +122,6 @@ public class ProcessFamilyImpl extends MethodConfigurationImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.PROCESS_FAMILY__DELIVERY_PROCESSES:
@@ -135,7 +136,6 @@ public class ProcessFamilyImpl extends MethodConfigurationImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);

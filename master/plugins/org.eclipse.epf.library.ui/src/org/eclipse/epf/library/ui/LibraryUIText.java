@@ -111,8 +111,6 @@ public class LibraryUIText {
 
 	public static final String TEXT_GUIDANCE = LibraryUIResources.guidance_text;
 
-	public static final String TEXT_UDT = LibraryUIResources.UDT_text;
-	
 	public static final String TEXT_GUIDELINE = LibraryUIResources.guideline_text;
 
 	public static final String TEXT_ITERATION = LibraryUIResources.iteration_text;

@@ -15,8 +15,8 @@ import java.util.List;
 
 import org.eclipse.epf.authoring.gef.util.DiagramEditorUtil;
 import org.eclipse.epf.authoring.ui.editors.EditorChooser;
-import org.eclipse.epf.authoring.ui.providers.DescriptionPageColumnProvider;
-import org.eclipse.epf.common.ui.PreferenceStoreWrapper;
+import org.eclipse.epf.authoring.ui.providers.MethodEditorPageProvider;
+import org.eclipse.epf.authoring.ui.providers.ProcessEditorPageProvider;
 import org.eclipse.epf.diagram.model.util.GraphicalDataManager;
 import org.eclipse.epf.library.ILibraryServiceListener;
 import org.eclipse.epf.library.LibraryPlugin;
@@ -115,13 +115,14 @@ public class AuthoringUIService {
 			EditorChooser.getInstance();
 
 			// Load EditorPage Providers
-			DescriptionPageColumnProvider.getInstance().loadProviders();
+			MethodEditorPageProvider.getInstance().loadProviders();
+			ProcessEditorPageProvider.getInstance().loadProviders();
 
 			// Set providers for library edit.
 			Providers.setConfiguratorFactory(new IConfiguratorFactory() {
 				public IConfigurator createConfigurator(
 						MethodConfiguration config) {
-					return new ProcessConfigurator(config, true);
+					return new ProcessConfigurator(config, null, true);
 				}
 			});
 
@@ -131,8 +132,7 @@ public class AuthoringUIService {
 			Providers.setPreferenceStore(LibraryPlugin.getDefault()
 					.getPreferenceStore());
 
-			PreferenceStoreWrapper store = new PreferenceStoreWrapper(AuthoringUIPlugin.getDefault().getPreferenceStore());
-			Providers.setAuthoringPluginPreferenceStore(store);
+			Providers.setAuthoringPlugin(AuthoringUIPlugin.getDefault());
 
 			List<ICommandListener> cmdListeners = GraphicalDataManager.getInstance()
 					.getCommandListeners();

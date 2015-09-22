@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.uma;
 
+import org.eclipse.emf.common.util.EList;
 import java.util.List;
 
 /**
@@ -47,7 +48,7 @@ public interface MethodPackage extends MethodElement,
 	 * @return the value of the '<em>Global</em>' attribute.
 	 * @see #setGlobal(Boolean)
 	 * @see org.eclipse.epf.uma.UmaPackage#getMethodPackage_Global()
-	 * @model default="false" dataType="org.eclipse.epf.uma.Boolean" required="true" ordered="false"
+	 * @model default="false"
 	 * @generated
 	 */
 	Boolean getGlobal();
@@ -73,10 +74,10 @@ public interface MethodPackage extends MethodElement,
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Reused Packages</em>' reference list.
 	 * @see org.eclipse.epf.uma.UmaPackage#getMethodPackage_ReusedPackages()
-	 * @model ordered="false"
+	 * @model type="org.eclipse.epf.uma.MethodPackage" ordered="false"
 	 * @generated
 	 */
-	List<MethodPackage> getReusedPackages();
+	List getReusedPackages();
 
 	/**
 	 * Returns the value of the '<em><b>Child Packages</b></em>' containment reference list.
@@ -89,10 +90,10 @@ public interface MethodPackage extends MethodElement,
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Child Packages</em>' containment reference list.
 	 * @see org.eclipse.epf.uma.UmaPackage#getMethodPackage_ChildPackages()
-	 * @model containment="true" resolveProxies="true" ordered="false"
+	 * @model type="org.eclipse.epf.uma.MethodPackage" containment="true" resolveProxies="true" ordered="false"
 	 * @generated
 	 */
-	List<MethodPackage> getChildPackages();
+	List getChildPackages();
 
 	MethodPackage getParentPackage();
 

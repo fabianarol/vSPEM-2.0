@@ -28,10 +28,6 @@ import org.eclipse.emf.edit.command.SetCommand;
 import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
-import org.eclipse.epf.library.edit.meta.TypeDefUtil;
-import org.eclipse.epf.library.edit.util.PropUtil;
-import org.eclipse.epf.uma.ContentDescription;
-import org.eclipse.epf.uma.util.ExtendedAttribute;
 
 /**
  * Manages the execution of editing commands with full support for dirty flag,
@@ -46,18 +42,14 @@ public class ActionManager implements IActionManager {
 
 	private EditingDomain editingDomain;
 
-	protected FullyRevertibleCommandStack commandStack;
+	private FullyRevertibleCommandStack commandStack;
 
 	public ActionManager() {
 		commandStack = createCommandStack();
-		editingDomain = createEditingDomain();
-	}
-	
-	protected EditingDomain createEditingDomain() {
-		return new AdapterFactoryEditingDomain(
+		editingDomain = new AdapterFactoryEditingDomain(
 				TngAdapterFactory.INSTANCE
-				.getNavigatorView_ComposedAdapterFactory(),
-		commandStack);
+						.getNavigatorView_ComposedAdapterFactory(),
+				commandStack);
 	}
 
 	protected FullyRevertibleCommandStack createCommandStack() {
@@ -136,16 +128,10 @@ public class ActionManager implements IActionManager {
 			break;
 		}
 		case SET: {
-			TypeDefUtil typeDefUtil = TypeDefUtil.getInstance();
-			ExtendedAttribute att = typeDefUtil.getAssociatedExtendedAttribute(feature);
-			oldValue = att == null ? object.eGet(feature) : typeDefUtil.eGet(object, feature);
+			oldValue = object.eGet(feature);
 			if ((oldValue != null && !oldValue.equals(value))
 					|| (oldValue == null && value != null)) {
-				if (att == null) {
-					cmd = new SetCommand(editingDomain, object, feature, value);
-				} else if ((value == null || value instanceof String) && object instanceof ContentDescription) {
-					cmd = PropUtil.getSetExtendedAttributeCommand((ContentDescription) object, att, (String) value);
-				}
+				cmd = new SetCommand(editingDomain, object, feature, value);
 			}
 			break;
 		}

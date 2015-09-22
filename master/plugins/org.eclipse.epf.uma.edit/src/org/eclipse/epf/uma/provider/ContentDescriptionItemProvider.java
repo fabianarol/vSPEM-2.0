@@ -20,7 +20,6 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.edit.provider.ComposeableAdapterFactory;
 import org.eclipse.emf.edit.provider.IEditingDomainItemProvider;
 import org.eclipse.emf.edit.provider.IItemLabelProvider;
-import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.IItemPropertySource;
 import org.eclipse.emf.edit.provider.IStructuredItemContentProvider;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
@@ -55,15 +54,13 @@ public class ContentDescriptionItemProvider extends MethodUnitItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	public List<IItemPropertyDescriptor> getPropertyDescriptors(Object object) {
+	public List getPropertyDescriptors(Object object) {
 		if (itemPropertyDescriptors == null) {
 			super.getPropertyDescriptors(object);
 
 			addMainDescriptionPropertyDescriptor(object);
 			addExternalIdPropertyDescriptor(object);
 			addKeyConsiderationsPropertyDescriptor(object);
-			addLongPresentationNamePropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
 	}
@@ -129,26 +126,6 @@ public class ContentDescriptionItemProvider extends MethodUnitItemProvider
 	}
 
 	/**
-	 * This adds a property descriptor for the Long Presentation Name feature.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected void addLongPresentationNamePropertyDescriptor(Object object) {
-		itemPropertyDescriptors
-				.add(createItemPropertyDescriptor(
-						((ComposeableAdapterFactory) adapterFactory)
-								.getRootAdapterFactory(),
-						getResourceLocator(),
-						getString("_UI_ContentDescription_longPresentationName_feature"), //$NON-NLS-1$
-						getString(
-								"_UI_PropertyDescriptor_description", "_UI_ContentDescription_longPresentationName_feature", "_UI_ContentDescription_type"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						UmaPackage.Literals.CONTENT_DESCRIPTION__LONG_PRESENTATION_NAME,
-						true, false, false,
-						ItemPropertyDescriptor.GENERIC_VALUE_IMAGE, null, null));
-	}
-
-	/**
 	 * This specifies how to implement {@link #getChildren} and is used to deduce an appropriate feature for an
 	 * {@link org.eclipse.emf.edit.command.AddCommand}, {@link org.eclipse.emf.edit.command.RemoveCommand} or
 	 * {@link org.eclipse.emf.edit.command.MoveCommand} in {@link #createCommand}.
@@ -156,9 +133,7 @@ public class ContentDescriptionItemProvider extends MethodUnitItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	public Collection<? extends EStructuralFeature> getChildrenFeatures(
-			Object object) {
+	public Collection getChildrenFeatures(Object object) {
 		if (childrenFeatures == null) {
 			super.getChildrenFeatures(object);
 			childrenFeatures
@@ -172,7 +147,6 @@ public class ContentDescriptionItemProvider extends MethodUnitItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EStructuralFeature getChildFeature(Object object, Object child) {
 		// Check the type of the specified child object and return the proper feature to use for
 		// adding (see {@link AddCommand}) it as a child.
@@ -186,7 +160,6 @@ public class ContentDescriptionItemProvider extends MethodUnitItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object getImage(Object object) {
 		return overlayImage(object, getResourceLocator().getImage(
 				"full/obj16/ContentDescription")); //$NON-NLS-1$
@@ -198,7 +171,6 @@ public class ContentDescriptionItemProvider extends MethodUnitItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String getText(Object object) {
 		String label = ((ContentDescription) object).getName();
 		return label == null || label.length() == 0 ? getString("_UI_ContentDescription_type") : //$NON-NLS-1$
@@ -212,7 +184,6 @@ public class ContentDescriptionItemProvider extends MethodUnitItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void notifyChanged(Notification notification) {
 		updateChildren(notification);
 
@@ -220,7 +191,6 @@ public class ContentDescriptionItemProvider extends MethodUnitItemProvider
 		case UmaPackage.CONTENT_DESCRIPTION__MAIN_DESCRIPTION:
 		case UmaPackage.CONTENT_DESCRIPTION__EXTERNAL_ID:
 		case UmaPackage.CONTENT_DESCRIPTION__KEY_CONSIDERATIONS:
-		case UmaPackage.CONTENT_DESCRIPTION__LONG_PRESENTATION_NAME:
 			fireNotifyChanged(new ViewerNotification(notification, notification
 					.getNotifier(), false, true));
 			return;
@@ -239,9 +209,8 @@ public class ContentDescriptionItemProvider extends MethodUnitItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	protected void collectNewChildDescriptors(
-			Collection<Object> newChildDescriptors, Object object) {
+	protected void collectNewChildDescriptors(Collection newChildDescriptors,
+			Object object) {
 		super.collectNewChildDescriptors(newChildDescriptors, object);
 
 		newChildDescriptors.add(createChildParameter(
@@ -259,7 +228,6 @@ public class ContentDescriptionItemProvider extends MethodUnitItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public ResourceLocator getResourceLocator() {
 		return UmaEditPlugin.INSTANCE;
 	}

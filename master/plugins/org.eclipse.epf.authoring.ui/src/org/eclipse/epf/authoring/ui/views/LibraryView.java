@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EventObject;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -33,7 +34,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.emf.common.CommonPlugin;
 import org.eclipse.emf.common.command.BasicCommandStack;
 import org.eclipse.emf.common.command.Command;
@@ -48,7 +48,6 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
 import org.eclipse.emf.edit.provider.ItemProviderAdapter;
-import org.eclipse.emf.edit.provider.WrapperItemProvider;
 import org.eclipse.emf.edit.ui.action.CopyAction;
 import org.eclipse.emf.edit.ui.action.CutAction;
 import org.eclipse.emf.edit.ui.action.DeleteAction;
@@ -56,34 +55,27 @@ import org.eclipse.emf.edit.ui.action.PasteAction;
 import org.eclipse.emf.edit.ui.dnd.LocalTransfer;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryContentProvider;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
-import org.eclipse.epf.authoring.ui.AuthoringUIExtensionManager;
 import org.eclipse.epf.authoring.ui.AuthoringUIHelpContexts;
 import org.eclipse.epf.authoring.ui.AuthoringUIPlugin;
 import org.eclipse.epf.authoring.ui.AuthoringUIResources;
 import org.eclipse.epf.authoring.ui.UIActionDispatcher;
-import org.eclipse.epf.authoring.ui.actions.AssignAction;
 import org.eclipse.epf.authoring.ui.actions.CreateMethodElementCommand;
-import org.eclipse.epf.authoring.ui.actions.CustomCategoryDeepCopyAction;
 import org.eclipse.epf.authoring.ui.actions.ILibraryActionBarContributor;
 import org.eclipse.epf.authoring.ui.actions.LayoutActionGroup;
 import org.eclipse.epf.authoring.ui.actions.LibraryActionBarContributor;
-import org.eclipse.epf.authoring.ui.actions.LibraryValidateAction;
 import org.eclipse.epf.authoring.ui.actions.LibraryViewCopyAction;
 import org.eclipse.epf.authoring.ui.actions.LibraryViewCutAction;
 import org.eclipse.epf.authoring.ui.actions.LibraryViewDeleteAction;
 import org.eclipse.epf.authoring.ui.actions.LibraryViewPasteAction;
-import org.eclipse.epf.authoring.ui.actions.LibraryViewSimpleAction;
 import org.eclipse.epf.authoring.ui.actions.NewPluginAction;
-import org.eclipse.epf.authoring.ui.actions.ReassignAction;
 import org.eclipse.epf.authoring.ui.actions.RenameAction;
-import org.eclipse.epf.authoring.ui.actions.UnassignAction;
 import org.eclipse.epf.authoring.ui.dialogs.MoveDialog;
 import org.eclipse.epf.authoring.ui.dialogs.SwitchConfigDialog;
 import org.eclipse.epf.authoring.ui.dialogs.VariabilitySelection;
-import org.eclipse.epf.authoring.ui.dialogs.MoveDialog.MoveDialogExt;
 import org.eclipse.epf.authoring.ui.dnd.LibraryViewerDragAdapter;
 import org.eclipse.epf.authoring.ui.editors.EditorChooser;
 import org.eclipse.epf.authoring.ui.editors.IEditorKeeper;
+import org.eclipse.epf.authoring.ui.editors.MethodElementEditor;
 import org.eclipse.epf.authoring.ui.editors.MethodElementEditorInput;
 import org.eclipse.epf.authoring.ui.editors.ProcessEditor;
 import org.eclipse.epf.authoring.ui.preferences.ApplicationPreferenceConstants;
@@ -92,20 +84,17 @@ import org.eclipse.epf.authoring.ui.providers.MethodElementLabelDecorator;
 import org.eclipse.epf.authoring.ui.util.LibraryValidationMarkerHelper;
 import org.eclipse.epf.authoring.ui.util.RefreshHandler;
 import org.eclipse.epf.authoring.ui.util.UIHelper;
-import org.eclipse.epf.common.ui.util.MsgBox;
+import org.eclipse.epf.common.serviceability.MsgBox;
 import org.eclipse.epf.library.ILibraryManager;
 import org.eclipse.epf.library.LibraryPlugin;
 import org.eclipse.epf.library.LibraryService;
 import org.eclipse.epf.library.LibraryServiceException;
 import org.eclipse.epf.library.edit.FeatureValueWrapperItemProvider;
-import org.eclipse.epf.library.edit.IFilter;
-import org.eclipse.epf.library.edit.INamedFilter;
 import org.eclipse.epf.library.edit.PluginUIPackageContext;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
 import org.eclipse.epf.library.edit.navigator.MethodLibraryItemProvider;
 import org.eclipse.epf.library.edit.navigator.PluginUIPackagesItemProvider;
 import org.eclipse.epf.library.edit.ui.UserInteractionHelper;
-import org.eclipse.epf.library.edit.util.ConfigurableComposedAdapterFactory;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.persistence.ILibraryResource;
 import org.eclipse.epf.library.persistence.ILibraryResourceSet;
@@ -119,8 +108,12 @@ import org.eclipse.epf.library.util.ImportExportUtil;
 import org.eclipse.epf.library.xmi.XMILibraryManager;
 import org.eclipse.epf.library.xmi.XMILibraryUtil;
 import org.eclipse.epf.persistence.FileManager;
+import org.eclipse.epf.persistence.MultiFileResourceSetImpl;
+import org.eclipse.epf.persistence.refresh.IRefreshEvent;
 import org.eclipse.epf.persistence.refresh.IRefreshHandler;
+import org.eclipse.epf.persistence.refresh.IRefreshListener;
 import org.eclipse.epf.persistence.refresh.RefreshJob;
+import org.eclipse.epf.persistence.util.LibrarySchedulingRule;
 import org.eclipse.epf.persistence.util.PersistenceUtil;
 import org.eclipse.epf.services.Services;
 import org.eclipse.epf.uma.BreakdownElement;
@@ -140,6 +133,7 @@ import org.eclipse.epf.uma.MethodPlugin;
 import org.eclipse.epf.uma.NamedElement;
 import org.eclipse.epf.uma.Process;
 import org.eclipse.epf.uma.ProcessComponent;
+import org.eclipse.epf.uma.ProcessElement;
 import org.eclipse.epf.uma.ProcessPackage;
 import org.eclipse.epf.uma.RoleDescriptor;
 import org.eclipse.epf.uma.RoleSet;
@@ -147,13 +141,11 @@ import org.eclipse.epf.uma.RoleSetGrouping;
 import org.eclipse.epf.uma.TeamProfile;
 import org.eclipse.epf.uma.VariabilityElement;
 import org.eclipse.epf.uma.WorkProductDescriptor;
-import org.eclipse.epf.uma.ecore.impl.MultiResourceEObject;
 import org.eclipse.epf.uma.edit.domain.TraceableAdapterFactoryEditingDomain;
 import org.eclipse.epf.uma.provider.MethodPluginItemProvider;
 import org.eclipse.epf.uma.util.AssociationHelper;
 import org.eclipse.epf.uma.util.MessageException;
 import org.eclipse.epf.uma.util.UmaUtil;
-import org.eclipse.epf.validation.LibraryEValidator;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
@@ -172,38 +164,42 @@ import org.eclipse.jface.viewers.DecoratingLabelProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelDecorator;
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
-import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.HTMLTransfer;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
+import org.eclipse.ui.dialogs.ListSelectionDialog;
 import org.eclipse.ui.part.IShowInTarget;
 import org.eclipse.ui.part.ShowInContext;
 import org.eclipse.ui.views.markers.internal.MarkerAdapter;
@@ -218,24 +214,15 @@ import org.eclipse.ui.views.navigator.ResourceNavigator;
  * @author Shilpa Toraskar
  * @author Kelvin Low
  * @author Jinhua Xi
- * @author Weiping Lu
  * @since 1.0
  */
-public class LibraryView extends AbstractBaseView implements IShowInTarget, IRefreshHandler {
+public class LibraryView extends AbstractBaseView implements IRefreshHandler,
+		IShowInTarget {
 
 	/**
 	 * The view ID.
 	 */
 	public static final String VIEW_ID = LibraryView.class.getName();
-
-	private static LibraryView INSTANCE = null;
-	
-	private static boolean needRegisterChangeListenersInCreate = false;
-	
-	public static void setNeedRegisterChangeListenersInCreate(
-			boolean needRegisterChangeListenersInCreate) {
-		LibraryView.needRegisterChangeListenersInCreate = needRegisterChangeListenersInCreate;
-	}
 
 	private static boolean DEBUG = AuthoringUIPlugin.getDefault().isDebugging();
 
@@ -244,12 +231,10 @@ public class LibraryView extends AbstractBaseView implements IShowInTarget, IRef
 	protected IDoubleClickListener doubleClickListener = null;
 
 	private ISelection selection;
-
+	
 	private LayoutActionGroup fLayoutActionSet;
 	
 	private String PERFORM_ID = "org.eclipse.epf.authoring.view.LibraryView.performValidatorAction"; //$NON-NLS-1$
-	
-	private Font italicFont = null;
 	
 	private IAction performLibraryValidationAction = new Action(
 			AuthoringUIResources.Validate_method_library, AuthoringUIPlugin.getDefault().getImageDescriptor(
@@ -261,16 +246,7 @@ public class LibraryView extends AbstractBaseView implements IShowInTarget, IRef
 		 */
 		public void run() {
 			try {
-//				ViewHelper.checkLibraryHealth();
-				
-				LibraryValidateAction validateAction = new LibraryValidateAction(LibraryService.getInstance().getCurrentMethodLibrary());
-				((LibraryValidateAction)validateAction).putContextData(LibraryEValidator.CTX_ADAPTER_FACTORY_PROVIDER,
-						ProcessEditor.adapterFactoryProvider);
-	
-				validateAction.run();
-				
-				
-				
+				ViewHelper.checkLibraryHealth();
 			} catch (Exception e) {
 				AuthoringUIPlugin.getDefault().getLogger().logError(e);
 			}
@@ -357,12 +333,12 @@ public class LibraryView extends AbstractBaseView implements IShowInTarget, IRef
 									if(libMgr instanceof XMILibraryManager) {
 										XMILibraryManager xmiLibMgr = ((XMILibraryManager)libMgr);
 										if(project.equals(xmiLibMgr.getMethodLibraryProject())) {	
+											System.out.println();
 											xmiLibMgr.handleLibraryMoved();
 											return false;
 										}
 									}
-								//} else if ((delta.getFlags() & IResourceDelta.OPEN) != 0) {
-								} else if ((delta.getFlags() & IResourceDelta.OPEN) != 0 && !ResourcesPlugin.getWorkspace().isTreeLocked()) {
+								} else if ((delta.getFlags() & IResourceDelta.OPEN) != 0) {
 									// project's open state was changed
 									IProject project = (IProject) delta.getResource();
 									if (project.isOpen() && project.hasNature(MethodLibraryProjectNature.NATURE_ID) &&
@@ -393,50 +369,31 @@ public class LibraryView extends AbstractBaseView implements IShowInTarget, IRef
 		}
 
 	};
-	
-	private RefreshHandler refreshHandler = new RefreshHandler(this) {
-		
-		@Override
-		public synchronized void doRefresh(
-				Collection<Resource> removedResources,
-				Collection<Resource> changedResources,
-				Collection<IResource> addedWorkspaceResources,
-				boolean refreshViews, IProgressMonitor monitor) {
-			if (!refreshViews) {
-				for (Iterator<Resource> iter = changedResources.iterator(); iter.hasNext();) {
-					Resource resource = (Resource) iter.next();
-					if (resource instanceof ILibraryResource
-							&& ((ILibraryResource) resource).getLoadStamp() > lastRefreshTimeStamp) {
-						refreshViews = true;
-						break;
-					}
+
+	private IRefreshListener refreshListener = new IRefreshListener() {
+
+		public void notifyRefreshed(IRefreshEvent event) {
+			if (event.getRefreshedObjects() != null
+					&& !event.getRefreshedObjects().isEmpty()) {
+				Control ctrl = getViewer().getControl();
+				if (ctrl == null || ctrl.isDisposed())
+					return;
+
+				if (ctrl.getDisplay().getThread() == Thread.currentThread()) {
+					doRefresh(getSite().getShell());
+				} else {
+					ctrl.getDisplay().syncExec(new Runnable() {
+
+						public void run() {
+							doRefresh(null);
+						}
+
+					});
 				}
 			}
-			
-			super.doRefresh(removedResources, changedResources, addedWorkspaceResources,
-					refreshViews, monitor);
 		}
-		
-		@Override
-		protected void refreshViews() {
-			LibraryView.this.refreshViews();
-		}
-	};
 
-	private IPropertyListener propertyListener = new IPropertyListener() {
-		public void propertyChanged(Object source, int propId) {
-			// TODO: Replace hardcoded constant with variable.
-			if (propId == 1) {
-				firePropertyChange(PROP_DIRTY);
-			}
-		}
 	};
-
-	
-	private LibraryViewExtender extender;
-	public LibraryViewExtender getExtender() {
-		return extender;
-	}
 
 	/**
 	 * Creates a new instance.
@@ -449,9 +406,6 @@ public class LibraryView extends AbstractBaseView implements IShowInTarget, IRef
 			PluginUIPackageContext.INSTANCE.setLayoutHierarchical();
 		}
 
-		INSTANCE = this;
-		
-		extender = AuthoringUIExtensionManager.getInstance().createLibraryViewExtender(this);
 	}
 	
 	/**
@@ -465,19 +419,13 @@ public class LibraryView extends AbstractBaseView implements IShowInTarget, IRef
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent,
 				AuthoringUIHelpContexts.LIBRARY_NAVIGATOR_VIEW_CONTEXT);
 
-		RefreshJob.getInstance().setRefreshHandler(refreshHandler);
-		
-		if (needRegisterChangeListenersInCreate) {
-			needRegisterChangeListenersInCreate = false; 
-			registerChangeListeners();
-		}
+		RefreshJob.getInstance().setRefreshHandler(this);
 	}
 	
 	private void makeActions() {
 		fLayoutActionSet= new LayoutActionGroup(this);
 		IActionBars actionBars= getViewSite().getActionBars();
-		fLayoutActionSet.fillActionBars(actionBars);		
-		getExtender().getActionBarExtender().contributeToViewMenu(actionBars.getMenuManager());
+		fLayoutActionSet.fillActionBars(actionBars);
 	}
 
 	/**
@@ -591,32 +539,7 @@ public class LibraryView extends AbstractBaseView implements IShowInTarget, IRef
 		// AdapterFactoryLabelProvider(adapterFactory));
 		treeViewer.setLabelProvider(new DecoratingLabelProvider(
 				new AdapterFactoryLabelProvider(adapterFactory),
-				new MethodElementLabelDecorator()) {
-		    
-			public Font getFont(Object element) {
-				if (customCategoryOwnedByOtherPlugin(element)) {
-					return getItalicFont();
-				}				
-				return super.getFont(element);
-			}
-			
-			private Font getItalicFont() {
-				if (italicFont == null) {
-					italicFont = createFont(SWT.ITALIC);
-				}
-				
-				return italicFont;
-			}
-			
-			private Font createFont(int style) {
-				FontData[] fontdata = Display.getCurrent().getSystemFont().getFontData();
-				for (FontData data : fontdata) {
-					data.setStyle(style);
-				}
-				
-				return new Font(Display.getCurrent(), fontdata);    	
-		    }
-		});
+				new MethodElementLabelDecorator()));
 
 		// Add a double click listener for launching the Method editors.
 		doubleClickListener = new IDoubleClickListener() {
@@ -649,16 +572,6 @@ public class LibraryView extends AbstractBaseView implements IShowInTarget, IRef
 			UIActionDispatcher.getInstance().setSelection(emptySelection);
 
 			getViewer().setInput(model);
-			
-			if(adapterFactory instanceof ConfigurableComposedAdapterFactory) {
-				IFilter filter = ((ConfigurableComposedAdapterFactory) adapterFactory).getFilter();
-				if(filter instanceof INamedFilter) {
-					String name = ((INamedFilter) filter).getName();
-					if(name != null) {
-						setContentDescription(name);
-					}
-				}
-			}
 			updateLastRefreshTimestamp();
 		} else {
 			AuthoringUIPlugin
@@ -685,13 +598,6 @@ public class LibraryView extends AbstractBaseView implements IShowInTarget, IRef
 		boolean show = ViewHelper.isViewInCurrentPerspective(VIEW_ID);
 		return (LibraryView)ViewHelper.findView(VIEW_ID, show);
 
-	}
-	
-	/**
-	 * Returns this view.
-	 */
-	public static LibraryView getViewInstance() {
-		return INSTANCE;
 	}
 
 	/**
@@ -745,15 +651,6 @@ public class LibraryView extends AbstractBaseView implements IShowInTarget, IRef
 			statusLineManager.setMessage(path);
 		}
 	}
-	
-	public void registerChangeListeners() {
-		ILibraryManager manager = (ILibraryManager) LibraryService
-		.getInstance().getCurrentLibraryManager();
-		if (manager != null) {
-			manager.registerEditingDomain(editingDomain);
-			manager.addPropertyListener(propertyListener);
-		}
-	}
 
 	/**
 	 * @see org.eclipse.epf.library.ILibraryServiceListener#libraryReopened(MethodLibrary)
@@ -765,26 +662,28 @@ public class LibraryView extends AbstractBaseView implements IShowInTarget, IRef
 	@Override
 	public void librarySet(MethodLibrary library) {
 		super.librarySet(library);
-		registerChangeListeners();
-	}
-	
-	@Override
-	public void libraryClosed(MethodLibrary library) {
 		ILibraryManager manager = (ILibraryManager) LibraryService
-				.getInstance().getCurrentLibraryManager();
+		.getInstance().getCurrentLibraryManager();
 		if (manager != null) {
-			manager.unregisterEditingDomain(editingDomain);
-			manager.removePropertyListener(propertyListener);
+			manager.registerEditingDomain(editingDomain);
+		
+			manager.addPropertyListener(new IPropertyListener() {
+				public void propertyChanged(Object source, int propId) {
+					// TODO: Replace hardcoded constant with variable.
+					if (propId == 1) {
+						firePropertyChange(PROP_DIRTY);
+					}
+				}
+			});
 		}
-		super.libraryClosed(library);
 	}
 
 	/**
 	 * The action bar for the library view
 	 */
-	protected class LibraryViewActionBarContributor extends LibraryActionBarContributor {
+	class LibraryViewActionBarContributor extends LibraryActionBarContributor {
 
-		protected IAction newPluginAction = new NewPluginAction(
+		private IAction newPluginAction = new NewPluginAction(
 				AuthoringUIResources.new_plugin);
 
 		private IAction moveAction = new Action(AuthoringUIResources.move) {
@@ -836,58 +735,8 @@ public class LibraryView extends AbstractBaseView implements IShowInTarget, IRef
 					}
 				}
 
-//				MoveDialog dlg = new MoveDialog(getSite().getShell(),
-//						elementsToMove, editingDomain);
-
-				boolean movingCCerror = false;
-				List<CustomCategory> movingCCsrcParents = new ArrayList<CustomCategory>();
-				int sz = elementsToMove == null ? 0 : elementsToMove.size();
-				if (sz == 0) {
-					return;
-				}
-				if (elementsToMove.iterator().next() instanceof CustomCategory) {
-					List uiList = ((IStructuredSelection) getSelection()).toList();
-					if (uiList.size() == sz) {
-						int i = -1;
-						for (Object element : elementsToMove) {
-							i++;
-							Object ui = uiList.get(i);
-							if (ui instanceof WrapperItemProvider) {
-								if (TngUtil.unwrap(ui) != element) {
-									movingCCerror = true;
-									break;
-								}
-								Object parent = ((WrapperItemProvider) ui).getParent(null);
-								if (TngUtil.unwrap(parent) instanceof CustomCategory) {
-									movingCCsrcParents.add((CustomCategory) TngUtil.unwrap(parent));
-								} else {
-									movingCCerror = true;
-									break;
-								}
-							} else {
-								movingCCerror = true;
-								break;
-							}
-						}
-					} else {
-						movingCCerror = true;
-					}
-				}
-				
-				if (movingCCerror) {
-					AuthoringUIPlugin
-					.getDefault()
-					.getMsgDialog()
-					.displayError(
-							AuthoringUIResources.errorDialog_title,
-							AuthoringUIResources.errorDialog_moveError);
-						return;
-				}
-						
-				MoveDialog dlg = ! movingCCsrcParents.isEmpty() ? new MoveDialogExt(getSite()
-						.getShell(), elementsToMove, editingDomain, movingCCsrcParents)
-						: new MoveDialog(getSite().getShell(), elementsToMove,
-								editingDomain);				
+				MoveDialog dlg = new MoveDialog(getSite().getShell(),
+						elementsToMove, editingDomain);
 				dlg.open();
 			}
 
@@ -912,14 +761,6 @@ public class LibraryView extends AbstractBaseView implements IShowInTarget, IRef
 			}
 		};
 
-		private LibraryViewSimpleAction assignAction = new AssignAction(LibraryView.this);
-		
-		private LibraryViewSimpleAction unassignAction = new UnassignAction(LibraryView.this);
-		
-		private LibraryViewSimpleAction reassignAction = new ReassignAction(LibraryView.this);
-
-		private LibraryViewSimpleAction customCategoryDeepCopyAction = new CustomCategoryDeepCopyAction(LibraryView.this);
-		
 		private RenameAction renameAction = new RenameAction();
 
 		private IAction replaceAction = new Action(
@@ -956,7 +797,7 @@ public class LibraryView extends AbstractBaseView implements IShowInTarget, IRef
 
 				boolean ret = UserInteractionHelper
 						.runWithProgress(
-								new org.eclipse.epf.library.edit.util.IRunnableWithProgress() {
+								new IRunnableWithProgress() {
 
 									public void run(IProgressMonitor monitor)
 											throws InvocationTargetException,
@@ -1003,8 +844,6 @@ public class LibraryView extends AbstractBaseView implements IShowInTarget, IRef
 		private boolean locked;
 
 		private boolean canMove;
-		
-		private boolean canAssign;
 
 		private IAction showInResourceNavigatorAction = new Action(
 				AuthoringUIResources.showInResourceNavigatorAction_label) {
@@ -1031,7 +870,7 @@ public class LibraryView extends AbstractBaseView implements IShowInTarget, IRef
 				}
 			}
 		};
-		
+
 		private boolean canRename;
 
 		/**
@@ -1184,21 +1023,11 @@ public class LibraryView extends AbstractBaseView implements IShowInTarget, IRef
 					boolean enabled = !locked;
 					renameAction.setEnabled(enabled);
 					moveAction.setEnabled(enabled);
-					
-					//assignAction.setEnabled(enabled);
-					unassignAction.setEnabled(enabled);
-					reassignAction.setEnabled(enabled);
-					//customCategoryDeepCopyAction.setEnabled(enabled);
 				}
 			}
 		}
-		
-		void updateSelection(ISelection selection) {
-			updateSelection_(selection);
-			getExtender().getActionBarExtender().updateSelection(selection);
-		}
-		
-		void updateSelection_(ISelection selection) {			
+
+		void updateSelection(ISelection selection) {			
 			IStructuredSelection sel = (IStructuredSelection) selection;
 			
 			renameAction.setActiveWorkbenchPart(LibraryView.this);
@@ -1216,13 +1045,8 @@ public class LibraryView extends AbstractBaseView implements IShowInTarget, IRef
 				renameAction.setEnabled(enabled);
 			}
 			moveAction.setEnabled(enabled);
-			
-			unassignAction.setEnabled(enabled);
-			reassignAction.setEnabled(enabled);
 
 			canMove = canMove(sel);
-			
-			canAssign = assignAction.updateSelection(sel);
 
 			if (!locked && sel.size() == 1
 					&& sel.getFirstElement() instanceof ProcessComponent) {
@@ -1256,30 +1080,9 @@ public class LibraryView extends AbstractBaseView implements IShowInTarget, IRef
 		protected void addGlobalActions(IMenuManager menuManager) {
 			super.addGlobalActions(menuManager);
 			menuManager.insertAfter("fixed-additions", newPluginAction); //$NON-NLS-1$
-		} 
-		
-		private boolean canMove(IStructuredSelection selection) {		
-			int ix = canMoveCheck4CustomCategories(selection);
-			if (ix != 0) {
-				return ix == 1;
-			}
-			
-			MethodPlugin srcPlugin = null;
-			for (Iterator iter = selection.iterator(); iter.hasNext();) {
-				Object element = iter.next();
-				if (element instanceof MethodElement) {
-					MethodPlugin plugin = UmaUtil.getMethodPlugin((MethodElement) element);
-					if (plugin == null) {
-						return false;
-					} else if (plugin != srcPlugin) {
-						if (srcPlugin != null) {
-							return false;
-						}
-						srcPlugin = plugin;
-					}
-				}
-			}
-			
+		}
+
+		private boolean canMove(IStructuredSelection selection) {
 			for (Iterator iter = selection.iterator(); iter.hasNext();) {
 				Object element = iter.next();
 				if ((element instanceof MethodElement)
@@ -1292,30 +1095,6 @@ public class LibraryView extends AbstractBaseView implements IShowInTarget, IRef
 			}
 			return false;
 		}
-		
-		//-1: cannot move
-		//0:  need futhre check
-		//1:  can move
-		private int canMoveCheck4CustomCategories(IStructuredSelection selection) {
-			boolean hasCC = false;
-			boolean hasOther = false;
-			for (Iterator iter = selection.iterator(); iter.hasNext();) {
-				Object obj = iter.next();
-				if (obj instanceof WrapperItemProvider && TngUtil.unwrap(obj) instanceof CustomCategory) {
-					if (customCategoryOwnedByOtherPlugin(obj)) {
-						return -1;
-					}
-					hasCC = true;
-				} else {
-					hasOther = true;
-				}
-				if (hasCC && hasOther) {
-					return -1;
-				}
-			}			
-			return hasCC ? 1 : 0;
-		}
-		
 
 		/**
 		 * Adds Separators for editor additions to the tool bar.
@@ -1324,9 +1103,9 @@ public class LibraryView extends AbstractBaseView implements IShowInTarget, IRef
 //			toolBarManager.add(new Separator("method-settings")); //$NON-NLS-1$
 //			toolBarManager.add(new Separator("method-additions")); //$NON-NLS-1$
 			performLibraryValidationAction.setId(PERFORM_ID);
-//			if (AuthoringUIPreferences.getEnableLibraryValidation()) {
+			if (AuthoringUIPreferences.getEnableLibraryValidation()) {
 				toolBarManager.add(performLibraryValidationAction);
-//			}
+			}
 			
 		}
 		
@@ -1334,16 +1113,9 @@ public class LibraryView extends AbstractBaseView implements IShowInTarget, IRef
 		 * @see LibraryActionBarContributor#menuAboutToShow(IMenuManager)
 		 */
 		public void menuAboutToShow(IMenuManager menuManager) {
-			menuAboutToShow_(menuManager);
-			getExtender().getActionBarExtender().menuAboutToShow(menuManager);
-		}
-		
-		private void menuAboutToShow_(IMenuManager menuManager) {
-			// This is needed to enable Paste after Copy but the selection has not been changed yet
-			//
-			updatePasteAction();
-			
 			checkLocked();
+			
+			
 
 			// Add our standard marker.
 			menuManager.add(new Separator("fixed-additions")); //$NON-NLS-1$
@@ -1352,6 +1124,9 @@ public class LibraryView extends AbstractBaseView implements IShowInTarget, IRef
 
 			// Add the edit menu actions.
 			menuManager.add(new ActionContributionItem(libraryViewEditAction));
+			menuManager.add(new ActionContributionItem(libraryViewAdaptAction));
+			menuManager.add(new ActionContributionItem(libraryViewSeeVariationAction));
+			menuManager.add(new ActionContributionItem(libraryViewGenerateReportAction));
 			menuManager.add(new ActionContributionItem(copyAction));
 			menuManager.add(new ActionContributionItem(pasteAction));
 			menuManager.add(new Separator());
@@ -1361,13 +1136,6 @@ public class LibraryView extends AbstractBaseView implements IShowInTarget, IRef
 			}
 			if (canMove) {
 				menuManager.add(new ActionContributionItem(moveAction));
-			}
-			
-			if (canAssign) {
-				menuManager.add(new ActionContributionItem(assignAction));
-				menuManager.add(new ActionContributionItem(unassignAction));
-				menuManager.add(new ActionContributionItem(reassignAction));
-				menuManager.add(new ActionContributionItem(customCategoryDeepCopyAction));				
 			}
 
 			menuManager.add(new Separator("view")); //$NON-NLS-1$
@@ -1392,7 +1160,6 @@ public class LibraryView extends AbstractBaseView implements IShowInTarget, IRef
 			if (!locked) {
 				MenuManager submenuManager = null;
 				submenuManager = new MenuManager(
-						AuthoringUIResources._UI_CreateChild_menu_item,
 						AuthoringUIResources._UI_CreateChild_menu_item);
 				populateManager(submenuManager, createChildActions, null);
 				menuManager.insertBefore("fixed-additions", submenuManager); //$NON-NLS-1$
@@ -1457,73 +1224,81 @@ public class LibraryView extends AbstractBaseView implements IShowInTarget, IRef
 		 */
 		protected void refreshViewer(final Viewer viewer) {
 			if (viewer == LibraryView.this.getViewer()) {
-				ILibraryManager manager = (ILibraryManager) LibraryService
-						.getInstance().getCurrentLibraryManager();
-				if (manager != null) {
-					ResourceSet resourceSet = manager.getEditingDomain()
-							.getResourceSet();
-					if (resourceSet instanceof ILibraryResourceSet) {
-						final ILibraryResourceSet libResourceSet = (ILibraryResourceSet) resourceSet;
-						if(libResourceSet.getPersistenceType().equals(Services.XMI_PERSISTENCE_TYPE)) {
-							IRunnableWithProgress runnable = new IRunnableWithProgress() {
+				IRunnableWithProgress runnable = new IRunnableWithProgress() {
 
-								public void run(IProgressMonitor monitor)
-										throws InvocationTargetException,
-										InterruptedException {
-									List<Resource> resources = new ArrayList<Resource>(libResourceSet.getResources());
-									int totalWorks = resources.size() + 3;
-									monitor.beginTask(AuthoringUIResources._UI_RefreshViewer_menu_item, totalWorks); //$NON-NLS-1$
-									try {
-										// Refresh all loaded resources and load newly added resources
-										//
-										monitor.subTask("Loading new resources...");
-										monitor.worked(1);
-										libResourceSet.loadNewResources();
-
-										List<Resource> removedResources = new ArrayList<Resource>();
-										List<Resource> changedResources = new ArrayList<Resource>();
-										for (Resource resource : resources) {
-											String loc = resource.getURI().toFileString();
-											monitor.subTask(NLS.bind("Checking resource ''{0}''...", loc));
-											monitor.worked(1);
-											IResource wsRes = FileManager.getResourceForLocation(loc);
-											if (wsRes == null) {
-												removedResources.add(resource);
-											} else if (!wsRes.isSynchronized(IResource.DEPTH_ZERO)) {
-												changedResources.add(resource);
-											}
+					public void run(IProgressMonitor monitor)
+							throws InvocationTargetException,
+							InterruptedException {
+						monitor.beginTask("", 3); //$NON-NLS-1$
+						monitor
+								.subTask(AuthoringUIResources._UI_RefreshViewer_menu_item);
+						monitor.worked(1);
+						try {
+							// Refresh all loaded resources and load newly added resources
+							//
+							ILibraryManager manager = (ILibraryManager) LibraryService
+									.getInstance().getCurrentLibraryManager();
+							if (manager != null) {
+								ResourceSet resourceSet = manager
+										.getEditingDomain().getResourceSet();
+								ILibraryResourceSet libResourceSet;
+								if (resourceSet instanceof ILibraryResourceSet
+										&& (libResourceSet = (ILibraryResourceSet) resourceSet)
+												.getPersistenceType()
+												.equals(
+														Services.XMI_PERSISTENCE_TYPE)) {
+									
+									libResourceSet.loadNewResources();
+									
+									List removedResources = new ArrayList();
+									List changedResources = new ArrayList();
+									for (Iterator iter = new ArrayList(
+											resourceSet.getResources())
+											.iterator(); iter.hasNext();) {
+										Resource resource = (Resource) iter
+												.next();
+										String loc = resource.getURI()
+												.toFileString();
+										IResource wsRes = FileManager
+												.getResourceForLocation(loc);
+										if (wsRes == null) {
+											removedResources.add(resource);
+										} else if (!wsRes
+												.isSynchronized(IResource.DEPTH_ZERO)) {
+											changedResources.add(resource);
 										}
-										monitor.subTask("Refreshing UI...");
-										monitor.worked(2);
-										if (removedResources.isEmpty()
-												&& changedResources.isEmpty()) {
-											viewer.refresh();
-										} else {
-											refreshHandler.doRefresh(removedResources,
-													changedResources, null, false, new NullProgressMonitor());
-										}
-									} finally {
-										monitor.done();
 									}
+									monitor.worked(2);
+									if (removedResources.isEmpty()
+											&& changedResources.isEmpty()) {
+										viewer.refresh();
+									} else {
+										doRefresh(removedResources,
+												changedResources, null, false);
+									}
+								} else {
+									viewer.refresh();
 								}
-
-							};
-							IRunnableContext context = new ProgressMonitorDialog(getSite()
-									.getShell());
-							try {
-								getSite().getWorkbenchWindow().getWorkbench()
-										.getProgressService().runInUI(context, runnable,
-												null);
-							} catch (Exception e) {
-								AuthoringUIPlugin.getDefault().getLogger().logError(e);
-								String title = AuthoringUIResources.ProcessEditor_refreshErrorTitle;
-								AuthoringUIPlugin.getDefault().getMsgDialog().displayError(
-										title, e.toString(), e);
 							}
-							return;
+						} finally {
+							monitor.done();
 						}
 					}
+
+				};
+				IRunnableContext context = new ProgressMonitorDialog(getSite()
+						.getShell());
+				try {
+					getSite().getWorkbenchWindow().getWorkbench()
+							.getProgressService().runInUI(context, runnable,
+									null);
+				} catch (Exception e) {
+					AuthoringUIPlugin.getDefault().getLogger().logError(e);
+					String title = AuthoringUIResources.ProcessEditor_refreshErrorTitle;
+					AuthoringUIPlugin.getDefault().getMsgDialog().displayError(
+							title, e.toString(), e);
 				}
+				return;
 			}
 			super.refreshViewer(viewer);
 		}
@@ -1551,11 +1326,7 @@ public class LibraryView extends AbstractBaseView implements IShowInTarget, IRef
 		Transfer[] transfers = new Transfer[] { HTMLTransfer.getInstance(),
 				TextTransfer.getInstance(), LocalTransfer.getInstance() };
 		viewer.addDragSupport(dndOperations, transfers,
-				createDragSourceListener(viewer));
-	}
-	
-	protected DragSourceListener createDragSourceListener(Viewer viewer) {
-		return new LibraryViewerDragAdapter(viewer);
+				new LibraryViewerDragAdapter(viewer));
 	}
 
 	/*
@@ -1579,28 +1350,28 @@ public class LibraryView extends AbstractBaseView implements IShowInTarget, IRef
 		AuthoringUIPlugin.getDefault().getPreferenceStore()
 				.addPropertyChangeListener(new IPropertyChangeListener() {
 					public void propertyChange(PropertyChangeEvent event) {
-//						if (event
-//								.getProperty()
-//								.equals(
-//										AuthoringUIPreferences.ENABLE_LIBRARY_VALIDATION)) {
-//							Boolean enabled = (Boolean) event.getNewValue();
-//							IToolBarManager toolBarManager = getViewSite()
-//								.getActionBars().getToolBarManager();
-//					
-//							if (enabled != null && enabled.booleanValue()) {		//always on now
-//								performLibraryValidationAction
-//										.setId(PERFORM_ID);
-//								toolBarManager.insertAfter("additions", performLibraryValidationAction); //$NON-NLS-1$
-//							} else {
-//								IContributionItem[] items = toolBarManager.getItems();
-//								for (int i = 0; i < items.length; i++) {
-//									IContributionItem item = (IContributionItem) items[i];
-//									if (item.getId().equals(PERFORM_ID))
-//										toolBarManager.remove(item);
-//								}
-//							}
-//							toolBarManager.update(true);
-//						}
+						if (event
+								.getProperty()
+								.equals(
+										AuthoringUIPreferences.ENABLE_LIBRARY_VALIDATION)) {
+							Boolean enabled = (Boolean) event.getNewValue();
+							IToolBarManager toolBarManager = getViewSite()
+								.getActionBars().getToolBarManager();
+					
+							if (enabled != null && enabled.booleanValue()) {
+								performLibraryValidationAction
+										.setId(PERFORM_ID);
+								toolBarManager.insertAfter("additions", performLibraryValidationAction); //$NON-NLS-1$
+							} else {
+								IContributionItem[] items = toolBarManager.getItems();
+								for (int i = 0; i < items.length; i++) {
+									IContributionItem item = (IContributionItem) items[i];
+									if (item.getId().equals(PERFORM_ID))
+										toolBarManager.remove(item);
+								}
+							}
+							toolBarManager.update(true);
+						}
 					}
 				});
 	}
@@ -1621,9 +1392,6 @@ public class LibraryView extends AbstractBaseView implements IShowInTarget, IRef
 			treeViewer.removeDoubleClickListener(doubleClickListener);
 		}
 		
-    	if (italicFont != null) {
-    		italicFont.dispose();
-    	}		
 	}
 
 	/**
@@ -1784,14 +1552,12 @@ public class LibraryView extends AbstractBaseView implements IShowInTarget, IRef
 			}
 			if (o instanceof ProcessComponent || o instanceof ProcessPackage) {
 
-				if (pluginAdapter != null) {	//Check null pointer here. To do: fix the root cause so that pluginAdapte would not be null here.
-					treeViewer.setExpandedState(pluginAdapter.getChildren(plugin)
-							.toArray()[1], true);
-					// Expand the process packages.
-					expandTreeViewerPackages(((MethodElement) o).eContainer());
-				}
+				treeViewer.setExpandedState(pluginAdapter.getChildren(plugin)
+						.toArray()[1], true);
+				// Expand the process packages.
+				expandTreeViewerPackages(((MethodElement) o).eContainer());
 
-			} else if (pluginAdapter != null) {
+			} else {
 				ITreeItemContentProvider methodContentPkg = (ITreeItemContentProvider) pluginAdapter
 						.getChildren(plugin).toArray()[0];
 				treeViewer.setExpandedState(methodContentPkg, true);
@@ -1925,6 +1691,399 @@ public class LibraryView extends AbstractBaseView implements IShowInTarget, IRef
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.epf.persistence.util.IRefreshHandler#refresh(org.eclipse.core.runtime.IProgressMonitor)
+	 */
+	public void refresh(final IProgressMonitor monitor) {
+		Control ctrl = getViewer().getControl();
+		if (ctrl == null || ctrl.isDisposed())
+			return;
+
+		if (ctrl.getDisplay().getThread() == Thread.currentThread()) {
+			doRefresh(getSite().getShell());
+		} else {
+			ctrl.getDisplay().syncExec(new Runnable() {
+
+				public void run() {
+					doRefresh(null);
+				}
+
+			});
+		}
+
+	}
+
+	private void blockingRefresh(final ArrayList removedResources,
+			final ArrayList changedResources,
+			final Collection addedWorkspaceResources,
+			final boolean refreshViews, Shell shell) {
+		final IRunnableWithProgress runnable = new IRunnableWithProgress() {
+
+			public void run(IProgressMonitor monitor)
+					throws InvocationTargetException, InterruptedException {
+				monitor.beginTask("", IProgressMonitor.UNKNOWN); //$NON-NLS-1$
+				monitor
+						.subTask(AuthoringUIResources._UI_RefreshViewer_menu_item);
+				monitor.worked(1);
+				try {
+					// monitor.worked(1);
+					doRefresh(removedResources, changedResources,
+							addedWorkspaceResources, refreshViews);
+				} finally {
+					monitor.done();
+				}
+			}
+
+		};
+
+		IRunnableContext context = new ProgressMonitorDialog(shell);
+		try {
+			getSite().getWorkbenchWindow().getWorkbench().getProgressService()
+					.runInUI(
+							context,
+							runnable,
+							new LibrarySchedulingRule(LibraryService
+									.getInstance().getCurrentMethodLibrary()));
+		} catch (Exception e) {
+			AuthoringUIPlugin.getDefault().getLogger().logError(e);
+			String title = AuthoringUIResources.ProcessEditor_refreshErrorTitle;
+			AuthoringUIPlugin.getDefault().getMsgDialog().displayError(title,
+					e.toString(), e);
+		}
+	}
+
+	/**
+	 * Must be synchronized to avoid stepping on each other in reloading
+	 * resources/refreshing UI
+	 * 
+	 * @param removedResources
+	 * @param changedResources
+	 * @param addedWorkspaceResources
+	 *            collection of IResource objects that are just newly added to
+	 *            the library
+	 * @param refreshViews
+	 */
+	private synchronized void doRefresh(Collection removedResources,
+			Collection changedResources, Collection addedWorkspaceResources,
+			boolean refreshViews) {
+		HashSet editorsToRefresh = new HashSet();
+		if (!removedResources.isEmpty()) {
+			handleRemovedResources(removedResources, editorsToRefresh);
+			refreshViews = true;
+		}
+		if (!changedResources.isEmpty()) {
+			handleChangedResources(changedResources, editorsToRefresh,
+					refreshViews);
+		} else {
+			if (refreshViews) {
+				refreshViews();
+			}
+
+			if (!editorsToRefresh.isEmpty()) {
+				// refresh the editors that handleRemovedResources requested
+				//
+				for (Iterator iter = editorsToRefresh.iterator(); iter
+						.hasNext();) {
+					Object editor = iter.next();
+					if (editor instanceof MethodElementEditor) {
+						((MethodElementEditor) editor).refresh();
+					}
+				}
+			}
+		}
+		if (addedWorkspaceResources != null
+				&& !addedWorkspaceResources.isEmpty()) {
+			ILibraryManager mgr = LibraryService.getInstance()
+					.getCurrentLibraryManager();
+			if (mgr != null) {
+				ResourceSet resourceSet = mgr.getEditingDomain()
+						.getResourceSet();
+				if (resourceSet instanceof MultiFileResourceSetImpl) {
+					((MultiFileResourceSetImpl) resourceSet)
+							.loadNewResources(addedWorkspaceResources);
+					((MultiFileResourceSetImpl) resourceSet).getUnresolvedProxyMarkerManager().validateAllMarkers();
+				}
+			}
+		}
+	}
+
+	private boolean isViewObject(Object o) {
+		return o instanceof MethodElement
+				&& !(o instanceof ContentDescription
+						|| o instanceof ProcessElement || (o instanceof ProcessPackage && UmaUtil
+						.getProcessComponent((MethodElement) o) == null));
+	}
+
+	private void doRefresh(IRefreshEvent event, Shell shell) {
+		if (DEBUG) {
+			System.out
+					.println("Refreshed objects: " + event.getRefreshedObjects()); //$NON-NLS-1$
+		}
+		boolean refresh = false;
+		for (Iterator iter = event.getRefreshedObjects().iterator(); iter
+				.hasNext();) {
+			Object e = iter.next();
+			if (isViewObject(e)) {
+				refresh = true;
+				break;
+			}
+		}
+		if (refresh) {
+			refreshViews();
+		}
+	}
+
+	/**
+	 * Refreshes the Library View
+	 * 
+	 * @param shell
+	 */
+	private void doRefresh(Shell shell) {
+		final boolean refreshViews = !RefreshJob.getInstance()
+				.getReloadedBeforeRefreshResources().isEmpty()
+				|| !RefreshJob.getInstance().getAddedResources().isEmpty();
+		ArrayList removedResources = new ArrayList(RefreshJob.getInstance()
+				.getRemovedResources());
+		ArrayList changedResources = new ArrayList(RefreshJob.getInstance()
+				.getChangedResources());
+		ArrayList addedWsResources = new ArrayList(RefreshJob.getInstance()
+				.getAddedWorkspaceResources());
+
+		if (!removedResources.isEmpty() || !changedResources.isEmpty()
+				|| !addedWsResources.isEmpty() || refreshViews) {
+			blockingRefresh(removedResources, changedResources,
+					addedWsResources, refreshViews, shell);
+		}
+
+		if (!removedResources.isEmpty()) {
+			RefreshJob.getInstance().getRemovedResources().removeAll(
+					removedResources);
+		}
+		if (!changedResources.isEmpty()) {
+			RefreshJob.getInstance().getChangedResources().removeAll(
+					changedResources);
+		}
+		if (!addedWsResources.isEmpty()) {
+			RefreshJob.getInstance().getAddedWorkspaceResources().removeAll(
+					addedWsResources);
+		}
+		if (refreshViews) {
+			RefreshJob.getInstance().getReloadedBeforeRefreshResources()
+					.clear();
+			RefreshJob.getInstance().getAddedResources().clear();
+		}
+	}
+
+	/**
+	 * @param removedResources2
+	 */
+	private Collection handleRemovedResources(Collection removedResources,
+			Collection editorsToRefresh) {
+		IWorkbenchPage workbenchPage = getSite().getPage();
+		IEditorReference[] editorReferences = workbenchPage
+				.getEditorReferences();
+		ArrayList dirtyEditorsWithConflict = new ArrayList();
+		ArrayList removedResourceList = new ArrayList(removedResources);
+		if (editorsToRefresh == null) {
+			editorsToRefresh = new ArrayList();
+		}
+		// find all editor with dirty conflict
+		//
+		for (int i = 0; i < editorReferences.length; i++) {
+			IEditorReference reference = editorReferences[i];
+			IEditorPart editor = reference.getEditor(true);
+			if (editor instanceof MethodElementEditor && editor.isDirty()) {
+				MethodElementEditorInput input = (MethodElementEditorInput) editor
+						.getEditorInput();
+				Resource resource = input.getMethodElement() != null ? input
+						.getMethodElement().eResource() : null;
+				if (!removedResources.contains(resource)) {
+					Collection usedResources = ((MethodElementEditor) editor)
+							.getUsedResources();
+					check_resource: for (int j = 0; j < removedResourceList
+							.size(); j++) {
+						resource = (Resource) removedResourceList.get(j);
+						if (usedResources.contains(resource)) {
+							dirtyEditorsWithConflict.add(editor);
+							break check_resource;
+						}
+					}
+				} else {
+					editorsToRefresh.add(editor);
+				}
+			}
+		}
+
+		if (!dirtyEditorsWithConflict.isEmpty()) {
+			Object[] selected = selectDirtyEditors(dirtyEditorsWithConflict);
+			for (int i = 0; i < selected.length; i++) {
+				editorsToRefresh.add(selected[i]);
+			}
+		}
+
+		// Unload the removed resources.
+		PersistenceUtil.unload(removedResources);
+
+		for (int i = 0; i < editorReferences.length; i++) {
+			IEditorReference reference = editorReferences[i];
+			IEditorPart editor = reference.getEditor(true);
+			if (editor instanceof MethodElementEditor && !editor.isDirty()) {
+				Collection usedResources = ((MethodElementEditor) editor)
+						.getUsedResources();
+				check_resource: for (int j = 0; j < removedResourceList.size(); j++) {
+					Resource resource = (Resource) removedResourceList.get(j);
+					if (usedResources.contains(resource)) {
+						editorsToRefresh.add(editor);
+						break check_resource;
+					}
+				}
+			}
+		}
+
+		return removedResources;
+	}
+
+	/**
+	 * 
+	 * @param changedResources
+	 * @return resources that have been reloaded
+	 */
+	private Collection handleChangedResources(Collection changedResources,
+			Collection editorsToRefresh, boolean forceRefreshViews) {
+		if (!forceRefreshViews) {
+			for (Iterator iter = changedResources.iterator(); iter.hasNext();) {
+				Resource resource = (Resource) iter.next();
+				if (resource instanceof ILibraryResource
+						&& ((ILibraryResource) resource).getLoadStamp() > lastRefreshTimeStamp) {
+					forceRefreshViews = true;
+					break;
+				}
+			}
+		}
+		return handleChangedResources(changedResources, null,
+				forceRefreshViews, editorsToRefresh);
+	}
+
+	/**
+	 * updates Library View when resources change
+	 * 
+	 * @param changedResources
+	 * @param editorsNotToRefresh
+	 * @param forceRefreshViews
+	 * @param editorsToRefresh
+	 * @return List of changed resources
+	 */
+	public Collection handleChangedResources(Collection changedResources,
+			Collection editorsNotToRefresh, boolean forceRefreshViews,
+			Collection editorsToRefresh) {
+		Control ctrl = getViewer().getControl();
+		if (ctrl == null || ctrl.isDisposed())
+			return Collections.EMPTY_LIST;
+
+		IWorkbenchPage workbenchPage = getSite().getPage();
+		IEditorReference[] editorReferences = workbenchPage
+				.getEditorReferences();
+		ArrayList<IEditorPart> dirtyEditorsWithConflict = new ArrayList<IEditorPart>();
+		ArrayList<Resource> changedResourceList = new ArrayList<Resource>(changedResources);
+		// find all editor with dirty conflict
+		//
+		for (int i = 0; i < editorReferences.length; i++) {
+			IEditorReference reference = editorReferences[i];
+			IEditorPart editor = reference.getEditor(true);
+			if (editor instanceof MethodElementEditor && editor.isDirty()) {
+				Collection<Resource> usedResources = ((MethodElementEditor) editor)
+						.getUsedResources();
+				check_resource: for (int j = 0; j < changedResourceList.size(); j++) {
+					Resource resource = (Resource) changedResourceList.get(j);
+					if (usedResources.contains(resource)) {
+						dirtyEditorsWithConflict.add(editor);
+						break check_resource;
+					}
+				}
+			}
+		}
+		final ArrayList editorListToRefresh = new ArrayList();
+		if (editorsToRefresh != null) {
+			editorListToRefresh.addAll(editorsToRefresh);
+		}
+		if (!dirtyEditorsWithConflict.isEmpty()) {
+			Object[] result = selectDirtyEditors(dirtyEditorsWithConflict);
+			if(result != null) {
+				for (int i = 0; i < result.length; i++) {
+					Object editor = result[i];
+					if ((editorsNotToRefresh == null || !editorsNotToRefresh
+							.contains(editor))
+							&& (editorsToRefresh == null || !editorsToRefresh
+									.contains(editor))) {
+						editorListToRefresh.add(editor);
+						dirtyEditorsWithConflict.remove(editor);
+					}
+				}
+			}
+			// remove all resources used by dirty editors with conflict from the
+			// collection of changed resources after updating cached modification stamp
+			// so they will not be prompted to reload again until the next external change
+			//
+			for (int i = 0; i < dirtyEditorsWithConflict.size(); i++) {
+				MethodElementEditor editor = (MethodElementEditor) dirtyEditorsWithConflict
+						.get(i);				
+				Collection<Resource> usedResources = editor.getUsedResources();
+				usedResources.retainAll(changedResourceList);
+				editor.updateResourceInfos(usedResources);
+				editor.ovewriteResources(usedResources);
+				changedResourceList.removeAll(usedResources);
+			}
+		}
+
+		boolean refreshViews = false;
+		if (!changedResourceList.isEmpty()) {
+			for (int i = 0; i < editorReferences.length; i++) {
+				IEditorReference reference = editorReferences[i];
+				IEditorPart editor = reference.getEditor(true);
+				if (editor instanceof MethodElementEditor && !editor.isDirty()) {
+					Collection<Resource> usedResources = ((MethodElementEditor) editor)
+							.getUsedResources();
+					check_resource: for (int j = 0; j < changedResourceList
+							.size(); j++) {
+						Resource resource = (Resource) changedResourceList
+								.get(j);
+						if (usedResources.contains(resource)) {
+							editorListToRefresh.add(editor);
+							break check_resource;
+						}
+					}
+				}
+			}
+
+			// Reload the selected changed resources.
+			ILibraryManager manager = (ILibraryManager) LibraryService
+					.getInstance().getCurrentLibraryManager();
+			if (manager != null) {
+				Collection<Resource> reloadedResources = manager
+						.reloadResources(changedResourceList);
+
+				refreshViews = !reloadedResources.isEmpty();
+			}
+		}
+		if (forceRefreshViews || refreshViews) {
+			refreshViews();
+		}
+		if (!editorListToRefresh.isEmpty()) {
+			for (int i = 0; i < editorListToRefresh.size(); i++) {
+				MethodElementEditor editor = (MethodElementEditor) editorListToRefresh
+						.get(i);
+				try {
+					editor.refresh();
+				} catch (Exception e) {
+					AuthoringUIPlugin.getDefault().getLogger().logError(e);
+				}
+			}
+		}
+		return changedResourceList;
+	}
+
 	/**
 	 * Refreshes Library and Configuration views if necessary
 	 * 
@@ -1948,10 +2107,8 @@ public class LibraryView extends AbstractBaseView implements IShowInTarget, IRef
 						try {
 							setSelectionToViewer(o);
 						} catch (Exception e) {
-							if (MultiResourceEObject.epfDebug(1)) {
-								AuthoringUIPlugin.getDefault().getLogger()
-										.logError(e);
-							}
+							AuthoringUIPlugin.getDefault().getLogger()
+									.logError(e);
 						}
 					} else {
 						ViewHelper.restoreSelection(getViewer(), selection);
@@ -2074,41 +2231,5 @@ public class LibraryView extends AbstractBaseView implements IShowInTarget, IRef
 	@Override
 	public String getViewId() {
 		return VIEW_ID;
-	}
-
-	public TreeViewer getTreeViewer() {
-		return treeViewer;
-	}
-	
-	@Override
-	public void setContentDescription(String description) {
-		super.setContentDescription(description);
-	}
-
-	public void refresh(IProgressMonitor monitor) {
-		refreshHandler.refresh(monitor);
-	}
-	
-	private boolean customCategoryOwnedByOtherPlugin(Object element) {
-		if (!(element instanceof WrapperItemProvider)) {
-			return false;
-		}
-		Object unwrapped = TngUtil.unwrap(element);
-		if (! (unwrapped instanceof CustomCategory)) {
-			return false;
-		}
-		CustomCategory cc = (CustomCategory) unwrapped;
-		
-		while (element instanceof WrapperItemProvider) {
-			element = ((WrapperItemProvider) element).getParent(null);
-		}
-		if (element instanceof CustomCategory) {
-			return UmaUtil.getMethodPlugin(cc) != UmaUtil.getMethodPlugin((CustomCategory) element); 
-		}
-		return false;
-	}
-	
-	public ISelection getCachedSelection() {
-		return selection;
 	}
 }

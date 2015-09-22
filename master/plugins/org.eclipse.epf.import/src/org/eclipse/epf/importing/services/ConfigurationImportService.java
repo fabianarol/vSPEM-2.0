@@ -19,9 +19,8 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.epf.common.service.versioning.VersionUtil;
-import org.eclipse.epf.common.ui.util.MsgBox;
-import org.eclipse.epf.common.utils.ExtensionHelper;
+import org.eclipse.epf.common.serviceability.MsgBox;
+import org.eclipse.epf.common.serviceability.VersionUtil;
 import org.eclipse.epf.common.utils.FileUtil;
 import org.eclipse.epf.export.services.LibraryDocument;
 import org.eclipse.epf.export.services.PluginExportService;
@@ -31,11 +30,11 @@ import org.eclipse.epf.library.LibraryService;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.project.MethodLibraryProject;
 import org.eclipse.epf.library.services.SafeUpdateController;
-import org.eclipse.epf.library.ui.util.ConvertGuidanceType;
-import org.eclipse.epf.library.ui.util.TypeConverter;
 import org.eclipse.epf.library.ui.wizards.OpenLibraryWizard;
+import org.eclipse.epf.library.util.ConvertGuidanceType;
 import org.eclipse.epf.library.util.LibraryUtil;
 import org.eclipse.epf.library.util.ResourceUtil;
+import org.eclipse.epf.library.util.TypeConverter;
 import org.eclipse.epf.persistence.migration.UpgradeCallerInfo;
 import org.eclipse.epf.persistence.refresh.RefreshJob;
 import org.eclipse.epf.uma.Activity;
@@ -61,9 +60,9 @@ public class ConfigurationImportService {
 	
 	private UpgradeCallerInfo upGradeInfo;
 	
-	protected ConfigurationImportData data;
+	private ConfigurationImportData data;
 
-	protected LibraryDocument importingLibDoc = null;
+	LibraryDocument importingLibDoc = null;
 
 	LibraryDiffManager diffMgr = null;
 
@@ -76,18 +75,6 @@ public class ConfigurationImportService {
 		this.data = data;
 	}
 
-	public static ConfigurationImportService newInstance(ConfigurationImportData data) {
-		Object obj = ExtensionHelper.create(ConfigurationImportService.class, data);
-		if (obj instanceof ConfigurationImportService) {
-			return (ConfigurationImportService) obj;
-		}		
-		return new ConfigurationImportService(data);
-	}
-	
-	protected LibraryDocument getImportingLibDoc() {
-		return importingLibDoc;
-	}
-	
 	/**
 	 * Analyzes the imported library with respect to the base library.
 	 */
@@ -125,14 +112,11 @@ public class ConfigurationImportService {
 			if (handleVersion) {
 				upGradeInfo = new ConfigurationImportService.UpgradeInfo(UpgradeCallerInfo.upgradeImportConfig, importingLibPath);
 				if (! handleToolVersion(importingLibPath, upGradeInfo)) {
-					String errMsg = upGradeInfo.getErrorMsg();
-					if (errMsg == null || errMsg.length() == 0) {
-						errMsg = ImportResources.ImportConfigurationWizard_ERR_Import_configuration;
-					}
 					data
 					.getErrorInfo()
 					.addError(
-							NLS.bind(errMsg, importingLibPath.getParent())); 
+							NLS.bind(ImportResources.ImportConfigurationWizard_ERR_Import_configuration, importingLibPath.getParent())); 
+
 					return;
 				}
 				if (upGradeInfo.getCopiedLibFile() != null) {
@@ -141,6 +125,15 @@ public class ConfigurationImportService {
 			}
 						
 			importingLibDoc = new LibraryDocument(importingLibPath);
+			
+			if (! handleVersion) {
+				String versionError = versionCheck(importingLibPath.getAbsolutePath(), 
+										ImportResources.importConfigWizard_title);
+				if (versionError != null) {
+					data.getErrorInfo().addError(versionError);
+					return;
+				}
+			}
 
 			boolean isConfigSpecs = importingLibDoc.isConfigSpecsOnly();
 
@@ -287,15 +280,12 @@ public class ConfigurationImportService {
 		}	
 		
 		try {
-			postImportOperation(monitor);
+			// Reopen the library.
+			LibraryService.getInstance().reopenCurrentMethodLibrary();		
+
 		} catch (Exception e) {
 			ImportPlugin.getDefault().getLogger().logError(e);
 		}
-	}
-	
-	protected void postImportOperation(IProgressMonitor monitor) throws Exception {
-		// Reopen the library.
-		LibraryService.getInstance().reopenCurrentMethodLibrary();	
 	}
 	
 	/**
@@ -486,9 +476,5 @@ public class ConfigurationImportService {
 			setCopiedLibFile(null);
 		}
 	};	
-	
-	public boolean isSynFreeLib() {
-		return importingLibDoc.isSynFreeLib();
-	}
 	
 }

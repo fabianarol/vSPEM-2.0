@@ -446,7 +446,7 @@ public class MethodLibraryPersister implements IFileBasedLibraryPersister {
 		}
 
 		String path;
-		if (resourceSet.hasOwnFolder(e)) {
+		if (MultiFileSaveUtil.hasOwnFolder(e)) {
 			// path is the directory of the MethodPlugin/ProcessComponent
 			//
 			path = new File(resource.getFinalURI().toFileString()).getParent();
@@ -649,64 +649,62 @@ public class MethodLibraryPersister implements IFileBasedLibraryPersister {
 		 * @see org.eclipse.epf.uma.persistence.MethodLibraryPersister#save(org.eclipse.emf.ecore.resource.Resource)
 		 */
 		public void save(Resource resource) throws Exception {
-			if (resource != null) {
-				if(resource.getResourceSet() instanceof MultiFileResourceSetImpl &&
-						resource instanceof MultiFileXMIResourceImpl) {
-					MultiFileResourceSetImpl resourceSet = (MultiFileResourceSetImpl) resource
-					.getResourceSet();
-					if (resourceSet == null) {
-						return;
-					}
-	
-					// update version info in library resource if needed
-					//
-					Resource libResourceToSave = null;
-					MethodElement me = PersistenceUtil.getMethodElement(resource);
-					if(me != null) {
-						MethodLibrary lib = UmaUtil.getMethodLibrary(me);
-						if(lib != null) {
-							Resource libResource = lib.eResource();
-							if(libResource != null 
-									&& libResource != resource
-									&& PersistenceUtil.checkToolVersion(libResource) != 0) {
-								libResourceToSave = libResource;
-							}
+			if(resource.getResourceSet() instanceof MultiFileResourceSetImpl &&
+					resource instanceof MultiFileXMIResourceImpl) {
+				MultiFileResourceSetImpl resourceSet = (MultiFileResourceSetImpl) resource
+				.getResourceSet();
+				if (resourceSet == null) {
+					return;
+				}
+
+				// update version info in library resource if needed
+				//
+				Resource libResourceToSave = null;
+				MethodElement me = PersistenceUtil.getMethodElement(resource);
+				if(me != null) {
+					MethodLibrary lib = UmaUtil.getMethodLibrary(me);
+					if(lib != null) {
+						Resource libResource = lib.eResource();
+						if(libResource != null 
+								&& libResource != resource
+								&& PersistenceUtil.checkToolVersion(libResource) != 0) {
+							libResourceToSave = libResource;
 						}
 					}
-	
-					if (MultiFileXMISaveImpl.checkModifyRequired(saveOptions)) {
-						Collection<Resource> resources;
-						if(libResourceToSave != null) {
-							resources = new ArrayList<Resource>();
-							resources.add(resource);
-							resources.add(libResourceToSave);
-						}
-						else {
-							resources = Collections.singletonList(resource);
-						}
-						MultiFileSaveUtil.checkModify(resources);
-						
-						// check out-of-sync
-						//
-						MultiFileSaveUtil.checkOutOfSynch(resources, saveOptions);
-						
-						MultiFileSaveUtil.checkFilePathLength(resources);
-					}
-	
-					resourceSet.save(resource, saveOptions);
+				}
+
+				if (MultiFileXMISaveImpl.checkModifyRequired(saveOptions)) {
+					Collection<Resource> resources;
 					if(libResourceToSave != null) {
-						resourceSet.save(libResourceToSave, saveOptions);
+						resources = new ArrayList<Resource>();
+						resources.add(resource);
+						resources.add(libResourceToSave);
 					}
+					else {
+						resources = Collections.singletonList(resource);
+					}
+					MultiFileSaveUtil.checkModify(resources);
+					
+					// check out-of-sync
+					//
+					MultiFileSaveUtil.checkOutOfSynch(resources, saveOptions);
+					
+					MultiFileSaveUtil.checkFilePathLength(resources);
 				}
-				else if(resource instanceof IFailSafeSavable) {
-					IFailSafeSavable failSafeSavable = (IFailSafeSavable) resource;
-					failSafeSavable.setTxID(txRecord.getTxID());
-					resource.save(saveOptions);
-					txRecord.getResourcesToCommit().add(resource);
+
+				resourceSet.save(resource, saveOptions);
+				if(libResourceToSave != null) {
+					resourceSet.save(libResourceToSave, saveOptions);
 				}
-				else {
-					throw new IllegalAccessException("Resource must implement org.eclipse.epf.library.persistence.internal.IFailSafeSavable"); //$NON-NLS-1$
-				}
+			}
+			else if(resource instanceof IFailSafeSavable) {
+				IFailSafeSavable failSafeSavable = (IFailSafeSavable) resource;
+				failSafeSavable.setTxID(txRecord.getTxID());
+				resource.save(saveOptions);
+				txRecord.getResourcesToCommit().add(resource);
+			}
+			else {
+				throw new IllegalAccessException("Resource must implement org.eclipse.epf.library.persistence.internal.IFailSafeSavable"); //$NON-NLS-1$
 			}
 		}
 
@@ -1086,23 +1084,14 @@ public class MethodLibraryPersister implements IFileBasedLibraryPersister {
 	}
 
 	public File getDefaultMethodConfigurationFolder(MethodLibrary library) {
-		return getDefaultMethodConfigurationFolder(library, true);
-	}
-	
-	public File getDefaultMethodConfigurationFolder(MethodLibrary library,
-			boolean create) {
 		File libDir = new File(library.eResource().getURI().toFileString()).getParentFile();
 		File configDir = new File(libDir, MultiFileSaveUtil.METHOD_CONFIGURATION_FOLDER_NAME);
-		if(configDir.exists()) {
-			return configDir;
-		} else if(create) {
+		if(!configDir.exists()) {
 			if(!configDir.mkdirs()) {
 				throw new MultiFileIOException(NLS.bind(PersistenceResources.cannot_create_dir_msg, configDir));				
-			} else {
-				return configDir;
 			}
 		}
-		return null;
+		return configDir;
 	}
 
 	public void setDefaultMethodConfigurationFolder(MethodLibrary library, File file) {
@@ -1129,25 +1118,8 @@ public class MethodLibraryPersister implements IFileBasedLibraryPersister {
 
 	public String getFolderAbsolutePath(MethodElement e) {
 		MethodLibrary library = UmaUtil.getMethodLibrary(e);
-		File libDir = null;
-		if(library == null) {
-			MethodPlugin plugin = UmaUtil.getMethodPlugin(e);
-			Resource resource;
-			if(plugin != null && (resource = ((InternalEObject) plugin).eDirectResource()) != null) {
-				URI uri = MultiFileSaveUtil.getFinalURI(resource);
-				libDir = new File(uri.toFileString()).getParentFile().getParentFile();
-			}			
-		}
-		else {
-			URI uri = MultiFileSaveUtil.getFinalURI(library.eResource());
-			libDir = new File(uri.toFileString()).getParentFile();
-		}
-		if (libDir != null) {
-			return new File(libDir, getRelativeElementPath(e))
-					.getAbsolutePath();
-		} else {
-			return null;
-		}
+		File libDir = new File(MultiFileSaveUtil.getFinalURI(library.eResource()).toFileString()).getParentFile();
+		return new File(libDir, getRelativeElementPath(e)).getAbsolutePath();
 	}
 	
 	/* (non-Javadoc)
@@ -1159,11 +1131,6 @@ public class MethodLibraryPersister implements IFileBasedLibraryPersister {
 			getObjectsWithDirectResources(it.next(), elements);
 		}
 		deleteAndSave(elements);
-	}
-
-	public File getFile(Resource resource) {
-		URI uri = MultiFileSaveUtil.getFinalURI(resource);
-		return new File(FileManager.toFileString(uri));
 	}
 
 }

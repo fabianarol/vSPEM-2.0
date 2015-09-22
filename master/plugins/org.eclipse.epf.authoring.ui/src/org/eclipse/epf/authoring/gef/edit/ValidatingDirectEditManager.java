@@ -15,7 +15,7 @@ import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.epf.authoring.gef.util.DiagramUIResources;
 import org.eclipse.epf.authoring.ui.AuthoringUIPlugin;
-import org.eclipse.epf.common.ui.util.MsgDialog;
+import org.eclipse.epf.common.serviceability.MsgDialog;
 import org.eclipse.epf.diagram.model.NamedNode;
 import org.eclipse.epf.diagram.model.WorkBreakdownElementNode;
 import org.eclipse.epf.library.edit.util.ProcessUtil;

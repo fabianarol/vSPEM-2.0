@@ -20,9 +20,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
-import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.emf.common.notify.impl.AdapterImpl;
 import org.eclipse.emf.edit.provider.IItemLabelProvider;
 import org.eclipse.emf.edit.provider.IStructuredItemContentProvider;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
@@ -31,11 +32,9 @@ import org.eclipse.emf.edit.provider.ViewerNotification;
 import org.eclipse.epf.library.edit.ILibraryItemProvider;
 import org.eclipse.epf.library.edit.IStatefulItemProvider;
 import org.eclipse.epf.library.edit.LibraryEditPlugin;
-import org.eclipse.epf.library.edit.TngAdapterFactory;
 import org.eclipse.epf.library.edit.util.Comparators;
 import org.eclipse.epf.library.edit.util.PluginUIPackagesMap;
 import org.eclipse.epf.library.edit.util.TngUtil;
-import org.eclipse.epf.uma.MethodLibrary;
 import org.eclipse.epf.uma.MethodPlugin;
 import org.eclipse.epf.uma.UmaPackage;
 import org.eclipse.epf.uma.provider.MethodPluginItemProvider;
@@ -48,7 +47,7 @@ import org.eclipse.epf.uma.provider.MethodPluginItemProvider;
 public class PluginUIPackagesItemProvider extends ItemProviderAdapter implements IStructuredItemContentProvider,
 	ITreeItemContentProvider, IItemLabelProvider, ILibraryItemProvider, IStatefulItemProvider {
 
-	public static final String PLUGIN_PACKAGE_SEPARATOR = "."; //$NON-NLS-1$
+	public static final String PACKAGE_SEPARATOR = "."; //$NON-NLS-1$
 
 	private Object parent;
 	
@@ -81,7 +80,7 @@ public class PluginUIPackagesItemProvider extends ItemProviderAdapter implements
 	}
 	
 	@Override
-	public Collection<? extends EStructuralFeature> getChildrenFeatures(Object object) {
+	public Collection getChildrenFeatures(Object object) {
 		// TODO Auto-generated method stub
 		return super.getChildrenFeatures(object);
 	}
@@ -135,7 +134,7 @@ public class PluginUIPackagesItemProvider extends ItemProviderAdapter implements
 		for (Iterator<MethodPlugin> iter = plugins.iterator();iter.hasNext();) {
 			MethodPlugin plugin = iter.next();
 			String deltaName = getNameDelta(this, plugin);
-			int dotIdx = deltaName.indexOf(PLUGIN_PACKAGE_SEPARATOR);
+			int dotIdx = deltaName.indexOf(PACKAGE_SEPARATOR);
 			if (dotIdx != -1) {
 				map.add(deltaName.substring(0, dotIdx), plugin);
 			} else {
@@ -152,14 +151,14 @@ public class PluginUIPackagesItemProvider extends ItemProviderAdapter implements
 			Map.Entry<String, Set<MethodPlugin>> entry = iter.next();
 			String name = entry.getKey();
 			Set<MethodPlugin> plugSet = entry.getValue();
-			PluginUIPackagesItemProvider provider = pluginPackagesItemProvidersMap.get(getFullName() + PLUGIN_PACKAGE_SEPARATOR + name);
+			PluginUIPackagesItemProvider provider = pluginPackagesItemProvidersMap.get(getFullName() + PACKAGE_SEPARATOR + name);
 			if (provider == null) {
 				provider = new PluginUIPackagesItemProvider(adapterFactory, name, plugSet);
-				pluginPackagesItemProvidersMap.put(getFullName() + PLUGIN_PACKAGE_SEPARATOR + name, provider);
+				pluginPackagesItemProvidersMap.put(getFullName() + PACKAGE_SEPARATOR + name, provider);
 			} else {
 				provider.setPlugins(plugSet);
 			}
-			existingNames.add(getFullName() + PLUGIN_PACKAGE_SEPARATOR + name);
+			existingNames.add(getFullName() + PACKAGE_SEPARATOR + name);
 			provider.setParent(this);
 			children.add(provider);
 		}
@@ -176,7 +175,7 @@ public class PluginUIPackagesItemProvider extends ItemProviderAdapter implements
 		String fullName = getName();
 		Object parent = getParent();
 		while (parent instanceof PluginUIPackagesItemProvider) {
-			fullName = ((PluginUIPackagesItemProvider)parent).getName() + PLUGIN_PACKAGE_SEPARATOR + fullName;
+			fullName = ((PluginUIPackagesItemProvider)parent).getName() + PACKAGE_SEPARATOR + fullName;
 			parent = ((PluginUIPackagesItemProvider)parent).getParent();
 		}
 		return fullName;
@@ -245,11 +244,11 @@ public class PluginUIPackagesItemProvider extends ItemProviderAdapter implements
 	 */
 	public ItemProviderAdapter getPluginItemProvider(MethodPlugin plugin) {
 		String deltaName = getNameDelta(this, plugin);
-		int dotIdx = deltaName.indexOf(PluginUIPackagesItemProvider.PLUGIN_PACKAGE_SEPARATOR);
+		int dotIdx = deltaName.indexOf(PluginUIPackagesItemProvider.PACKAGE_SEPARATOR);
 		if (dotIdx != -1) {
 			String packageProviderName = deltaName.substring(0, dotIdx);
 			if (pluginPackagesItemProvidersMap != null) {
-				PluginUIPackagesItemProvider provider = pluginPackagesItemProvidersMap.get(getFullName() + PLUGIN_PACKAGE_SEPARATOR + packageProviderName);
+				PluginUIPackagesItemProvider provider = pluginPackagesItemProvidersMap.get(getFullName() + PACKAGE_SEPARATOR + packageProviderName);
 				if (provider != null) {
 					return provider;
 				}
@@ -257,36 +256,6 @@ public class PluginUIPackagesItemProvider extends ItemProviderAdapter implements
 		} else {
 			return (MethodPluginItemProvider) TngUtil
 				.getAdapter(plugin, MethodPluginItemProvider.class);
-		}
-		return null;
-	}
-	
-	/**
-	 * 
-	 * @param itemName name of item to find
-	 * @param lib MethodLibrary
-	 * @return the MethodPlugin or PluginUIPackagesItemProvider with the specified name, or null if not found
-	 */
-	public static Object findPluginItemProvider(String itemName, MethodLibrary lib) {
-		ITreeItemContentProvider adapter = (ITreeItemContentProvider)TngAdapterFactory.INSTANCE
-				.getNavigatorView_ComposedAdapterFactory().adapt(lib, ITreeItemContentProvider.class);
-		if (adapter instanceof MethodLibraryItemProvider) {
-			MethodLibraryItemProvider libraryAdapter = (MethodLibraryItemProvider)adapter;
-			List<MethodPlugin> pluginList = lib.getMethodPlugins();
-			for (MethodPlugin plugin : pluginList) {
-				if (itemName.equals(plugin.getName())) {
-					return plugin;
-				}
-				Collection<?> children = libraryAdapter.getChildren(lib);
-				ItemProviderAdapter pluginTreeAdapter = libraryAdapter.getPluginItemProvider(plugin);
-				while (pluginTreeAdapter instanceof PluginUIPackagesItemProvider) {
-					if (itemName.equals(((PluginUIPackagesItemProvider)pluginTreeAdapter).getFullName())) {
-						return pluginTreeAdapter;
-					}
-					children = pluginTreeAdapter.getChildren(pluginTreeAdapter);
-					pluginTreeAdapter = ((PluginUIPackagesItemProvider)pluginTreeAdapter).getPluginItemProvider(plugin);
-				}
-			}
 		}
 		return null;
 	}

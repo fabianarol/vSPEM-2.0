@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.uma;
 
+import org.eclipse.emf.common.util.EList;
 import java.util.List;
 
 /**
@@ -19,10 +20,6 @@ import java.util.List;
  *
  * <!-- begin-model-doc -->
  * A Section is a special Method Element that represents structural subsections of a Content Description's sectionDescription attribute.  It is used for either large scale documentation of Content Elements organized into sections as well as to flexibly add new Sections to Content Elements using contribution variability added to the Section concept for Method Plug-ins.
- * Section in the package Method Plugin inherits from Variability Element and extends Section defined in Method Core :: Basic Elements with new capabilities for variability. 
- * For example, when a Task contributes to another Task its Presentation association is contributed including its Sections (i.e. its Steps), which are modeled as parts of the Content Description instance.  Sections can be nested and therefore Task Descriptions can be flexibly organized in Steps with sub-Steps.  Sections are Variability Elements themselves, so they can contribute to each other.  For example, one could model a Task step as a Section instance without relating it to a Task Description that directly contributes to (or replaces) another Section which is part of a Task Description.  This contribution (or replacement) would add new description text to the original step description (or replace the original step description).  Another example would be to contribute new Check List items organized as Sections to an existing Check List (defined as guidance).  
- * 
- * 
  * <!-- end-model-doc -->
  *
  * <p>
@@ -51,7 +48,7 @@ public interface Section extends VariabilityElement {
 	 * @return the value of the '<em>Section Name</em>' attribute.
 	 * @see #setSectionName(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getSection_SectionName()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getSectionName();
@@ -77,7 +74,7 @@ public interface Section extends VariabilityElement {
 	 * @return the value of the '<em>Section Description</em>' attribute.
 	 * @see #setSectionDescription(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getSection_SectionDescription()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getSectionDescription();
@@ -103,10 +100,10 @@ public interface Section extends VariabilityElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Sub Sections</em>' containment reference list.
 	 * @see org.eclipse.epf.uma.UmaPackage#getSection_SubSections()
-	 * @model containment="true" resolveProxies="true" ordered="false"
+	 * @model type="org.eclipse.epf.uma.Section" containment="true" resolveProxies="true" ordered="false"
 	 * @generated
 	 */
-	List<Section> getSubSections();
+	List getSubSections();
 
 	/**
 	 * Returns the value of the '<em><b>Predecessor</b></em>' reference.
@@ -119,7 +116,7 @@ public interface Section extends VariabilityElement {
 	 * @return the value of the '<em>Predecessor</em>' reference.
 	 * @see #setPredecessor(Section)
 	 * @see org.eclipse.epf.uma.UmaPackage#getSection_Predecessor()
-	 * @model ordered="false"
+	 * @model
 	 * @generated
 	 */
 	Section getPredecessor();

@@ -1,20 +1,16 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: WorkOrderType.java,v 1.3 2007/06/05 21:14:59 klow Exp $
+ */
 package org.eclipse.epf.xml.uma;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.emf.common.util.Enumerator;
+import org.eclipse.emf.common.util.AbstractEnumerator;
 
 /**
  * <!-- begin-user-doc -->
@@ -25,47 +21,10 @@ import org.eclipse.emf.common.util.Enumerator;
  * Represents a relationship between two Breakdown Element in which one Breakdown Element depends on the start or finish of another Breakdown Element in order to begin or end. This enumeration defines the different types of Work Order relationships available in UMA and is used to provide values for Work Order's linkType attribute.
  * <!-- end-model-doc -->
  * @see org.eclipse.epf.xml.uma.UmaPackage#getWorkOrderType()
- * @model extendedMetaData="name='WorkOrderType'"
+ * @model
  * @generated
  */
-public enum WorkOrderType implements Enumerator
-{
-	/**
-	 * The '<em><b>Finish To Start</b></em>' literal object.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #FINISH_TO_START_VALUE
-	 * @generated
-	 * @ordered
-	 */
-	FINISH_TO_START(0, "finishToStart", "finishToStart"),
-	/**
-	 * The '<em><b>Finish To Finish</b></em>' literal object.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #FINISH_TO_FINISH_VALUE
-	 * @generated
-	 * @ordered
-	 */
-	FINISH_TO_FINISH(1, "finishToFinish", "finishToFinish"),
-	/**
-	 * The '<em><b>Start To Start</b></em>' literal object.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #START_TO_START_VALUE
-	 * @generated
-	 * @ordered
-	 */
-	START_TO_START(2, "startToStart", "startToStart"),
-	/**
-	 * The '<em><b>Start To Finish</b></em>' literal object.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #START_TO_FINISH_VALUE
-	 * @generated
-	 * @ordered
-	 */
-	START_TO_FINISH(3, "startToFinish", "startToFinish");
+public final class WorkOrderType extends AbstractEnumerator {
 	/**
 	 * The '<em><b>Finish To Start</b></em>' literal value.
 	 * <!-- begin-user-doc -->
@@ -74,12 +33,12 @@ public enum WorkOrderType implements Enumerator
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @see #FINISH_TO_START
+	 * @see #FINISH_TO_START_LITERAL
 	 * @model name="finishToStart"
 	 * @generated
 	 * @ordered
 	 */
-	public static final int FINISH_TO_START_VALUE = 0;
+	public static final int FINISH_TO_START = 0;
 
 	/**
 	 * The '<em><b>Finish To Finish</b></em>' literal value.
@@ -89,12 +48,12 @@ public enum WorkOrderType implements Enumerator
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @see #FINISH_TO_FINISH
+	 * @see #FINISH_TO_FINISH_LITERAL
 	 * @model name="finishToFinish"
 	 * @generated
 	 * @ordered
 	 */
-	public static final int FINISH_TO_FINISH_VALUE = 1;
+	public static final int FINISH_TO_FINISH = 1;
 
 	/**
 	 * The '<em><b>Start To Start</b></em>' literal value.
@@ -104,12 +63,12 @@ public enum WorkOrderType implements Enumerator
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @see #START_TO_START
+	 * @see #START_TO_START_LITERAL
 	 * @model name="startToStart"
 	 * @generated
 	 * @ordered
 	 */
-	public static final int START_TO_START_VALUE = 2;
+	public static final int START_TO_START = 2;
 
 	/**
 	 * The '<em><b>Start To Finish</b></em>' literal value.
@@ -119,12 +78,52 @@ public enum WorkOrderType implements Enumerator
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @see #START_TO_FINISH
+	 * @see #START_TO_FINISH_LITERAL
 	 * @model name="startToFinish"
 	 * @generated
 	 * @ordered
 	 */
-	public static final int START_TO_FINISH_VALUE = 3;
+	public static final int START_TO_FINISH = 3;
+
+	/**
+	 * The '<em><b>Finish To Start</b></em>' literal object.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #FINISH_TO_START
+	 * @generated
+	 * @ordered
+	 */
+	public static final WorkOrderType FINISH_TO_START_LITERAL = new WorkOrderType(FINISH_TO_START, "finishToStart", "finishToStart");
+
+	/**
+	 * The '<em><b>Finish To Finish</b></em>' literal object.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #FINISH_TO_FINISH
+	 * @generated
+	 * @ordered
+	 */
+	public static final WorkOrderType FINISH_TO_FINISH_LITERAL = new WorkOrderType(FINISH_TO_FINISH, "finishToFinish", "finishToFinish");
+
+	/**
+	 * The '<em><b>Start To Start</b></em>' literal object.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #START_TO_START
+	 * @generated
+	 * @ordered
+	 */
+	public static final WorkOrderType START_TO_START_LITERAL = new WorkOrderType(START_TO_START, "startToStart", "startToStart");
+
+	/**
+	 * The '<em><b>Start To Finish</b></em>' literal object.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #START_TO_FINISH
+	 * @generated
+	 * @ordered
+	 */
+	public static final WorkOrderType START_TO_FINISH_LITERAL = new WorkOrderType(START_TO_FINISH, "startToFinish", "startToFinish");
 
 	/**
 	 * An array of all the '<em><b>Work Order Type</b></em>' enumerators.
@@ -134,10 +133,10 @@ public enum WorkOrderType implements Enumerator
 	 */
 	private static final WorkOrderType[] VALUES_ARRAY =
 		new WorkOrderType[] {
-			FINISH_TO_START,
-			FINISH_TO_FINISH,
-			START_TO_START,
-			START_TO_FINISH,
+			FINISH_TO_START_LITERAL,
+			FINISH_TO_FINISH_LITERAL,
+			START_TO_START_LITERAL,
+			START_TO_FINISH_LITERAL,
 		};
 
 	/**
@@ -146,7 +145,7 @@ public enum WorkOrderType implements Enumerator
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public static final List<WorkOrderType> VALUES = Collections.unmodifiableList(Arrays.asList(VALUES_ARRAY));
+	public static final List VALUES = Collections.unmodifiableList(Arrays.asList(VALUES_ARRAY));
 
 	/**
 	 * Returns the '<em><b>Work Order Type</b></em>' literal with the specified literal value.
@@ -188,34 +187,13 @@ public enum WorkOrderType implements Enumerator
 	 */
 	public static WorkOrderType get(int value) {
 		switch (value) {
-			case FINISH_TO_START_VALUE: return FINISH_TO_START;
-			case FINISH_TO_FINISH_VALUE: return FINISH_TO_FINISH;
-			case START_TO_START_VALUE: return START_TO_START;
-			case START_TO_FINISH_VALUE: return START_TO_FINISH;
+			case FINISH_TO_START: return FINISH_TO_START_LITERAL;
+			case FINISH_TO_FINISH: return FINISH_TO_FINISH_LITERAL;
+			case START_TO_START: return START_TO_START_LITERAL;
+			case START_TO_FINISH: return START_TO_FINISH_LITERAL;
 		}
 		return null;
 	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	private final int value;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	private final String name;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	private final String literal;
 
 	/**
 	 * Only this class can construct instances.
@@ -224,46 +202,7 @@ public enum WorkOrderType implements Enumerator
 	 * @generated
 	 */
 	private WorkOrderType(int value, String name, String literal) {
-		this.value = value;
-		this.name = name;
-		this.literal = literal;
+		super(value, name, literal);
 	}
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public int getValue() {
-	  return value;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public String getName() {
-	  return name;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public String getLiteral() {
-	  return literal;
-	}
-
-	/**
-	 * Returns the literal value of the enumerator, which is its string representation.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public String toString() {
-		return literal;
-	}
-}
+} //WorkOrderType

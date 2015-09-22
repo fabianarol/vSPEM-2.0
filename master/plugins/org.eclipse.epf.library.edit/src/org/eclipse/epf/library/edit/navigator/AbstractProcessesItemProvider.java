@@ -23,13 +23,13 @@ import org.eclipse.emf.edit.provider.IItemPropertySource;
 import org.eclipse.emf.edit.provider.IStructuredItemContentProvider;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
 import org.eclipse.emf.edit.provider.ItemProviderAdapter;
-import org.eclipse.epf.common.preferences.IPreferenceStoreWrapper;
-import org.eclipse.epf.common.preferences.IPropertyChangeListenerWrapper;
 import org.eclipse.epf.library.edit.IGroupContainer;
 import org.eclipse.epf.library.edit.LibraryEditPlugin;
 import org.eclipse.epf.library.edit.Providers;
 import org.eclipse.epf.library.edit.element.IElementItemProvider;
 import org.eclipse.epf.library.edit.util.ModelStructure;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
 
 /**
  * The abstract base item provider adapter class for the "Processes" folder in
@@ -51,7 +51,7 @@ public abstract class AbstractProcessesItemProvider extends ItemProviderAdapter
 
 	protected static final boolean processContributionEnabled = false;
 
-	private IPropertyChangeListenerWrapper prefStoreListener;
+	private IPropertyChangeListener prefStoreListener;
 
 	/**
 	 * @param adapterFactory
@@ -94,7 +94,7 @@ public abstract class AbstractProcessesItemProvider extends ItemProviderAdapter
 	 * @see org.eclipse.emf.edit.provider.ItemProviderAdapter#dispose()
 	 */
 	public void dispose() {
-		IPreferenceStoreWrapper prefStore = Providers.getPreferenceStore();
+		IPreferenceStore prefStore = Providers.getPreferenceStore();
 		if (prefStore != null && prefStoreListener != null) {
 			prefStore.removePropertyChangeListener(prefStoreListener);
 		}

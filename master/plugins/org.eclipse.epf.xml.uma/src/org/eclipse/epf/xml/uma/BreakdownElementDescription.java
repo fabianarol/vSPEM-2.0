@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: BreakdownElementDescription.java,v 1.2 2006/06/23 00:01:26 jxi Exp $
+ */
 package org.eclipse.epf.xml.uma;
 
 
@@ -42,7 +38,7 @@ public interface BreakdownElementDescription extends ContentDescription {
 	 * @return the value of the '<em>Usage Guidance</em>' attribute.
 	 * @see #setUsageGuidance(String)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getBreakdownElementDescription_UsageGuidance()
-	 * @model dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="kind='attribute' name='usageGuidance'"
 	 * @generated
 	 */

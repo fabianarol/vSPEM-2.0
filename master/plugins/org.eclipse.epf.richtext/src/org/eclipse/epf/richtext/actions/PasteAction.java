@@ -1,13 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
- *******************************************************************************/
 //------------------------------------------------------------------------------
 // Copyright (c) 2005, 2007 IBM Corporation and others.
 // All rights reserved. This program and the accompanying materials
@@ -27,7 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.epf.common.serviceability.Logger;
-import org.eclipse.epf.common.ui.util.ClipboardUtil;
+import org.eclipse.epf.common.utils.ClipboardUtil;
 import org.eclipse.epf.common.utils.FileUtil;
 import org.eclipse.epf.common.utils.NetUtil;
 import org.eclipse.epf.richtext.IRichText;

@@ -32,7 +32,7 @@ import org.eclipse.epf.diagram.core.services.DiagramManager;
 import org.eclipse.epf.library.edit.command.INestedCommandProvider;
 import org.eclipse.epf.library.edit.util.IDiagramManager;
 import org.eclipse.epf.library.edit.util.TngUtil;
-import org.eclipse.epf.library.ui.util.TypeConverter.TypeConversionCommand;
+import org.eclipse.epf.library.util.TypeConverter.TypeConversionCommand;
 import org.eclipse.epf.uma.Activity;
 import org.eclipse.epf.uma.Process;
 import org.eclipse.gmf.runtime.notation.Diagram;

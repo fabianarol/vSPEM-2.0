@@ -12,8 +12,7 @@ package org.eclipse.epf.authoring.ui.preferences;
 
 import java.io.File;
 
-import org.eclipse.epf.common.preferences.IPreferenceStoreWrapper;
-import org.eclipse.epf.common.ui.CommonUIPlugin;
+import org.eclipse.epf.common.utils.FileUtil;
 import org.eclipse.epf.library.LibraryPlugin;
 import org.eclipse.epf.library.prefs.LibraryPreferenceConstants;
 import org.eclipse.epf.library.ui.preferences.LibraryUIPreferences;
@@ -145,7 +144,7 @@ public class LibraryLocationData {
 	 *
 	 */
 	public void loadFromPreferenceStore() {
-		IPreferenceStoreWrapper store = LibraryPlugin.getDefault()
+		IPreferenceStore store = LibraryPlugin.getDefault()
 				.getPreferenceStore();
 
 		String lastDir = store
@@ -168,7 +167,7 @@ public class LibraryLocationData {
 	 *
 	 */
 	public void saveToPreferenceStore() {
-		IPreferenceStoreWrapper store = LibraryPlugin.getDefault()
+		IPreferenceStore store = LibraryPlugin.getDefault()
 				.getPreferenceStore();
 		File file = new File(this.getParentFolder());
 		LibraryUIPreferences.setSavedLibraryPath(file.getAbsolutePath());

@@ -33,7 +33,4 @@ public interface ITextReferenceReplacer {
 	 * @return
 	 */
 	String replace(String text, EObject owner, Map oldToNewObjectMap);
-	
-	IResourceScanner getResourceScanner();
-	
 }

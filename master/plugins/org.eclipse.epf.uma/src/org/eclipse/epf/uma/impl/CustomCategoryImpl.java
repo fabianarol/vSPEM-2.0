@@ -39,6 +39,13 @@ import org.eclipse.epf.uma.UmaPackage;
 public class CustomCategoryImpl extends ContentCategoryImpl implements
 		CustomCategory {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The cached value of the '{@link #getCategorizedElements() <em>Categorized Elements</em>}' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -46,7 +53,7 @@ public class CustomCategoryImpl extends ContentCategoryImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<DescribableElement> categorizedElements;
+	protected EList categorizedElements = null;
 
 	/**
 	 * The cached value of the '{@link #getSubCategories() <em>Sub Categories</em>}' reference list.
@@ -56,7 +63,7 @@ public class CustomCategoryImpl extends ContentCategoryImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<ContentCategory> subCategories;
+	protected EList subCategories = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -68,7 +75,7 @@ public class CustomCategoryImpl extends ContentCategoryImpl implements
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -76,7 +83,6 @@ public class CustomCategoryImpl extends ContentCategoryImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.CUSTOM_CATEGORY;
 	}
@@ -86,9 +92,9 @@ public class CustomCategoryImpl extends ContentCategoryImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<DescribableElement> getCategorizedElements() {
+	public List getCategorizedElements() {
 		if (categorizedElements == null) {
-			categorizedElements = new EObjectResolvingEList<DescribableElement>(
+			categorizedElements = new EObjectResolvingEList(
 					DescribableElement.class, this,
 					UmaPackage.CUSTOM_CATEGORY__CATEGORIZED_ELEMENTS);
 		}
@@ -100,11 +106,10 @@ public class CustomCategoryImpl extends ContentCategoryImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<ContentCategory> getSubCategories() {
+	public List getSubCategories() {
 		if (subCategories == null) {
-			subCategories = new EObjectResolvingEList<ContentCategory>(
-					ContentCategory.class, this,
-					UmaPackage.CUSTOM_CATEGORY__SUB_CATEGORIES);
+			subCategories = new EObjectResolvingEList(ContentCategory.class,
+					this, UmaPackage.CUSTOM_CATEGORY__SUB_CATEGORIES);
 		}
 		return subCategories;
 	}
@@ -114,7 +119,6 @@ public class CustomCategoryImpl extends ContentCategoryImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.CUSTOM_CATEGORY__CATEGORIZED_ELEMENTS:
@@ -130,19 +134,15 @@ public class CustomCategoryImpl extends ContentCategoryImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.CUSTOM_CATEGORY__CATEGORIZED_ELEMENTS:
 			getCategorizedElements().clear();
-			getCategorizedElements().addAll(
-					(Collection<? extends DescribableElement>) newValue);
+			getCategorizedElements().addAll((Collection) newValue);
 			return;
 		case UmaPackage.CUSTOM_CATEGORY__SUB_CATEGORIES:
 			getSubCategories().clear();
-			getSubCategories().addAll(
-					(Collection<? extends ContentCategory>) newValue);
+			getSubCategories().addAll((Collection) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -153,7 +153,6 @@ public class CustomCategoryImpl extends ContentCategoryImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.CUSTOM_CATEGORY__CATEGORIZED_ELEMENTS:
@@ -171,7 +170,6 @@ public class CustomCategoryImpl extends ContentCategoryImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);

@@ -10,7 +10,6 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.library.ui.views;
 
-import org.eclipse.emf.edit.ui.provider.ExtendedImageRegistry;
 import org.eclipse.epf.library.edit.LibraryEditPlugin;
 import org.eclipse.swt.graphics.Image;
 
@@ -22,8 +21,8 @@ import org.eclipse.swt.graphics.Image;
  */
 public class ProcessTreeUIFolder {
 
-	private static final Image DEFAULT_IMAGE = ExtendedImageRegistry.getInstance().getImage( 
-		LibraryEditPlugin.INSTANCE.getImage("full/obj16/Folder")); //$NON-NLS-1$
+	private static final Image DEFAULT_IMAGE = LibraryEditPlugin.INSTANCE
+			.getImage("full/obj16/Folder"); //$NON-NLS-1$
 
 	private String name;
 

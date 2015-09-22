@@ -39,7 +39,7 @@ public interface TaskDescription extends ContentDescription {
 	 * @return the value of the '<em>Purpose</em>' attribute.
 	 * @see #setPurpose(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getTaskDescription_Purpose()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getPurpose();
@@ -65,7 +65,7 @@ public interface TaskDescription extends ContentDescription {
 	 * @return the value of the '<em>Alternatives</em>' attribute.
 	 * @see #setAlternatives(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getTaskDescription_Alternatives()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getAlternatives();

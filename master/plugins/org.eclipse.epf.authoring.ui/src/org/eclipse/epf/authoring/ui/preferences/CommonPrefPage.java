@@ -10,8 +10,6 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.authoring.ui.preferences;
 
-import org.eclipse.epf.common.preferences.IPreferenceStoreWrapper;
-import org.eclipse.epf.common.ui.PreferenceStoreWrapper;
 import org.eclipse.epf.library.LibraryPlugin;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferencePage;
@@ -124,11 +122,7 @@ public class CommonPrefPage extends PreferencePage {
 	 */
 	protected IPreferenceStore doGetPreferenceStore() {
 
-		IPreferenceStoreWrapper wrapper = LibraryPlugin.getDefault().getPreferenceStore();
-		if ( wrapper instanceof PreferenceStoreWrapper ) {
-			return ((PreferenceStoreWrapper)wrapper).getStore();
-		}
-		return null;
+		return LibraryPlugin.getDefault().getPreferenceStore();
 		// return PlatformUI.getWorkbench().getPreferenceStore();
 
 	}

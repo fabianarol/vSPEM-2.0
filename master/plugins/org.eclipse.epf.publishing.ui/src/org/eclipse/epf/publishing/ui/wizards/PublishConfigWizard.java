@@ -18,11 +18,10 @@ import java.util.List;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.epf.authoring.ui.AuthoringUIPlugin;
-import org.eclipse.epf.common.service.utils.CommandLineRunUtil;
 import org.eclipse.epf.common.utils.FileUtil;
-import org.eclipse.epf.library.edit.ui.UIHelper;
-import org.eclipse.epf.library.util.LibraryUtil;
-import org.eclipse.epf.library.util.LibraryUtil.ConfigAndPlugin;
+import org.eclipse.epf.library.LibraryService;
+import org.eclipse.epf.library.LibraryServiceUtil;
+import org.eclipse.epf.library.edit.ui.UserInteractionHelper;
 import org.eclipse.epf.publishing.services.PublishHTMLOptions;
 import org.eclipse.epf.publishing.services.PublishManager;
 import org.eclipse.epf.publishing.services.PublishOptions;
@@ -31,7 +30,6 @@ import org.eclipse.epf.publishing.ui.PublishingUIResources;
 import org.eclipse.epf.publishing.ui.preferences.PublishingUIPreferences;
 import org.eclipse.epf.ui.wizards.BaseWizard;
 import org.eclipse.epf.uma.MethodConfiguration;
-import org.eclipse.epf.uma.util.UmaUtil;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.widgets.Composite;
@@ -158,29 +156,6 @@ public class PublishConfigWizard extends BaseWizard implements INewWizard {
 		}
 	}
 
-	@Override
-	public IWizardPage getStartingPage() {
-		IWizardPage page = wizardExtender == null ?  null : wizardExtender.getStartingPage();
-		if (page != null) {
-			return page;
-		}
-		return super.getStartingPage();
-	}
-	
-	@Override
-	public IWizardPage getNextPage(IWizardPage page) {
-		//override the base wizard's logic, 
-		//let the wizard extender drive the page flow when there is a wizard extender
-		IWizardPage nextPage = null;
-		if (wizardExtender != null) {
-			nextPage = wizardExtender.getNextPage(page);
-		}
-		else {
-			nextPage = super.getNextPage(page);
-		}
-		return nextPage;
-	}
-
 	/**
 	 * @see org.eclipse.jface.wizard.Wizard#createPageControls(Composite)
 	 */
@@ -199,7 +174,7 @@ public class PublishConfigWizard extends BaseWizard implements INewWizard {
 			return wizardExtender.doFinish();
 		} else {
 			PublishManager publisher = new PublishManager();
-			boolean success = publishConfig(selectConfigPage.getSelectedConfig(),
+			boolean success = publishConfig(selectConfigPage.getConfigName(),
 					getPublishingOptions(), publisher);
 			if (publisher != null) {
 				publisher.dispose();
@@ -216,22 +191,15 @@ public class PublishConfigWizard extends BaseWizard implements INewWizard {
 	 * @param options
 	 *            the publishing options
 	 */
-	public boolean publishConfig(MethodConfiguration config, PublishOptions options,
+	public boolean publishConfig(String configName, PublishOptions options,
 			PublishManager publisher) {
-		
-		ConfigAndPlugin tempConfigAndPlugin = null;
 		try {
 			if (checkAndCreateDir(options)) {
-				MethodConfiguration realConfig = config;
-				if (UmaUtil.getMethodLibrary(config) == null && 		//config passed is a mock config
-					options.isPublishProcess()) {
-					tempConfigAndPlugin = LibraryUtil.addTempConfigAndPluginToCurrentLibrary(options.getProcesses());
-					if (tempConfigAndPlugin != null && tempConfigAndPlugin.config != null) {
-						realConfig = tempConfigAndPlugin.config;					
-					}
-				}
-												
-				publisher.init(options.getPublishDir(), realConfig, options);
+				MethodConfiguration config = LibraryServiceUtil
+						.getMethodConfiguration(LibraryService.getInstance()
+								.getCurrentMethodLibrary(), configName);
+
+				publisher.init(options.getPublishDir(), config, options);
 				PublishingOperation operation = new PublishingOperation(
 						publisher);
 
@@ -239,11 +207,10 @@ public class PublishConfigWizard extends BaseWizard implements INewWizard {
 						Display.getCurrent().getActiveShell(), publisher
 								.getViewBuilder());
 
-				UIHelper.runWithProgress(operation, dlg, true,
+				UserInteractionHelper.runWithProgress(operation, dlg, true,
 						PublishingUIResources.publishConfigWizard_title);
 
-				//if the user cancel the publishing,do not close the publish wizard(which means return false)
-				return !publisher.getViewBuilder().isCanceled();
+				return true;
 			} else {
 				return false;
 			}
@@ -253,16 +220,15 @@ public class PublishConfigWizard extends BaseWizard implements INewWizard {
 					PublishingUIResources.publishConfigError_msg,
 					PublishingUIResources.publishConfigError_reason, e);
 		} finally {
-			LibraryUtil.removeTempConfigAndPluginFromCurrentLibrary(tempConfigAndPlugin);			
 			if (selectPublishingOptionsPage != null) {
 				selectPublishingOptionsPage.savePreferences();
 			}
 			if (selectDestinationPage != null) {
 				selectDestinationPage.savePreferences();
 			}
-			if (selectContentPage != null) {
-				selectContentPage.savePreferences();
-			}
+			MethodConfiguration config = LibraryServiceUtil
+					.getMethodConfiguration(LibraryService.getInstance()
+							.getCurrentMethodLibrary(), configName);
 			String configId = config.getGuid();
 			PublishingUIPreferences.setConfigPrefInitialized(configId, true);
 			PublishingUIPreferences.saveAllPreferences();
@@ -353,7 +319,7 @@ public class PublishConfigWizard extends BaseWizard implements INewWizard {
 		if (file.exists()) {
 			File[] files = file.listFiles();
 			if (files != null && files.length > 0) {
-				answer =  CommandLineRunUtil.getInstance().isNeedToRun() ? true : PublishingUIPlugin
+				answer = PublishingUIPlugin
 						.getDefault()
 						.getMsgDialog()
 						.displayConfirmation(

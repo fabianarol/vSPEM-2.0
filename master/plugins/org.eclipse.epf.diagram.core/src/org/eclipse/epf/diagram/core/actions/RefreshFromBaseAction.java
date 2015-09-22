@@ -16,11 +16,9 @@ package org.eclipse.epf.diagram.core.actions;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.emf.ecore.EModelElement;
 import org.eclipse.emf.ecore.EObject;
@@ -32,7 +30,6 @@ import org.eclipse.epf.diagram.core.DiagramCorePlugin;
 import org.eclipse.epf.diagram.core.DiagramCoreResources;
 import org.eclipse.epf.diagram.core.bridge.BridgeHelper;
 import org.eclipse.epf.diagram.core.bridge.DiagramAdapter;
-import org.eclipse.epf.diagram.core.bridge.NodeAdapter;
 import org.eclipse.epf.diagram.core.part.AbstractDiagramEditor;
 import org.eclipse.epf.diagram.core.part.util.DiagramEditorUtil;
 import org.eclipse.epf.diagram.core.services.DiagramHelper;
@@ -65,10 +62,8 @@ import org.eclipse.uml2.uml.StructuredActivityNode;
 /**
  * Action to refresh the latest changes from base activity diagram into 
  * extend's Activity diagram. Action will keep the existing immediate children's 
- * information of extend diagram, only refresh the base diagram's related information.
- *  
+ * information of extend diagram, only refresh the base diagram's related information. 
  * @author Shashidhar Kannoori
- * @author Phong Nguyen Le
  */
 public class RefreshFromBaseAction implements IObjectActionDelegate {
 
@@ -130,7 +125,7 @@ public class RefreshFromBaseAction implements IObjectActionDelegate {
 				if(e instanceof Activity){
 					if(((Activity)e).getVariabilityBasedOnElement() == null
 							|| (((Activity)e).getVariabilityBasedOnElement() != null
-							&& ((Activity)e).getVariabilityType() != VariabilityType.EXTENDS)){
+							&& ((Activity)e).getVariabilityType() != VariabilityType.EXTENDS_LITERAL)){
 						action.setEnabled(false);
 						return;
 					}
@@ -495,7 +490,7 @@ public class RefreshFromBaseAction implements IObjectActionDelegate {
 		EObject model = diagram.getElement();
 		Activity base = (Activity) act.getVariabilityBasedOnElement();
 		if (base == null
-				|| act.getVariabilityType() == VariabilityType.LOCAL_REPLACEMENT) {
+				|| act.getVariabilityType() == VariabilityType.LOCAL_REPLACEMENT_LITERAL) {
 			return false;
 		}
 		int type = DiagramHelper.getDiagramType(diagram);
@@ -547,19 +542,14 @@ public class RefreshFromBaseAction implements IObjectActionDelegate {
 						}
 					}
 				}
-				
-				Map<MethodElement, Edge> targetToCustomLinkMap = new HashMap<MethodElement, Edge>();
+
 				// Collect the edges thats exists in extend diagram
 				for (Iterator<?> iter = diagram.getEdges().iterator(); iter
 						.hasNext();) {
 					Edge edge = (Edge) iter.next();
-					if (contains(oldNodes, edge.getTarget())) {
-						if(contains(oldNodes, edge.getSource())) {
-							oldEdges.add(edge);
-						} else { // must be custom connection
-							MethodElement e = helper.getMethodElement((Node) edge.getTarget(), resourceSet);
-							targetToCustomLinkMap.put(e, edge);
-						}
+					if (contains(oldNodes, edge.getSource())
+							&& contains(oldNodes, edge.getTarget())) {
+						oldEdges.add(edge);
 					}
 				}
 
@@ -572,8 +562,6 @@ public class RefreshFromBaseAction implements IObjectActionDelegate {
 				for (Edge edge : oldEdges) {
 					diagram.removeEdge(edge);
 					helper.removeEdgeModel(model, edge.getElement());
-					edge.setSource(null);
-					edge.setTarget(null);
 				}
 
 				// replace associated base element with
@@ -584,39 +572,7 @@ public class RefreshFromBaseAction implements IObjectActionDelegate {
 
 				// Mark inherited
 				for (Object obj : baseCopy.getChildren()) {
-					View child = (View) obj;
-					BridgeHelper.markInherited(child);
-					if(child instanceof Node) {
-						MethodElement e = helper.getMethodElement((Node) child, resourceSet);
-						if(e != null) {
-							Edge edge = targetToCustomLinkMap.get(e);
-							if(edge != null) {
-								// update custom edge with new copy of target from base
-								edge.setTarget(child);
-								Object edgeModel = edge.getElement();
-								if(edgeModel instanceof ActivityEdge && child.getElement() instanceof ActivityNode) {
-									ActivityEdge actEdge = (ActivityEdge) edgeModel;
-									// disable notification for node adapter of
-									// the old target so associated work order
-									// will not be removed
-									ActivityNode oldTarget = actEdge.getTarget();
-									NodeAdapter nodeAdapter = BridgeHelper.getNodeAdapter(oldTarget);
-									boolean notify = false;
-									if(nodeAdapter != null) {
-										notify = nodeAdapter.isNotificationEnabled();
-										nodeAdapter.setNotificationEnabled(false);
-									}
-									try {
-										((ActivityEdge) edgeModel).setTarget((ActivityNode) child.getElement());
-									} finally {
-										if(nodeAdapter != null) {
-											nodeAdapter.setNotificationEnabled(notify);
-										}
-									}
-								}
-							}
-						}
-					}
+					BridgeHelper.markInherited((View) obj);
 				}
 				for (Object obj : baseCopy.getEdges()) {
 					BridgeHelper.markInherited((View) obj);
@@ -637,7 +593,7 @@ public class RefreshFromBaseAction implements IObjectActionDelegate {
 				if (baseEdgeModels != null && !baseEdgeModels.isEmpty()) {
 					helper.addEdgeModels(model, baseEdgeModels);
 				}
-				
+
 				// TODO: handle the missed links.
 
 				// ActivityDiagramAdapter adapter =
@@ -664,6 +620,22 @@ public class RefreshFromBaseAction implements IObjectActionDelegate {
 			diagramSvc.dispose();
 		}
 		return true;
+	}
+	
+	public static org.eclipse.emf.common.command.Command copyDiagram(EditingDomain domain, Diagram diagram) {
+		ArrayList list = new ArrayList();
+		list.add(diagram.getElement());
+		list.add(diagram);
+		org.eclipse.emf.common.command.Command cmd = CopyCommand.create(domain, list);
+		cmd.execute();
+//		for (Iterator iter = cmd.getResult().iterator(); iter.hasNext();) {
+//			Object element = (Object) iter.next();
+//			if(element instanceof Diagram) {
+//				return (Diagram) element;
+//			}
+//		}
+		return cmd;
+		//return null;
 	}
 	
 	public void initialize(){

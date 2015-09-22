@@ -21,8 +21,6 @@ import org.eclipse.epf.library.edit.IFilter;
 import org.eclipse.epf.library.edit.command.IActionManager;
 import org.eclipse.epf.library.edit.itemsfilter.FilterConstants;
 import org.eclipse.epf.library.edit.process.command.LinkMethodElementCommand;
-import org.eclipse.epf.library.edit.util.ProcessUtil;
-import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.ui.LibraryUIText;
 import org.eclipse.epf.uma.CompositeRole;
 import org.eclipse.epf.uma.Role;
@@ -130,16 +128,11 @@ public class RoleDescriptorGeneralSection extends DescriptorGeneralSection {
 				fd.setBlockOnOpen(true);
 				fd.setViewerSelectionSingle(true);
 				fd.setTitle(FilterConstants.ROLES);
-				fd.setEnableProcessScope(true);
-				fd.setSection(getSection());
 				fd.open();
 				setMethodElement(fd.getSelectedItems());
 
 				// update method element control
 				ctrl_method_element.setText(getMethodElementName(element));
-				if (isSyncFree()) {
-					getEditor().updateOnLinkedElementChange(element);
-				}
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e1) {
@@ -208,8 +201,7 @@ public class RoleDescriptorGeneralSection extends DescriptorGeneralSection {
 	private String getMethodElementName(RoleDescriptor element) {
 		String str = PropertiesResources.Process_None; 
 		if (element.getRole() != null) {
-//			str = element.getRole().getName();
-			str = TngUtil.getLabelWithPath(element.getRole());
+			str = element.getRole().getName();
 		}
 
 		return str;
@@ -236,12 +228,6 @@ public class RoleDescriptorGeneralSection extends DescriptorGeneralSection {
 			}
 		}
 
-		if (isSyncFree()) {
-			if (element.getRole() != null) {
-				linkButton.setEnabled(false);
-			}
-			clearButton.setEnabled(false);
-		}	
 	}
 
 
@@ -275,9 +261,4 @@ public class RoleDescriptorGeneralSection extends DescriptorGeneralSection {
 		}
 		return LibraryUIText.TEXT_ROLE_DESCRIPTOR + ": "; //$NON-NLS-1$
 	}
-	
-	protected boolean isSyncFree() {
-		return ProcessUtil.isSynFree();
-	}
-	
 }

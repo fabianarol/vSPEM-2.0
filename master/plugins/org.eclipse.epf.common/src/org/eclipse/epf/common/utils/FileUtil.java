@@ -10,8 +10,6 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.common.utils;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -33,21 +31,10 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.epf.common.CommonPlugin;
-import org.osgi.framework.Bundle;
 
 /**
  * Utility class for managing directories and files.
@@ -92,8 +79,6 @@ public class FileUtil {
 	 * UTF-8 encoding.
 	 */
 	public static final String ENCODING_UTF_8 = "UTF-8";//$NON-NLS-1$
-	
-	private static Map<File, File> copiedFileMap;
 
 	/**
 	 * Private constructor to prevent this class from being instantiated. All
@@ -548,27 +533,6 @@ public class FileUtil {
 
 		return ret;
 	}
-	
-	public static boolean deleteTree(File file) {
-		boolean ret = true;
-
-		if (file.isDirectory()) {
-			File[] files = file.listFiles();
-			if (files != null) {
-				for (File f : files) {
-					if (!deleteTree(f)) {
-						ret = false;
-					}
-				}
-			}
-		}
-
-		if (!file.delete()) {
-			ret = false;
-		}
-
-		return ret;
-	}
 
 	/**
 	 * Recursively delete all sub-directories and files in a directory except
@@ -610,27 +574,8 @@ public class FileUtil {
 	 *            the target file or path
 	 */
 	public static boolean copyFile(File srcFile, File tgtFile) {
-		Map<File, File> map = getCopiedFileMap();
-		File keyFile = null;
-		File valFile = null;
-		if (map != null) {
-			try {
-				keyFile = tgtFile.getCanonicalFile();
-				valFile = srcFile.getCanonicalFile();
-				if (valFile.equals(map.get(keyFile))) {
-					return true;
-				}
-			} catch (Exception e) {
-				keyFile = valFile = null;
-			}			
-		}
-				
 		try {
-			boolean ret = copyfile(srcFile, tgtFile);
-			if (map != null && keyFile != null && valFile != null) {
-				map.put(keyFile, valFile);
-			}
-			return ret;
+			return copyfile(srcFile, tgtFile);
 		} catch (IOException ex) {
 			CommonPlugin.getDefault().getLogger().logError(ex);
 			return false;
@@ -740,17 +685,6 @@ public class FileUtil {
 			}
 		}
 	}
-	
-	public static boolean copyFileToDir(File srcFile, String tgtDirName) {
-		String tgtFileName = tgtDirName + File.separator + srcFile.getName();
-		File tgtFile = new File(tgtFileName);
-		
-		if (tgtFile.exists()) {
-			return true;
-		} else {
-			return copyFile(srcFile, tgtFile);
-		}		
-	}
 
 	/**
 	 * Copies the content of a directory to another directory.
@@ -847,25 +781,6 @@ public class FileUtil {
 		return charBuffer;
 	}
 
-	public static String readInputStream(InputStream input) throws IOException {
-		String result = "";  //$NON-NLS-1$
-		byte[] readData = new byte[8 * 1024];
-		try {
-			int bytesRead = 0;
-			while ( (bytesRead = input.read(readData)) > 0) {
-				result += new String(readData, 0, bytesRead);
-			}
-		} finally {
-			if (input != null) {
-				try {
-					input.close();
-				} catch (IOException e) {
-				}
-			}
-		}
-		return result;
-	}
-
 	public static StringBuffer readFile(File file, String encoding)
 			throws IOException {
 
@@ -884,7 +799,8 @@ public class FileUtil {
 				result.append(buffer, 0, size);
 			}
 		} catch (Exception e) {
-			CommonPlugin.getDefault().getLogger().logError(e);
+			// System.out.println(encoding);
+			e.printStackTrace();
 		} finally {
 			if (fis != null) {
 				fis.close();
@@ -1149,172 +1065,4 @@ public class FileUtil {
 			sourceFile.delete();
 		}
 	}
-
-	private static Map<File, File> getCopiedFileMap() {
-		return copiedFileMap;
-	}
-
-	public static void setCopiedFileMap(Map<File, File> copiedFileMap) {
-		FileUtil.copiedFileMap = copiedFileMap;
-	}
-	
-	
-	/**
-	 * Unzips the contents of a zip file to a directory
-	 * 
-	 * @param zipfile
-	 *            source zip file
-	 * @param tgtDir
-	 *            target directory
-	 */
-	public static boolean unzip(File srcZipFile, File tgtDir) {
-		if (! srcZipFile.exists() || ! tgtDir.exists()) {
-			return false;
-		}
-
-		if (! tgtDir.isDirectory()) {
-			return false;
-		}
-
-		try {
-			ZipFile zipFile = new ZipFile(srcZipFile);
-			Enumeration entries = zipFile.entries();
-
-			while (entries.hasMoreElements()) {
-				ZipEntry entry = (ZipEntry) entries.nextElement();
-				
-				File tgtFile = new File(tgtDir, entry.getName());
-
-				if (entry.isDirectory() && ! tgtFile.exists()) {
-					tgtFile.mkdirs();
-					
-				} else {
-					File parentFolder = tgtFile.getParentFile();
-					if (! parentFolder.exists()) {
-						parentFolder.mkdirs();
-					}
-										
-					copyInputStream(zipFile.getInputStream(entry),
-							new BufferedOutputStream(new FileOutputStream(
-									new File(tgtDir, entry.getName()))));
-				}
-			}
-
-			zipFile.close();
-		} catch (IOException ioe) {
-			return false;
-		}
-		return false;
-	}
-
-	private static final void copyInputStream(InputStream in, OutputStream out)
-			throws IOException {
-		byte[] buffer = new byte[1024];
-		int len;
-
-		while ((len = in.read(buffer)) >= 0)
-			out.write(buffer, 0, len);
-
-		in.close();
-		out.close();
-	}
-	
-	public static class FileChecker {		
-		public IStatus syncExecCheckModify(List<String> modifiedFiles) {
-			return Status.OK_STATUS;
-		}				
-	}
-	
-	private static FileChecker fileChecker;
-	private static void loadDeafultFileChecker() {
-		if (fileChecker != null) {
-			return;
-		}
-		Bundle bundle = Platform.getBundle("org.eclipse.epf.import");
-		try { 
-			bundle.start();
-		} catch (Exception e) {
-		}
-	}
-	public static void setFileChecker(FileChecker fileChecker) {
-		FileUtil.fileChecker = fileChecker;
-	}
-	
-	public static IStatus syncExecCheckModify(List<String> modifiedFiles) {
-		loadDeafultFileChecker();
-		if (fileChecker != null) {
-			return fileChecker.syncExecCheckModify(modifiedFiles);
-		}
-		return Status.OK_STATUS;
-	}
-		
-	public static boolean binaryEqual(File f1, File f2) {
-		BufferedInputStream is1 = null;
-		BufferedInputStream is2 = null;
-
-		int bufSz = 1024;
-		byte buff1[] = new byte[bufSz];
-		byte buff2[] = new byte[bufSz];
-
-		try {
-			is1 = new BufferedInputStream(new FileInputStream(f1));
-			is2 = new BufferedInputStream(new FileInputStream(f2));
-
-			int read1 = -1;
-			int read2 = -1;
-
-			do {
-				int offset1 = 0;
-				while (offset1 < bufSz
-						&& (read1 = is1.read(buff1, offset1, bufSz - offset1)) >= 0) {
-					offset1 += read1;
-				}
-
-				int offset2 = 0;
-				while (offset2 < bufSz
-						&& (read2 = is2.read(buff2, offset2, bufSz - offset2)) >= 0) {
-					offset2 += read2;
-				}
-				if (offset1 != offset2)
-					return false;
-				if (offset1 != bufSz) {
-					Arrays.fill(buff1, offset1, bufSz, (byte) 0);
-					Arrays.fill(buff2, offset2, bufSz, (byte) 0);
-				}
-				if (!Arrays.equals(buff1, buff2))
-					return false;
-			} while (read1 >= 0 && read2 >= 0);
-			if (read1 < 0 && read2 < 0)
-				return true; 
-			return false;
-
-		} catch (Exception e) {
-			CommonPlugin.getDefault().getLogger().logError(e);
-			return false;
-		}
-	}
-	
-	public static void log(String msg) {
-		CommonPlugin.getDefault().getLogger().logInfo(msg);
-	}
-	
-	private static ValidateEdit validateEdit;
-	public static ValidateEdit getValidateEdit() {
-		if (validateEdit != null) {
-			return validateEdit;
-		}
-		Object obj = ExtensionHelper.create(ValidateEdit.class, null);
-		if (obj instanceof ValidateEdit) {
-			validateEdit = (ValidateEdit) obj;
-			return validateEdit;
-		}
-		//Don't cache this default one.
-		return new ValidateEdit();
-	}
-	
-	public static IStatus validateEdit(IWorkspace workspace, IFile[] files, Object context) {
-		ValidateEdit validateEdit = getValidateEdit();
-		return validateEdit.validateEdit(workspace, files, context);
-	}
-	
 }

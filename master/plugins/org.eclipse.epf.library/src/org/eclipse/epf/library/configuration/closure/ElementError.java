@@ -1,13 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
 package org.eclipse.epf.library.configuration.closure;
 
 import org.eclipse.core.resources.IMarker;
@@ -28,8 +18,8 @@ public class ElementError  extends ErrorInfo implements IConfigurationError {
 	public ElementError(MethodConfiguration config,  
 			int errorLevel, String message, 
 			Object ownerElement, Object causeElement, 
-			int relation, String messageId) {
-		super(errorLevel, message, ownerElement, causeElement, relation, messageId);
+			int relation) {
+		super(errorLevel, message, ownerElement, causeElement, relation);
 		this.configId = config.getGuid();
 	}
 

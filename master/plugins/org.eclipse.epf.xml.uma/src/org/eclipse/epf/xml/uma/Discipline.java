@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: Discipline.java,v 1.4 2007/05/04 22:46:43 klow Exp $
+ */
 package org.eclipse.epf.xml.uma;
 
 import org.eclipse.emf.common.util.EList;
@@ -50,7 +46,7 @@ public interface Discipline extends ContentCategory {
 	 * @return the value of the '<em>Group2</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getDiscipline_Group2()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
-	 *        extendedMetaData="kind='group' name='group:24'"
+	 *        extendedMetaData="kind='group' name='group:22'"
 	 * @generated
 	 */
 	FeatureMap getGroup2();
@@ -66,11 +62,11 @@ public interface Discipline extends ContentCategory {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Task</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getDiscipline_Task()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='Task' group='#group:24'"
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='Task' group='#group:22'"
 	 * @generated
 	 */
-	EList<String> getTask();
+	EList getTask();
 
 	/**
 	 * Returns the value of the '<em><b>Sub Discipline</b></em>' containment reference list.
@@ -83,11 +79,11 @@ public interface Discipline extends ContentCategory {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Sub Discipline</em>' containment reference list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getDiscipline_SubDiscipline()
-	 * @model containment="true" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='SubDiscipline' group='#group:24'"
+	 * @model type="org.eclipse.epf.xml.uma.Discipline" containment="true" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='SubDiscipline' group='#group:22'"
 	 * @generated
 	 */
-	EList<Discipline> getSubDiscipline();
+	EList getSubDiscipline();
 
 	/**
 	 * Returns the value of the '<em><b>Reference Workflow</b></em>' attribute list.
@@ -100,10 +96,10 @@ public interface Discipline extends ContentCategory {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Reference Workflow</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getDiscipline_ReferenceWorkflow()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='ReferenceWorkflow' group='#group:24'"
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='ReferenceWorkflow' group='#group:22'"
 	 * @generated
 	 */
-	EList<String> getReferenceWorkflow();
+	EList getReferenceWorkflow();
 
 } // Discipline

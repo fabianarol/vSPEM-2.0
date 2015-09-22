@@ -32,7 +32,6 @@ import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.command.CommandStack;
 import org.eclipse.emf.common.command.CommandStackListener;
 import org.eclipse.emf.common.notify.Adapter;
-import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
 import org.eclipse.emf.common.util.URI;
@@ -46,11 +45,7 @@ import org.eclipse.emf.edit.provider.ComposedAdapterFactory;
 import org.eclipse.emf.edit.provider.INotifyChangedListener;
 import org.eclipse.emf.edit.provider.ReflectiveItemProviderAdapterFactory;
 import org.eclipse.emf.edit.provider.resource.ResourceItemProviderAdapterFactory;
-import org.eclipse.epf.common.preferences.IPreferenceStoreWrapper;
-import org.eclipse.epf.common.preferences.IPropertyChangeEventWrapper;
-import org.eclipse.epf.common.preferences.IPropertyChangeListenerWrapper;
 import org.eclipse.epf.common.serviceability.DebugTrace;
-import org.eclipse.epf.library.configuration.ConfigurationHelper;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
 import org.eclipse.epf.library.edit.command.IActionManager;
 import org.eclipse.epf.library.edit.util.Suppression;
@@ -79,6 +74,8 @@ import org.eclipse.epf.uma.MethodPlugin;
 import org.eclipse.epf.uma.UmaPackage;
 import org.eclipse.epf.uma.ecore.impl.MultiResourceEObject;
 import org.eclipse.epf.uma.util.AssociationHelper;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.IPropertyListener;
 
 /**
@@ -334,8 +331,8 @@ public abstract class AbstractLibraryManager implements ILibraryManager {
 	};
 
 	// Listen to preference store changes.
-	private IPropertyChangeListenerWrapper preferenceStoreChangeListener = new IPropertyChangeListenerWrapper() {
-		public void propertyChange(IPropertyChangeEventWrapper event) {
+	private IPropertyChangeListener preferenceStoreChangeListener = new IPropertyChangeListener() {
+		public void propertyChange(PropertyChangeEvent event) {
 			if (event.getProperty().equals(
 					LibraryPreferences.DISCARD_UNRESOLVED_REFERENCES)) {
 				saveOptions.put(
@@ -389,7 +386,6 @@ public abstract class AbstractLibraryManager implements ILibraryManager {
 
 		// Register the editing domain.
 		registerEditingDomain(editingDomain);
-
 	}
 
 	/**
@@ -572,29 +568,13 @@ public abstract class AbstractLibraryManager implements ILibraryManager {
 
 		// Add a listener to monitor library changes made in the given editing
 		// domain.
-		AdapterFactory adapterFactory = domain.getAdapterFactory();
-		if(adapterFactory instanceof ComposedAdapterFactory) {
-			ComposedAdapterFactory composedAdapterFactory = (ComposedAdapterFactory) adapterFactory;
-			// remove the listener before adding it to make sure that the same listener is not added more than one
-			composedAdapterFactory.removeListener(notifyChangedListener);
-			composedAdapterFactory.addListener(notifyChangedListener);
-		}
+		((ComposedAdapterFactory) domain.getAdapterFactory())
+				.addListener(notifyChangedListener);
 
 		// Add a listener to monitor changes made to the command stack.
 		// This is used to select the most recently affected objects in the
 		// viewer.
-		domain.getCommandStack().removeCommandStackListener(commandStackListener);
 		domain.getCommandStack().addCommandStackListener(commandStackListener);
-	}
-	
-	public void unregisterEditingDomain(AdapterFactoryEditingDomain domain) {
-		AdapterFactory adapterFactory = domain.getAdapterFactory();
-		if(adapterFactory instanceof ComposedAdapterFactory) {
-			ComposedAdapterFactory composedAdapterFactory = (ComposedAdapterFactory) adapterFactory;
-			composedAdapterFactory.removeListener(notifyChangedListener);
-		}
-
-		domain.getCommandStack().removeCommandStackListener(commandStackListener);
 	}
 
 	/**
@@ -746,9 +726,7 @@ public abstract class AbstractLibraryManager implements ILibraryManager {
 //		if (debug) {
 //			DebugTrace.print(this, "getMethodElement", "guid=" + guid); //$NON-NLS-1$ //$NON-NLS-2$
 //		}
-		if (guid == null) {
-			return null;
-		}
+
 		try {
 			ILibraryResourceSet resourceSet = (ILibraryResourceSet) library
 					.eResource().getResourceSet();
@@ -1039,13 +1017,10 @@ public abstract class AbstractLibraryManager implements ILibraryManager {
 	 */
 	public void dispose() {
 		if (preferenceStoreChangeListener != null) {
-			IPreferenceStoreWrapper prefStoreWrapper = LibraryPlugin
+			LibraryPlugin
 					.getDefault()
-					.getPreferenceStore();
-			
-			if(prefStoreWrapper != null) {
-				prefStoreWrapper.removePropertyChangeListener(preferenceStoreChangeListener);
-			}
+					.getPreferenceStore()
+					.removePropertyChangeListener(preferenceStoreChangeListener);
 		}
 
 		if (libraryChangedListeners.size() > 0) {
@@ -1059,12 +1034,9 @@ public abstract class AbstractLibraryManager implements ILibraryManager {
 		if (resourceChangeListeners.size() > 0) {
 			resourceChangeListeners.clear();
 		}
-		if(editingDomain != null) {
-			unregisterEditingDomain(editingDomain);
-			editingDomain = null;
-		}
-		library = null;
 
+		editingDomain = null;
+		library = null;
 	}
 
 	/**
@@ -1338,9 +1310,6 @@ public abstract class AbstractLibraryManager implements ILibraryManager {
 								.hasNext();) {
 							MethodConfiguration config = (MethodConfiguration) itconfig
 									.next();
-							if (! ConfigurationHelper.getDelegate().needFixupLoadCheckPackages(config)) {
-								continue;
-							}
 							List pkgs = config.getMethodPackageSelection();
 							if (!pkgs.contains(e)) {
 								// pkgs.add(e);
@@ -1357,9 +1326,8 @@ public abstract class AbstractLibraryManager implements ILibraryManager {
 					}
 				}
 			}
-			
-//wlu0 9-12-2012: we are now using "loadCheckPkgs" property mechanism to handle adding to configuration. No need to save here.
-//			helper.save();
+
+			helper.save();
 
 		} catch (RuntimeException e) {
 			LibraryPlugin.getDefault().getLogger().logError(e);
@@ -1376,6 +1344,6 @@ public abstract class AbstractLibraryManager implements ILibraryManager {
 	 */
 	protected abstract String getLibraryPersisterType();
 
-	protected abstract ILibraryResourceSet createResourceSet();
+	protected abstract ILibraryResourceSet createResourceSet();	
 
 }

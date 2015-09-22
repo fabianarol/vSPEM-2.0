@@ -29,12 +29,19 @@ public class TermDefinitionImpl extends GuidanceImpl implements TermDefinition {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	protected TermDefinitionImpl() {
 		super();
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -42,7 +49,6 @@ public class TermDefinitionImpl extends GuidanceImpl implements TermDefinition {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.TERM_DEFINITION;
 	}

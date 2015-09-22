@@ -38,7 +38,7 @@ public interface GuidanceDescription extends ContentDescription {
 	 * @return the value of the '<em>Attachments</em>' attribute.
 	 * @see #setAttachments(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getGuidanceDescription_Attachments()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getAttachments();

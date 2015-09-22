@@ -21,7 +21,6 @@ import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.edit.provider.AdapterFactoryTreeIterator;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
@@ -34,29 +33,23 @@ import org.eclipse.epf.diagram.model.NodeContainer;
 import org.eclipse.epf.diagram.model.RoleTaskComposite;
 import org.eclipse.epf.diagram.model.TaskNode;
 import org.eclipse.epf.diagram.model.WorkProductComposite;
-import org.eclipse.epf.diagram.model.WorkProductDescriptorNode;
-import org.eclipse.epf.diagram.model.util.DiagramModelPreference;
 import org.eclipse.epf.diagram.model.util.GraphicalDataHelper;
 import org.eclipse.epf.diagram.model.util.IActivityDetailDiagramChangeListener;
 import org.eclipse.epf.diagram.model.util.IAdapterFactoryFilter;
-import org.eclipse.epf.library.edit.IFilter;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
 import org.eclipse.epf.library.edit.process.BSActivityItemProvider;
 import org.eclipse.epf.library.edit.process.BreakdownElementWrapperItemProvider;
 import org.eclipse.epf.library.edit.process.IBSItemProvider;
 import org.eclipse.epf.library.edit.util.ConfigurableComposedAdapterFactory;
 import org.eclipse.epf.library.edit.util.ProcessUtil;
-import org.eclipse.epf.library.edit.util.TaskDescriptorPropUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.uma.Activity;
 import org.eclipse.epf.uma.Artifact;
 import org.eclipse.epf.uma.BreakdownElement;
-import org.eclipse.epf.uma.Constraint;
 import org.eclipse.epf.uma.Descriptor;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.RoleDescriptor;
 import org.eclipse.epf.uma.TaskDescriptor;
-import org.eclipse.epf.uma.UmaPackage;
 import org.eclipse.epf.uma.WorkProduct;
 import org.eclipse.epf.uma.WorkProductDescriptor;
 import org.eclipse.epf.uma.util.AssociationHelper;
@@ -294,15 +287,6 @@ public class ActivityDetailDiagramImpl extends DiagramImpl implements
 	public Collection getChildren() {
 		return getAllBreakdownElements(true);
 	}
-	
-	private static boolean isValid(IFilter filter) {
-		if(filter instanceof IAdapterFactoryFilter) {
-			IAdapterFactoryFilter adapterFactoryFilter = (IAdapterFactoryFilter) filter;
-			return adapterFactoryFilter.getWBSAdapterFactory() != null && adapterFactoryFilter.getTBSAdapterFactory() != null &&
-			adapterFactoryFilter.getWPBSAdapterFactory() != null;
-		}
-		return filter != null;
-	}
 
 	/**
 	 * Gets all breakdown elements or their wrappers for the activity of this
@@ -312,23 +296,19 @@ public class ActivityDetailDiagramImpl extends DiagramImpl implements
 	 */
 	Collection getAllBreakdownElements(boolean filterSuppressed) {
 		ArrayList breakdownElements = new ArrayList();
-		AdapterFactory[] adapterFactories = null;
+		AdapterFactory[] adapterFactories;
 		if (filter instanceof IAdapterFactoryFilter) {
 			IAdapterFactoryFilter adapterFactoryFilter = (IAdapterFactoryFilter) filter;
-			// make sure the filter is valid
-			if(isValid(adapterFactoryFilter)) {
-				adapterFactories = new AdapterFactory[] {
-						adapterFactoryFilter.getWBSAdapterFactory(),
-						adapterFactoryFilter.getTBSAdapterFactory(),
-						adapterFactoryFilter.getWPBSAdapterFactory() };
-			}
-		}
-		if(adapterFactories == null) {
+			adapterFactories = new AdapterFactory[] {
+					adapterFactoryFilter.getWBSAdapterFactory(),
+					adapterFactoryFilter.getTBSAdapterFactory(),
+					adapterFactoryFilter.getWPBSAdapterFactory() };
+		} else {
 			adapterFactories = DEFAULT_ADAPTER_FACTORIES;
 		}
 		if (wrapper != null) {
-			List<?> wrappers = ProcessUtil.getWrappers(wrapper, adapterFactories);
-			for (Iterator<?> iter = wrappers.iterator(); iter.hasNext();) {
+			List wrappers = ProcessUtil.getWrappers(wrapper, adapterFactories);
+			for (Iterator iter = wrappers.iterator(); iter.hasNext();) {
 				BreakdownElementWrapperItemProvider w = (BreakdownElementWrapperItemProvider) iter
 						.next();
 				extractChildren(w, w, breakdownElements, filterSuppressed);
@@ -433,68 +413,55 @@ public class ActivityDetailDiagramImpl extends DiagramImpl implements
 				super.populateNodes();
 			}
 
-			if (!isValid(filter)) {
+			if (filter == null) {
 				filter = ((ConfigurableComposedAdapterFactory) DEFAULT_ADAPTER_FACTORIES[0])
 						.getFilter();
 			}
 
 			// Node newNode = null;
-			ArrayList<Node> nodes = new ArrayList<Node>();
-			Collection<?> breakdownElements = getAllBreakdownElements(true);
-			Collection<RoleDescriptor> roleDescriptors = new HashSet<RoleDescriptor>();
-			for (Iterator<?> iterator = breakdownElements.iterator(); iterator
+			ArrayList nodes = new ArrayList();
+			Collection breakdownElements = getAllBreakdownElements(true);
+			Collection roleDescriptors = new HashSet();
+			for (Iterator iterator = breakdownElements.iterator(); iterator
 					.hasNext();) {
 				Object object = iterator.next();
 				Object element = TngUtil.unwrap(object);
 				if (element instanceof TaskDescriptor) {
 					TaskDescriptor descriptor = (TaskDescriptor) element;
-					List<RoleDescriptor> performers = descriptor
+					RoleDescriptor roleDescriptor = descriptor
 							.getPerformedPrimarilyBy();
-					for (RoleDescriptor roleDescriptor : performers)	{
-						if (roleDescriptor != null
-								&& filter.accept(roleDescriptor)
-								// TODO: need to check if the role descriptor is
-								// inherited and locally suppressed
-								// if locally suppressed, check the wrapper of the
-								// role descriptor
-								//
-								&& !roleDescriptor.getSuppressed().booleanValue()
-								&& !roleDescriptors.contains(roleDescriptor)) {
-							roleDescriptors.add(roleDescriptor);
-							// newNode = createRoleTaskComposite(roleDescriptor);
-							// if(newNode != null) {
-							// if(ProcessUtil.isInherited(object)) {
-							// // task descriptor is inherited, its primary
-							// performer is not local
-							// // set role node of the RoleTaskComposite to
-							// read-only
-							// //
-							// Node roleNode = (Node)
-							// ((NodeContainer)newNode).getNodes().get(0);
-							// roleNode.setReadOnly(true);
-							// }
-							// nodes.add(newNode);
-							// }
-							createRoleTaskCompositeRows(roleDescriptor, object,
-									nodes);
-						}
-//						if (roleDescriptors.contains(roleDescriptor)) {
-//							createTaskInputOutputNodes(descriptor, nodes);
-//						}
-					}					
-				}
-			}
-			
-			for (Node node : new ArrayList<Node>(nodes)) {
-				if(node instanceof RoleTaskComposite) {
-					for(Node childNode : ((RoleTaskComposite) node).getNodes()) {
-						if(childNode instanceof TaskNode) {
-							createTaskInputOutputNodes((TaskNode) childNode, nodes);
-						}
+					if (roleDescriptor != null
+							&& filter.accept(roleDescriptor)
+							// TODO: need to check if the role descriptor is
+							// inherited and locally suppressed
+							// if locally suppressed, check the wrapper of the
+							// role descriptor
+							//
+							&& !roleDescriptor.getSuppressed().booleanValue()
+							&& !roleDescriptors.contains(roleDescriptor)) {
+						roleDescriptors.add(roleDescriptor);
+						// newNode = createRoleTaskComposite(roleDescriptor);
+						// if(newNode != null) {
+						// if(ProcessUtil.isInherited(object)) {
+						// // task descriptor is inherited, its primary
+						// performer is not local
+						// // set role node of the RoleTaskComposite to
+						// read-only
+						// //
+						// Node roleNode = (Node)
+						// ((NodeContainer)newNode).getNodes().get(0);
+						// roleNode.setReadOnly(true);
+						// }
+						// nodes.add(newNode);
+						// }
+						createRoleTaskCompositeRows(roleDescriptor, object,
+								nodes);
+					}
+					if (roleDescriptors.contains(roleDescriptor)) {
+						createTaskInputOutputNodes(descriptor, nodes);
 					}
 				}
 			}
-
 			selectNodes(nodes);
 		} finally {
 			notificationEnabled = oldNotify;
@@ -611,13 +578,12 @@ public class ActivityDetailDiagramImpl extends DiagramImpl implements
 				if (child instanceof WorkProductComposite) {
 					// WorkProductComposite workproductComposite =
 					// (WorkProductComposite) child.getObject();
-					WorkProductCompositeImpl workproductComposite = (WorkProductCompositeImpl) child;
+					WorkProductComposite workproductComposite = (WorkProductComposite) child;
 					if (workproductComposite.getType() == WorkProductComposite.INPUTS) {
 						Object object = workproductComposite.getObject();
 						if (object instanceof TaskDescriptor) {
-//							Node node = GraphicalDataHelper.findNode(this,
-//									object, TaskNode.class);
-							TaskNode node = workproductComposite.getTaskNode();
+							Node node = GraphicalDataHelper.findNode(this,
+									object, TaskNode.class);
 							if(node != null && GraphicalDataHelper.findLink(child, object) == null) {
 								Link link = ModelFactory.eINSTANCE.createLink();
 								link.setSource(child);
@@ -631,9 +597,8 @@ public class ActivityDetailDiagramImpl extends DiagramImpl implements
 					if (workproductComposite.getType() == WorkProductComposite.OUTPUTS) {
 						Object object = workproductComposite.getObject();
 						if (object instanceof TaskDescriptor) {
-//							Node node = GraphicalDataHelper.findNode(this,
-//									object, TaskNode.class);
-							TaskNode node = workproductComposite.getTaskNode();
+							Node node = GraphicalDataHelper.findNode(this,
+									object, TaskNode.class);
 							if(node != null && GraphicalDataHelper.findLink(node, object) == null) {
 								Link link = ModelFactory.eINSTANCE.createLink();
 								link.setSource(node);
@@ -697,7 +662,8 @@ public class ActivityDetailDiagramImpl extends DiagramImpl implements
 	public WorkProductComposite createWorkProductComposite(
 			TaskDescriptor taskDescriptor, int type) {
 		WorkProductComposite workproductComposite = null;
-		for (Node element : getNodes()) {
+		for (Iterator iter = getNodes().iterator(); iter.hasNext();) {
+			Node element = (Node) iter.next();
 			if (element instanceof WorkProductComposite) {
 				WorkProductComposite wpc = (WorkProductComposite) element;
 				if(wpc.getLinkedElement() == taskDescriptor && wpc.getType() == type) {					
@@ -714,38 +680,6 @@ public class ActivityDetailDiagramImpl extends DiagramImpl implements
 		workproductComposite.setUMAContainer(getGraphNode());
 		workproductComposite.setDiagram(this);
 		workproductComposite.setObject(taskDescriptor);
-		setState(type, workproductComposite);
-		return workproductComposite;
-	}
-
-	public WorkProductComposite createWorkProductComposite(
-			TaskNode taskNode, int type) {
-		TaskDescriptor taskDescriptor = (TaskDescriptor) taskNode.getLinkedElement();
-		// find existing WorkProductComposite for the given TaskNode
-		//
-		List<Link> links = type == WorkProductComposite.OUTPUTS ? taskNode.getOutgoingConnections() : taskNode.getIncomingConnections();
-		WorkProductComposite workproductComposite = null;
-		for (Link link : links) {
-			Node node = type == WorkProductComposite.OUTPUTS ? link.getTarget() : link.getSource();
-			if(node instanceof WorkProductComposite) {
-				WorkProductComposite wpc = (WorkProductComposite) node;
-				if(wpc.getLinkedElement() == taskDescriptor && wpc.getType() == type) {					
-					workproductComposite = wpc;
-					break;
-				}				
-			}
-		}
-		if(workproductComposite == null) {
-			workproductComposite = ModelFactory.eINSTANCE
-			.createWorkProductComposite();
-			workproductComposite.setType(type);
-			((WorkProductCompositeImpl) workproductComposite).setTaskNode(taskNode);
-		}
-		workproductComposite.setUMAContainer(getGraphNode());
-		workproductComposite.setDiagram(this);
-		workproductComposite.setObject(taskDescriptor);
-		
-		setState(type, workproductComposite);
 		return workproductComposite;
 	}
 
@@ -806,27 +740,24 @@ public class ActivityDetailDiagramImpl extends DiagramImpl implements
 	 * @see org.eclipse.epf.diagram.model.impl.DiagramImpl#addNode(java.lang.Object)
 	 */
 	protected Node addNode(Object obj) {
-		if (!isValid(filter)) {
+		if (filter == null) {
 			filter = ((ConfigurableComposedAdapterFactory) DEFAULT_ADAPTER_FACTORIES[0])
 					.getFilter();
 		}
+		if (obj instanceof TaskDescriptor
+				&& !filter.accept(((TaskDescriptor) obj)
+						.getPerformedPrimarilyBy()))
+			return null;
 		Node node = null;
 		if (obj instanceof TaskDescriptor) {
-			List<RoleDescriptor> descList = ((TaskDescriptor) obj).getPerformedPrimarilyBy();
-			find_node:
-			for (RoleDescriptor roleDescriptor : descList)	{
-				if (filter.accept(roleDescriptor)) {
-					node = findNode(this, roleDescriptor);
-					if (node == null) {
-						node = createRoleTaskComposite(roleDescriptor);
-						getNodes().add(node);
-					} else {
-						node = super.addNode(getNodes(), obj);
-					}
-					if(node != null) {
-						break find_node;
-					}
-				}
+			RoleDescriptor roleDescriptor = ((TaskDescriptor) obj)
+					.getPerformedPrimarilyBy();
+			node = findNode(this, roleDescriptor);
+			if (node == null) {
+				node = createRoleTaskComposite(roleDescriptor);
+				getNodes().add(node);
+			} else {
+				node = super.addNode(getNodes(), obj);
 			}
 		} else {
 			node = super.addNode(getNodes(), obj);
@@ -880,9 +811,9 @@ public class ActivityDetailDiagramImpl extends DiagramImpl implements
 			System.out
 					.println("ActivityDetailDiagram.addToUmaModel(): WorkBreakdownElement index: " + i); //$NON-NLS-1$
 			if (i == -1) {
-				act.getBreakdownElements().add((BreakdownElement) addedNode.getObject());
+				act.getBreakdownElements().add(addedNode.getObject());
 			} else {
-				act.getBreakdownElements().add(i, (BreakdownElement) addedNode.getObject());
+				act.getBreakdownElements().add(i, addedNode.getObject());
 			}
 		}
 
@@ -938,22 +869,6 @@ public class ActivityDetailDiagramImpl extends DiagramImpl implements
 			nodes.add(newNode);
 		}
 	}
-	
-	public void createTaskInputOutputNodes(TaskNode taskNode, Collection nodes) {
-		TaskDescriptor descriptor = (TaskDescriptor) taskNode.getLinkedElement();
-		Node newNode = null;
-		if (!descriptor.getMandatoryInput().isEmpty()) {
-			newNode = createWorkProductComposite(taskNode,
-					WorkProductComposite.INPUTS);
-			nodes.add(newNode);
-		}
-		if (!descriptor.getOutput().isEmpty()) {
-			newNode = createWorkProductComposite(taskNode,
-					WorkProductComposite.OUTPUTS);
-			nodes.add(newNode);
-		}		
-	}
-	
 	/* (non-Javadoc)
 	 * @see org.eclipse.epf.diagram.model.impl.DiagramImpl#setNew(boolean)
 	 */
@@ -971,47 +886,43 @@ public class ActivityDetailDiagramImpl extends DiagramImpl implements
 	public void moveNode(Object movedObject, int position, Object oldPosition) {
 		if(!(movedObject instanceof TaskDescriptor))
 			return;
-		TaskDescriptor taskDescriptor = (TaskDescriptor) movedObject;
-		List<RoleDescriptor> descList = ((TaskDescriptor) movedObject)
-				.getPerformedPrimarilyBy();
-		find_node:
-		for (RoleDescriptor roleDescriptor : descList) {
-			if (filter.accept(roleDescriptor)) {
-				Node roleNode = findNode(this, roleDescriptor);
-				if (roleNode != null) {
-					int oldPos = 0;
-					if (oldPosition instanceof Integer) {
-						oldPos = ((Integer) oldPosition).intValue();
-					}
-					TaskNode taskNode = (TaskNode) GraphicalDataHelper
-							.findNode((NodeContainer) roleNode, taskDescriptor,
-									TaskNode.class);
-
-					// move up
-					if (oldPos > position) {
-						int i = taskNode.getIndex();
-						Node prevNode = findTaskNode(
-								(RoleTaskComposite) roleNode, i - 1);
-						if (prevNode != null) {
-							taskNode.setIndex(i - 1);
-							((TaskNode) prevNode).setIndex(i);
-						}
-
-					} else {
-						// move down
-						int i = taskNode.getIndex();
-						Node nextNode = findTaskNode(
-								(RoleTaskComposite) roleNode, i + 1);
-						if (nextNode != null) {
-							taskNode.setIndex(i + 1);
-							((TaskNode) nextNode).setIndex(i);
-						}
-					}
-					
-					break find_node;
-				}
+		TaskDescriptor taskDescriptor = (TaskDescriptor)movedObject;
+		
+		if (!filter.accept(taskDescriptor.getPerformedPrimarilyBy()))
+			return;
+		
+		RoleDescriptor roleDescriptor = ((TaskDescriptor) movedObject)
+											.getPerformedPrimarilyBy();
+		Node roleNode = findNode(this, roleDescriptor);
+		if(roleNode == null) return;
+		
+		int oldPos = 0;
+		if(oldPosition instanceof Integer){
+			oldPos = ((Integer)oldPosition).intValue();
+		}
+		TaskNode taskNode = (TaskNode)GraphicalDataHelper.findNode(
+				(NodeContainer)roleNode, taskDescriptor,
+				TaskNode.class);
+		
+		//move up
+		if(oldPos > position){
+			int i = taskNode.getIndex();
+			Node prevNode = findTaskNode((RoleTaskComposite)roleNode, i-1);
+			if(prevNode != null){
+				taskNode.setIndex(i-1);
+				((TaskNode)prevNode).setIndex(i);
+			}
+			
+		}else{
+			// move down
+			int i = taskNode.getIndex();
+			Node nextNode = findTaskNode((RoleTaskComposite)roleNode, i+1);
+			if(nextNode != null){
+				taskNode.setIndex(i+1);
+				((TaskNode)nextNode).setIndex(i);
 			}
 		}
+		
 	}
 	
 	private Node findTaskNode(RoleTaskComposite container, int index) {
@@ -1039,50 +950,6 @@ public class ActivityDetailDiagramImpl extends DiagramImpl implements
 			}
 		}
 		return list;
-	}
-	
-	private void setState(int type, Node node) {
-		TaskDescriptor td = null;
-		
-		if (node instanceof WorkProductComposite) {
-			td = (TaskDescriptor)((WorkProductComposite)node).getLinkedElement();
-		}
-		
-		if (node instanceof NodeContainer) {
-			for (Node element : ((NodeContainer)node).getNodes()) {
-				if (element instanceof WorkProductDescriptorNode) {
-					WorkProductDescriptorNode wpNode = (WorkProductDescriptorNode) element;
-					MethodElement methodElement = wpNode.getLinkedElement();
-					if (methodElement instanceof WorkProductDescriptor){
-						String stateText = null;
-
-						boolean useNewWorkproductState = DiagramModelPreference.getUseStateOnWorkproduct();
-						if (useNewWorkproductState) {
-							WorkProductDescriptor wpd = (WorkProductDescriptor)methodElement;
-							EReference ref = null;
-							
-							if (type == WorkProductComposite.INPUTS) {
-								ref = UmaPackage.eINSTANCE.getTaskDescriptor_MandatoryInput();
-							} else if (type == WorkProductComposite.OUTPUTS) {
-								ref = UmaPackage.eINSTANCE.getTaskDescriptor_Output();
-							}
-							
-							List<Constraint> states = TaskDescriptorPropUtil.getTaskDescriptorPropUtil().getWpStates(td, wpd, ref);
-							if (states.size() > 0) {
-								stateText = states.get(0).getBody();
-							}							
-						} else {
-							if (type == WorkProductComposite.INPUTS)
-								stateText = ((WorkProductDescriptor) methodElement).getActivityEntryState();
-							else if (type == WorkProductComposite.OUTPUTS)
-								stateText = ((WorkProductDescriptor) methodElement).getActivityExitState();							
-						}
-						
-						wpNode.setState(stateText);
-					}					
-				}
-			}	
-		}
 	}
 	
 } // ActivityDetailDiagramImpl

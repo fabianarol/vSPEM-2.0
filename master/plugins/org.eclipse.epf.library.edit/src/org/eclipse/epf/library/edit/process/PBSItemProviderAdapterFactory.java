@@ -29,6 +29,14 @@ public class PBSItemProviderAdapterFactory extends ItemProviderAdapterFactory {
 		return new PBSActivityItemProvider(this);
 	}
 
+	public Adapter createvpActivityAdapter() {
+		return createActivityAdapter();
+	}
+	
+	public Adapter createVarActivityAdapter() {
+		return createActivityAdapter();
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -37,6 +45,22 @@ public class PBSItemProviderAdapterFactory extends ItemProviderAdapterFactory {
 	public Adapter createMilestoneAdapter() {
 		return new PBSMilestoneItemProvider(this, (ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
 				.createMilestoneAdapter());
+		
+
+	}
+	
+	public Adapter createVarMilestoneAdapter() {
+		return new PBSMilestoneItemProvider(this, (ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
+				.createVarMilestoneAdapter());
+		
+//		return createMilestoneAdapter();
+	}
+	
+	public Adapter createvpMilestoneAdapter() {
+		return new PBSMilestoneItemProvider(this, (ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
+				.createvpMilestoneAdapter());
+		
+//		return createMilestoneAdapter();
 	}
 
 	/*
@@ -47,6 +71,14 @@ public class PBSItemProviderAdapterFactory extends ItemProviderAdapterFactory {
 	public Adapter createIterationAdapter() {
 		return createActivityAdapter();
 	}
+	
+	public Adapter createvpIterationAdapter() {
+		return createActivityAdapter();
+	}
+	
+	public Adapter createVarIterationAdapter() {
+		return createActivityAdapter();
+	}
 
 	/*
 	 * (non-Javadoc)
@@ -54,6 +86,14 @@ public class PBSItemProviderAdapterFactory extends ItemProviderAdapterFactory {
 	 * @see org.eclipse.epf.uma.util.BreakdownAdapterFactory#createPhaseAdapter()
 	 */
 	public Adapter createPhaseAdapter() {
+		return createActivityAdapter();
+	}
+	
+	public Adapter createvpPhaseAdapter() {
+		return createActivityAdapter();
+	}
+	
+	public Adapter createVarPhaseAdapter() {
 		return createActivityAdapter();
 	}
 

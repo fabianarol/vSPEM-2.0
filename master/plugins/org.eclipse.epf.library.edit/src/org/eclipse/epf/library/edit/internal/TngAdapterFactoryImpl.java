@@ -17,16 +17,12 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExtension;
-import org.eclipse.core.runtime.IExtensionPoint;
-import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.Notifier;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.edit.command.CommandParameter;
 import org.eclipse.emf.edit.domain.EditingDomain;
@@ -41,19 +37,14 @@ import org.eclipse.emf.edit.provider.IStructuredItemContentProvider;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
 import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 import org.eclipse.emf.edit.provider.ReflectiveItemProviderAdapterFactory;
-import org.eclipse.epf.common.preferences.IPreferenceStoreWrapper;
-import org.eclipse.epf.common.preferences.IPropertyChangeEventWrapper;
-import org.eclipse.epf.common.preferences.IPropertyChangeListenerWrapper;
-import org.eclipse.epf.common.utils.ExtensionHelper;
+import org.eclipse.epf.common.plugin.AbstractPlugin;
 import org.eclipse.epf.library.edit.IConfigurable;
 import org.eclipse.epf.library.edit.IConfigurator;
 import org.eclipse.epf.library.edit.IFilter;
 import org.eclipse.epf.library.edit.ILibraryItemProvider;
-import org.eclipse.epf.library.edit.LibraryEditPlugin;
+import org.eclipse.epf.library.edit.IWrapper;
 import org.eclipse.epf.library.edit.Providers;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
-import org.eclipse.epf.library.edit.configuration.PracticeItemProvider;
-import org.eclipse.epf.library.edit.configuration.PracticeSubgroupItemProvider;
 import org.eclipse.epf.library.edit.process.OBSItemProviderAdapterFactory;
 import org.eclipse.epf.library.edit.process.PBSItemProviderAdapterFactory;
 import org.eclipse.epf.library.edit.process.WBSItemProviderAdapterFactory;
@@ -65,13 +56,14 @@ import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.library.edit.util.Suppression;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.uma.Activity;
-import org.eclipse.epf.uma.ContentCategory;
 import org.eclipse.epf.uma.ContentElement;
 import org.eclipse.epf.uma.CustomCategory;
 import org.eclipse.epf.uma.Milestone;
 import org.eclipse.epf.uma.TaskDescriptor;
 import org.eclipse.epf.uma.TeamProfile;
-import org.osgi.framework.Bundle;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 
 /**
  * The default method library adapter factory implementation.
@@ -80,16 +72,7 @@ import org.osgi.framework.Bundle;
  * @since 1.0
  */
 public class TngAdapterFactoryImpl implements TngAdapterFactory {
-	public static final TngAdapterFactory createAdapterFactoryProvider() {
-		Object provider = ExtensionHelper.create(TngAdapterFactory.class, null);
-		return provider instanceof TngAdapterFactory ? (TngAdapterFactory) provider : new TngAdapterFactoryImpl();
-//		return new TngAdapterFactoryImpl();
-	}
 	
-	private static final String WBS_ADAPTER_FACTORY_ID = "wbs"; //$NON-NLS-1$
-	private static final String LIBRARY_ADAPTER_FACTORY_ID = "library"; //$NON-NLS-1$
-	private static final String CONFIGURATION_ADAPTER_FACTORY_ID = "configuration"; //$NON-NLS-1$
-
 	private ExposedAdapterFactory wbsAdapterFactory = null;
 
 	private ExposedAdapterFactory obsAdapterFactory = null;
@@ -177,10 +160,7 @@ public class TngAdapterFactoryImpl implements TngAdapterFactory {
 
 	private AdapterFactory[] getWBS_AdapterFactories() {
 		if (wbsAdapterFactories == null) {
-			AdapterFactory factory = createAdapterFactoryFromExtension(WBS_ADAPTER_FACTORY_ID);
-			if(factory == null) {
-				factory = new WBSItemProviderAdapterFactory();
-			}
+			WBSItemProviderAdapterFactory factory = new WBSItemProviderAdapterFactory();
 			wbsAdapterFactories = new AdapterFactory[] {
 			// new ResourceItemProviderAdapterFactory(),
 					factory,
@@ -223,15 +203,10 @@ public class TngAdapterFactoryImpl implements TngAdapterFactory {
 		if (navigatorAdapterFactory == null) {
 			synchronized (this) {
 				if (navigatorAdapterFactory == null) {
-					AdapterFactory factory = createAdapterFactoryFromExtension(LIBRARY_ADAPTER_FACTORY_ID);
-					if (factory == null) {
-						factory = new org.eclipse.epf.library.edit.navigator.ItemProviderAdapterFactory();
-					}
 					navigatorAdapterFactory = new ExposedAdapterFactory(
 							new AdapterFactory[] {
-									// new
-									// ResourceItemProviderAdapterFactory(),
-									factory,
+									// new ResourceItemProviderAdapterFactory(),
+									new org.eclipse.epf.library.edit.navigator.ItemProviderAdapterFactory(),
 									new ReflectiveItemProviderAdapterFactory() });
 				}
 			}
@@ -264,14 +239,10 @@ public class TngAdapterFactoryImpl implements TngAdapterFactory {
 		if (configurationAdapterFactory == null) {
 			synchronized (this) {
 				if (configurationAdapterFactory == null) {
-					AdapterFactory factory = createAdapterFactoryFromExtension(CONFIGURATION_ADAPTER_FACTORY_ID);
-					if(factory == null) {
-						factory = new org.eclipse.epf.library.edit.configuration.ItemProviderAdapterFactory();
-					}
 					configurationAdapterFactory = new ExposedAdapterFactory(
 							new AdapterFactory[] {
 									// new ResourceItemProviderAdapterFactory(),
-									factory,
+									new org.eclipse.epf.library.edit.configuration.ItemProviderAdapterFactory(),
 									new ReflectiveItemProviderAdapterFactory() });
 				}
 			}
@@ -290,7 +261,7 @@ public class TngAdapterFactoryImpl implements TngAdapterFactory {
 				getConfigurationView_ComposedAdapterFactory(), filter);
 	}
 
-	protected static class FilterItemProvider implements Adapter,
+	private static class FilterItemProvider implements Adapter,
 			IStructuredItemContentProvider, ITreeItemContentProvider,
 			IItemLabelProvider, IItemPropertySource {
 		private static final HashSet<Class<?>> CLASSES_EXCLUDED_FROM_SORTING = new HashSet<Class<?>>();
@@ -300,7 +271,6 @@ public class TngAdapterFactoryImpl implements TngAdapterFactory {
 			CLASSES_EXCLUDED_FROM_SORTING.add(CustomCategory.class);
 			CLASSES_EXCLUDED_FROM_SORTING.add(TaskDescriptor.class);
 			CLASSES_EXCLUDED_FROM_SORTING.add(TeamProfile.class);
-			CLASSES_EXCLUDED_FROM_SORTING.add(PracticeSubgroupItemProvider.class);
 		}
 
 		private ItemProviderAdapter adapter;
@@ -309,7 +279,7 @@ public class TngAdapterFactoryImpl implements TngAdapterFactory {
 
 		private boolean isAdapterConfigurable;
 
-		protected FilterItemProvider(ItemProviderAdapter adapter, IFilter filter) {
+		FilterItemProvider(ItemProviderAdapter adapter, IFilter filter) {
 			this.adapter = adapter;
 			this.filter = filter;
 			if (adapter instanceof IConfigurable) {
@@ -317,10 +287,6 @@ public class TngAdapterFactoryImpl implements TngAdapterFactory {
 				((IConfigurable) adapter).setFilter(filter);
 			}
 
-		}
-		
-		public ItemProviderAdapter getAdapter() {
-			return adapter;
 		}
 
 		/*
@@ -365,15 +331,6 @@ public class TngAdapterFactoryImpl implements TngAdapterFactory {
 		 * @see org.eclipse.emf.edit.provider.IEditingDomainItemProvider#getChildren(java.lang.Object)
 		 */
 		public Collection<?> getChildren(Object object) {
-			Collection<?> children = getChildren_(object);
-			if (filter instanceof IConfigurator) {
-				IConfigurator configurator = (IConfigurator) filter;
-				children = configurator.getModifiedChildren(object, children);
-			}
-			return children;
-		}
-		
-		private Collection<?> getChildren_(Object object) {
 			List<Object> children = null;
 			fake_loop: do {
 				
@@ -386,16 +343,27 @@ public class TngAdapterFactoryImpl implements TngAdapterFactory {
 					IConfigurator configurator = (IConfigurator) filter;
 					children = new ArrayList<Object>();
 					boolean replaceChildren = false;
-					for (Iterator<?> iter = ((ILibraryItemProvider) adapter)
+					for (Iterator iter = ((ILibraryItemProvider) adapter)
 							.getChildrenFeatures(object).iterator(); iter
 							.hasNext();) {
 						EStructuralFeature feature = (EStructuralFeature) iter
 								.next();
-						Collection<?> otherChildren = configurator.getChildren(
+						Collection otherChildren = configurator.getChildren(
 								object, feature);
 						if (otherChildren != null) {
 							replaceChildren = true;
-							children.addAll(otherChildren);
+							if (adapter instanceof IWrapper) {
+								IWrapper wrapper = (IWrapper) adapter;
+								for (Iterator iterator = otherChildren
+										.iterator(); iterator.hasNext();) {
+									Object child = iterator.next();
+									children.add(wrapper.wrap((EObject) object,
+											feature, child,
+											CommandParameter.NO_INDEX));
+								}
+							} else {
+								children.addAll(otherChildren);
+							}
 						}
 					}
 					if (replaceChildren) {
@@ -403,14 +371,18 @@ public class TngAdapterFactoryImpl implements TngAdapterFactory {
 					}
 				} 
 				if (isAdapterConfigurable) {
-					Collection<?> collection = adapter.getChildren(object);
-					children = new ArrayList<Object>(collection);
+					Collection collection = adapter.getChildren(object);
+					if (collection instanceof List) {
+						children = (List) collection;
+					} else {
+						children = new ArrayList(collection);
+					}
 					break fake_loop;
 				}
 				
 				// regular adapter
-				children = new ArrayList<Object>(adapter.getChildren(object));
-				for (Iterator<?> iter = children.iterator(); iter.hasNext();) {
+				children = new ArrayList(adapter.getChildren(object));
+				for (Iterator iter = children.iterator(); iter.hasNext();) {
 					Object element = (Object) iter.next();
 					if (!filter.accept(element)) {
 						iter.remove();
@@ -418,15 +390,10 @@ public class TngAdapterFactoryImpl implements TngAdapterFactory {
 				}
 			} while (false);
 
-			if (adapter instanceof PracticeItemProvider) {
-				return ((PracticeItemProvider) adapter).getModifiedChildren(object, children);
-			}
-			
 			// alphabetically sort the children
 			//
-			Object uObj = TngUtil.unwrap(object);
-			if (!TngUtil.isInstanceOf(CLASSES_EXCLUDED_FROM_SORTING, uObj) &&
-					!(uObj instanceof ContentCategory)) {
+			if (!TngUtil.isInstanceOf(CLASSES_EXCLUDED_FROM_SORTING, TngUtil
+					.unwrap(object))) {
 				Collections.sort(children,
 						Comparators.PRESENTATION_NAME_COMPARATOR);
 			}
@@ -486,9 +453,6 @@ public class TngAdapterFactoryImpl implements TngAdapterFactory {
 		 * @see org.eclipse.emf.edit.provider.ITreeItemContentProvider#hasChildren(java.lang.Object)
 		 */
 		public boolean hasChildren(Object object) {
-			if (object instanceof TaskDescriptor) {
-				return false;
-			}
 			if (filter instanceof IConfigurator
 					&& adapter instanceof ILibraryItemProvider) {
 				// always return true to improve performance
@@ -553,7 +517,7 @@ public class TngAdapterFactoryImpl implements TngAdapterFactory {
 
 	}
 
-	protected static class FilterAdapterFactory implements AdapterFactory,
+	private static class FilterAdapterFactory implements AdapterFactory,
 			IChangeNotifier, IDisposable {
 
 		private ComposedAdapterFactory adapterFactory;
@@ -738,8 +702,9 @@ public class TngAdapterFactoryImpl implements TngAdapterFactory {
 	 */
 	public ComposedAdapterFactory createProcessComposedAdapterFactory() {
 		org.eclipse.epf.library.edit.process.consolidated.ItemProviderAdapterFactory adapterFactory = new org.eclipse.epf.library.edit.process.consolidated.ItemProviderAdapterFactory();
-		IPreferenceStoreWrapper prefStore = Providers.getAuthoringPluginPreferenceStore();
-		if (prefStore != null) {
+		AbstractPlugin authoringPlugin = Providers.getAuthoringPlugin();
+		if (authoringPlugin != null) {
+			IPreferenceStore prefStore = authoringPlugin.getPreferenceStore();
 			adapterFactory.setColumnIndexToNameMap(ProcessUtil
 					.toColumnIndexToNameMap(prefStore
 							.getString(LibraryEditConstants.PREF_WBS_COLUMNS)));
@@ -751,44 +716,6 @@ public class TngAdapterFactoryImpl implements TngAdapterFactory {
 		return new ExposedAdapterFactory(adapterFactories);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.ibm.library.edit.TngAdapterFactory#createLibraryComposedAdapterFactory()
-	 */
-	public ComposedAdapterFactory createLibraryComposedAdapterFactory() {
-		AdapterFactory factory = createAdapterFactoryFromExtension(LIBRARY_ADAPTER_FACTORY_ID);
-		if (factory == null) {
-			factory = new org.eclipse.epf.library.edit.navigator.ItemProviderAdapterFactory();
-		}
-		return new ExposedAdapterFactory(
-				new AdapterFactory[] {
-						// new
-						// ResourceItemProviderAdapterFactory(),
-						factory,
-						new ReflectiveItemProviderAdapterFactory() });
-
-	}
-	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.ibm.library.edit.TngAdapterFactory#createLibraryComposedAdapterFactory()
-	 */
-	public ComposedAdapterFactory createConfigPage_LibraryComposedAdapterFactory() {
-//		AdapterFactory factory = createAdapterFactoryFromExtension(LIBRARY_ADAPTER_FACTORY_ID);
-//		if (factory == null) {
-		AdapterFactory	factory = new org.eclipse.epf.library.edit.navigator.ConfigPageItemProviderAdapterFactory();
-//		}
-		return new ExposedAdapterFactory(
-				new AdapterFactory[] {
-						// new
-						// ResourceItemProviderAdapterFactory(),
-						factory,
-						new ReflectiveItemProviderAdapterFactory() });
-
-	}
-	
 	// Section for TNG Filter modification process.
 	// filter modification code. Similar to getFilterView_AdapterFactory(IFilter
 	// filter)
@@ -867,7 +794,7 @@ public class TngAdapterFactoryImpl implements TngAdapterFactory {
 			synchronized (this) {
 				if (procAdapterFactory == null) {
 					org.eclipse.epf.library.edit.process.consolidated.ItemProviderAdapterFactory adapterFactory = new org.eclipse.epf.library.edit.process.consolidated.ItemProviderAdapterFactory();
-					final IPreferenceStoreWrapper prefStore = Providers.getPreferenceStore();
+					final IPreferenceStore prefStore = Providers.getPreferenceStore();
 					if (prefStore != null) {
 						adapterFactory
 								.setColumnIndexToNameMap(ProcessUtil
@@ -879,9 +806,9 @@ public class TngAdapterFactoryImpl implements TngAdapterFactory {
 						// and add listener to its change
 						//
 						Suppression.setAutoInheritSuppressionStates(prefStore.getBoolean(LibraryEditConstants.PREF_INHERIT_SUPPRESSION_STATE));
-						prefStore.addPropertyChangeListener(new IPropertyChangeListenerWrapper() {
+						prefStore.addPropertyChangeListener(new IPropertyChangeListener() {
 
-							public void propertyChange(IPropertyChangeEventWrapper event) {
+							public void propertyChange(PropertyChangeEvent event) {
 								if(LibraryEditConstants.PREF_INHERIT_SUPPRESSION_STATE.equals(event.getProperty())) {
 									Suppression.setAutoInheritSuppressionStates(prefStore.getBoolean(LibraryEditConstants.PREF_INHERIT_SUPPRESSION_STATE));
 								}
@@ -956,13 +883,15 @@ public class TngAdapterFactoryImpl implements TngAdapterFactory {
 			// remove adapter factory as property change listener from
 			// preference store
 			//
-			IPreferenceStoreWrapper prefStore = Providers.getAuthoringPluginPreferenceStore();
-			if (prefStore != null) {
+			AbstractPlugin authoringPlugin = Providers.getAuthoringPlugin();
+			if (authoringPlugin != null) {
+				IPreferenceStore prefStore = authoringPlugin
+						.getPreferenceStore();
 				for (int i = 0; i < procAdapterFactories.length; i++) {
 					Object adapterFactory = procAdapterFactories[i];
-					if (adapterFactory instanceof IPropertyChangeListenerWrapper) {
+					if (adapterFactory instanceof IPropertyChangeListener) {
 						prefStore
-								.removePropertyChangeListener((IPropertyChangeListenerWrapper) adapterFactory);
+								.removePropertyChangeListener((IPropertyChangeListener) adapterFactory);
 					}
 				}
 			}
@@ -1043,41 +972,6 @@ public class TngAdapterFactoryImpl implements TngAdapterFactory {
 		if (procAdapterFactory != null) {
 			procAdapterFactory.cleanUp();
 		}
-	}
-
-	private static AdapterFactory createAdapterFactoryFromExtension(String id) {
-		// Process the contributors.
-		//
-		IExtensionRegistry extensionRegistry = Platform.getExtensionRegistry();
-		IExtensionPoint extensionPoint = extensionRegistry.getExtensionPoint(LibraryEditPlugin.PLUGIN_ID, "adapterFactories"); //$NON-NLS-1$
-		if (extensionPoint != null) {
-			IExtension[] extensions = extensionPoint.getExtensions();
-			for (int i = 0; i < extensions.length; i++) {
-				IExtension extension = extensions[i];
-				String pluginId = extension.getNamespaceIdentifier();
-				Bundle bundle = Platform.getBundle(pluginId);
-				IConfigurationElement[] configElements = extension
-						.getConfigurationElements();
-				for (int j = 0; j < configElements.length; j++) {
-					IConfigurationElement configElement = configElements[j];
-					try {
-						String factoryId = configElement.getAttribute("id"); //$NON-NLS-1$
-						if(id.equals(factoryId)) {
-							String className = configElement.getAttribute("class"); //$NON-NLS-1$
-							if(className != null) {
-								Object factory = bundle.loadClass(className).newInstance();
-								if(factory instanceof AdapterFactory) {
-									return (AdapterFactory) factory;
-								}
-							}
-						}
-					} catch (Exception e) {
-						LibraryEditPlugin.INSTANCE.log(e);
-					}
-				}
-			}
-		}
-		return null;
 	}
 
 }

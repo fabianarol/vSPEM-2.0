@@ -10,10 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.uma.impl;
 
-import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.epf.uma.Classifier;
 import org.eclipse.epf.uma.UmaPackage;
 
@@ -22,33 +19,17 @@ import org.eclipse.epf.uma.UmaPackage;
  * An implementation of the model object '<em><b>Classifier</b></em>'.
  * <!-- end-user-doc -->
  * <p>
- * The following features are implemented:
- * <ul>
- *   <li>{@link org.eclipse.epf.uma.impl.ClassifierImpl#getIsAbstract <em>Is Abstract</em>}</li>
- * </ul>
  * </p>
  *
  * @generated
  */
 public abstract class ClassifierImpl extends TypeImpl implements Classifier {
 	/**
-	 * The default value of the '{@link #getIsAbstract() <em>Is Abstract</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getIsAbstract()
 	 * @generated
-	 * @ordered
 	 */
-	protected static final Boolean IS_ABSTRACT_EDEFAULT = Boolean.FALSE;
-	/**
-	 * The cached value of the '{@link #getIsAbstract() <em>Is Abstract</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getIsAbstract()
-	 * @generated
-	 * @ordered
-	 */
-	protected Boolean isAbstract = IS_ABSTRACT_EDEFAULT;
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -60,7 +41,7 @@ public abstract class ClassifierImpl extends TypeImpl implements Classifier {
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -68,114 +49,8 @@ public abstract class ClassifierImpl extends TypeImpl implements Classifier {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.CLASSIFIER;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public Boolean getIsAbstract() {
-		return isAbstract;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setIsAbstract(Boolean newIsAbstract) {
-		Boolean oldIsAbstract = isAbstract;
-		isAbstract = newIsAbstract;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					UmaPackage.CLASSIFIER__IS_ABSTRACT, oldIsAbstract,
-					isAbstract));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public Object eGet(int featureID, boolean resolve, boolean coreType) {
-		switch (featureID) {
-		case UmaPackage.CLASSIFIER__IS_ABSTRACT:
-			return getIsAbstract();
-		}
-		return super.eGet(featureID, resolve, coreType);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public void eSet(int featureID, Object newValue) {
-		switch (featureID) {
-		case UmaPackage.CLASSIFIER__IS_ABSTRACT:
-			setIsAbstract((Boolean) newValue);
-			return;
-		}
-		super.eSet(featureID, newValue);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public void eUnset(int featureID) {
-		switch (featureID) {
-		case UmaPackage.CLASSIFIER__IS_ABSTRACT:
-			setIsAbstract(IS_ABSTRACT_EDEFAULT);
-			return;
-		}
-		super.eUnset(featureID);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public boolean eIsSet(int featureID) {
-		//UMA-->
-		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);
-		if (feature != null) {
-			return isFeatureWithOverridenDefaultValueSet(feature);
-		}
-		//UMA<--		
-		switch (featureID) {
-		case UmaPackage.CLASSIFIER__IS_ABSTRACT:
-			return IS_ABSTRACT_EDEFAULT == null ? isAbstract != null
-					: !IS_ABSTRACT_EDEFAULT.equals(isAbstract);
-		}
-		return super.eIsSet(featureID);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public String toString() {
-		if (eIsProxy())
-			return super.toString();
-
-		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (isAbstract: "); //$NON-NLS-1$
-		result.append(isAbstract);
-		result.append(')');
-		return result.toString();
 	}
 
 } //ClassifierImpl

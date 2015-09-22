@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.diagram.add.edit.parts;
 
-import org.eclipse.draw2d.GridLayout;
+//import org.eclipse.draw2d.GridLayout;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.LayoutManager;
 import org.eclipse.draw2d.RectangleFigure;
@@ -346,6 +346,6 @@ public class RoleNodeEditPart extends ShapeNodeEditPart {
 	 * @generated
 	 */
 	public static final Font ROLENODENAMEFIGURE_FONT = new Font(Display
-			.getCurrent(), "Arial", 8, SWT.NORMAL); //$NON-NLS-1$
+			.getCurrent(), "Arial", 8, SWT.NORMAL);
 
 }

@@ -22,7 +22,7 @@ import org.eclipse.epf.library.edit.internal.TngAdapterFactoryImpl;
  */
 public interface TngAdapterFactory {
 
-	public static final TngAdapterFactory INSTANCE = TngAdapterFactoryImpl.createAdapterFactoryProvider();
+	public static final TngAdapterFactory INSTANCE = new TngAdapterFactoryImpl();
 	
 	public static final AdapterFactory[] processAdapterFactories = {
 		INSTANCE.getWBS_ComposedAdapterFactory(),
@@ -121,24 +121,6 @@ public interface TngAdapterFactory {
 	 */
 	public ComposedAdapterFactory createPublishingCBSAdapterFactory();
 
-	/**
-	 * Creates a new adapter factory for the library.
-	 * Client is responsible for disposing it after use by calling
-	 * {@linkplain ComposedAdapterFactory#dispose()}
-	 * 
-	 * @return an adapter factory for the library
-	 */
-	public ComposedAdapterFactory createLibraryComposedAdapterFactory();
-	
-	/**
-	 * Creates a new adapter factory for the library to be used in configuration page.
-	 * Client is responsible for disposing it after use by calling
-	 * {@linkplain ComposedAdapterFactory#dispose()}
-	 * 
-	 * @return an adapter factory for the library
-	 */
-	public ComposedAdapterFactory createConfigPage_LibraryComposedAdapterFactory();
-	
 	/**
 	 * Gets the singleton composed adapter factory for the Work Product
 	 * Breakdown Structure editor.

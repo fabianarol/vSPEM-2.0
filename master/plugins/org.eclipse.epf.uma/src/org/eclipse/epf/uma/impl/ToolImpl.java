@@ -36,6 +36,13 @@ import org.eclipse.epf.uma.UmaPackage;
  */
 public class ToolImpl extends ContentCategoryImpl implements Tool {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The cached value of the '{@link #getToolMentors() <em>Tool Mentors</em>}' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -43,7 +50,7 @@ public class ToolImpl extends ContentCategoryImpl implements Tool {
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<ToolMentor> toolMentors;
+	protected EList toolMentors = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -55,7 +62,7 @@ public class ToolImpl extends ContentCategoryImpl implements Tool {
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -63,7 +70,6 @@ public class ToolImpl extends ContentCategoryImpl implements Tool {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.TOOL;
 	}
@@ -73,10 +79,10 @@ public class ToolImpl extends ContentCategoryImpl implements Tool {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<ToolMentor> getToolMentors() {
+	public List getToolMentors() {
 		if (toolMentors == null) {
-			toolMentors = new EObjectResolvingEList<ToolMentor>(
-					ToolMentor.class, this, UmaPackage.TOOL__TOOL_MENTORS);
+			toolMentors = new EObjectResolvingEList(ToolMentor.class, this,
+					UmaPackage.TOOL__TOOL_MENTORS);
 		}
 		return toolMentors;
 	}
@@ -86,7 +92,6 @@ public class ToolImpl extends ContentCategoryImpl implements Tool {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.TOOL__TOOL_MENTORS:
@@ -100,14 +105,11 @@ public class ToolImpl extends ContentCategoryImpl implements Tool {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.TOOL__TOOL_MENTORS:
 			getToolMentors().clear();
-			getToolMentors()
-					.addAll((Collection<? extends ToolMentor>) newValue);
+			getToolMentors().addAll((Collection) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -118,7 +120,6 @@ public class ToolImpl extends ContentCategoryImpl implements Tool {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.TOOL__TOOL_MENTORS:
@@ -133,7 +134,6 @@ public class ToolImpl extends ContentCategoryImpl implements Tool {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);

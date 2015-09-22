@@ -28,7 +28,6 @@ import org.eclipse.epf.uma.Role;
 import org.eclipse.epf.uma.RoleDescriptor;
 import org.eclipse.epf.uma.TaskDescriptor;
 import org.eclipse.epf.uma.UmaPackage;
-import org.eclipse.epf.uma.WorkProduct;
 import org.eclipse.epf.uma.WorkProductDescriptor;
 import org.eclipse.epf.uma.util.AssociationHelper;
 
@@ -42,7 +41,6 @@ import org.eclipse.epf.uma.util.AssociationHelper;
  *   <li>{@link org.eclipse.epf.uma.impl.RoleDescriptorImpl#getRole <em>Role</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.impl.RoleDescriptorImpl#getModifies <em>Modifies</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.impl.RoleDescriptorImpl#getResponsibleFor <em>Responsible For</em>}</li>
- *   <li>{@link org.eclipse.epf.uma.impl.RoleDescriptorImpl#getResponsibleForExclude <em>Responsible For Exclude</em>}</li>
  * </ul>
  * </p>
  *
@@ -51,6 +49,13 @@ import org.eclipse.epf.uma.util.AssociationHelper;
 public class RoleDescriptorImpl extends DescriptorImpl implements
 		RoleDescriptor {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The cached value of the '{@link #getRole() <em>Role</em>}' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -58,7 +63,7 @@ public class RoleDescriptorImpl extends DescriptorImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected Role role;
+	protected Role role = null;
 
 	/**
 	 * The cached value of the '{@link #getResponsibleFor() <em>Responsible For</em>}' reference list.
@@ -68,17 +73,7 @@ public class RoleDescriptorImpl extends DescriptorImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<WorkProductDescriptor> responsibleFor;
-
-	/**
-	 * The cached value of the '{@link #getResponsibleForExclude() <em>Responsible For Exclude</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getResponsibleForExclude()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<WorkProduct> responsibleForExclude;
+	protected EList responsibleFor = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -90,7 +85,7 @@ public class RoleDescriptorImpl extends DescriptorImpl implements
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -98,7 +93,6 @@ public class RoleDescriptorImpl extends DescriptorImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.ROLE_DESCRIPTOR;
 	}
@@ -178,9 +172,9 @@ public class RoleDescriptorImpl extends DescriptorImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<WorkProductDescriptor> getResponsibleFor() {
+	public List getResponsibleFor() {
 		if (responsibleFor == null) {
-			responsibleFor = new EObjectResolvingEList<WorkProductDescriptor>(
+			responsibleFor = new EObjectResolvingEList(
 					WorkProductDescriptor.class, this,
 					UmaPackage.ROLE_DESCRIPTOR__RESPONSIBLE_FOR);
 		}
@@ -192,21 +186,6 @@ public class RoleDescriptorImpl extends DescriptorImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<WorkProduct> getResponsibleForExclude() {
-		if (responsibleForExclude == null) {
-			responsibleForExclude = new EObjectResolvingEList<WorkProduct>(
-					WorkProduct.class, this,
-					UmaPackage.ROLE_DESCRIPTOR__RESPONSIBLE_FOR_EXCLUDE);
-		}
-		return responsibleForExclude;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.ROLE_DESCRIPTOR__ROLE:
@@ -217,8 +196,6 @@ public class RoleDescriptorImpl extends DescriptorImpl implements
 			return getModifies();
 		case UmaPackage.ROLE_DESCRIPTOR__RESPONSIBLE_FOR:
 			return getResponsibleFor();
-		case UmaPackage.ROLE_DESCRIPTOR__RESPONSIBLE_FOR_EXCLUDE:
-			return getResponsibleForExclude();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -228,27 +205,14 @@ public class RoleDescriptorImpl extends DescriptorImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.ROLE_DESCRIPTOR__ROLE:
 			setRole((Role) newValue);
 			return;
-		case UmaPackage.ROLE_DESCRIPTOR__MODIFIES:
-			getModifies().clear();
-			getModifies().addAll(
-					(Collection<? extends WorkProductDescriptor>) newValue);
-			return;
 		case UmaPackage.ROLE_DESCRIPTOR__RESPONSIBLE_FOR:
 			getResponsibleFor().clear();
-			getResponsibleFor().addAll(
-					(Collection<? extends WorkProductDescriptor>) newValue);
-			return;
-		case UmaPackage.ROLE_DESCRIPTOR__RESPONSIBLE_FOR_EXCLUDE:
-			getResponsibleForExclude().clear();
-			getResponsibleForExclude().addAll(
-					(Collection<? extends WorkProduct>) newValue);
+			getResponsibleFor().addAll((Collection) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -259,20 +223,13 @@ public class RoleDescriptorImpl extends DescriptorImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.ROLE_DESCRIPTOR__ROLE:
 			setRole((Role) null);
 			return;
-		case UmaPackage.ROLE_DESCRIPTOR__MODIFIES:
-			getModifies().clear();
-			return;
 		case UmaPackage.ROLE_DESCRIPTOR__RESPONSIBLE_FOR:
 			getResponsibleFor().clear();
-			return;
-		case UmaPackage.ROLE_DESCRIPTOR__RESPONSIBLE_FOR_EXCLUDE:
-			getResponsibleForExclude().clear();
 			return;
 		}
 		super.eUnset(featureID);
@@ -283,7 +240,6 @@ public class RoleDescriptorImpl extends DescriptorImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);
@@ -298,9 +254,6 @@ public class RoleDescriptorImpl extends DescriptorImpl implements
 			return !getModifies().isEmpty();
 		case UmaPackage.ROLE_DESCRIPTOR__RESPONSIBLE_FOR:
 			return responsibleFor != null && !responsibleFor.isEmpty();
-		case UmaPackage.ROLE_DESCRIPTOR__RESPONSIBLE_FOR_EXCLUDE:
-			return responsibleForExclude != null
-					&& !responsibleForExclude.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}

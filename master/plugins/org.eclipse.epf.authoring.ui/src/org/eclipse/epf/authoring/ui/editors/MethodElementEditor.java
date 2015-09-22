@@ -22,7 +22,6 @@ import java.util.EventObject;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,7 +40,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.emf.common.command.Command;
-import org.eclipse.emf.common.command.CommandStack;
 import org.eclipse.emf.common.command.CommandStackListener;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
@@ -50,27 +48,59 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
-import org.eclipse.emf.edit.domain.EditingDomain;
-import org.eclipse.emf.edit.domain.IEditingDomainProvider;
-import org.eclipse.emf.edit.ui.provider.ExtendedImageRegistry;
-import org.eclipse.emf.workspace.util.WorkspaceSynchronizer;
+import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.epf.authoring.ui.AuthoringPerspective;
 import org.eclipse.epf.authoring.ui.AuthoringUIPlugin;
 import org.eclipse.epf.authoring.ui.AuthoringUIResources;
 import org.eclipse.epf.authoring.ui.actions.LibraryValidateAction;
+import org.eclipse.epf.authoring.ui.forms.ChecklistItemsPage;
+import org.eclipse.epf.authoring.ui.forms.ContentElementGuidancePage;
 import org.eclipse.epf.authoring.ui.forms.ContentPackageDescriptionPage;
+import org.eclipse.epf.authoring.ui.forms.CustomCategoryAssignPage;
+import org.eclipse.epf.authoring.ui.forms.CustomCategoryDescriptionPage;
+import org.eclipse.epf.authoring.ui.forms.DisciplineDescriptionPage;
+import org.eclipse.epf.authoring.ui.forms.DisciplineGroupingDescriptionPage;
+import org.eclipse.epf.authoring.ui.forms.DisciplineGroupingDisciplinesPage;
+import org.eclipse.epf.authoring.ui.forms.DisciplineReferenceWorkflowPage;
+import org.eclipse.epf.authoring.ui.forms.DisciplineTasksPage;
+import org.eclipse.epf.authoring.ui.forms.DomainDescriptionPage;
+import org.eclipse.epf.authoring.ui.forms.DomainWorkProductsPage;
+import org.eclipse.epf.authoring.ui.forms.GuidanceDescriptionPage;
+import org.eclipse.epf.authoring.ui.forms.GuidanceWithAttachmentsDescriptionPage;
+import org.eclipse.epf.authoring.ui.forms.IExtensionFormPage;
 import org.eclipse.epf.authoring.ui.forms.IRefreshable;
+import org.eclipse.epf.authoring.ui.forms.MethodLibraryDescriptionFormPage;
+import org.eclipse.epf.authoring.ui.forms.MethodPluginDescriptionPage;
+import org.eclipse.epf.authoring.ui.forms.PracticeDescriptionPage;
+import org.eclipse.epf.authoring.ui.forms.PracticeReferencesPage;
+import org.eclipse.epf.authoring.ui.forms.RoleCategoriesPage;
+import org.eclipse.epf.authoring.ui.forms.RoleDescriptionPage;
+import org.eclipse.epf.authoring.ui.forms.RoleSetDescriptionPage;
+import org.eclipse.epf.authoring.ui.forms.RoleSetGroupingDescriptionPage;
+import org.eclipse.epf.authoring.ui.forms.RoleSetGroupingRoleSets;
+import org.eclipse.epf.authoring.ui.forms.RoleSetRolesPage;
+import org.eclipse.epf.authoring.ui.forms.RoleWorkProductsPage;
+import org.eclipse.epf.authoring.ui.forms.TaskCategoriesPage;
+import org.eclipse.epf.authoring.ui.forms.TaskDescriptionPage;
+import org.eclipse.epf.authoring.ui.forms.TaskRolesPage;
+import org.eclipse.epf.authoring.ui.forms.TaskStepsPage;
+import org.eclipse.epf.authoring.ui.forms.TaskWorkProductsPage;
+import org.eclipse.epf.authoring.ui.forms.ToolDescriptionPage;
+import org.eclipse.epf.authoring.ui.forms.ToolToolMentorsPage;
+import org.eclipse.epf.authoring.ui.forms.WorkProductCategoriesPage;
+import org.eclipse.epf.authoring.ui.forms.WorkProductDeliverablePartsPage;
+import org.eclipse.epf.authoring.ui.forms.WorkProductDescriptionPage;
+import org.eclipse.epf.authoring.ui.forms.WorkProductTypeDescriptionPage;
+import org.eclipse.epf.authoring.ui.forms.WorkProductTypeWorkProductsPage;
 import org.eclipse.epf.authoring.ui.internal.MethodElementEditorErrorTickUpdater;
-import org.eclipse.epf.authoring.ui.providers.IMethodElementEditorPageProviderExtension;
-import org.eclipse.epf.authoring.ui.providers.MethodElementEditorDefaultPageProvider;
+import org.eclipse.epf.authoring.ui.providers.MethodEditorPageProvider;
 import org.eclipse.epf.authoring.ui.providers.MethodElementLabelDecorator;
 import org.eclipse.epf.authoring.ui.richtext.IMethodRichText;
 import org.eclipse.epf.authoring.ui.util.LibraryValidationMarkerHelper;
 import org.eclipse.epf.authoring.ui.views.ElementHTMLViewer;
 import org.eclipse.epf.authoring.ui.views.LibraryView;
 import org.eclipse.epf.authoring.ui.views.ViewHelper;
-import org.eclipse.epf.common.ui.util.PerspectiveUtil;
+import org.eclipse.epf.common.utils.PerspectiveUtil;
 import org.eclipse.epf.common.utils.StrUtil;
 import org.eclipse.epf.library.ILibraryManager;
 import org.eclipse.epf.library.LibraryService;
@@ -81,11 +111,7 @@ import org.eclipse.epf.library.edit.command.ActionManager;
 import org.eclipse.epf.library.edit.command.FullyRevertibleCommandStack;
 import org.eclipse.epf.library.edit.command.IActionManager;
 import org.eclipse.epf.library.edit.command.IResourceAwareCommand;
-import org.eclipse.epf.library.edit.meta.TypeDefUtil;
 import org.eclipse.epf.library.edit.ui.UserInteractionHelper;
-import org.eclipse.epf.library.edit.util.ExtensionManager;
-import org.eclipse.epf.library.edit.util.MethodElementPropUtil;
-import org.eclipse.epf.library.edit.util.PropUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.persistence.ILibraryResource;
 import org.eclipse.epf.library.persistence.ILibraryResourceSet;
@@ -100,20 +126,36 @@ import org.eclipse.epf.persistence.util.LibrarySchedulingRule;
 import org.eclipse.epf.persistence.util.PersistenceUtil;
 import org.eclipse.epf.richtext.IRichText;
 import org.eclipse.epf.services.ILibraryPersister;
-import org.eclipse.epf.services.ILibraryPersister.FailSafeMethodLibraryPersister;
 import org.eclipse.epf.services.Services;
-import org.eclipse.epf.uma.ContentDescription;
+import org.eclipse.epf.services.ILibraryPersister.FailSafeMethodLibraryPersister;
+import org.eclipse.epf.uma.Checklist;
 import org.eclipse.epf.uma.ContentPackage;
-import org.eclipse.epf.uma.DescribableElement;
+import org.eclipse.epf.uma.CustomCategory;
+import org.eclipse.epf.uma.Deliverable;
+import org.eclipse.epf.uma.Discipline;
+import org.eclipse.epf.uma.DisciplineGrouping;
+import org.eclipse.epf.uma.Domain;
+import org.eclipse.epf.uma.Guidance;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.MethodLibrary;
 import org.eclipse.epf.uma.MethodPlugin;
+import org.eclipse.epf.uma.Practice;
+import org.eclipse.epf.uma.Role;
+import org.eclipse.epf.uma.RoleSet;
+import org.eclipse.epf.uma.RoleSetGrouping;
+import org.eclipse.epf.uma.Task;
+import org.eclipse.epf.uma.Tool;
 import org.eclipse.epf.uma.UmaPackage;
+import org.eclipse.epf.uma.WorkProduct;
+import org.eclipse.epf.uma.WorkProductType;
 import org.eclipse.epf.uma.util.UmaUtil;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
@@ -122,7 +164,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
@@ -130,18 +171,13 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IPartService;
-import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWindowListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.forms.editor.IFormPage;
 import org.eclipse.ui.ide.IGotoMarker;
 import org.eclipse.ui.part.FileEditorInput;
-import org.eclipse.ui.part.MultiPageEditorPart;
-import org.eclipse.ui.part.MultiPageSelectionProvider;
-import org.eclipse.ui.views.properties.PropertySheet;
 
 /**
  * The Method Element editor.
@@ -152,7 +188,7 @@ import org.eclipse.ui.views.properties.PropertySheet;
  * @since 1.0
  */
 public class MethodElementEditor extends AbstractBaseFormEditor implements
-		IGotoMarker, IEditingDomainProvider {
+		ISelectionProvider, IGotoMarker {
 
 	protected static class ResourceInfo {
 		long modificationStamp;
@@ -188,24 +224,16 @@ public class MethodElementEditor extends AbstractBaseFormEditor implements
 	protected ElementHTMLViewer previewer = null;
 
 	protected MethodElement elementObj = null;
-	
-	protected AdapterFactoryEditingDomain editingDomain;
 
 	// The rich text control or editor whose content was last modified before
 	// the Save or Save All button key is selected.
 	protected IMethodRichText modifiedRichText = null;
 
-	protected Adapter elementChangedListener = new AdapterImpl() {
+	protected Adapter nameChangedListener = new AdapterImpl() {
 		public void notifyChanged(org.eclipse.emf.common.notify.Notification msg) {
 			switch (msg.getFeatureID(MethodElement.class)) {
 			case UmaPackage.METHOD_ELEMENT__NAME:
 				nameChanged();
-				break;
-			}
-			
-			switch(msg.getFeatureID(DescribableElement.class)) {
-			case UmaPackage.DESCRIBABLE_ELEMENT__NODEICON:
-				iconChanged();
 				break;
 			}
 		}
@@ -237,13 +265,6 @@ public class MethodElementEditor extends AbstractBaseFormEditor implements
 	
 	protected MethodElementEditorErrorTickUpdater fMethodElementEditorErrorTickUpdater = null;
 	
-	/**
-	 * Extension name
-	 */
-	public static final String METHOD_PAGE_PROVIDERS_EXTENSION_NAME = "MethodElementEditorPageProviders"; //$NON-NLS-1$
-	protected static List<IMethodElementEditorPageProviderExtension> allPageProviders;
-	protected static IMethodElementEditorPageProviderExtension defaultPageProvider;
-
 	/**
 	 * Listens for workspace changes.
 	 */
@@ -471,7 +492,7 @@ public class MethodElementEditor extends AbstractBaseFormEditor implements
 
 	private boolean disposed;
 
-	protected HashMap<Resource, ResourceInfo> resourceInfoMap = new HashMap<Resource, ResourceInfo>();
+	protected HashMap<Resource, ResourceInfo> resourceInfoMap;
 
 	private IFile elementFile;
 	
@@ -487,147 +508,127 @@ public class MethodElementEditor extends AbstractBaseFormEditor implements
 		createActionManager();
 	}
 	
-	protected void iconChanged() {
-		SafeUpdateController.asyncExec(new Runnable() {
-
-			public void run() {
-				setTitleImage();
-			}
-			
-		});
-	}
-
 	protected void createEditorErrorTickUpdater() {
 		
 		this.fMethodElementEditorErrorTickUpdater = new MethodElementEditorErrorTickUpdater(this);
 	}
 	
-	public class MeEditorActionManager extends ActionManager {
-		
-		protected void registerExecutedCommand(Command command) {			
-		}
-		
-		protected FullyRevertibleCommandStack createCommandStack() {
-			return new FullyRevertibleCommandStack(this) {
-				public boolean doExecute(Command command) {
-					registerExecutedCommand(command);
-					// Check modify first.
-					if (command instanceof IResourceAwareCommand) {
-						Collection modifiedResources = ((IResourceAwareCommand) command)
-								.getModifiedResources();
-						if (modifiedResources != null
-								&& !(modifiedResources.isEmpty())) {
-							IStatus status = UserInteractionHelper
-									.checkModify(modifiedResources,
-											getSite().getShell());
-							if (!status.isOK()) {
-								MethodElementEditor.this
-										.handleError(status);
-								return false;
-							}
-						}
-					} else {
-						EObject owner = TngUtil.getOwner(command);
-						if (owner != null) {
-							IStatus status = TngUtil.checkEdit(owner,
-									getSite().getShell());
-							if (!status.isOK()) {
-								AuthoringUIPlugin
-										.getDefault()
-										.getMsgDialog()
-										.display(
-												AuthoringUIResources.errorDialog_title, 
-												AuthoringUIResources.editDialog_msgCannotEdit, 
-												status);
-								return false;
-							}
-						}
-					}
-
-					if (changeTime == -1) {
-						changeTime = System.currentTimeMillis();
-					}
-					boolean ret = super.doExecute(command);
-					if (!ret && changeTime != -1) {
-						changeTime = -1;
-					}
-					return ret;
-				}
-
-			};
-		}
-
-		public boolean doAction(int actionType, EObject object,
-				org.eclipse.emf.ecore.EStructuralFeature feature,
-				Object value, int index) {
-			final IStatus status = TngUtil
-					.checkEdit(object, getSite().getShell());
-			if (status.isOK()) {
-				return super.doAction(actionType, object, feature, value,
-						index);
-			} else {
-				// this might be called from a non-UI thread
-				// so make sure the message dialog will be shown in a UI thread
-				//
-				SafeUpdateController.syncExec(new Runnable() {
-
-					public void run() {
-						AuthoringUIPlugin.getDefault().getMsgDialog().displayError(
-								AuthoringUIResources.editDialog_title, 
-								AuthoringUIResources.editDialog_msgCannotEdit, 
-								status);
-					}
-					
-				});
-				return false;
-			}
-		}
-
-		protected void save(Resource resource) {
-			// don't save resource that is changed outside of this editor
-			//
-			if (changedResources.contains(resource)) {
-				return;
-			}
-			
-			boolean canSave;
-			if(resource.getURI().isFile()) {
-				File file = new File(resource.getURI().toFileString());
-				canSave = file.lastModified() > changeTime;
-			}
-			else {
-				canSave = true;
-			}				
-			try {
-				if(canSave) {
-					ILibraryPersister.FailSafeMethodLibraryPersister persister = getPersister();
-					try {
-						persister.save(resource);
-						persister.commit();
-					} catch (Exception e) {
-						AuthoringUIPlugin.getDefault().getLogger()
-						.logError(e);
-						try {
-							persister.rollback();
-						} catch (Exception ex) {
-							ViewHelper
-							.reloadCurrentLibaryOnRollbackError(getEditorSite()
-									.getShell());
-						}
-					}
-				}
-			} finally {
-				changeTime = -1;
-			}
-		}
-	};
-
-	protected ActionManager newActionManager() {
-		return new MeEditorActionManager();
-	}
-	
 	protected void createActionManager() {
-		actionMgr = newActionManager();
+		actionMgr = new ActionManager() {
+
+			protected FullyRevertibleCommandStack createCommandStack() {
+				return new FullyRevertibleCommandStack(this) {
+					public boolean doExecute(Command command) {
+						// Check modify first.
+						if (command instanceof IResourceAwareCommand) {
+							Collection modifiedResources = ((IResourceAwareCommand) command)
+									.getModifiedResources();
+							if (modifiedResources != null
+									&& !(modifiedResources.isEmpty())) {
+								IStatus status = UserInteractionHelper
+										.checkModify(modifiedResources,
+												getSite().getShell());
+								if (!status.isOK()) {
+									MethodElementEditor.this
+											.handleError(status);
+									return false;
+								}
+							}
+						} else {
+							EObject owner = TngUtil.getOwner(command);
+							if (owner != null) {
+								IStatus status = TngUtil.checkEdit(owner,
+										getSite().getShell());
+								if (!status.isOK()) {
+									AuthoringUIPlugin
+											.getDefault()
+											.getMsgDialog()
+											.display(
+													AuthoringUIResources.errorDialog_title, 
+													AuthoringUIResources.editDialog_msgCannotEdit, 
+													status);
+									return false;
+								}
+							}
+						}
+
+						if (changeTime == -1) {
+							changeTime = System.currentTimeMillis();
+						}
+						boolean ret = super.doExecute(command);
+						if (!ret && changeTime != -1) {
+							changeTime = -1;
+						}
+						return ret;
+					}
+
+				};
+			}
+
+			public boolean doAction(int actionType, EObject object,
+					org.eclipse.emf.ecore.EStructuralFeature feature,
+					Object value, int index) {
+				final IStatus status = TngUtil
+						.checkEdit(object, getSite().getShell());
+				if (status.isOK()) {
+					return super.doAction(actionType, object, feature, value,
+							index);
+				} else {
+					// this might be called from a non-UI thread
+					// so make sure the message dialog will be shown in a UI thread
+					//
+					SafeUpdateController.syncExec(new Runnable() {
+
+						public void run() {
+							AuthoringUIPlugin.getDefault().getMsgDialog().displayError(
+									AuthoringUIResources.editDialog_title, 
+									AuthoringUIResources.editDialog_msgCannotEdit, 
+									status);
+						}
+						
+					});
+					return false;
+				}
+			}
+
+			protected void save(Resource resource) {
+				// don't save resource that is changed outside of this editor
+				//
+				if (changedResources.contains(resource)) {
+					return;
+				}
+				
+				boolean canSave;
+				if(resource.getURI().isFile()) {
+					File file = new File(resource.getURI().toFileString());
+					canSave = file.lastModified() > changeTime;
+				}
+				else {
+					canSave = true;
+				}				
+				try {
+					if(canSave) {
+						ILibraryPersister.FailSafeMethodLibraryPersister persister = getPersister();
+						try {
+							persister.save(resource);
+							persister.commit();
+						} catch (Exception e) {
+							AuthoringUIPlugin.getDefault().getLogger()
+							.logError(e);
+							try {
+								persister.rollback();
+							} catch (Exception ex) {
+								ViewHelper
+								.reloadCurrentLibaryOnRollbackError(getEditorSite()
+										.getShell());
+							}
+						}
+					}
+				} finally {
+					changeTime = -1;
+				}
+			}
+		};
 
 		actionMgr.getCommandStack().addCommandStackListener(
 				new CommandStackListener() {
@@ -671,10 +672,6 @@ public class MethodElementEditor extends AbstractBaseFormEditor implements
 		return actionMgr;
 	}
 
-	protected void setTitleImage() {
-		Image titleImage = ExtendedImageRegistry.getInstance().getImage(TngUtil.getImage(elementObj));
-		setTitleImage(titleImage);
-	}
 	/**
 	 * @see org.eclipse.ui.forms.editor.FormEditor#init(IEditorSite,
 	 *      IEditorInput)
@@ -696,24 +693,16 @@ public class MethodElementEditor extends AbstractBaseFormEditor implements
 			}
 		}
 		setInput(input);
-		site.setSelectionProvider(new MultiPageSelectionProvider(this));
+		site.setSelectionProvider(this);
 		activationListener = new ActivationListener(site.getWorkbenchWindow()
 				.getPartService());
 
-		setTitleImage();
-		
-		CommandStack commandStack = actionMgr.getCommandStack();
-		editingDomain = new AdapterFactoryEditingDomain(TngAdapterFactory.INSTANCE
-				.getNavigatorView_ComposedAdapterFactory(), commandStack) {
-			@Override
-			public boolean isReadOnly(Resource resource) {
-				if(elementObj != null && TngUtil.isLocked(elementObj)) {
-					return true;
-				}
-				return super.isReadOnly(resource);
-			}
-		};
-
+		ILabelProvider labelProvider = new AdapterFactoryLabelProvider(
+				TngAdapterFactory.INSTANCE
+						.getNavigatorView_ComposedAdapterFactory());
+		Image titleImage = labelProvider.getImage(elementObj);
+		labelProvider.dispose();
+		setTitleImage(titleImage);
 	}
 
 	/**
@@ -729,21 +718,14 @@ public class MethodElementEditor extends AbstractBaseFormEditor implements
 		elementObj = methodElementInput.getMethodElement();
 
 		setPartName();
-		elementObj.eAdapters().add(elementChangedListener);
+		elementObj.eAdapters().add(nameChangedListener);
 		
 		if (fMethodElementEditorErrorTickUpdater != null)
 			fMethodElementEditorErrorTickUpdater.updateEditorImage(elementObj);
 
 	}
 
-	public MethodElement getMethodElement()
-	{
-		return elementObj;
-	}
-	
-	private boolean updateResourceInfosCalled = false;
 	public void updateResourceInfos(Collection<Resource> resources) {
-		updateResourceInfosCalled = true;
 		if(resourceInfoMap == null) {
 			resourceInfoMap = new HashMap<Resource, ResourceInfo>();
 		}
@@ -842,15 +824,8 @@ public class MethodElementEditor extends AbstractBaseFormEditor implements
 	
 	private boolean isOutOfSync(Resource resource) {
 		ResourceInfo info = resourceInfoMap.get(resource);
-		if (!updateResourceInfosCalled && info == null) {
-			IFile file = WorkspaceSynchronizer.getFile(resource);
-			if(file != null) {
-				return !file.isSynchronized(IResource.DEPTH_ZERO);
-			}
-		}
-		
 		long stamp = ISynchronizationHelper.INSTANCE.getModificationStamp(resource);
-		if(stamp != IResource.NULL_STAMP ) {
+		if(stamp != IResource.NULL_STAMP) {
 			if(info == null || info.modificationStamp != stamp) {
 				if(ISynchronizationHelper.INSTANCE.isSynchronized(resource)) {
 					// refresh the cached stamp
@@ -890,13 +865,6 @@ public class MethodElementEditor extends AbstractBaseFormEditor implements
 		}
 		return false;
 	}
-	
-	private boolean promptReloadFiles(Collection<Resource> usedResources) {
-		if(checkFileChanged(usedResources)) {
-			return promptReloadFiles();
-		}
-		return false;
-	}
 
 	protected boolean promptReloadFiles() {
 		String title = AuthoringUIResources.editor_error_activated_outofsync_title;
@@ -906,7 +874,7 @@ public class MethodElementEditor extends AbstractBaseFormEditor implements
 	}
 	
 	private boolean handleFileChanged(final Collection<Resource> usedResources) {
-		boolean ret = promptReloadFiles(usedResources);
+		boolean ret = promptReloadFiles();
 		if (ret) {
 			IRunnableWithProgress runnable = new IRunnableWithProgress() {
 
@@ -1005,51 +973,117 @@ public class MethodElementEditor extends AbstractBaseFormEditor implements
 		setPartName(partName);
 	}
 
-	protected static List<IMethodElementEditorPageProviderExtension> getAllPageProviders() {
-		if (allPageProviders == null) {
-			allPageProviders = ExtensionManager.getExtensions(AuthoringUIPlugin.getDefault().getId(), METHOD_PAGE_PROVIDERS_EXTENSION_NAME, IMethodElementEditorPageProviderExtension.class);
-		}
-		return allPageProviders;
+	/**
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#addSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
+	 */
+	public void addSelectionChangedListener(ISelectionChangedListener listener) {
+		selectionChangedListeners.add(listener);
 	}
 
+	/**
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#removeSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
+	 */
+	public void removeSelectionChangedListener(
+			ISelectionChangedListener listener) {
+		selectionChangedListeners.remove(listener);
+	}
 
-	protected IMethodElementEditorPageProviderExtension getDefaultPageProvider() {
-		if (defaultPageProvider == null) {
-			defaultPageProvider = new MethodElementEditorDefaultPageProvider();
+	/**
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#getSelection()
+	 */
+	public ISelection getSelection() {
+		return currentSelection;
+	}
+
+	/**
+	 * @see org.eclipse.jface.viewers.ISelectionProvider#setSelection(org.eclipse.jface.viewers.ISelection)
+	 */
+	public void setSelection(ISelection selection) {
+		currentSelection = selection;
+
+		for (Iterator listeners = new ArrayList<ISelectionChangedListener>(selectionChangedListeners)
+				.iterator(); listeners.hasNext();) {
+			ISelectionChangedListener listener = (ISelectionChangedListener) listeners
+					.next();
+			listener
+					.selectionChanged(new SelectionChangedEvent(this, selection));
 		}
-		return defaultPageProvider;
 	}
 
 	/**
 	 * @see org.eclipse.ui.forms.editor.FormEditor#addPages()
 	 */
 	protected void addPages() {
-		// first get original list
-		Map<Object,String> pageMap = getDefaultPageProvider().getPages(new LinkedHashMap<Object,String>(), this, elementObj);
-		
-		// let extensions modify
-		List<IMethodElementEditorPageProviderExtension> pageProviders = getAllPageProviders();
-		if (pageProviders != null && pageProviders.size() > 0) {
-			for (IMethodElementEditorPageProviderExtension extension : pageProviders) {
-				pageMap = extension.getPages(pageMap, this, elementObj);
-			}
-		}
-		// now add pages
 		try {
-			for (Map.Entry<Object, String> pageEntry : pageMap.entrySet()) {
-				Object page = pageEntry.getKey();
-				String name = pageEntry.getValue();
-				int index = -1;
-				if (page instanceof Control) {
-					index = addPage((Control)page);
-				} else if (page instanceof IFormPage) {
-					index = addPage((IFormPage)page);
-				} else if (page instanceof IEditorPart) {
-					index = addPage((IEditorPart)page, getEditorInput());
+			if (elementObj instanceof MethodLibrary) {
+				addPage(new MethodLibraryDescriptionFormPage(this));
+			} else if (elementObj instanceof MethodPlugin) {
+				addPage(new MethodPluginDescriptionPage(this));
+			} else if (elementObj instanceof ContentPackage) {
+				addPage(new ContentPackageDescriptionPage(this));
+			} else if (elementObj instanceof Role) {
+				addPage(new RoleDescriptionPage(this));
+				addPage(new RoleWorkProductsPage(this));
+				addPage(new ContentElementGuidancePage(this));
+				addPage(new RoleCategoriesPage(this));
+			} else if (elementObj instanceof Task) {
+				addPage(new TaskDescriptionPage(this));
+				addPage(new TaskStepsPage(this));
+				addPage(new TaskRolesPage(this));
+				addPage(new TaskWorkProductsPage(this));
+				addPage(new ContentElementGuidancePage(this));
+				addPage(new TaskCategoriesPage(this));
+			} else if (elementObj instanceof WorkProduct) {
+				addPage(new WorkProductDescriptionPage(this));
+				if (elementObj instanceof Deliverable) {
+					addPage(new WorkProductDeliverablePartsPage(this));
 				}
-				if (name != null) {
-					setPageText(index, name);
+				addPage(new ContentElementGuidancePage(this));
+				addPage(new WorkProductCategoriesPage(this));
+			} else if (elementObj instanceof Guidance) {
+				if (TngUtil.isAllowedAttachments(elementObj)) {
+					addPage(new GuidanceWithAttachmentsDescriptionPage(this));
+				} else if (elementObj instanceof Practice) {
+					addPage(new PracticeDescriptionPage(this));
+					addPage(new PracticeReferencesPage(this));
+				} else if (elementObj instanceof Checklist) {
+					addPage(new GuidanceDescriptionPage(this));
+					addPage(new ChecklistItemsPage(this));
+				} else {
+					addPage(new GuidanceDescriptionPage(this));
 				}
+				if (!(elementObj instanceof Practice))
+					addPage(new ContentElementGuidancePage(this));
+			} else if (elementObj instanceof Discipline) {
+				addPage(new DisciplineDescriptionPage(this));
+				addPage(new DisciplineTasksPage(this));
+				addPage(new DisciplineReferenceWorkflowPage(this));
+				addPage(new ContentElementGuidancePage(this));
+			} else if (elementObj instanceof DisciplineGrouping) {
+				addPage(new DisciplineGroupingDescriptionPage(this));
+				addPage(new DisciplineGroupingDisciplinesPage(this));
+			} else if (elementObj instanceof Domain) {
+				addPage(new DomainDescriptionPage(this));
+				addPage(new DomainWorkProductsPage(this));
+				addPage(new ContentElementGuidancePage(this));
+			} else if (elementObj instanceof WorkProductType) {
+				addPage(new WorkProductTypeDescriptionPage(this));
+				addPage(new WorkProductTypeWorkProductsPage(this));
+				addPage(new ContentElementGuidancePage(this));
+			} else if (elementObj instanceof RoleSet) {
+				addPage(new RoleSetDescriptionPage(this));
+				addPage(new RoleSetRolesPage(this));
+				addPage(new ContentElementGuidancePage(this));
+			} else if (elementObj instanceof RoleSetGrouping) {
+				addPage(new RoleSetGroupingDescriptionPage(this));
+				addPage(new RoleSetGroupingRoleSets(this));
+			} else if (elementObj instanceof Tool) {
+				addPage(new ToolDescriptionPage(this));
+				addPage(new ToolToolMentorsPage(this));
+				addPage(new ContentElementGuidancePage(this));
+			} else if (elementObj instanceof CustomCategory) {
+				addPage(new CustomCategoryDescriptionPage(this));
+				addPage(new CustomCategoryAssignPage(this));
 			}
 
 			setPartName(elementObj.getName());
@@ -1057,7 +1091,25 @@ public class MethodElementEditor extends AbstractBaseFormEditor implements
 			if (!(elementObj instanceof ContentPackage || elementObj instanceof MethodPlugin))
 				createPreviewPage();
 
-		
+			if (elementObj instanceof Task) {
+				// check for extenstion point and add the page if there
+				List<?> pageProviders = MethodEditorPageProvider.getInstance()
+						.getPageProviders();
+
+				if (pageProviders != null && pageProviders.size() > 0) {
+					try {
+						for (int i = 0; i < pageProviders.size(); i++) {
+							Object page = pageProviders.get(i);
+							if (page instanceof IExtensionFormPage) {
+								IExtensionFormPage formPage = (IExtensionFormPage) page;
+								formPage.setEditor(this);
+							}
+						}
+					} catch (Exception e) {
+						AuthoringUIPlugin.getDefault().getLogger().logError(e);
+					}
+				}
+			}
 		} catch (Throwable t) {
 			AuthoringUIPlugin.getDefault().getLogger().logError(t);
 			dispose();
@@ -1096,7 +1148,7 @@ public class MethodElementEditor extends AbstractBaseFormEditor implements
 				actionMgr.undoAll();
 			}
 			actionMgr.dispose();
-			elementObj.eAdapters().remove(elementChangedListener);
+			elementObj.eAdapters().remove(nameChangedListener);
 			
 			if(resourceInfoMap != null) {
 				resourceInfoMap.clear();
@@ -1176,8 +1228,7 @@ public class MethodElementEditor extends AbstractBaseFormEditor implements
 			EStructuralFeature modalObjectFeature = richText
 					.getModalObjectFeature();
 			if (modalObject != null && modalObjectFeature != null) {
-//				Object oldContent = modalObject.eGet(modalObjectFeature);
-				Object oldContent = TypeDefUtil.getInstance().eGet(modalObject, modalObjectFeature);
+				Object oldContent = modalObject.eGet(modalObjectFeature);
 				if (!mustRestoreValue(richText, oldContent)) {
 					Object newContent = richText.getText();
 					richText.setInitialText((String)newContent);
@@ -1331,9 +1382,6 @@ public class MethodElementEditor extends AbstractBaseFormEditor implements
 
 			Collection<Resource> resourcesToAdjustLocation = null;
 			
-			if (! PropUtil.getPropUtil().isEdited(elementObj)) {
-				PropUtil.getPropUtil(getActionManager()).setEdited(elementObj, true);
-			}
 			try {
 				persister.getSaveOptions().put(
 						ILibraryPersister.FailSafeMethodLibraryPersister.OPTIONS_OVERWRITABLE_RESOURCES, 
@@ -1358,7 +1406,6 @@ public class MethodElementEditor extends AbstractBaseFormEditor implements
 					persister.commit();
 					dirty = false;
 					actionMgr.saveIsDone();
-					MethodElementPropUtil.getMethodElementPropUtil().notifyElemetSaved(elementObj);
 					changeTime = -1;
 					resourcesToAdjustLocation = getResourceToAdjustLocation();	
 					setResourceInfos(getUsedResources());
@@ -1515,17 +1562,9 @@ public class MethodElementEditor extends AbstractBaseFormEditor implements
 			//previewer.setLayoutManager(null);
 			previewer.showElementContent(elementObj);
 		}
-		Object page = pages.get(newPageIndex);
-		if (page instanceof MultiPageEditorPart) {
-			IViewPart propertiesView = getEditorSite().getPage().findView("org.eclipse.ui.views.PropertySheet"); //$NON-NLS-1$
-			if (propertiesView instanceof PropertySheet) {
-				((PropertySheet)propertiesView).partActivated(this);
-			}
-
-		}
 	}
 
-	public void setDirty() {
+	private void setDirty() {
 		dirty = true;
 		firePropertyChange(PROP_DIRTY);
 	}
@@ -1583,8 +1622,6 @@ public class MethodElementEditor extends AbstractBaseFormEditor implements
 		private boolean checkContainerResource;
 
 		private boolean disabled = false;
-		
-		private boolean forNameOnly = false;
 
 		/**
 		 * Creates a new instance.
@@ -1595,14 +1632,6 @@ public class MethodElementEditor extends AbstractBaseFormEditor implements
 			this.element = element;
 		}
 
-		public boolean isForNameOnly() {
-			return forNameOnly;
-		}
-
-		public void setForNameOnly(boolean forNameOnly) {
-			this.forNameOnly = forNameOnly;
-		}
-		
 		private void restoreText(Object control, String txt) {
 			boolean old = disabled;
 			try {
@@ -1626,12 +1655,6 @@ public class MethodElementEditor extends AbstractBaseFormEditor implements
 
 		private boolean checkEdit(EObject element, Object control,
 				boolean checkContainerResource) {
-			if(widgetToCheck == control) {
-				// checkEdit is being performed for the control
-				//
-				return true;
-			}
-			
 			// keep a reference to the current widget so mustRestoreValue() can
 			// use it to check
 			// whether a focus lost event is triggered during a checkEdit.
@@ -1664,10 +1687,7 @@ public class MethodElementEditor extends AbstractBaseFormEditor implements
 					}
 
 					status = TngUtil.checkEdit(element, getSite().getShell());
-					if (status.isOK() && isForNameOnly() && element instanceof DescribableElement) {
-						ContentDescription presentation = ((DescribableElement) element).getPresentation();
-						status = TngUtil.checkEdit(presentation, getSite().getShell());
-					}
+
 					if (!status.isOK()) {
 						if (control instanceof IRichText) {
 							((IRichText) control).restoreText();
@@ -1766,27 +1786,15 @@ public class MethodElementEditor extends AbstractBaseFormEditor implements
 					}
 					return;
 				}
-				
-				boolean checkParent = checkContainerResource;
-				if (element instanceof ContentDescription) {
-					ContentDescription content = (ContentDescription) element;
-					EObject containder = content.eContainer();
-					if (containder instanceof DescribableElement) {
-						DescribableElement parent = (DescribableElement) containder;						
-						if (! PropUtil.getPropUtil().isEdited(parent)) {
-							checkParent = true;
-						}
-					}
-				}
 
-				if (!checkEdit(element, widget, checkParent)) {
+				if (!checkEdit(element, widget, checkContainerResource)) {
 					if (DEBUG) {
 						System.out
 								.println("MethodElementEditor.ModifyListener.modifyText: checkEdit failed, exit"); //$NON-NLS-1$
 					}
 					return;
 				}
-				
+
 				if (widget instanceof IMethodRichText) {
 					IMethodRichText richText = (IMethodRichText) widget;
 					setModifiedRichText(richText);
@@ -1978,7 +1986,9 @@ public class MethodElementEditor extends AbstractBaseFormEditor implements
 
 		if (checkFileChangedRequired) {
 			Collection<Resource> usedResources = getUsedResources();
-			handleFileChanged(usedResources);
+			if (checkFileChanged(usedResources)) {
+				handleFileChanged(usedResources);
+			}
 		}
 	}
 
@@ -2067,7 +2077,7 @@ public class MethodElementEditor extends AbstractBaseFormEditor implements
 							dirty = false;
 						}
 						if (elementObj.eIsProxy()) {
-							elementObj.eAdapters().remove(elementChangedListener);
+							elementObj.eAdapters().remove(nameChangedListener);
 							EObject e = RefreshJob.getInstance().resolve(
 									elementObj);
 							if (e instanceof MethodElement
@@ -2157,16 +2167,4 @@ public class MethodElementEditor extends AbstractBaseFormEditor implements
 		return disposed;
 	}
 
-	public EditingDomain getEditingDomain() {
-		return editingDomain;
-	}
-	
-	public void setFocus() {
-		super.setFocus();
-		Object obj = getSelectedPage();
-		if (obj instanceof ContentPackageDescriptionPage) {
-			ContentPackageDescriptionPage page = (ContentPackageDescriptionPage) obj;
-			page.updateSupportingCheckbox();
-		}
-	}
 }

@@ -27,7 +27,7 @@ import org.eclipse.epf.uma.provider.MethodPluginItemProvider;
  */
 public class StructuredMethodPluginItemProvider extends
 		MethodPluginItemProvider implements IGroupContainer,
-		IStatefulItemProvider {
+		IStatefulItemProvider, IStructuredMethodPluginItemProvider {
 
 	protected Map groupItemProviderMap;
 
@@ -83,5 +83,4 @@ public class StructuredMethodPluginItemProvider extends
 
 		super.dispose();
 	}
-
 }

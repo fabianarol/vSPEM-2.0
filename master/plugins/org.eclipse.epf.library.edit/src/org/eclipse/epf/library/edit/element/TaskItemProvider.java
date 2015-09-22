@@ -13,10 +13,15 @@ package org.eclipse.epf.library.edit.element;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.eclipse.emf.common.command.Command;
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.edit.command.CopyCommand.Helper;
+import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.epf.library.edit.util.TngUtil;
+import org.eclipse.epf.uma.edit.command.MethodElementCreateCopyCommand;
+import org.eclipse.epf.uma.edit.command.MethodElementInitializeCopyCommand;
 
 /**
  * The item provider adapter for a task.
@@ -100,6 +105,16 @@ public class TaskItemProvider extends org.eclipse.epf.uma.provider.TaskItemProvi
 		return TngUtil.getLabel(object, getString("_UI_Task_type")); //$NON-NLS-1$
 	}
 
+	protected Command createInitializeCopyCommand(EditingDomain domain,
+			EObject owner, Helper helper) {
+		return new MethodElementInitializeCopyCommand(domain, owner, helper);
+	}
+
+	protected Command createCreateCopyCommand(EditingDomain domain,
+			EObject owner, Helper helper) {
+		return new MethodElementCreateCopyCommand(domain, owner, helper);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -131,14 +146,5 @@ public class TaskItemProvider extends org.eclipse.epf.uma.provider.TaskItemProvi
 		TngUtil.refreshParentIfNameChanged(notification, this);
 		
 		super.notifyChanged(notification);
-	}
-	
-	@Override
-	public Object getImage(Object object) {
-		Object image = TngUtil.getCustomNodeIcon(object);
-		if(image != null) {
-			return image;
-		}
-		return super.getImage(object);
 	}
 }

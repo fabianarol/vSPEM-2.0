@@ -22,10 +22,12 @@ import org.eclipse.epf.authoring.ui.filters.WorkProductFilter;
 import org.eclipse.epf.library.edit.IFilter;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
 import org.eclipse.epf.library.edit.command.IActionManager;
+import org.eclipse.epf.library.edit.command.MoveInCategoryCommand;
 import org.eclipse.epf.library.edit.itemsfilter.FilterConstants;
 import org.eclipse.epf.library.edit.util.CategorySortHelper;
 import org.eclipse.epf.library.edit.util.ContentElementOrderList;
 import org.eclipse.epf.library.edit.util.ModelStructure;
+import org.eclipse.epf.uma.ContentCategory;
 import org.eclipse.epf.uma.ContentElement;
 import org.eclipse.epf.uma.UmaPackage;
 import org.eclipse.epf.uma.WorkProduct;
@@ -81,16 +83,10 @@ public class WorkProductTypeWorkProductsPage extends AssociationFormPage {
 			public Object[] getElements(Object object) {
 				//return ((WorkProductType) object).getWorkProducts().toArray();
 				if (allSteps == null) {
-//					allSteps = new ContentElementOrderList(
-//							contentElement,
-//							ContentElementOrderList.CONTENT_ELEMENTS__FOR_ELEMENT_ONLY,
-//							getOrderFeature());
-					allSteps = getProviderExtender().newContentElementOrderList(contentElement, 
+					allSteps = new ContentElementOrderList(
+							contentElement,
 							ContentElementOrderList.CONTENT_ELEMENTS__FOR_ELEMENT_ONLY,
-							getOrderFeature(), 1);
-				}
-				if (getProviderExtender().useContentProviderAPIs()) {
-					return getProviderExtender().getElements(object, 1);
+							getContentCategoryOrderFeature());
 				}
 				List returnList = CategorySortHelper.sortCategoryElements(contentElement, 
 						allSteps.toArray());
@@ -175,7 +171,7 @@ public class WorkProductTypeWorkProductsPage extends AssociationFormPage {
 	}
 	
 	@Override
-	protected EStructuralFeature getOrderFeature() {
+	protected EStructuralFeature getContentCategoryOrderFeature() {
 		return UmaPackage.eINSTANCE.getWorkProductType_WorkProducts();
 	}
 
@@ -185,7 +181,7 @@ public class WorkProductTypeWorkProductsPage extends AssociationFormPage {
 	}
 	
 	@Override
-	public ContentElementOrderList getContentElementOrderList() {
+	protected ContentElementOrderList getContentElementOrderList() {
 		return allSteps;
 	}
 

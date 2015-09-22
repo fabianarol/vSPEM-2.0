@@ -12,7 +12,6 @@ package org.eclipse.epf.services;
 
 import java.io.File;
 
-import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.MethodLibrary;
 
@@ -84,8 +83,6 @@ public interface IFileBasedLibraryPersister extends ILibraryPersister {
 	 */
 	public File getDefaultMethodConfigurationFolder(MethodLibrary library);
 	
-	public File getDefaultMethodConfigurationFolder(MethodLibrary library, boolean create);
-	
 	/**
 	 * Sets the default folder to store method configuration in the specified method library.
 	 * 
@@ -102,11 +99,4 @@ public interface IFileBasedLibraryPersister extends ILibraryPersister {
 	 */
 	public String getResourceFolderPath(MethodElement e);
 	
-	/**
-	 * Gets file in local file system of the specified resource
-	 *  
-	 * @param resource
-	 * @return the file in local file system
-	 */
-	public File getFile(Resource resource);
 }

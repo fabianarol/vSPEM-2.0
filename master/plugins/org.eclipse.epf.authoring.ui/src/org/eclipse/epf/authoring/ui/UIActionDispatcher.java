@@ -17,11 +17,8 @@ import org.eclipse.epf.authoring.ui.dialogs.ContributionSelection;
 import org.eclipse.epf.authoring.ui.editors.EditorChooser;
 import org.eclipse.epf.authoring.ui.views.ConfigurationView;
 import org.eclipse.epf.authoring.ui.views.LibraryView;
-import org.eclipse.epf.common.ui.util.PerspectiveUtil;
-import org.eclipse.epf.library.configuration.ConfigurationHelper;
+import org.eclipse.epf.common.utils.PerspectiveUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
-import org.eclipse.epf.uma.BreakdownElement;
-import org.eclipse.epf.uma.Milestone;
 import org.eclipse.epf.uma.VariabilityElement;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -117,15 +114,11 @@ public class UIActionDispatcher implements ISelectionProvider {
 								selectedObject = contribSelection
 										.getSelectedContributor(element);
 							}
-							else if (obj instanceof Milestone) {
-								selectedObject = TngUtil.getOwningProcess((BreakdownElement) obj);
-							}
 						} else {
 							selectedObject = obj;
 						}
 
 						if (selectedObject != null) {
-							
 							EditorChooser.getInstance().openEditor(
 									selectedObject);
 						}
@@ -145,24 +138,13 @@ public class UIActionDispatcher implements ISelectionProvider {
 							if (desc.getId().equals(
 									AuthoringPerspective.PERSPECTIVE_ID)) {
 								addDoubleClickListener(doubleClickListener);
-								if (LibraryView.getViewInstance() == null) {
-									LibraryView.setNeedRegisterChangeListenersInCreate(true);
-								} else {
-									LibraryView.getViewInstance().registerChangeListeners();
-								}
 							} else {
 								removeDoubleClickListener(doubleClickListener);
 							}
-							
-							ConfigurationHelper.getDelegate().setAuthoringPerspective(
-									AuthoringPerspective.PERSPECTIVE_ID.equals(desc.getId()));
 						}
 
 						public void perspectiveChanged(IWorkbenchPage page,
 								IPerspectiveDescriptor desc, String id) {
-
-							ConfigurationHelper.getDelegate().setAuthoringPerspective(
-									AuthoringPerspective.PERSPECTIVE_ID.equals(desc.getId()));
 						}
 					});
 		}

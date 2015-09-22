@@ -10,22 +10,15 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.diagram.ui.service;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
-//import java.io.FileOutputStream;
-//import java.io.OutputStream;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
-import javax.imageio.stream.FileImageOutputStream;
 
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
@@ -56,7 +49,6 @@ import org.eclipse.epf.library.edit.util.Suppression;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.layout.ProcessAdapterFactoryFilter;
 import org.eclipse.epf.library.layout.diagram.DiagramInfo;
-import org.eclipse.epf.diagram.ui.utils.ImageUtils;
 import org.eclipse.epf.library.services.SafeUpdateController;
 import org.eclipse.epf.library.util.ResourceHelper;
 import org.eclipse.epf.uma.Activity;
@@ -68,8 +60,8 @@ import org.eclipse.gmf.runtime.diagram.core.preferences.PreferencesHint;
 import org.eclipse.gmf.runtime.notation.Diagram;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
-//import org.eclipse.swt.graphics.ImageData;
-//import org.eclipse.swt.graphics.ImageLoader;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -407,26 +399,10 @@ public class DiagramImageService implements IDiagramImageService {
 					if (!f.exists()) {
 						f.createNewFile();
 					}
-//					OutputStream os = new FileOutputStream(f);
-//					ImageLoader loader = new ImageLoader();
-//					loader.data = new ImageData[] { image.getImageData() };
-//					loader.save(os, SWT.IMAGE_JPEG);
-					
-//					/*
-					// Setting compression level to maximum quality
-					Iterator iter = ImageIO.getImageWritersByFormatName("jpeg"); //$NON-NLS-1$
-					ImageWriter writer = (ImageWriter)iter.next();
-					ImageWriteParam iwp = writer.getDefaultWriteParam();
-					iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-					iwp.setCompressionQuality(1);
-
-					FileImageOutputStream output = new FileImageOutputStream(f);
-					writer.setOutput(output);
-					BufferedImage bufferedImage = ImageUtils.convertToAWT(image.getImageData());
-					IIOImage iioImage = new IIOImage(bufferedImage, null, null);
-					writer.write(null, iioImage, iwp);
-					writer.dispose();
-//					 */
+					OutputStream os = new FileOutputStream(f);
+					ImageLoader loader = new ImageLoader();
+					loader.data = new ImageData[] { image.getImageData() };
+					loader.save(os, SWT.IMAGE_JPEG);					
 				} else {
 					DiagramUIPlugin.getDefault().getLogger().logError(
 							"Failed to create diagram image for" + e); //$NON-NLS-1$

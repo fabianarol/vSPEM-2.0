@@ -27,10 +27,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
-import org.eclipse.emf.transaction.RollbackException;
 import org.eclipse.epf.diagram.model.util.IAdapterFactoryFilter;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
 import org.eclipse.epf.library.edit.command.IActionManager;
@@ -38,14 +36,11 @@ import org.eclipse.epf.library.edit.process.ActivityWrapperItemProvider;
 import org.eclipse.epf.library.edit.process.BSActivityItemProvider;
 import org.eclipse.epf.library.edit.process.BreakdownElementWrapperItemProvider;
 import org.eclipse.epf.library.edit.process.IBSItemProvider;
+import org.eclipse.epf.library.edit.process.WBSActivityItemProvider;
 import org.eclipse.epf.library.edit.util.ConfigurableComposedAdapterFactory;
-import org.eclipse.epf.library.edit.util.DescriptorPropUtil;
-import org.eclipse.epf.library.edit.util.PredecessorList;
-import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.uma.Activity;
 import org.eclipse.epf.uma.BreakdownElement;
-import org.eclipse.epf.uma.Descriptor;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.Milestone;
 import org.eclipse.epf.uma.TaskDescriptor;
@@ -54,8 +49,6 @@ import org.eclipse.epf.uma.UmaPackage;
 import org.eclipse.epf.uma.VariabilityElement;
 import org.eclipse.epf.uma.WorkBreakdownElement;
 import org.eclipse.epf.uma.WorkOrder;
-import org.eclipse.gmf.runtime.notation.Edge;
-import org.eclipse.gmf.runtime.notation.View;
 import org.eclipse.uml2.uml.ActivityEdge;
 import org.eclipse.uml2.uml.ActivityNode;
 import org.eclipse.uml2.uml.ActivityParameterNode;
@@ -254,80 +247,6 @@ public class ActivityDiagramAdapter extends DiagramAdapter {
 		}
 		return false;
 	}
-	
-	protected List<WorkBreakdownElement> getLocalPredecessors(ActivityNode node) {
-		Activity diagramActivity = (Activity) BridgeHelper.getMethodElement(getDiagram());
-		AdapterFactory adapterFactory = getAdapterFactory();
-		ITreeItemContentProvider adapter = (ITreeItemContentProvider) adapterFactory.adapt(diagramActivity, ITreeItemContentProvider.class);
-		Collection<?> children = adapter.getChildren(diagramActivity);
-		return getLocalPredecessors(node, children);
-	}
-	
-	private List<WorkBreakdownElement> getLocalPredecessors(ActivityNode node, Collection<?> activityChildren) {
-		MethodElement e = BridgeHelper.getMethodElement(node);
-		if(e instanceof WorkBreakdownElement) {
-			// find item provider
-			//
-			Object object = null;
-			for (Object child : activityChildren) {
-				if(e == TngUtil.unwrap(child)) {
-					object = child;
-					break;
-				}
-			}
-			if(object != null) {
-				Object ip = getAdapterFactory().adapt(object, ITreeItemContentProvider.class);
-				if(ip instanceof IBSItemProvider) {
-					Object parent = ((ITreeItemContentProvider) ip).getParent(object);
-					ArrayList<WorkBreakdownElement> preds = new ArrayList<WorkBreakdownElement>();
-					PredecessorList predList = ((IBSItemProvider) ip).getPredecessors();
-					for (Object predIp : predList) {
-						Object pred = TngUtil.unwrap(predIp);
-						
-						if (ProcessUtil.isSynFree() && pred instanceof TaskDescriptor) {
-							DescriptorPropUtil propUtil = DescriptorPropUtil.getDesciptorPropUtil();
-							List<? extends Descriptor> childList = propUtil.getCustomizingChildren((TaskDescriptor) pred);
-							if (childList != null && ! childList.isEmpty()) {
-								boolean processed = false;
-								for (Descriptor des : childList) {
-									if (des.getSuperActivities() == parent) {
-										preds.add((WorkBreakdownElement) des);
-										processed = true;
-										break;
-									}
-								}
-								if (processed) {
-									continue;
-								}
-							}
-						}
-						// make sure that predecessors are sibling
-						//
-						if(((ITreeItemContentProvider) predIp).getParent(pred) == parent) {
-							if(pred instanceof WorkBreakdownElement) {
-								preds.add((WorkBreakdownElement) pred);
-							} else if (pred instanceof Adapter) {
-								pred = ((Adapter) pred).getTarget();
-								if(pred instanceof WorkBreakdownElement) {
-									preds.add((WorkBreakdownElement) pred);
-								}
-							}
-						} else if (ProcessUtil.isSynFree() && pred instanceof Adapter) {
-							pred = ((Adapter) pred).getTarget();
-							if (pred instanceof TaskDescriptor) {
-								TaskDescriptor td = (TaskDescriptor) pred;
-								if (td.getSuperActivities() == parent) {
-									preds.add(td);
-								}
-							}
-						}
-					}
-					return preds;
-				}
-			}
-		}
-		return Collections.emptyList();
-	}
 
 	AdapterFactory getAdapterFactory(){
 		AdapterFactory adapterFactory = null;
@@ -371,22 +290,17 @@ public class ActivityDiagramAdapter extends DiagramAdapter {
 					
 					if (link.getSource() != null && link.getSource() instanceof ControlNode)
 						continue linkListWalk;
-					
+
+					Object pred = BridgeHelper.getMethodElement(link.getSource());
 					boolean workOrderFound = false;
-					WorkOrder workOrder = (WorkOrder) BridgeHelper.getMethodElement(link);
-					if(workOrder == null) {
-						Object pred = BridgeHelper.getMethodElement(link.getSource());
-						find_WorkOrder: for (Iterator iterator1 = wbe
-								.getLinkToPredecessor().iterator(); iterator1
-								.hasNext();) {
-							WorkOrder wo = (WorkOrder) iterator1.next();
-							if (isValidWorkOrder(wo, pred)) {
-								workOrderFound = true;
-								break find_WorkOrder;
-							}
+					find_WorkOrder: for (Iterator iterator1 = wbe
+							.getLinkToPredecessor().iterator(); iterator1
+							.hasNext();) {
+						WorkOrder wo = (WorkOrder) iterator1.next();
+						if (isValidWorkOrder(wo, pred)) {
+							workOrderFound = true;
+							break find_WorkOrder;
 						}
-					} else {
-						workOrderFound = true;
 					}
 					if (!workOrderFound) {
 						// invalid link, remove it
@@ -423,70 +337,84 @@ public class ActivityDiagramAdapter extends DiagramAdapter {
 		// add new link for those WorkOrders that still don't have the
 		// corresponding link
 		//
-		Activity diagramActivity = (Activity) BridgeHelper.getMethodElement(getDiagram());
 		AdapterFactory adapterFactory = getAdapterFactory();
-		ITreeItemContentProvider adapter = (ITreeItemContentProvider) adapterFactory.adapt(diagramActivity, ITreeItemContentProvider.class);
-		Collection<?> children = adapter.getChildren(diagramActivity);
 		
 		for (ActivityNode node : selectedNodes) {
-			List<WorkBreakdownElement> preds = getLocalPredecessors(node, children);
-
-			// Iterate work orders and create links.
-			for (WorkBreakdownElement pred : preds) {
-				ActivityNode predNode = BridgeHelper.findNode(getDiagram(),
-						pred, true);
-				if (predNode != null) {
-					// check if there is a link for this work order
-					// already
-					//
-					boolean linkFound = false;
-					find_link: for (Iterator<?> iterator1 = node
-							.getIncomings().iterator(); iterator1
-							.hasNext();) {
-						ActivityEdge link = (ActivityEdge) iterator1.next();
-						if (link.getSource() == predNode) {
-							// link already exists
-							// check if work order is set to this link
-							//
-							linkFound = true;
-//							MethodElement me = BridgeHelper.getMethodElement(link);
-//							if (link != null) {
-//								BridgeHelper.setSemanticModel(
-//										link, workOrder);
-//							}
-							break find_link;
-						}
+			MethodElement e;
+			if ((e = BridgeHelper.getMethodElement(node)) instanceof WorkBreakdownElement) {
+				List list = new ArrayList(); 
+				// Get the raw data of workorders for object.
+				WorkBreakdownElement local = (WorkBreakdownElement) e;
+				list.addAll(local.getLinkToPredecessor());
+				
+				// Get the Predecessor List on top of raw data, this is need for in case of extend.
+				ITreeItemContentProvider adapter = null;
+				adapter = (ITreeItemContentProvider)adapterFactory
+									.adapt(local, ITreeItemContentProvider.class);
+				if(adapter instanceof IBSItemProvider){
+					list.addAll(((IBSItemProvider)adapter).getPredecessors());
+				}
+				
+				// Iterate work orders and create links.
+				for (Iterator iterator = list.iterator(); iterator
+						.hasNext();) {
+					Object next = iterator.next();
+					WorkOrder workOrder = null;
+					BreakdownElement pred = null;
+					if(next instanceof WorkOrder){
+						workOrder = (WorkOrder)next;
+						pred = workOrder.getPred();
 					}
-					if (!linkFound) {
-						// check if this WorkOrder can be represented
-						// via links of TypedNodes
-						//
-						if (!canReachAsFirstActivityNode(predNode, node)) {
-							// add new link for this work order
+					if(next instanceof WBSActivityItemProvider){
+						pred = (BreakdownElement)((WBSActivityItemProvider)next).getTarget(); 
+					}
+					
+					if (pred != null && pred instanceof WorkBreakdownElement) {
+						ActivityNode predNode = BridgeHelper.findNode(getDiagram(),
+								pred, true);
+						if (predNode != null) {
+							// check if there is a link for this work order
+							// already
 							//
-							NodeAdapter nodeAdapter = BridgeHelper.getNodeAdapter(node);
-							NodeAdapter predNodeAdapter = BridgeHelper.getNodeAdapter(predNode);
-							if(nodeAdapter != null && predNodeAdapter != null) {
-								boolean oldNotify = nodeAdapter.notificationEnabled;
-								boolean predNodeNotify = predNodeAdapter.notificationEnabled;
-								try {
-									nodeAdapter.notificationEnabled = false;
-									predNodeAdapter.notificationEnabled = false;
-									ActivityEdge edge = nodeAdapter.addIncomingConnection(pred);
-									if(BridgeHelper.isInherited(node)) {
-										// target node is inherited, must find the custom work order and associate it with the edge
-										//
-										WorkBreakdownElement inheritedChild = (WorkBreakdownElement) BridgeHelper.getMethodElement(node);
-										if(inheritedChild != null) {
-											WorkOrder wo = ProcessUtil.findWorkOrder(diagramActivity, inheritedChild, pred);
-											if(wo != null) {
-												BridgeHelper.associate(edge, wo);
-											}
+							boolean linkFound = false;
+							find_link: for (Iterator iterator1 = node
+									.getIncomings().iterator(); iterator1
+									.hasNext();) {
+								ActivityEdge link = (ActivityEdge) iterator1.next();
+								if (link.getSource() == predNode) {
+									// link already exists
+									// check if work order is set to this link
+									//
+									linkFound = true;
+//									MethodElement me = BridgeHelper.getMethodElement(link);
+									if (link == null) {
+										BridgeHelper.setSemanticModel(
+												link, workOrder);
+									}
+									break find_link;
+								}
+							}
+							if (!linkFound) {
+								// check if this WorkOrder can be represented
+								// via links of TypedNodes
+								//
+								if (!canReachAsFirstActivityNode(predNode, node)) {
+									// add new link for this work order
+									//
+									NodeAdapter nodeAdapter = BridgeHelper.getNodeAdapter(node);
+									NodeAdapter predNodeAdapter = BridgeHelper.getNodeAdapter(predNode);
+									if(nodeAdapter != null && predNodeAdapter != null) {
+										boolean oldNotify = nodeAdapter.notificationEnabled;
+										boolean predNodeNotify = predNodeAdapter.notificationEnabled;
+										try {
+											nodeAdapter.notificationEnabled = false;
+											predNodeAdapter.notificationEnabled = false;
+											nodeAdapter.addIncomingConnection(pred); 
+										} finally {
+											nodeAdapter.notificationEnabled = oldNotify;
+											predNodeAdapter.notificationEnabled = predNodeNotify;
 										}
 									}
-								} finally {
-									nodeAdapter.notificationEnabled = oldNotify;
-									predNodeAdapter.notificationEnabled = predNodeNotify;
 								}
 							}
 						}
@@ -544,69 +472,32 @@ public class ActivityDiagramAdapter extends DiagramAdapter {
 		return selectedNodes;
 	}
 	
-	@Override
-	protected void updateView(Collection<?> selectedNodes)
-			throws InterruptedException, RollbackException {
-		super.updateView(selectedNodes);
-		hideUnusedSyncBars();
-	}
-	
-	protected void hideUnusedSyncBars() {
-		View diagram = getView();
-		for (Object child : diagram.getVisibleChildren()) {
-			View childView = (View) child;
-			// hide a sync bar that is not connected to any visible target node
-			// or source node, which is associated with a work breakdown element
-			//
-			if(childView.getElement() instanceof ControlNode && 
-					BridgeHelper.isSynchBar((ActivityNode) childView.getElement()) &&
-					!isConnectedToVisibleWBENode(childView)) {
-				childView.setVisible(false);
-			}
-		}
-	}
-	
-	private static boolean isConnectedToVisibleWBENode(View view) {
-		// check source nodes
-		//
-		for(Object object : view.getTargetEdges()) {
-			View connectedView = ((Edge) object).getSource();
-//			if(connectedView != null && connectedView.isVisible() && 
-//					connectedView.getElement() instanceof ActivityNode &&
-//					BridgeHelper.getMethodElement(connectedView) instanceof WorkBreakdownElement) {
-//				return true;
-//			}
-			if(connectedView != null && connectedView.isVisible() && 
-					connectedView.getElement() instanceof ActivityNode ) {
-				return true;
-			}
-		}
-		
-		// check target nodes
-		//
-		for(Object object : view.getSourceEdges()) {
-			View connectedView = ((Edge) object).getTarget();
-//			if(connectedView != null && connectedView.isVisible() && 
-//					connectedView.getElement() instanceof ActivityNode &&
-//					BridgeHelper.getMethodElement(connectedView) instanceof WorkBreakdownElement) {
-//				return true;
-//			}
-			if(connectedView != null && connectedView.isVisible() && 
-					connectedView.getElement() instanceof ActivityNode) {
-				return true;
-			}
-		}
-		
-		return false;
-	}
-	
-	private List<? extends ControlNode> associateControlNodes(Collection<?> methodElements) {
-		List<ControlNode> ctrlNodes = new ArrayList<ControlNode>();
-		for (Iterator<?> iter = getDiagram().getNodes().iterator(); iter.hasNext();) {
+	private List associateControlNodes(Collection methodElements) {
+		List ctrlNodes = new ArrayList();
+		for (Iterator iter = getDiagram().getNodes().iterator(); iter.hasNext();) {
 			ActivityNode node = (ActivityNode) iter.next();
 			if(node instanceof ControlNode) {
+//				// select this control node for the diagram only if it has a target node or source node,
+//				// direct or indirect, that is associated with a method element in the specified
+//				// method element collection
+//				//
+//				Collection actNodes = new ArrayList();
+//				BridgeHelper.getTargetNodes(actNodes, node, WorkBreakdownElement.class);
+//				BridgeHelper.getSourceNodes(actNodes, node, WorkBreakdownElement.class);
+//				if(!actNodes.isEmpty()) {
+//					for (Iterator iterator = actNodes.iterator(); iterator
+//							.hasNext();) {
+//						ActivityNode elementNode = (ActivityNode) iterator.next();
+//						if(methodElements.contains(BridgeHelper.getMethodElement(elementNode))) {
+//							if(addNodeAdapterTo(node) != null) {
+//								ctrlNodes.add(node);
+//							}
+//						}
+//					}
+//				}
+				
 				if(addNodeAdapterTo(node) != null) {
-					ctrlNodes.add((ControlNode) node);
+					ctrlNodes.add(node);
 				}
 			}
 		}

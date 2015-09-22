@@ -13,8 +13,7 @@ package org.eclipse.epf.authoring.ui;
 import org.eclipse.epf.authoring.ui.internal.ImageDescriptorRegistry;
 import org.eclipse.epf.authoring.ui.internal.ProblemMarkerManager;
 import org.eclipse.epf.authoring.ui.preferences.LibraryViewPrefPage;
-import org.eclipse.epf.common.serviceability.Logger;
-import org.eclipse.epf.common.ui.AbstractPlugin;
+import org.eclipse.epf.common.plugin.AbstractPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -42,18 +41,17 @@ public class AuthoringUIPlugin extends AbstractPlugin {
 
 	
 	/**
-	 * @see org.eclipse.epf.common.ui.AbstractPlugin#start(org.osgi.framework.BundleContext)
+	 * @see org.eclipse.epf.common.plugin.AbstractPlugin#start(org.osgi.framework.BundleContext)
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		
 		// Initialize the Authoring UI service.
 		AuthoringUIService.getInstance().start();
-		Logger.SeeLogFileForMoreDetails = AuthoringUIResources.editors_MethodElementEditor_saveErrorReason1;
 	}
 
 	/**
-	 * @see org.eclipse.epf.common.ui.AbstractPlugin#stop(org.osgi.framework.BundleContext)
+	 * @see org.eclipse.epf.common.plugin.AbstractPlugin#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);
@@ -64,7 +62,7 @@ public class AuthoringUIPlugin extends AbstractPlugin {
 	protected void init(BundleContext context) throws Exception {
 		super.init(context);
 		
-		LibraryViewPrefPage.initDefaults(getDefault().getPreferenceStore());		
+		LibraryViewPrefPage.initDefaults(getDefault().getPreferenceStore());
 	}
 
 	/**

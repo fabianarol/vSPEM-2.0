@@ -12,25 +12,18 @@ package org.eclipse.epf.importing.xml.wizards;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.epf.authoring.ui.wizards.SaveAllEditorsPage;
-import org.eclipse.epf.common.ui.util.MsgBox;
+import org.eclipse.epf.common.serviceability.MsgBox;
 import org.eclipse.epf.export.xml.ExportXMLPlugin;
-import org.eclipse.epf.importing.ImportPlugin;
-import org.eclipse.epf.importing.ImportResources;
 import org.eclipse.epf.importing.xml.ImportXMLPlugin;
 import org.eclipse.epf.importing.xml.ImportXMLResources;
 import org.eclipse.epf.importing.xml.preferences.ImportXMLPreferences;
 import org.eclipse.epf.importing.xml.services.ImportXMLService;
 import org.eclipse.epf.library.ILibraryManager;
 import org.eclipse.epf.library.LibraryService;
-import org.eclipse.epf.library.edit.util.ProcessUtil;
-import org.eclipse.epf.library.services.SafeUpdateController;
 import org.eclipse.epf.library.ui.actions.LibraryLockingOperationRunner;
 import org.eclipse.epf.library.ui.wizards.LibraryBackupUtil;
 import org.eclipse.epf.library.util.ResourceUtil;
@@ -38,11 +31,11 @@ import org.eclipse.epf.persistence.MultiFileSaveUtil;
 import org.eclipse.epf.persistence.refresh.RefreshJob;
 import org.eclipse.epf.services.IFileManager;
 import org.eclipse.epf.services.Services;
-import org.eclipse.epf.ui.wizards.BaseWizard;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
@@ -56,15 +49,13 @@ import org.eclipse.ui.IWorkbench;
  * @author Kelvin Low
  * @since 1.0
  */
-public class ImportXMLWizard extends BaseWizard implements IImportWizard {
+public class ImportXMLWizard extends Wizard implements IImportWizard {
 
-	ImportXMLService service = ImportXMLService.newInstance();
+	ImportXMLService service = new ImportXMLService();
 
 	private boolean succeed = true;
 	
 	private SelectXMLFilePage filePage = null;
-	
-	public static final String WIZARD_EXTENSION_POINT_ID = "org.eclipse.epf.import.xml.importXMLWizard"; //$NON-NLS-1$	
 
 	/**
 	 * Creates a new instance.
@@ -80,7 +71,6 @@ public class ImportXMLWizard extends BaseWizard implements IImportWizard {
 	 *      IStructuredSelection)
 	 */
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
-		super.init(workbench, selection);
 	}
 
 	/**
@@ -114,33 +104,8 @@ public class ImportXMLWizard extends BaseWizard implements IImportWizard {
 				.getDefault().getImageDescriptor(
 						"full/wizban/ImportXML.gif")); //$NON-NLS-1$
 		
-		if (wizardExtender == null) {			
-			filePage = new SelectXMLFilePage();
-			addPage(filePage);			
-			return;
-		}
-		
-		List<IWizardPage> wizardPages = new ArrayList<IWizardPage>();
-
-		IWizardPage page = wizardExtender
-				.getReplaceWizardPage(SelectXMLFilePage.PAGE_NAME);
-		if (page != null) {
-			filePage = (SelectXMLFilePage) page;
-			wizardPages.add(page);
-		} else {
-			filePage = new SelectXMLFilePage();
-			addPage(filePage);		
-		}
-
-		super.getNewWizardPages(wizardPages);
-
-		for (Iterator<IWizardPage> it = wizardPages.iterator(); it
-				.hasNext();) {
-			IWizardPage wizardPage = it.next();
-			super.addPage(wizardPage);
-		}
-
-		wizardExtender.initWizardPages(wizardPages);
+		filePage = new SelectXMLFilePage();
+		addPage(filePage);
 	}
 
 	/**
@@ -179,14 +144,14 @@ public class ImportXMLWizard extends BaseWizard implements IImportWizard {
 		}
 		
 		
-//		runner = new LibraryLockingOperationRunner();
-//		runner.run(new IRunnableWithProgress() {
-//			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-//				String msg = NLS.bind(ImportXMLResources.review_log_files,
-//						service.getLogPath());
-//					MsgBox.prompt(msg, SWT.OK);
-//			}			
-//		});		
+		runner = new LibraryLockingOperationRunner();
+		runner.run(new IRunnableWithProgress() {
+			public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+				String msg = NLS.bind(ImportXMLResources.review_log_files,
+						service.getLogPath());
+					MsgBox.prompt(msg, SWT.OK);
+			}			
+		});		
 		
 		ResourceUtil.refreshResources(LibraryService.getInstance()
 				.getCurrentMethodLibrary(), new NullProgressMonitor());
@@ -212,23 +177,15 @@ public class ImportXMLWizard extends BaseWizard implements IImportWizard {
 					boolean mergeOption = filePage.getMergeOption();
 					boolean checkBasePlugins = filePage.getCheckBasePlugins();
 					service.setOverwrite(!mergeOption);
-					service.setMergeLevel(filePage.getMergerLevel());
 					service.setCheckBasePlugins(checkBasePlugins);
 					succeed = service.loadXml(xmlFile);
 					if (! succeed) {
 						return;
-					}
-					
-					if (! handleSynFreeFlag()) {
-						return;
-					}
-					
+					}					
 					service.doImport(monitor);
 					ImportXMLPreferences.setXMLFile(xmlFile);
 					ImportXMLPreferences.setMergeOption(mergeOption);
 					ImportXMLPreferences.setCheckBasePluginsOption(checkBasePlugins);
-					ImportXMLPreferences.setMergeLevel(filePage.getMergerLevel());
-					
 				} catch (Exception e) {
 					throw new InvocationTargetException(e);
 				} finally {
@@ -236,7 +193,6 @@ public class ImportXMLWizard extends BaseWizard implements IImportWizard {
 				}
 
 			}
-
 		};
 		try {
 			getContainer().run(true, false, op);
@@ -265,55 +221,5 @@ public class ImportXMLWizard extends BaseWizard implements IImportWizard {
 	 */
 	public void dispose() {
 		service.dispose();
-	}
-	
-	private boolean handleSynFreeFlag() {
-		final boolean needToConvert = ProcessUtil.isSynFree() && !service.isSynFreeLib();
-		final boolean toReject = !ProcessUtil.isSynFree() && service.isSynFreeLib();
-		final boolean result[] = new boolean[1];
-		result[0] = true;
-		
-		if (needToConvert || toReject) {
-			SafeUpdateController.syncExec(new Runnable() {
-				public void run() {
-					if (needToConvert) {
-//						String message = ImportResources.ImportNoSynLib_ConvertMsg;
-//						result[0] = ImportPlugin
-//								.getDefault()
-//								.getMsgDialog()
-//								.displayConfirmation(
-//										ImportXMLResources.importXMLWizard_title,
-//										message);
-						String message = ImportResources.ImportNoSynLibToSynLib_Error;
-						ImportPlugin
-								.getDefault()
-								.getMsgDialog()
-								.displayError(
-										ImportXMLResources.importXMLWizard_title,
-										message);
-						result[0] = false;
-					} else if (toReject) {
-						String message = ImportResources.ImportSynLibToNoSynLib_Error;
-						ImportPlugin
-								.getDefault()
-								.getMsgDialog()
-								.displayError(
-										ImportXMLResources.importXMLWizard_title,
-										message);
-						result[0] = false;
-					}
-				}
-			});
-		}
-		
-		return result[0];
-	}
-	
-
-	/**
-	 * @see org.eclipse.epf.ui.wizards.BaseWizard#getWizardExtenderExtensionPointId()
-	 */
-	public String getWizardExtenderExtensionPointId() {
-		return WIZARD_EXTENSION_POINT_ID;
 	}
 }

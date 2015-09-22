@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %pluginName
-Bundle-SymbolicName: org.eclipse.epf.diagram.ui;singleton:=true
-Bundle-Version: 1.5.0.qualifier
+Bundle-SymbolicName: org.eclipse.epf.diagram.ui
+Bundle-Version: 1.2.0.qualifier
 Bundle-Activator: org.eclipse.epf.diagram.ui.DiagramUIPlugin
 Bundle-Vendor: %providerName
 Bundle-Localization: plugin
@@ -13,11 +13,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.epf.diagram.add,
  org.eclipse.epf.diagram.wpdd,
  org.eclipse.epf.diagram.ad;visibility:=reexport,
- org.eclipse.gmf.runtime.diagram.ui.actions;visibility:=reexport,
- org.eclipse.epf.common.ui
+ org.eclipse.gmf.runtime.diagram.ui.actions;visibility:=reexport
 Eclipse-LazyStart: true
 Export-Package: org.eclipse.epf.diagram.ui,
  org.eclipse.epf.diagram.ui.service,
- org.eclipse.epf.diagram.ui.utils,
  org.eclipse.epf.diagram.ui.viewer
 Bundle-RequiredExecutionEnvironment: J2SE-1.5

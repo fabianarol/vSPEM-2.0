@@ -10,33 +10,21 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.library.configuration;
 
-import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.epf.common.utils.ExtensionHelper;
 import org.eclipse.epf.common.utils.StrUtil;
-import org.eclipse.epf.library.ConfigHelperDelegate;
+import org.eclipse.epf.library.ILibraryManager;
 import org.eclipse.epf.library.LibraryPlugin;
-import org.eclipse.epf.library.edit.PresentationContext;
-import org.eclipse.epf.library.edit.meta.TypeDefUtil;
+import org.eclipse.epf.library.LibraryService;
+import org.eclipse.epf.library.LibraryServiceUtil;
 import org.eclipse.epf.library.edit.util.CategorySortHelper;
-import org.eclipse.epf.library.edit.util.MethodElementPropUtil;
-import org.eclipse.epf.library.edit.util.PracticePropUtil;
-import org.eclipse.epf.library.edit.util.PropUtil;
 import org.eclipse.epf.library.edit.util.SectionList;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.util.LibraryUtil;
@@ -44,17 +32,20 @@ import org.eclipse.epf.library.util.ResourceHelper;
 import org.eclipse.epf.uma.Activity;
 import org.eclipse.epf.uma.Artifact;
 import org.eclipse.epf.uma.CapabilityPattern;
+import org.eclipse.epf.uma.ContentCategory;
 import org.eclipse.epf.uma.ContentDescription;
 import org.eclipse.epf.uma.ContentElement;
 import org.eclipse.epf.uma.CustomCategory;
 import org.eclipse.epf.uma.DeliveryProcess;
 import org.eclipse.epf.uma.DescribableElement;
-import org.eclipse.epf.uma.FulfillableElement;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodElement;
+import org.eclipse.epf.uma.MethodLibrary;
 import org.eclipse.epf.uma.MethodPackage;
 import org.eclipse.epf.uma.MethodPlugin;
 import org.eclipse.epf.uma.Practice;
+import org.eclipse.epf.uma.ProcessComponent;
+import org.eclipse.epf.uma.ProcessPackage;
 import org.eclipse.epf.uma.Role;
 import org.eclipse.epf.uma.RoleDescriptor;
 import org.eclipse.epf.uma.SupportingMaterial;
@@ -68,37 +59,14 @@ import org.eclipse.epf.uma.WorkProductDescriptor;
 import org.eclipse.epf.uma.ecore.impl.MultiResourceEObject;
 import org.eclipse.epf.uma.ecore.util.OppositeFeature;
 import org.eclipse.epf.uma.util.AssociationHelper;
-import org.eclipse.epf.uma.util.Scope;
-import org.eclipse.epf.uma.util.UserDefinedTypeMeta;
 
 
 /**
  * @author Jinhua Xi
  * @author Phong Nguyen Le
- * @author Weiping Lu
  * @since 1.0
  */
 public class ConfigurationHelper {
-	
-	public static boolean serverMode = false;
-	private static ConfigHelperDelegate delegate;
-
-	static {
-		ConfigHelperDelegate extendedDelegate = (ConfigHelperDelegate) ExtensionHelper
-				.getExtension(LibraryPlugin.getDefault().getId(),
-						"configHelperDelegateExt");//$NON-NLS-1$
-		if (extendedDelegate == null) {
-			delegate = new ConfigHelperDelegate();
-		} else {
-			delegate = extendedDelegate;
-		}
-	}
-	
-	public static ConfigHelperDelegate getDelegate() {
-		return delegate;
-	}
-	
-	private static boolean inheritingSlotFeatures = false; 
 	
 	public static final String ATTRIBUTE_VALUE_SEPERATOR = "<p/>"; //$NON-NLS-1$
 
@@ -143,7 +111,7 @@ public class ConfigurationHelper {
 			return false;
 		}
 
-		return getDelegate().isSystemPackage(p, pkg);
+		return TngUtil.getAllSystemPackages(p).contains(pkg);
 	}
 
 	/**
@@ -212,7 +180,7 @@ public class ConfigurationHelper {
 							base).iterator(); it.hasNext();) {
 						VariabilityElement e = (VariabilityElement) it.next();
 						if ((e != element)
-								&& (e.getVariabilityType() == VariabilityType.REPLACES)
+								&& (e.getVariabilityType() == VariabilityType.REPLACES_LITERAL)
 								&& isOwnerSelected(e, config, checkSubtracted)) {
 							if (debug) {
 								System.out
@@ -232,7 +200,109 @@ public class ConfigurationHelper {
 
 	private static boolean isOwnerSelected(MethodElement element,
 			MethodConfiguration config, boolean checkSubtracted) {
-		return getDelegate().isOwnerSelected(element, config, checkSubtracted);
+		MethodLibrary library = LibraryServiceUtil.getMethodLibrary(config);
+		ILibraryManager libraryManager = library == null? null : LibraryService.getInstance().getLibraryManager(library);
+		if (libraryManager != null) {
+			return LibraryService.getInstance()
+						.getConfigurationManager(config)
+							.getConfigurationData()
+								.isOwnerSelected(element, checkSubtracted);
+		}
+				
+		if (element == null) {
+			return false;
+		}
+
+		if (config == null || isDescriptionElement(element)) {
+			return true;
+		}
+
+		// since UMA 1.0.4, configuration can have added categories 
+		// and subtracted categories. The order of filtering is:
+		// 1. any element in the subtracted categories should be excluded
+		// 2. any element in the added categories should be included
+		// 3. any element not in the selected package or plugin should be excluded.
+		
+		if ( checkSubtracted ) {
+			// first check subtracted elements
+			List subtractedCategories = config.getSubtractedCategory();
+			if ( subtractedCategories.size() > 0 ) {
+				for ( Iterator it = subtractedCategories.iterator(); it.hasNext(); ) {
+					ContentCategory cc = (ContentCategory)it.next();
+					if ( cc == element ) {
+						return false;
+					}
+					
+					// need to check all content category types and sub-categories
+					// we need to have an efficient algorithm for this checking.
+					// for now, only check the custom category's categorised elements
+					// TODO. Jinhua Xi, 11/27/2006
+					if ( cc instanceof CustomCategory ) {
+						if ( ((CustomCategory)cc).getCategorizedElements().contains(element) ) {
+							return false;
+						}
+					} else {
+						// TODO, not implemented yet
+						System.out.println("TODO, isOwnerSelected: not implemented yet"); //$NON-NLS-1$
+					}
+				}
+			}
+		}
+		
+		// then check added categories
+		// TODO
+		
+		// elements beyond configuration scope should be always visible
+		if ((element instanceof MethodLibrary)
+				|| (element instanceof MethodConfiguration)) {
+			return true;
+		} else if (element instanceof MethodPlugin) {
+			List plugins = config.getMethodPluginSelection();
+			return (plugins != null) && plugins.contains(element);
+		} else {
+			// if the ownerprocess can't show, can't accept
+			if (element instanceof Activity) {
+				Activity base = (Activity) ((Activity) element)
+						.getVariabilityBasedOnElement();
+				if (base != null && base != element) {
+					MethodElement owningProc = TngUtil.getOwningProcess(base);
+					if ( owningProc != null && owningProc != element 
+							&& !inConfig(owningProc, config, checkSubtracted)) {
+						return false;
+					}
+				}
+			}
+
+			EObject pkg = LibraryUtil.getSelectable(element);
+
+			// accept global package if the plugin is in the configuration
+			if (pkg instanceof MethodPackage
+					&& isGlobalPackage((MethodPackage) pkg)) {
+				MethodPlugin plugin = LibraryUtil.getMethodPlugin(pkg);
+				return inConfig(plugin, config, checkSubtracted);
+			}
+
+			List pkgs = config.getMethodPackageSelection();
+			if (pkgs == null) {
+				return false;
+			}
+
+			// per Phong's request, for ProcessPackage, check the
+			// ProcessComponent parent instead
+			if (pkg instanceof ProcessPackage) {
+				while ((pkg != null) && !(pkg instanceof ProcessComponent)
+						&& !pkgs.contains(pkg)) {
+					pkg = pkg.eContainer();
+				}
+			}
+
+			// if package not selected, return false
+			if ((pkg == null) || !pkgs.contains(pkg)) {
+				return false;
+			}
+
+			return true;
+		}
 	}
 
 	/**
@@ -244,7 +314,7 @@ public class ConfigurationHelper {
 		if (element == null || element.getVariabilityBasedOnElement() == null)
 			return false;
 
-		return element.getVariabilityType() == VariabilityType.CONTRIBUTES;
+		return element.getVariabilityType() == VariabilityType.CONTRIBUTES_LITERAL;
 	}
 
 	/**
@@ -256,31 +326,7 @@ public class ConfigurationHelper {
 		if (element == null || element.getVariabilityBasedOnElement() == null)
 			return false;
 
-		return element.getVariabilityType() == VariabilityType.REPLACES;
-	}
-	
-	/**
-	 * is "b" an ancestor of "a" through a "contribute chain" relationship
-	 * @param a
-	 * @param b
-	 * @return
-	 */
-	public static boolean contrubuteChain(VariabilityElement a, VariabilityElement b) {	
-		VariabilityElement element = a;
-		while (element != null) {
-			if (element.getVariabilityType() != VariabilityType.CONTRIBUTES) {
-				return false;
-			}
-			element = element.getVariabilityBasedOnElement();
-			if (element == null) {
-				return false;
-			}
-			if (element == b) {
-				return true;
-			}
-		}
-		
-		return false;
+		return element.getVariabilityType() == VariabilityType.REPLACES_LITERAL;
 	}
 
 	/**
@@ -292,7 +338,7 @@ public class ConfigurationHelper {
 		if (element == null || element.getVariabilityBasedOnElement() == null)
 			return false;
 
-		return element.getVariabilityType() == VariabilityType.EXTENDS_REPLACES;
+		return element.getVariabilityType() == VariabilityType.EXTENDS_REPLACES_LITERAL;
 	}
 	
 	/**
@@ -304,7 +350,7 @@ public class ConfigurationHelper {
 		if (element == null || element.getVariabilityBasedOnElement() == null)
 			return false;
 
-		return element.getVariabilityType() == VariabilityType.EXTENDS;
+		return element.getVariabilityType() == VariabilityType.EXTENDS_LITERAL;
 	}
 
 	/**
@@ -335,8 +381,8 @@ public class ConfigurationHelper {
 			}
 
 			VariabilityType type = e.getVariabilityType();
-			if ( type == VariabilityType.REPLACES 
-					|| type == VariabilityType.EXTENDS_REPLACES) {
+			if ( type == VariabilityType.REPLACES_LITERAL 
+					|| type == VariabilityType.EXTENDS_REPLACES_LITERAL) {
 				if (ve != null) {
 					if (debug) {
 						System.out
@@ -375,7 +421,7 @@ public class ConfigurationHelper {
 				.iterator(); it.hasNext();) {
 			VariabilityElement e = (VariabilityElement) it.next();
 			if ((e != null)
-					&& (e.getVariabilityType() == VariabilityType.CONTRIBUTES)
+					&& (e.getVariabilityType() == VariabilityType.CONTRIBUTES_LITERAL)
 					&& inConfig(e, config)) {
 				VariabilityElement replacer = getReplacer(e, config);
 				if (replacer != null) {
@@ -386,121 +432,9 @@ public class ConfigurationHelper {
 			}
 		}
 
-		if (element instanceof Activity) {
-			Comparator<MethodElement> comparator = getContributorComparator(items);
-			Collections.sort(items, comparator);
-		}		
-		
 		return items;
 	}
 
-	private static Comparator<MethodElement> getContributorComparator(List<MethodElement> contributors) {
-		for (MethodElement contributor : contributors) {			
-			if (! isRefineRuleSyntax(contributor)) {				
-				Comparator<MethodElement> comparator = new Comparator<MethodElement>() {
-
-					public int compare(MethodElement object1, MethodElement object2) {
-						PropUtil propUtil = PropUtil.getPropUtil();
-						String v1 = propUtil.getContributionOrder(object1);
-						if (v1 == null) {
-							v1 = "";//$NON-NLS-1$
-						}
-						String v2 =  propUtil.getContributionOrder(object2);
-						if (v2 == null) {
-							v2 = "";//$NON-NLS-1$
-						}
-						if (v1.length() == 0) {
-							return v2.length() == 0 ? 0 : 1;
-						} else if (v2.length() == 0) {
-							return v1.length() == 0 ? 0 : -1;	
-						}
-						return v1.compareTo(v2);
-					}
-
-				    public boolean equals(Object object) {
-				    	return this == object;
-				    }
-				};
-				
-				return comparator;
-			}			
-		}
-		
-		Comparator<MethodElement> comparator = new Comparator<MethodElement>() {
-
-			public int compare(MethodElement object1, MethodElement object2) {
-				PropUtil propUtil = PropUtil.getPropUtil();
-				String v1 = propUtil.getContributionOrder(object1);
-				if (v1 == null) {
-					v1 = "";//$NON-NLS-1$
-				}
-				String v2 =  propUtil.getContributionOrder(object2);
-				if (v2 == null) {
-					v2 = "";//$NON-NLS-1$
-				}
-				if (v1.length() == 0) {
-					return v2.length() == 0 ? 0 : 1;
-				} else if (v2.length() == 0) {
-					return v1.length() == 0 ? 0 : -1;	
-				}
-				
-				String[] str1 = v1.split("\\.");	//$NON-NLS-1$
-				String[] str2 = v2.split("\\.");	//$NON-NLS-1$
-				int sz = Math.min(str1.length, str2.length);
-				for (int i = 0; i < sz; i++) {
-					int n1 = 0;
-					int n2 = 0;
-					try {
-						n1 = Integer.parseInt(str1[i]);
-					} catch (Exception e) {
-					}
-					try {
-						n2 = Integer.parseInt(str2[i]);
-					} catch (Exception e) {						
-					}
-					if (n1 != n2) {
-						return n1 < n2 ? -1 : 1; 
-					}
-				}
-				if (str1.length == str2.length ) {
-					return 0;
-				}
-				return str1.length < str2.length ? -1 : 1;
-			}
-
-		    public boolean equals(Object object) {
-		    	return this == object;
-		    }
-		};
-				
-		return comparator;
-	}
-
-	private static boolean isRefineRuleSyntax(MethodElement contributor) {
-		PropUtil propUtil = PropUtil.getPropUtil();
-		String value = propUtil.getContributionOrder(contributor);		
-		if (value == null || value.length() == 0) {
-			return true;
-		}
-		boolean dotIsAllowed = false;
-		for (int i = 0; i < value.length(); i++) {
-			char c = value.charAt(i);
-			if (c == '.') {
-				if (!dotIsAllowed) {
-					return false;
-				}
-				dotIsAllowed = false;
-				
-			} else if ('9' >= c && c >= '0') {				
-				dotIsAllowed = true;
-				
-			} else {
-				return false;
-			}			
-		}
-		return true;
-	}
-	
 	public static List getExtenders(VariabilityElement element,
 			MethodConfiguration config) {
 		List items = new ArrayList();
@@ -513,41 +447,13 @@ public class ConfigurationHelper {
 				.iterator(); it.hasNext();) {
 			VariabilityElement e = (VariabilityElement) it.next();
 			if ((e != null)
-					&& (e.getVariabilityType() == VariabilityType.EXTENDS)
+					&& (e.getVariabilityType() == VariabilityType.EXTENDS_LITERAL)
 					&& inConfig(e, config)) {
 					items.add(e);
 			}
 		}
 
 		return items;
-	}
-	
-	public static Set<VariabilityElement> getLocalContributersAndReplacers(VariabilityElement element,
-			MethodConfiguration config) {
-		Set<VariabilityElement> items = new HashSet<VariabilityElement>();
-
-		if ( element == null ) {
-			return items;
-		}
-		
-		for (Iterator it = AssociationHelper.getImmediateVarieties(element)
-				.iterator(); it.hasNext();) {
-			VariabilityElement e = (VariabilityElement) it.next();
-			if ((e != null)
-					&& (isLocalContributerOrReplacer(e))
-					&& inConfig(e, config)) {
-					items.add(e);
-			}
-		}
-
-		return items;
-	}
-	
-	private static boolean isLocalContributerOrReplacer(
-			VariabilityElement ve) {
-		VariabilityType type = ve.getVariabilityType();
-		return type == VariabilityType.LOCAL_CONTRIBUTION
-				|| type == VariabilityType.LOCAL_REPLACEMENT;
 	}
 	
 	public static boolean canShow(MethodElement element,
@@ -633,7 +539,7 @@ public class ConfigurationHelper {
 			return false;
 		}
 
-		while ((e != null) && (isReplacer(e) || isExtendReplacer(e))) {
+		while ((e != null) && isReplacer(e)) {
 			e = (VariabilityElement) e.getVariabilityBasedOnElement();
 			if (isContributor(e)) {
 				return false;
@@ -681,32 +587,28 @@ public class ConfigurationHelper {
 		// [Bug 196399] P-name is not inherited from its base element in an extending element
 		String name = null;
 
-		name = element.getPresentationName();
-		if ( StrUtil.isBlank(name) && (element instanceof VariabilityElement) ) {
-			EStructuralFeature f = UmaPackage.eINSTANCE.getVariabilityElement_VariabilityBasedOnElement();
-			ElementRealizer r = DefaultElementRealizer.newElementRealizer(config);	
-			MethodElement me = element;
+		if ( element instanceof DescribableElement ) {
+			name = ((DescribableElement)element).getPresentationName();
+			if ( StrUtil.isBlank(name) && (element instanceof VariabilityElement) ) {
+				
+				EStructuralFeature f = UmaPackage.eINSTANCE.getVariabilityElement_VariabilityBasedOnElement();
+				ElementRealizer r = new DefaultElementRealizer(config);	
+				MethodElement me = element;
 
-			Set<MethodElement> seens = new HashSet<MethodElement>();
-			do {
-				VariabilityElement oldMe = (VariabilityElement) me;
-				me = (DescribableElement)ConfigurationHelper.calc01FeatureValue(me, f, r);
-				if ( me == null ) {
-					break;
-				} else if (oldMe == me || seens.contains(me)) {
-					me = oldMe.getVariabilityBasedOnElement();
-					if (me == null) {
+				do {
+					VariabilityElement oldMe = (VariabilityElement) me;
+					me = (DescribableElement)ConfigurationHelper.calc01FeatureValue(me, f, r);
+					if ( me == null ) {
 						break;
-					}
-				}					
-				name = ((DescribableElement)me).getPresentationName();
-				if (seens.contains(me)) {	//to prevent loop in case such as											
-					break;					//both extend-replacer and base have empty pres name
-				}
-				seens.add(oldMe);
-				seens.add(me);
-			} while ( StrUtil.isBlank(name) );
-		}
+					} else if (oldMe == me) {
+						me = oldMe.getVariabilityBasedOnElement();						
+					}					
+					
+					name = ((DescribableElement)me).getPresentationName();
+					
+				} while ( StrUtil.isBlank(name) );
+			}
+		} 
 		
 		if ( StrUtil.isBlank(name) ) {
 			name = TngUtil.getPresentationName(element);
@@ -765,7 +667,7 @@ public class ConfigurationHelper {
 				|| feature == UmaPackage.eINSTANCE.getNamedElement_Name()
 				|| feature == UmaPackage.eINSTANCE
 						.getContentDescription_ExternalId() 
-				|| feature == UmaPackage.eINSTANCE.getMethodElement_PresentationName()) {
+				|| feature == UmaPackage.eINSTANCE.getDescribableElement_PresentationName()) {
 			return false;
 		}
 
@@ -823,36 +725,24 @@ public class ConfigurationHelper {
 			MethodElement OwnerElement, EStructuralFeature feature,
 			MethodConfiguration config, FeatureValue values, ElementRealizer realizer) {
 		
-		TypeDefUtil typeDefUtil = TypeDefUtil.getInstance();
-		
 		// make sure this is a valid feature 
 		// for example, if an activity contributes to a Capability Pattern,
 		// some CapabilityPattern specific feature may not be a valid feature for the Activity
 //		List features = element.getInstanceProperties();
-		List features = LibraryUtil.getStructuralFeatures(element, true);
-		if ( !features.contains(feature)) {
-			if (element instanceof Practice) {
-				PracticePropUtil practicePropUtil = PracticePropUtil.getPracticePropUtil();
-				Practice practice = (Practice) element;
-				UserDefinedTypeMeta meta = practicePropUtil.getUdtMeta(practice);
-				if (meta == null || ! meta.isQualifiedRefernce((EReference) feature)) {
-					return;
-				}
-			} else {	
-				return;
-			}
+		List features = LibraryUtil.getStructuralFeatures(element);
+		if ( !features.contains(feature) ) {
+			return;
 		}
 		
 		// EClassifier type = feature.getEType();
 		VariabilityElement ve = getVariableOwner((OwnerElement == null) ? element
 				: OwnerElement);
 
-//		Object value = element.eGet(feature);
-		Object value = typeDefUtil.eGet(element, feature);
+		Object value = element.eGet(feature);
 
 		values.add(ve, value);
 
-		if (config == null || config instanceof Scope) {
+		if (config == null) {
 			return;
 		}
 
@@ -863,190 +753,11 @@ public class ConfigurationHelper {
 		
 		// according to Peter, the realization should be always top down.
 		// i.e realize the base first, then include the contributions
-		__mergeBase(element, ve, feature, config, values, realizer);
-		
-		if (element instanceof FulfillableElement) {
-			if (feature != UmaPackage.eINSTANCE
-					.getFulfillableElement_Fulfills()) {
-				mergeSlotFeatureValues((FulfillableElement) element, feature,
-						config, values, realizer);
-			}
-		} else if (OwnerElement instanceof FulfillableElement) {
-			mergeSlotFeatureValues(element, (FulfillableElement) OwnerElement,
-					feature, config, values, realizer);	
-		}
-		
-		if (realizer != null) {
-			realizer.addExtraFeatureValues(element, feature, values);
-		}
+		__mergeBase(element, ve, feature, config, values, realizer);	
 		
 		if (!is01Feature(feature) || (values.size() == 0) ) {
 			__mergeContributors(element, ve, feature, config, values, realizer);
 		}
-	}
-	
-//	public static List<FulfillableElement> calcFulfillableElement_Fulfills(FulfillableElement element,
-//			MethodConfiguration config);
-	
-	//Change the signature and use a try/catch block in case there is any regression with some corner case.
-	public static List<FulfillableElement> calcFulfillableElement_Fulfills(FulfillableElement element,
-			ElementRealizer realizer) {
-		try {
-			return calcFulfillableElement_Fulfills_(element, realizer);
-		} catch (Exception e) {
-			return Collections.EMPTY_LIST;
-		}
-	}
-	
-	private static List<FulfillableElement> calcFulfillableElement_Fulfills_(FulfillableElement element,
-					ElementRealizer realizer) {
-		List<FulfillableElement> resultList = new ArrayList<FulfillableElement>();
-		
-		MethodConfiguration config = realizer.getConfiguration();
-//		ElementRealizer realizer = DefaultElementRealizer.newElementRealizer(config);
-		Object fullfillsObj = calc0nFeatureValue(element,
-				UmaPackage.eINSTANCE.getFulfillableElement_Fulfills(),
-				realizer);	
-		
-		if (! (fullfillsObj instanceof List)) {
-			return resultList;
-		}
-
-		EStructuralFeature feature = UmaPackage.eINSTANCE.getFulfillableElement_Fulfills();
-		for (FulfillableElement slot : (List<FulfillableElement>) fullfillsObj) {
-			slot = (FulfillableElement) getCalculatedElement(slot, config);
-			if (slotMatching(slot, element, realizer)) {
-				resultList.add(slot);
-			}
-		}
-		
-		if (resultList.size() > 1) {
-			Comparator comparator = PresentationContext.INSTANCE.getPresNameComparator();
-			Collections.<FulfillableElement>sort(resultList, comparator);
-		}
-		
-		return resultList;
-	}
-	
-	private static void mergeSlotFeatureValues(FulfillableElement element,
-			EStructuralFeature feature, MethodConfiguration config,
-			FeatureValue values, ElementRealizer realizer) {
-		if (!inheritingSlotFeatures) {
-			return;
-		}
-		
-		if (feature == UmaPackage.eINSTANCE.getFulfillableElement_Fulfills()) {			
-			return;
-		}
-		if (!(element instanceof WorkProduct)) {
-			return;
-		}
-		if (values.size() > 0) {
-			return;
-		}
-		
-		List<FulfillableElement> slots = calcFulfillableElement_Fulfills(element, realizer);
-
-		for (FulfillableElement slot : slots) {
-			if (slot instanceof WorkProduct) {
-				slot = (FulfillableElement) getCalculatedElement(slot, config);
-				calculateFeature(slot, null, feature, config, values,
-						realizer);
-			}
-		}
-	}
-	
-	private static void mergeSlotFeatureValues(MethodElement element, FulfillableElement OwnerElement,
-			EStructuralFeature feature, MethodConfiguration config,
-			FeatureValue values, ElementRealizer realizer) {
-		if (!inheritingSlotFeatures) {
-			return;
-		}
-		
-		if (! (element instanceof ContentDescription)) {
-			return;
-		}
-		
-		if (!(OwnerElement instanceof WorkProduct)) {
-			return;
-		}
-		if (values.size() > 0) {
-			return;
-		}
-		
-		List<FulfillableElement> slots = calcFulfillableElement_Fulfills(OwnerElement, realizer);
-
-		for (FulfillableElement slot : slots) {
-			if (slot instanceof WorkProduct) {
-				slot = (FulfillableElement) getCalculatedElement(slot, config);
-				ContentDescription slotOwnedElement = slot.getPresentation();				
-				calculateFeature(slotOwnedElement, slot, feature, config, values,
-						realizer);
-			}
-		}
-	}
-	
-	private static void mergeSlotOppositeFeatureValues(FulfillableElement element,
-			OppositeFeature feature, MethodConfiguration config,
-			FeatureValue values, ElementRealizer realizer) {
-		if (!inheritingSlotFeatures) {
-			return;
-		}
-		
-		if (feature == AssociationHelper.FulFills_FullFillableElements) {
-			return;
-		}
-		
-		if (!(element instanceof WorkProduct)) {
-			return;
-		}
-		if (values.size() > 0) {
-			return;
-		}
-		
-		List<FulfillableElement> slots = calcFulfillableElement_Fulfills(element, realizer);
-
-		for (FulfillableElement slot : slots) {
-			slot = (FulfillableElement) getCalculatedElement(slot, config);
-			calculateOppositeFeature(slot, feature, realizer, values);
-		}
-	}
-	
-	public static List<FulfillableElement> calcFulfills_FulfillableElement(
-			FulfillableElement slot, MethodConfiguration config) {
-		List<FulfillableElement> resultList = new ArrayList<FulfillableElement>();
-
-		ElementRealizer realizer = DefaultElementRealizer
-				.newElementRealizer(config);
-
-		List fulfillingList = calc0nFeatureValue(slot, AssociationHelper.FulFills_FullFillableElements, realizer);
-
-		for (FulfillableElement element : (List<FulfillableElement>) fulfillingList) {
-			element = (FulfillableElement) getCalculatedElement(element, config);
-			if (slotMatching(slot, element, realizer)) {
-				resultList.add(element);
-			}
-		}
-		
-		if (resultList.size() > 1) {
-			Comparator comparator = PresentationContext.INSTANCE.getPresNameComparator();
-			Collections.<FulfillableElement>sort(resultList, comparator);
-		}
-		
-		return resultList;
-	}		
-	
-	private static boolean slotMatching(FulfillableElement slot,
-			FulfillableElement element, ElementRealizer realizer) {
-		if (slot == null || !slot.getIsAbstract()) {
-			return false;
-		}		
-
-		if (realizer != null) {	
-			return realizer.slotMatching(slot, element);
-		}
-
-		return true;
 	}
 	
 	private static void __mergeBase(MethodElement element,
@@ -1058,10 +769,6 @@ public class ConfigurationHelper {
 		boolean extendReplace = isExtendReplacer(ve) || 
 				ElementRealizer.isExtendReplaceEnabled() && isReplacer(ve);
 		boolean isExtender = isExtender(ve);
-		
-		if (extendReplace && PropUtil.getPropUtil().isCustomize(ve)) {
-			return;
-		}
 		
 		if (isExtender || extendReplace) {
 			boolean mergebase = false;
@@ -1268,7 +975,7 @@ public class ConfigurationHelper {
 				// (i.e. i am an entender)
 				// this handles the senario: G2 replaces G1 and G3 extends G1
 				ElementRealizer realizer2 = 
-					DefaultElementRealizer.newElementRealizer(config, (!isReplacer), (!isReplacer));
+					new DefaultElementRealizer(config, (!isReplacer), (!isReplacer));
 
 				MethodElement e = getCalculatedElement(ce
 						.getVariabilityBasedOnElement(), realizer2);
@@ -1286,11 +993,6 @@ public class ConfigurationHelper {
 					calculateOppositeFeature(e, feature, mergeReplacerBase, mergeExtenderBase, realizer, values);
 				}
 			}
-			
-			if (element instanceof FulfillableElement) {
-				mergeSlotOppositeFeatureValues((FulfillableElement) element, feature, config, values, realizer);
-			}
-			
 		}
 	}
 
@@ -1304,7 +1006,7 @@ public class ConfigurationHelper {
 	 */
 	public static List getCalculatedElements(List elements,
 			MethodConfiguration config) {
-		return getCalculatedElements(elements, DefaultElementRealizer.newElementRealizer(config) );
+		return getCalculatedElements(elements, new DefaultElementRealizer(config) );
 	}
 	
 	/**
@@ -1339,7 +1041,7 @@ public class ConfigurationHelper {
 	 */
 	public static MethodElement getCalculatedElement(MethodElement element,
 			MethodConfiguration config) {
-		ElementRealizer realizer = DefaultElementRealizer.newElementRealizer(config, true, true);
+		ElementRealizer realizer = new DefaultElementRealizer(config, true, true);
 
 		return getCalculatedElement(element, realizer);
 	}
@@ -1465,11 +1167,11 @@ public class ConfigurationHelper {
 	 * @param oFeature
 	 * @return EStructuralFeature
 	 */
-	public static EStructuralFeature get01Feature(OppositeFeature oFeature) {		
-/*		if ( oFeature == AssociationHelper.Role_Primary_Tasks 
+	public static EStructuralFeature get01Feature(OppositeFeature oFeature) {
+		if ( oFeature == AssociationHelper.Role_Primary_Tasks 
 				|| oFeature == AssociationHelper.RoleDescriptor_PrimaryTaskDescriptors ) {
 			return oFeature.getTargetFeature();
-		}*/
+		}
 		
 		return null;
 	}
@@ -1484,33 +1186,8 @@ public class ConfigurationHelper {
 	 * @return List a list of {@link MethodElement}
 	 */
 	public static List calc0nFeatureValue(MethodElement element,
-			EStructuralFeature feature, ElementRealizer realizer) {
-		TypeDefUtil typeDefUtil = TypeDefUtil.getInstance();
-		if (realizer == null) {
-			Object value = typeDefUtil.eGet(element, feature);
-			return value instanceof List ? (List) value : null;
-		}
-		
-		if (realizer != null && realizer.getConfiguration() instanceof Scope) {
-//			Object value = element.eGet(feature);
-			Object value = typeDefUtil.eGet(element, feature);
-			if (value instanceof List) {
-				List listValue = new ArrayList((List) value); 
-				for (int i = 0; i < listValue.size(); i++) {
-					if (listValue.get(i) instanceof MethodElement) {
-						MethodElement e0 = (MethodElement) listValue.get(i);
-						MethodElement e1 = realizer.realize(e0);
-						if (e1 != null && e1 != e0) {
-							listValue.set(i, e1);
-						}
-					} else {
-						break;
-					}
-				}
-				return listValue;
-			}
-			return null;
-		}
+			EStructuralFeature feature, ElementRealizer realizer) 
+	{
 		return calc0nFeatureValue(element, null, feature, realizer);
 	}
 	
@@ -1529,18 +1206,6 @@ public class ConfigurationHelper {
 	 * @return List a list of {@link MethodElement}
 	 */
 	public static List calc0nFeatureValue(MethodElement element, MethodElement ownerElement, 
-			EStructuralFeature feature, ElementRealizer realizer) {
-		List ret = calc0nFeatureValue_(element, ownerElement, feature, realizer);
-		if (ret != null && !ret.isEmpty() && (element instanceof Task) && feature == UmaPackage.eINSTANCE.getTask_OptionalInput()) {
-			List mInputs = calc0nFeatureValue_(element, ownerElement, UmaPackage.eINSTANCE.getTask_MandatoryInput(), realizer);
-			if (mInputs != null && ! mInputs.isEmpty()) {
-				ret.removeAll(mInputs);
-			}			
-		}		
-		return ret;
-	}
-	
-	private static List calc0nFeatureValue_(MethodElement element, MethodElement ownerElement, 
 			EStructuralFeature feature, ElementRealizer realizer) {
 				
 		List v = null;
@@ -1604,7 +1269,7 @@ public class ConfigurationHelper {
 
 				
 				// workaround to allow show/hide subtracted elements
-				ElementRealizer r = DefaultElementRealizer.newElementRealizer(config);
+				DefaultElementRealizer r = new DefaultElementRealizer(config);
 				r.setShowSubtracted(realizer.showSubtracted());
 				
 				MethodElement oo = calc01FeatureValue(o, of, r);
@@ -1635,10 +1300,7 @@ public class ConfigurationHelper {
 		
 		List returnList = realizer.realize(element, feature, values);
 		if (CategorySortHelper.needToSort(element, feature)) {
-			Map map = MethodElementPropUtil.getMethodElementPropUtil().getExtendedPropertyMap(element, false);
-			if (map == null || ! map.containsKey(ConfigurationFilter.isEmptyCheckLock)) {
-				returnList = CategorySortHelper.sortCategoryElements(element, returnList.toArray(), true, feature, config);
-			}
+			returnList = CategorySortHelper.sortCategoryElements(element, returnList.toArray(), true);
 		}
 
 		// the following part might not be general to all cases
@@ -1744,44 +1406,9 @@ public class ConfigurationHelper {
 	public static Object calcAttributeFeatureValue(MethodElement element,
 			MethodElement ownerElement, EStructuralFeature feature,
 			MethodConfiguration config) {
-		if (config instanceof Scope) {
-//			Object value = element.eGet(feature);
-			Object value = TypeDefUtil.getInstance().eGet(element, feature);
-			if (value instanceof MethodElement) {
-				ElementRealizer realizer = DefaultElementRealizer.newElementRealizer(config);
-				value = realizer.realize((MethodElement) value);
-			}
-			return value;
-		}
-
-		//Inherent externalId for a extends and extends-replaces variability element
-		if (ownerElement instanceof DescribableElement
-				&& ownerElement instanceof VariabilityElement
-				&& element instanceof ContentDescription
-				&& feature == UmaPackage.eINSTANCE
-						.getContentDescription_ExternalId()) {
-			VariabilityElement va = (VariabilityElement) ownerElement;
-			ContentDescription presentation = (ContentDescription) element;
-			while (presentation != null) {
-				String extenalId = presentation.getExternalId();
-				if (extenalId != null && extenalId.trim().length() > 0) {
-					return extenalId;
-				}
-				presentation = null;
-				if (va.getVariabilityType() == VariabilityType.EXTENDS
-						|| va.getVariabilityType() == VariabilityType.EXTENDS_REPLACES) {
-					va = va.getVariabilityBasedOnElement();
-					if (va != null) {
-						presentation = ((DescribableElement) va)
-								.getPresentation();
-					}
-				}
-			}
-		}
-		
 		if (isMergableAttribute(feature)) {
 			// merge the attribute values
-			ElementRealizer realizer = DefaultElementRealizer.newElementRealizer(config);
+			ElementRealizer realizer = new DefaultElementRealizer(config);
 			AttributeFeatureValue values = new AttributeFeatureValue(element, ownerElement, feature, realizer);
 			calculateFeature(element, ownerElement, feature, config, values,
 						realizer);
@@ -1794,7 +1421,7 @@ public class ConfigurationHelper {
 //				}
 //
 //				if (feature == UmaPackage.eINSTANCE
-//						.getMethodElement_PresentationName()) {
+//						.getDescribableElement_PresentationName()) {
 //					if (values.size() > 1) {
 //						// something wrong here, will not happen but put test
 //						// message here just in case
@@ -1833,8 +1460,7 @@ public class ConfigurationHelper {
 			return values.getValue();
 		}
 
-//		return element.eGet(feature);
-		return TypeDefUtil.getInstance().eGet(element, feature);
+		return element.eGet(feature);
 	}
 
 	/**
@@ -1867,18 +1493,10 @@ public class ConfigurationHelper {
 			OppositeFeature feature, boolean mergeReplacerBase, boolean mergeExtenderBase, ElementRealizer realizer) {
 		ToManyOppositeFeatureValue values = new ToManyOppositeFeatureValue(element, feature, realizer);
 		calculateOppositeFeature(element, feature, mergeReplacerBase, mergeExtenderBase, realizer, values);
-		List ret = (List)values.getValue();
-		if (feature == AssociationHelper.DescribableElement_CustomCategories) {
-			Set<CustomCategory> set = ConfigurationHelper.getDelegate().getDynamicCustomCategories(element);
-			if (set != null && !set.isEmpty()) {
-				set.removeAll(ret);
-				if (! set.isEmpty()) {
-					ret.addAll(set);
-				}
-			}
-		}				
-		return ret;
+		return (List)values.getValue();
 	}
+	
+	
 	
 	/**
 	 * get the calculated 0..1 feature value of the specipied element and
@@ -2098,8 +1716,7 @@ public class ConfigurationHelper {
 			ve = (VariabilityElement)e;
 			isDesc = false;
 		} else {
-//			str = e.eGet(attrib);
-			str = TypeDefUtil.getInstance().eGet(e, attrib);
+			str = e.eGet(attrib);
 			return (str==null) ? "" : str.toString(); //$NON-NLS-1$
 		}
 		
@@ -2110,12 +1727,11 @@ public class ConfigurationHelper {
 					
 		VariabilityElement base = ve.getVariabilityBasedOnElement();
 		VariabilityType variabilityType = ve.getVariabilityType();
-		if( base != null && variabilityType == VariabilityType.LOCAL_CONTRIBUTION) {
+		if( base != null && variabilityType == VariabilityType.LOCAL_CONTRIBUTION_LITERAL) {
 			// for local contribution, append the text to the base
 			Object strBase;
 			if ( isDesc ) {
-//				str = ((DescribableElement)ve).getPresentation().eGet(attrib);
-				str = TypeDefUtil.getInstance().eGet(((DescribableElement)ve).getPresentation(), attrib);
+				str = ((DescribableElement)ve).getPresentation().eGet(attrib);
 				strBase = calcAttributeFeatureValue( ((DescribableElement)base).getPresentation(), base, attrib, config);
 			} else {
 				str = ve.eGet(attrib);
@@ -2138,7 +1754,7 @@ public class ConfigurationHelper {
 //		List values = new ArrayList();
 //		VariabilityElement base;
 //		VariabilityType variabilityType;	
-//		boolean concat = attrib != UmaPackage.eINSTANCE.getMethodElement_PresentationName();
+//		boolean concat = attrib != UmaPackage.eINSTANCE.getDescribableElement_PresentationName();
 //		while(true) {
 //			base = ve.getVariabilityBasedOnElement();
 //			if(base == null) {
@@ -2314,29 +1930,18 @@ public class ConfigurationHelper {
 		OppositeFeature ofeature = AssociationHelper.Role_Primary_Tasks;
 		ToManyOppositeFeatureValue fv2 = new ToManyOppositeFeatureValue(element, ofeature, realizer);
 		calculateOppositeFeature(element, ofeature, realizer, fv2);
-		
 		if ( fv2.size() > 0 ) {
 			List v2 = (List)fv2.getValue();
 			EStructuralFeature feature = UmaPackage.eINSTANCE.getTask_Output();
-			Set set = new LinkedHashSet();
 			for (Iterator it = v2.iterator(); it.hasNext(); ) {
 				MethodElement e = (MethodElement)it.next();
 				ToManyFeatureValue fv = new ToManyFeatureValue(element, ownerElement, feature, realizer);
-				
-//				This is wrong: fv.getValue() may return a copy instead of the reference of the internal value field! 				
-//				((List)).addAll(v);   
+				((List)fv.getValue()).addAll(v);
 				
 				calculateFeature(e, ownerElement, 
 						feature, 
 						realizer.getConfiguration(), fv, realizer);	
-//				v = (List)fv.getValue();
-				List list = (List)fv.getValue();
-				if (list != null && !list.isEmpty()) {
-					set.addAll(list);
-				}								
-			}
-			if (! set.isEmpty()) {
-				v.addAll(set);
+				v = (List)fv.getValue();
 			}
 		}	
 		
@@ -2390,14 +1995,12 @@ public class ConfigurationHelper {
 		List modifyRoles = new ArrayList();
 		for (Iterator it = tasks.iterator(); it.hasNext(); ) {
 			Task t = (Task)it.next();
-			List<Role> rList = (List<Role>)ConfigurationHelper.calc0nFeatureValue(
+			Role r = (Role)ConfigurationHelper.calc01FeatureValue(
 					t, 
 					UmaPackage.eINSTANCE.getTask_PerformedBy(), 
 					realizer);
-			for (Role r: rList) {
-				if ( (r != null) && !modifyRoles.contains(r) ) {
-					modifyRoles.add(r);
-				}
+			if ( (r != null) && !modifyRoles.contains(r) ) {
+				modifyRoles.add(r);
 			}
 		}
 		
@@ -2496,27 +2099,5 @@ public class ConfigurationHelper {
 				getBaseProcesses((Activity)o, config, value);
 			}
 		}
-	}
-	
-	public static URI getInheritingUri(DescribableElement obj, URI uri,
-			VariabilityElement[] uriInheritingBases, MethodConfiguration config, int uriType) {
-		VariabilityElement ve = (VariabilityElement) obj;
-		VariabilityElement base = ve.getVariabilityBasedOnElement();
-		if (base != null
-				&& (ve.getVariabilityType() == VariabilityType.EXTENDS || ve
-						.getVariabilityType() == VariabilityType.EXTENDS_REPLACES)) {
-			base = (VariabilityElement) ConfigurationHelper.getCalculatedElement(base, config);
-			if (base != null) {
-				if (uriType == 0) {
-					uri = ((DescribableElement) base).getNodeicon();
-				} else if (uriType == 1) {
-					uri = ((DescribableElement) base).getShapeicon();
-				}
-				if (uri != null) {
-					uriInheritingBases[0] = base;
-				}
-			}
-		}
-		return uri;
 	}
 }

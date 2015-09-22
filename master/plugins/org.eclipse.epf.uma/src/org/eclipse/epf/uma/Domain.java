@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.uma;
 
+import org.eclipse.emf.common.util.EList;
 import java.util.List;
 
 /**
@@ -20,7 +21,6 @@ import java.util.List;
  * <!-- begin-model-doc -->
  * Domain is a refineable hierarchy grouping related work products.  In other words, Domains can be further divided into sub-domains, with work product elements to be categorized only at the leaf-level of this hierarchy.
  * Domain is a logical grouping of work products that have an affinity to each other based on resources, timing, or relationship.  A Domain may be divided into subdomains.  For example, GS Method uses six predefined Domains for Work Products: Application, Architecture, Business, Engagement, Operations and Organization.
- * 
  * <!-- end-model-doc -->
  *
  * <p>
@@ -47,10 +47,10 @@ public interface Domain extends ContentCategory {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Work Products</em>' reference list.
 	 * @see org.eclipse.epf.uma.UmaPackage#getDomain_WorkProducts()
-	 * @model ordered="false"
+	 * @model type="org.eclipse.epf.uma.WorkProduct" ordered="false"
 	 * @generated
 	 */
-	List<WorkProduct> getWorkProducts();
+	List getWorkProducts();
 
 	/**
 	 * Returns the value of the '<em><b>Subdomains</b></em>' containment reference list.
@@ -63,9 +63,9 @@ public interface Domain extends ContentCategory {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Subdomains</em>' containment reference list.
 	 * @see org.eclipse.epf.uma.UmaPackage#getDomain_Subdomains()
-	 * @model containment="true" resolveProxies="true" ordered="false"
+	 * @model type="org.eclipse.epf.uma.Domain" containment="true" resolveProxies="true" ordered="false"
 	 * @generated
 	 */
-	List<Domain> getSubdomains();
+	List getSubdomains();
 
 } // Domain

@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: TaskDescriptor.java,v 1.4 2007/05/04 22:46:43 klow Exp $
+ */
 package org.eclipse.epf.xml.uma;
 
 import org.eclipse.emf.common.util.EList;
@@ -28,8 +24,8 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * The following features are supported:
  * <ul>
  *   <li>{@link org.eclipse.epf.xml.uma.TaskDescriptor#getTask <em>Task</em>}</li>
- *   <li>{@link org.eclipse.epf.xml.uma.TaskDescriptor#getGroup3 <em>Group3</em>}</li>
  *   <li>{@link org.eclipse.epf.xml.uma.TaskDescriptor#getPerformedPrimarilyBy <em>Performed Primarily By</em>}</li>
+ *   <li>{@link org.eclipse.epf.xml.uma.TaskDescriptor#getGroup2 <em>Group2</em>}</li>
  *   <li>{@link org.eclipse.epf.xml.uma.TaskDescriptor#getAdditionallyPerformedBy <em>Additionally Performed By</em>}</li>
  *   <li>{@link org.eclipse.epf.xml.uma.TaskDescriptor#getAssistedBy <em>Assisted By</em>}</li>
  *   <li>{@link org.eclipse.epf.xml.uma.TaskDescriptor#getExternalInput <em>External Input</em>}</li>
@@ -57,7 +53,7 @@ public interface TaskDescriptor extends WorkBreakdownElement {
 	 * @return the value of the '<em>Task</em>' attribute.
 	 * @see #setTask(String)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getTaskDescriptor_Task()
-	 * @model dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="kind='element' name='Task'"
 	 * @generated
 	 */
@@ -74,38 +70,48 @@ public interface TaskDescriptor extends WorkBreakdownElement {
 	void setTask(String value);
 
 	/**
-	 * Returns the value of the '<em><b>Performed Primarily By</b></em>' attribute list.
-	 * The list contents are of type {@link java.lang.String}.
+	 * Returns the value of the '<em><b>Performed Primarily By</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Performed Primarily By</em>' attribute isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Performed Primarily By</em>' attribute list.
+	 * @return the value of the '<em>Performed Primarily By</em>' attribute.
+	 * @see #setPerformedPrimarilyBy(String)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getTaskDescriptor_PerformedPrimarilyBy()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='PerformedPrimarilyBy' group='#group:36'"
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 *        extendedMetaData="kind='element' name='PerformedPrimarilyBy'"
 	 * @generated
 	 */
-	EList<String> getPerformedPrimarilyBy();
+	String getPerformedPrimarilyBy();
 
 	/**
-	 * Returns the value of the '<em><b>Group3</b></em>' attribute list.
+	 * Sets the value of the '{@link org.eclipse.epf.xml.uma.TaskDescriptor#getPerformedPrimarilyBy <em>Performed Primarily By</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Performed Primarily By</em>' attribute.
+	 * @see #getPerformedPrimarilyBy()
+	 * @generated
+	 */
+	void setPerformedPrimarilyBy(String value);
+
+	/**
+	 * Returns the value of the '<em><b>Group2</b></em>' attribute list.
 	 * The list contents are of type {@link org.eclipse.emf.ecore.util.FeatureMap.Entry}.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Group3</em>' attribute list isn't clear,
+	 * If the meaning of the '<em>Group2</em>' attribute list isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Group3</em>' attribute list.
-	 * @see org.eclipse.epf.xml.uma.UmaPackage#getTaskDescriptor_Group3()
+	 * @return the value of the '<em>Group2</em>' attribute list.
+	 * @see org.eclipse.epf.xml.uma.UmaPackage#getTaskDescriptor_Group2()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
-	 *        extendedMetaData="kind='group' name='group:36'"
+	 *        extendedMetaData="kind='group' name='group:27'"
 	 * @generated
 	 */
-	FeatureMap getGroup3();
+	FeatureMap getGroup2();
 
 	/**
 	 * Returns the value of the '<em><b>Additionally Performed By</b></em>' attribute list.
@@ -118,11 +124,11 @@ public interface TaskDescriptor extends WorkBreakdownElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Additionally Performed By</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getTaskDescriptor_AdditionallyPerformedBy()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='AdditionallyPerformedBy' group='#group:36'"
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='AdditionallyPerformedBy' group='#group:27'"
 	 * @generated
 	 */
-	EList<String> getAdditionallyPerformedBy();
+	EList getAdditionallyPerformedBy();
 
 	/**
 	 * Returns the value of the '<em><b>Assisted By</b></em>' attribute list.
@@ -135,11 +141,11 @@ public interface TaskDescriptor extends WorkBreakdownElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Assisted By</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getTaskDescriptor_AssistedBy()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='AssistedBy' group='#group:36'"
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='AssistedBy' group='#group:27'"
 	 * @generated
 	 */
-	EList<String> getAssistedBy();
+	EList getAssistedBy();
 
 	/**
 	 * Returns the value of the '<em><b>External Input</b></em>' attribute list.
@@ -152,11 +158,11 @@ public interface TaskDescriptor extends WorkBreakdownElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>External Input</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getTaskDescriptor_ExternalInput()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='ExternalInput' group='#group:36'"
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='ExternalInput' group='#group:27'"
 	 * @generated
 	 */
-	EList<String> getExternalInput();
+	EList getExternalInput();
 
 	/**
 	 * Returns the value of the '<em><b>Mandatory Input</b></em>' attribute list.
@@ -169,11 +175,11 @@ public interface TaskDescriptor extends WorkBreakdownElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Mandatory Input</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getTaskDescriptor_MandatoryInput()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='MandatoryInput' group='#group:36'"
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='MandatoryInput' group='#group:27'"
 	 * @generated
 	 */
-	EList<String> getMandatoryInput();
+	EList getMandatoryInput();
 
 	/**
 	 * Returns the value of the '<em><b>Optional Input</b></em>' attribute list.
@@ -186,11 +192,11 @@ public interface TaskDescriptor extends WorkBreakdownElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Optional Input</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getTaskDescriptor_OptionalInput()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='OptionalInput' group='#group:36'"
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='OptionalInput' group='#group:27'"
 	 * @generated
 	 */
-	EList<String> getOptionalInput();
+	EList getOptionalInput();
 
 	/**
 	 * Returns the value of the '<em><b>Output</b></em>' attribute list.
@@ -203,11 +209,11 @@ public interface TaskDescriptor extends WorkBreakdownElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Output</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getTaskDescriptor_Output()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='Output' group='#group:36'"
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='Output' group='#group:27'"
 	 * @generated
 	 */
-	EList<String> getOutput();
+	EList getOutput();
 
 	/**
 	 * Returns the value of the '<em><b>Step</b></em>' containment reference list.
@@ -220,11 +226,11 @@ public interface TaskDescriptor extends WorkBreakdownElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Step</em>' containment reference list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getTaskDescriptor_Step()
-	 * @model containment="true"
+	 * @model type="org.eclipse.epf.xml.uma.Section" containment="true"
 	 *        extendedMetaData="kind='element' name='Step'"
 	 * @generated
 	 */
-	EList<Section> getStep();
+	EList getStep();
 
 	/**
 	 * Returns the value of the '<em><b>Is Synchronized With Source</b></em>' attribute.
@@ -239,7 +245,7 @@ public interface TaskDescriptor extends WorkBreakdownElement {
 	 * @see #unsetIsSynchronizedWithSource()
 	 * @see #setIsSynchronizedWithSource(boolean)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getTaskDescriptor_IsSynchronizedWithSource()
-	 * @model unsettable="true" dataType="org.eclipse.emf.ecore.xml.type.Boolean"
+	 * @model unique="false" unsettable="true" dataType="org.eclipse.emf.ecore.xml.type.Boolean"
 	 *        extendedMetaData="kind='attribute' name='isSynchronizedWithSource'"
 	 * @generated
 	 */

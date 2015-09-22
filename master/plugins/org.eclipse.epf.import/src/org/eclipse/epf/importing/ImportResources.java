@@ -37,7 +37,6 @@ public final class ImportResources extends NLS {
 	public static String ConfigurationImportService_MSG0;
 	public static String ConfigurationImportService_MSG1;
 	public static String ConfigurationImportService_MSG3;
-	public static String ConfigurationImportService_handleToolVersion_error;
 	public static String ImportConfigurationWizard_MSG1;
 	public static String FileModifyChecker_Checkout_failed_msg;
 	public static String FileModifyChecker_Checkout_failed_title;
@@ -46,9 +45,6 @@ public final class ImportResources extends NLS {
 	public static String ImportPluginWizard_readonly;
 	public static String ImportPluginWizard_MSG1;
 	public static String ImportPluginWizard_error;
-	public static String ImportNoSynLib_ConvertMsg;
-	public static String ImportSynLibToNoSynLib_Error;
-	public static String ImportNoSynLibToSynLib_Error;
 	public static String ImportPluginWizard_warn_existing_plugins;
 	public static String ImportPluginWizard_confirm_continue;
 	public static String ImportPluginWizard_warn_circular_plugins;

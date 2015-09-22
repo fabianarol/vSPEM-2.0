@@ -47,24 +47,16 @@ public class PublishOptions {
 
 	// Show method content in the descriptor pages option.
 	protected boolean showMethodContentInDescriptors;
-	
-	protected boolean showLinkedPageForDescriptor;
 
 	// Show related descriptors in the task, role, and work product pages
 	// option.
 	protected boolean showRelatedDescriptors;
-	
-	//Show all indirect (green) occurrences in extended patterns
-	protected boolean showRelatedDescriptorsOption;
 
 	// Show task descriptors in the navigation tree option.
 	protected boolean showDescriptorsInNavigationTree;
 
 	// Publish empty categories option (currently not supported in the UI).
 	protected boolean publishEmptyCategories;
-	
-	//Show related links in the task, role, and work product pages
-	protected boolean showRelatedLinks;
 
 	/**
 	 * Creates a new instance.
@@ -238,14 +230,6 @@ public class PublishOptions {
 			boolean showMethodContentInDescriptors) {
 		this.showMethodContentInDescriptors = showMethodContentInDescriptors;
 	}
-	
-	public boolean isShowLinkedPageForDescriptor() {
-		return showLinkedPageForDescriptor;
-	}
-	
-	public void setShowLinkedPageForDescriptor(boolean showLinkedPageForDescriptor) {
-		this.showLinkedPageForDescriptor = showLinkedPageForDescriptor;
-	}
 
 	/**
 	 * Gets the show related descriptors in the task, role, and work product
@@ -268,51 +252,6 @@ public class PublishOptions {
 	 */
 	public void setShowRelatedDescriptors(boolean showRelatedDescriptors) {
 		this.showRelatedDescriptors = showRelatedDescriptors;
-	}
-	
-	/**
-	 * Gets the show related links in the task, role, and work product
-	 * pages option.
-	 * 
-	 * @return <code>true</code> if related links will be displayed in
-	 *         the task, role, and work product pages
-	 */
-	public boolean isShowRelatedLinks() {
-		return showRelatedLinks;
-	}
-
-	/**
-	 * Sets the show related links in the task, role, and work product
-	 * pages option.
-	 * 
-	 * @param showRelatedDescriptors
-	 *            if <code>true</code>, display the related links in
-	 *            the task, role, and work product pages
-	 */
-	public void setShowRelatedLinks(boolean showRelatedLinks) {
-		this.showRelatedLinks = showRelatedLinks;
-	}
-
-	
-	/**
-	 * Gets show all indirect (green) occurrences in extended patterns option
-	 * 
-	 * @return <code>true</code> if all indirect descriptors will be displayed in
-	 *         the task, role, and work product pages
-	 */
-	public boolean isShowRelatedDescriptorsOption() {
-		return showRelatedDescriptorsOption;
-	}
-
-	/**
-	 * Sets the show all indirect (green) occurrences in extended patterns option
-	 * 
-	 * @param showRelatedDescriptorsOption
-	 *            if <code>true</code>, display all indirect descriptors in
-	 *            the task, role, and work product pages
-	 */
-	public void setShowRelatedDescriptorsOption(boolean showRelatedDescriptorsOption) {
-		this.showRelatedDescriptorsOption = showRelatedDescriptorsOption;
 	}
 
 	/**

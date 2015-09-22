@@ -34,6 +34,10 @@ import org.eclipse.ui.wizards.IWizardCategory;
 import org.eclipse.ui.wizards.IWizardDescriptor;
 import org.eclipse.ui.wizards.IWizardRegistry;
 
+
+//añado el import correspondiente de la clase new process line
+import org.eclipse.epf.authoring.ui.wizards.NewProcessLineWizard;
+
 /**
  * The Method Authoring perspective.
  * 
@@ -55,6 +59,9 @@ public class AuthoringPerspective implements IPerspectiveFactory {
 		newWizardShortcuts.add(NewLibraryWizard.WIZARD_ID);
 		newWizardShortcuts.add(NewPluginWizard.WIZARD_ID);
 		newWizardShortcuts.add(NewConfigurationWizard.WIZARD_ID);
+		
+		//con esta línea hago que se añada el process line al menu
+		newWizardShortcuts.add(NewProcessLineWizard.WIZARD_ID);
 	}
 
 	/**
@@ -104,6 +111,10 @@ public class AuthoringPerspective implements IPerspectiveFactory {
 		outputFolder.addPlaceholder(IProgressConstants.PROGRESS_VIEW_ID);
 
 		layout.addNewWizardShortcut(NewLibraryWizard.WIZARD_ID);
+		
+		
+		//   procdss line 
+		layout.addNewWizardShortcut(NewProcessLineWizard.WIZARD_ID);
 		layout.addNewWizardShortcut(NewPluginWizard.WIZARD_ID);
 		layout.addNewWizardShortcut(NewConfigurationWizard.WIZARD_ID);
 

@@ -19,12 +19,10 @@ import java.util.List;
 import org.eclipse.draw2d.DelegatingLayout;
 import org.eclipse.draw2d.FreeformLayer;
 import org.eclipse.draw2d.LayeredPane;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.epf.diagram.core.DiagramCoreResources;
-import org.eclipse.epf.diagram.core.bridge.BridgeHelper;
 import org.eclipse.epf.diagram.core.part.AbstractDiagramEditor;
 import org.eclipse.epf.diagram.core.util.DiagramConstants;
-import org.eclipse.epf.diagram.model.Node;
+import org.eclipse.epf.diagram.wpdd.edit.parts.DiagramEditPartFactory;
 import org.eclipse.epf.diagram.wpdd.providers.DiagramElementTypes;
 import org.eclipse.gef.LayerConstants;
 import org.eclipse.gmf.runtime.diagram.core.preferences.PreferencesHint;
@@ -119,10 +117,4 @@ public class WPDDiagramEditor extends AbstractDiagramEditor {
 					WPDDiagramEditorPlugin.DIAGRAM_PREFERENCES_HINT);
 		return connectionRequest;
 	}
-	
-	@Override
-	protected boolean isOrphan(EObject modelElement) {
-		return modelElement instanceof Node && BridgeHelper.getMethodElement(modelElement) == null;
-	}
-
 }

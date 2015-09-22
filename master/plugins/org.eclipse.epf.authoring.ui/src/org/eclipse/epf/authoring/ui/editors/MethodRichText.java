@@ -21,9 +21,8 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.epf.authoring.ui.forms.BaseFormPage;
 import org.eclipse.epf.authoring.ui.richtext.IMethodRichText;
-import org.eclipse.epf.authoring.ui.richtext.MethodRichTextContext;
 import org.eclipse.epf.authoring.ui.util.MethodRichTextMarkerHelper;
-import org.eclipse.epf.common.IHTMLFormatter;
+import org.eclipse.epf.common.html.HTMLFormatter;
 import org.eclipse.epf.library.layout.RichTextContentValidator;
 import org.eclipse.epf.library.util.ResourceHelper;
 import org.eclipse.epf.richtext.RichText;
@@ -98,23 +97,13 @@ public class MethodRichText extends RichText implements IMethodRichText {
 	}
 
 	/**
-	 * Creates a new instance.
-	 * 
-	 * @param context
-	 *            The context
-	 */
-	public MethodRichText(MethodRichTextContext context) {
-		this(context.getParent(), context.getStyle(), context.getBasePath());
-	}
-
-	/**
 	 * Updates the presentation names of all element links.
 	 * 
 	 * @param text
 	 *            Rich text encoded in HTML format.
 	 */
 	@Override
-	public String tidyText(String text) {
+	protected String tidyText(String text) {
 		/*
 		 *  this will do the following to the HTML:
 		 *  1.  update Element Links
@@ -139,8 +128,6 @@ public class MethodRichText extends RichText implements IMethodRichText {
 		}
 		if (this.methodElement instanceof DescribableElement) { 
 			this.contentDescription = ((DescribableElement)this.methodElement).getPresentation();
-		} else if (this.methodElement instanceof ContentDescription) {
-			this.contentDescription = (ContentDescription)(this.methodElement);
 		}
 	}
 
@@ -270,13 +257,13 @@ public class MethodRichText extends RichText implements IMethodRichText {
 	
 	protected void createMarker(String fullErrMsg) throws CoreException {
 		if (contentDescription.eContainer() instanceof DescribableElement) {
-			Matcher m = IHTMLFormatter.jTidyErrorParser.matcher(fullErrMsg);                                                                          
+			Matcher m = HTMLFormatter.jTidyErrorParser.matcher(fullErrMsg);                                                                          
 			if (m.find()) {                                                                                                                          
 				String location = m.group(1);
 				String errorMsg = m.group(4);
 				BasicDiagnostic diagnostics = 
 			          new BasicDiagnostic
-			            (IHTMLFormatter.DIAGNOSTIC_SOURCE,
+			            (HTMLFormatter.DIAGNOSTIC_SOURCE,
 			             0, "", //$NON-NLS-1$
 			                new Object[] { contentDescription, fieldNameTrim });
 	

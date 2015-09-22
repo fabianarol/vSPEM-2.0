@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: ProcessImpl.java,v 1.5 2007/06/05 21:14:59 klow Exp $
+ */
 package org.eclipse.epf.xml.uma.impl;
 
 import java.util.Collection;
@@ -49,7 +45,7 @@ public class ProcessImpl extends ActivityImpl implements org.eclipse.epf.xml.uma
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<String> includesPattern;
+	protected EList includesPattern;
 
 	/**
 	 * The default value of the '{@link #getDefaultContext() <em>Default Context</em>}' attribute.
@@ -79,7 +75,7 @@ public class ProcessImpl extends ActivityImpl implements org.eclipse.epf.xml.uma
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<String> validContext;
+	protected EList validContext;
 
 	/**
 	 * The default value of the '{@link #getDiagramURI() <em>Diagram URI</em>}' attribute.
@@ -115,7 +111,6 @@ public class ProcessImpl extends ActivityImpl implements org.eclipse.epf.xml.uma
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.PROCESS;
 	}
@@ -125,9 +120,9 @@ public class ProcessImpl extends ActivityImpl implements org.eclipse.epf.xml.uma
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<String> getIncludesPattern() {
+	public EList getIncludesPattern() {
 		if (includesPattern == null) {
-			includesPattern = new EDataTypeEList<String>(String.class, this, UmaPackage.PROCESS__INCLUDES_PATTERN);
+			includesPattern = new EDataTypeEList(String.class, this, UmaPackage.PROCESS__INCLUDES_PATTERN);
 		}
 		return includesPattern;
 	}
@@ -158,9 +153,9 @@ public class ProcessImpl extends ActivityImpl implements org.eclipse.epf.xml.uma
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<String> getValidContext() {
+	public EList getValidContext() {
 		if (validContext == null) {
-			validContext = new EDataTypeEList<String>(String.class, this, UmaPackage.PROCESS__VALID_CONTEXT);
+			validContext = new EDataTypeEList(String.class, this, UmaPackage.PROCESS__VALID_CONTEXT);
 		}
 		return validContext;
 	}
@@ -191,7 +186,6 @@ public class ProcessImpl extends ActivityImpl implements org.eclipse.epf.xml.uma
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 			case UmaPackage.PROCESS__INCLUDES_PATTERN:
@@ -211,20 +205,18 @@ public class ProcessImpl extends ActivityImpl implements org.eclipse.epf.xml.uma
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-		@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 			case UmaPackage.PROCESS__INCLUDES_PATTERN:
 				getIncludesPattern().clear();
-				getIncludesPattern().addAll((Collection<? extends String>)newValue);
+				getIncludesPattern().addAll((Collection)newValue);
 				return;
 			case UmaPackage.PROCESS__DEFAULT_CONTEXT:
 				setDefaultContext((String)newValue);
 				return;
 			case UmaPackage.PROCESS__VALID_CONTEXT:
 				getValidContext().clear();
-				getValidContext().addAll((Collection<? extends String>)newValue);
+				getValidContext().addAll((Collection)newValue);
 				return;
 			case UmaPackage.PROCESS__DIAGRAM_URI:
 				setDiagramURI((String)newValue);
@@ -238,7 +230,6 @@ public class ProcessImpl extends ActivityImpl implements org.eclipse.epf.xml.uma
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 			case UmaPackage.PROCESS__INCLUDES_PATTERN:
@@ -262,7 +253,6 @@ public class ProcessImpl extends ActivityImpl implements org.eclipse.epf.xml.uma
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 			case UmaPackage.PROCESS__INCLUDES_PATTERN:
@@ -282,7 +272,6 @@ public class ProcessImpl extends ActivityImpl implements org.eclipse.epf.xml.uma
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 

@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: UmaResourceFactoryImpl.java,v 1.3 2006/09/07 00:06:00 klow Exp $
+ */
 package org.eclipse.epf.xml.uma.util;
 
 import org.eclipse.emf.common.util.URI;
@@ -39,7 +35,6 @@ public class UmaResourceFactoryImpl extends ResourceFactoryImpl {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Resource createResource(URI uri) {
 		XMLResource result = new UmaResourceImpl(uri);
 		result.getDefaultSaveOptions().put(XMLResource.OPTION_EXTENDED_META_DATA, Boolean.TRUE);

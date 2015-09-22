@@ -1,0 +1,12 @@
+/ActivityFinalNodeCreateCommand.java/1.1/Fri May 18 21:52:01 2007//
+/ActivityParameterNodeCreateCommand.java/1.1/Fri May 18 21:52:01 2007//
+/ActivityPartitionCreateCommand.java/1.1/Fri May 18 21:52:01 2007//
+/ControlFlowCreateCommand.java/1.1/Fri May 18 21:52:01 2007//
+/ControlFlowReorientCommand.java/1.2/Sat May 19 00:02:32 2007//
+/DecisionNodeCreateCommand.java/1.1/Fri May 18 21:52:01 2007//
+/ForkNodeCreateCommand.java/1.1/Fri May 18 21:52:01 2007//
+/InitialNodeCreateCommand.java/1.1/Fri May 18 21:52:01 2007//
+/JoinNodeCreateCommand.java/1.1/Fri May 18 21:52:00 2007//
+/MergeNodeCreateCommand.java/1.1/Fri May 18 21:51:59 2007//
+/StructuredActivityNodeCreateCommand.java/1.1/Fri May 18 21:51:59 2007//
+/UMLReorientConnectionViewCommand.java/1.2/Fri May 18 21:52:00 2007//

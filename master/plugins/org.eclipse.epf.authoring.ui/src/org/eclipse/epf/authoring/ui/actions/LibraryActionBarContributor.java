@@ -74,7 +74,16 @@ public class LibraryActionBarContributor extends
 
 	// Library view edit action
 	protected LibraryViewEditAction libraryViewEditAction;
-
+	
+	// Library view adapt action
+	protected LibraryViewAdaptAction libraryViewAdaptAction;
+	
+	// Library view see variation action
+	protected LibraryViewSeeVariationAction libraryViewSeeVariationAction;
+	
+	// Library view generate Jasper Report action
+	protected LibraryViewGenerateReportAction libraryViewGenerateReportAction;
+	
 	// Configuration view edit action
 	protected ConfigurationViewEditAction configViewEditAction;
 
@@ -263,6 +272,9 @@ public class LibraryActionBarContributor extends
 				: activeViewPart.getSite().getSelectionProvider();
 		selectionProvider.removeSelectionChangedListener(deleteAction);
 		selectionProvider.removeSelectionChangedListener(libraryViewEditAction);
+		selectionProvider.removeSelectionChangedListener(libraryViewAdaptAction);//Eliminamos el listener de cambio
+		selectionProvider.removeSelectionChangedListener(libraryViewSeeVariationAction);//Eliminamos el listener de cambio
+		selectionProvider.removeSelectionChangedListener(libraryViewGenerateReportAction);//Eliminamos el listener de cambio
 		selectionProvider.removeSelectionChangedListener(cutAction);
 		selectionProvider.removeSelectionChangedListener(copyAction);
 		selectionProvider.removeSelectionChangedListener(pasteAction);
@@ -270,6 +282,12 @@ public class LibraryActionBarContributor extends
 
 	public void disableGlobalEditMenu() {
 		deleteAction.setEnabled(false);
+		if (libraryViewAdaptAction != null)
+			libraryViewAdaptAction.setEnabled(false);
+		if(libraryViewSeeVariationAction != null)
+			libraryViewSeeVariationAction.setEnabled(false);
+		if(libraryViewGenerateReportAction != null)
+			libraryViewGenerateReportAction.setEnabled(false);
 		if (libraryViewEditAction != null)
 			libraryViewEditAction.setEnabled(false);
 		if (configViewEditAction != null)
@@ -283,6 +301,12 @@ public class LibraryActionBarContributor extends
 
 	public void enableGlobalEditMenu() {
 		deleteAction.setEnabled(true);
+		if (libraryViewAdaptAction != null)
+			libraryViewAdaptAction.setEnabled(true);
+		if (libraryViewSeeVariationAction != null)
+			libraryViewSeeVariationAction.setEnabled(true);
+		if (libraryViewGenerateReportAction != null)
+			libraryViewGenerateReportAction.setEnabled(true);
 		if (libraryViewEditAction != null)
 			libraryViewEditAction.setEnabled(true);
 		if (configViewEditAction != null)
@@ -315,6 +339,9 @@ public class LibraryActionBarContributor extends
 				: activeViewPart.getSite().getSelectionProvider();
 		selectionProvider.addSelectionChangedListener(deleteAction);
 		selectionProvider.addSelectionChangedListener(libraryViewEditAction);
+		selectionProvider.addSelectionChangedListener(libraryViewAdaptAction);//Añadimos el listener de seleccion
+		selectionProvider.addSelectionChangedListener(libraryViewSeeVariationAction);
+		selectionProvider.addSelectionChangedListener(libraryViewGenerateReportAction);
 		selectionProvider.addSelectionChangedListener(cutAction);
 		selectionProvider.addSelectionChangedListener(copyAction);
 		selectionProvider.addSelectionChangedListener(pasteAction);
@@ -328,19 +355,6 @@ public class LibraryActionBarContributor extends
 
 		update();
 	}
-	
-	protected void updatePasteAction() {
-		if (activeViewPart == null)
-			return;
-
-		ISelectionProvider selectionProvider = activeViewPart instanceof ISelectionProvider ? (ISelectionProvider) activeViewPart
-				: activeViewPart.getSite().getSelectionProvider();
-		ISelection selection = selectionProvider.getSelection();
-		IStructuredSelection structuredSelection = selection instanceof IStructuredSelection ? (IStructuredSelection) selection
-				: StructuredSelection.EMPTY;
-		pasteAction.setEnabled(pasteAction.updateSelection(structuredSelection));
-	}
-
 
 	/**
 	 * @see org.eclipse.emf.edit.ui.action.EditingDomainActionBarContributor#update()
@@ -357,6 +371,9 @@ public class LibraryActionBarContributor extends
 
 		deleteAction.updateSelection(structuredSelection);
 		libraryViewEditAction.updateSelection(structuredSelection);
+		libraryViewAdaptAction.updateSelection(structuredSelection);
+		libraryViewSeeVariationAction.updateSelection(structuredSelection);
+		libraryViewGenerateReportAction.updateSelection(structuredSelection);
 		cutAction.updateSelection(structuredSelection);
 		copyAction.updateSelection(structuredSelection);
 		pasteAction.updateSelection(structuredSelection);
@@ -423,16 +440,10 @@ public class LibraryActionBarContributor extends
 		Collection actions = new ArrayList();
 		if (descriptors != null) {
 			for (Iterator i = descriptors.iterator(); i.hasNext();) {
-				Object obj = i.next();
-				if (obj instanceof Separator) {
-					actions.add(obj);
-				} else {
-					actions.add(new MethodCreateChildAction(editingDomain,
-							selection, obj));
-				}
+				actions.add(new MethodCreateChildAction(editingDomain,
+						selection, i.next()));
 			}
 		}
-		
 		return actions;
 	}
 
@@ -465,18 +476,13 @@ public class LibraryActionBarContributor extends
 	protected void populateManager(IContributionManager manager,
 			Collection actions, String contributionID) {
 		if (actions != null) {
-			for (Iterator i = actions.iterator(); i.hasNext();) {				
-				Object obj = i.next();
-				if (obj instanceof IAction) {
-					IAction action = (IAction)obj;
-					if (contributionID != null) {
-						manager.insertBefore(contributionID, action);
-					} else {
-						manager.add(action);
-					}
-				} else if (obj instanceof Separator) {
-					manager.add((Separator)obj);
-				}				
+			for (Iterator i = actions.iterator(); i.hasNext();) {
+				IAction action = (IAction) i.next();
+				if (contributionID != null) {
+					manager.insertBefore(contributionID, action);
+				} else {
+					manager.add(action);
+				}
 			}
 		}
 	}
@@ -558,7 +564,23 @@ public class LibraryActionBarContributor extends
 
 		ISharedImages sharedImages = PlatformUI.getWorkbench()
 				.getSharedImages();
-
+		
+		/**vEPFC***/
+		//vEPF Adapt Tailored Process
+		libraryViewAdaptAction = new LibraryViewAdaptAction(AuthoringUIResources.actionLabel_adapt); 
+		actionBars.setGlobalActionHandler(LibraryViewAdaptAction.ACTION_ID,
+				libraryViewAdaptAction);
+		//vEPF See Variation Action
+		libraryViewSeeVariationAction = new LibraryViewSeeVariationAction(AuthoringUIResources.actionLabel_seeVariation);
+		actionBars.setGlobalActionHandler(LibraryViewSeeVariationAction.ACTION_ID,
+				libraryViewSeeVariationAction);
+		
+		//vEPF GenerateReport Action
+		libraryViewGenerateReportAction = new LibraryViewGenerateReportAction(AuthoringUIResources.actionLabel_generateReport);
+		actionBars.setGlobalActionHandler(LibraryViewGenerateReportAction.ACTION_ID,
+				libraryViewGenerateReportAction);
+		/****/
+		
 		libraryViewEditAction = new LibraryViewEditAction(AuthoringUIResources.actionLabel_edit); 
 		actionBars.setGlobalActionHandler(LibraryViewEditAction.ACTION_ID,
 				libraryViewEditAction);
@@ -599,6 +621,9 @@ public class LibraryActionBarContributor extends
 				redoAction);
 
 		libraryViewEditAction.setEnabled(false);
+		libraryViewAdaptAction.setEnabled(false);//Inicialmente no esta activada
+		libraryViewSeeVariationAction.setEnabled(false);
+		libraryViewGenerateReportAction.setEnabled(false);
 		
 		contributeToToolBar(actionBars.getToolBarManager());
 	}

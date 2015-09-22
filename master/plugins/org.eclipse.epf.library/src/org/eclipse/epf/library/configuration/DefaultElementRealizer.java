@@ -14,8 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.epf.library.LibraryPlugin;
-import org.eclipse.epf.library.edit.util.ExtensionManager;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.UmaPackage;
@@ -26,43 +24,15 @@ import org.eclipse.epf.uma.Whitepaper;
  * Realizes the element based on the configuration and realize options.
  * 
  * @author Jinhua Xi
- * @author Phong Nguyen Le
- * @author Weiping Lu
  * @since 1.0
  */
 public class DefaultElementRealizer extends ElementRealizer {
-	
-	public static final String DefaultElementRealizer_Type = "DefaultElementRealizer"; //$NON-NLS-1$
-	public static final String PublishingElementRealizer_Type = "PublishingElementRealizer"; //$NON-NLS-1$
-	public static final String ProcessPublishingElementRealizer_Type = "ProcessPublishingElementRealizer"; //$NON-NLS-1$
-		
-	protected static final ElementRealizer createElementRealizerExtension(MethodConfiguration config, String type) {
-		Object ext = ExtensionManager.createExtension(LibraryPlugin.getDefault().getId(), "elementRealizerFactory"); //$NON-NLS-1$
-		return ext instanceof IElementRealizerFactory ?
-			((IElementRealizerFactory) ext).createRealizer(config, type) : null;
-	}
-	
-	public static final ElementRealizer newElementRealizer(
-			MethodConfiguration config, boolean resolveContributor,
-			boolean resolveReplacer) {
-		ElementRealizer realizer = createElementRealizerExtension(config, DefaultElementRealizer_Type);
-		if (realizer == null) {
-			realizer = new DefaultElementRealizer(config);
-		}
-		realizer.setResolveContributor(resolveContributor);
-		realizer.setResolveReplacer(resolveReplacer);
-		return realizer;
-	}
-	
-	public static final ElementRealizer newElementRealizer(MethodConfiguration config) {
-		return newElementRealizer(config, true, true);
-	}
-	
+
 	/**
 	 * construct an instance with the give configuration
 	 * @param config MethodConfiguration
 	 */
-	protected DefaultElementRealizer(MethodConfiguration config) {
+	public DefaultElementRealizer(MethodConfiguration config) {
 		super(config);
 	}
 
@@ -73,7 +43,7 @@ public class DefaultElementRealizer extends ElementRealizer {
 	 * @param resolveContributor boolean if true, contrubutors from feature value list will be resolved. default to false.
 	 * @param resolveReplacer boolean if ture, element with a replacer will be resolved to the replacer. default to true.
 	 */
-	protected DefaultElementRealizer(MethodConfiguration config,
+	public DefaultElementRealizer(MethodConfiguration config,
 			boolean resolveContributor, boolean resolveReplacer) {
 		super(config, resolveContributor, resolveReplacer);
 	}

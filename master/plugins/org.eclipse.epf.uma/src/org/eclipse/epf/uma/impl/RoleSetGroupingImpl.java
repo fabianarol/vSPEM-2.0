@@ -37,6 +37,13 @@ import org.eclipse.epf.uma.UmaPackage;
 public class RoleSetGroupingImpl extends ContentCategoryImpl implements
 		RoleSetGrouping {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The cached value of the '{@link #getRoleSets() <em>Role Sets</em>}' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -44,7 +51,7 @@ public class RoleSetGroupingImpl extends ContentCategoryImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<RoleSet> roleSets;
+	protected EList roleSets = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -56,7 +63,7 @@ public class RoleSetGroupingImpl extends ContentCategoryImpl implements
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -64,7 +71,6 @@ public class RoleSetGroupingImpl extends ContentCategoryImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.ROLE_SET_GROUPING;
 	}
@@ -74,9 +80,9 @@ public class RoleSetGroupingImpl extends ContentCategoryImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<RoleSet> getRoleSets() {
+	public List getRoleSets() {
 		if (roleSets == null) {
-			roleSets = new EObjectResolvingEList<RoleSet>(RoleSet.class, this,
+			roleSets = new EObjectResolvingEList(RoleSet.class, this,
 					UmaPackage.ROLE_SET_GROUPING__ROLE_SETS);
 		}
 		return roleSets;
@@ -87,7 +93,6 @@ public class RoleSetGroupingImpl extends ContentCategoryImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.ROLE_SET_GROUPING__ROLE_SETS:
@@ -101,13 +106,11 @@ public class RoleSetGroupingImpl extends ContentCategoryImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.ROLE_SET_GROUPING__ROLE_SETS:
 			getRoleSets().clear();
-			getRoleSets().addAll((Collection<? extends RoleSet>) newValue);
+			getRoleSets().addAll((Collection) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -118,7 +121,6 @@ public class RoleSetGroupingImpl extends ContentCategoryImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.ROLE_SET_GROUPING__ROLE_SETS:
@@ -133,7 +135,6 @@ public class RoleSetGroupingImpl extends ContentCategoryImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);

@@ -30,7 +30,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
-import org.eclipse.epf.common.ui.AbstractPlugin;
+import org.eclipse.epf.common.plugin.AbstractPlugin;
 import org.eclipse.epf.diagram.model.provider.ModelItemProviderAdapterFactory;
 
 import org.eclipse.epf.uma.provider.UmaItemProviderAdapterFactory;

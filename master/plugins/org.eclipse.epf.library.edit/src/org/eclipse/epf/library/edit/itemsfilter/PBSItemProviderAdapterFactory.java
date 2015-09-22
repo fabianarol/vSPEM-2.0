@@ -27,6 +27,14 @@ public class PBSItemProviderAdapterFactory extends
 		return new PBSActivityItemProvider(this);
 	}
 
+	public Adapter createvpActivityAdapter() {
+		return createActivityAdapter();
+	}
+	
+	public Adapter createVarActivityAdapter() {
+		return createActivityAdapter();
+	}
+	
 	public Adapter createCapabilityPatternAdapter() {
 		return new PBSProcessItemProvider(this, (ItemProviderAdapter) super
 				.createCapabilityPatternAdapter());

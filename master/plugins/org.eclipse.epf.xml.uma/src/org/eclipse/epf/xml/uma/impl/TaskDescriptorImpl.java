@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: TaskDescriptorImpl.java,v 1.4 2007/06/05 21:14:59 klow Exp $
+ */
 package org.eclipse.epf.xml.uma.impl;
 
 import java.util.Collection;
@@ -34,8 +30,8 @@ import org.eclipse.epf.xml.uma.UmaPackage;
  * The following features are implemented:
  * <ul>
  *   <li>{@link org.eclipse.epf.xml.uma.impl.TaskDescriptorImpl#getTask <em>Task</em>}</li>
- *   <li>{@link org.eclipse.epf.xml.uma.impl.TaskDescriptorImpl#getGroup3 <em>Group3</em>}</li>
  *   <li>{@link org.eclipse.epf.xml.uma.impl.TaskDescriptorImpl#getPerformedPrimarilyBy <em>Performed Primarily By</em>}</li>
+ *   <li>{@link org.eclipse.epf.xml.uma.impl.TaskDescriptorImpl#getGroup2 <em>Group2</em>}</li>
  *   <li>{@link org.eclipse.epf.xml.uma.impl.TaskDescriptorImpl#getAdditionallyPerformedBy <em>Additionally Performed By</em>}</li>
  *   <li>{@link org.eclipse.epf.xml.uma.impl.TaskDescriptorImpl#getAssistedBy <em>Assisted By</em>}</li>
  *   <li>{@link org.eclipse.epf.xml.uma.impl.TaskDescriptorImpl#getExternalInput <em>External Input</em>}</li>
@@ -71,14 +67,34 @@ public class TaskDescriptorImpl extends WorkBreakdownElementImpl implements Task
 	protected String task = TASK_EDEFAULT;
 
 	/**
-	 * The cached value of the '{@link #getGroup3() <em>Group3</em>}' attribute list.
+	 * The default value of the '{@link #getPerformedPrimarilyBy() <em>Performed Primarily By</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getGroup3()
+	 * @see #getPerformedPrimarilyBy()
 	 * @generated
 	 * @ordered
 	 */
-	protected FeatureMap group3;
+	protected static final String PERFORMED_PRIMARILY_BY_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getPerformedPrimarilyBy() <em>Performed Primarily By</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getPerformedPrimarilyBy()
+	 * @generated
+	 * @ordered
+	 */
+	protected String performedPrimarilyBy = PERFORMED_PRIMARILY_BY_EDEFAULT;
+
+	/**
+	 * The cached value of the '{@link #getGroup2() <em>Group2</em>}' attribute list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getGroup2()
+	 * @generated
+	 * @ordered
+	 */
+	protected FeatureMap group2;
 
 	/**
 	 * The cached value of the '{@link #getStep() <em>Step</em>}' containment reference list.
@@ -88,7 +104,7 @@ public class TaskDescriptorImpl extends WorkBreakdownElementImpl implements Task
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Section> step;
+	protected EList step;
 
 	/**
 	 * The default value of the '{@link #isIsSynchronizedWithSource() <em>Is Synchronized With Source</em>}' attribute.
@@ -133,7 +149,6 @@ public class TaskDescriptorImpl extends WorkBreakdownElementImpl implements Task
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.TASK_DESCRIPTOR;
 	}
@@ -164,8 +179,8 @@ public class TaskDescriptorImpl extends WorkBreakdownElementImpl implements Task
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<String> getPerformedPrimarilyBy() {
-		return getGroup3().list(UmaPackage.Literals.TASK_DESCRIPTOR__PERFORMED_PRIMARILY_BY);
+	public String getPerformedPrimarilyBy() {
+		return performedPrimarilyBy;
 	}
 
 	/**
@@ -173,11 +188,23 @@ public class TaskDescriptorImpl extends WorkBreakdownElementImpl implements Task
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public FeatureMap getGroup3() {
-		if (group3 == null) {
-			group3 = new BasicFeatureMap(this, UmaPackage.TASK_DESCRIPTOR__GROUP3);
+	public void setPerformedPrimarilyBy(String newPerformedPrimarilyBy) {
+		String oldPerformedPrimarilyBy = performedPrimarilyBy;
+		performedPrimarilyBy = newPerformedPrimarilyBy;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, UmaPackage.TASK_DESCRIPTOR__PERFORMED_PRIMARILY_BY, oldPerformedPrimarilyBy, performedPrimarilyBy));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public FeatureMap getGroup2() {
+		if (group2 == null) {
+			group2 = new BasicFeatureMap(this, UmaPackage.TASK_DESCRIPTOR__GROUP2);
 		}
-		return group3;
+		return group2;
 	}
 
 	/**
@@ -185,8 +212,8 @@ public class TaskDescriptorImpl extends WorkBreakdownElementImpl implements Task
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<String> getAdditionallyPerformedBy() {
-		return getGroup3().list(UmaPackage.Literals.TASK_DESCRIPTOR__ADDITIONALLY_PERFORMED_BY);
+	public EList getAdditionallyPerformedBy() {
+		return getGroup2().list(UmaPackage.Literals.TASK_DESCRIPTOR__ADDITIONALLY_PERFORMED_BY);
 	}
 
 	/**
@@ -194,8 +221,8 @@ public class TaskDescriptorImpl extends WorkBreakdownElementImpl implements Task
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<String> getAssistedBy() {
-		return getGroup3().list(UmaPackage.Literals.TASK_DESCRIPTOR__ASSISTED_BY);
+	public EList getAssistedBy() {
+		return getGroup2().list(UmaPackage.Literals.TASK_DESCRIPTOR__ASSISTED_BY);
 	}
 
 	/**
@@ -203,8 +230,8 @@ public class TaskDescriptorImpl extends WorkBreakdownElementImpl implements Task
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<String> getExternalInput() {
-		return getGroup3().list(UmaPackage.Literals.TASK_DESCRIPTOR__EXTERNAL_INPUT);
+	public EList getExternalInput() {
+		return getGroup2().list(UmaPackage.Literals.TASK_DESCRIPTOR__EXTERNAL_INPUT);
 	}
 
 	/**
@@ -212,8 +239,8 @@ public class TaskDescriptorImpl extends WorkBreakdownElementImpl implements Task
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<String> getMandatoryInput() {
-		return getGroup3().list(UmaPackage.Literals.TASK_DESCRIPTOR__MANDATORY_INPUT);
+	public EList getMandatoryInput() {
+		return getGroup2().list(UmaPackage.Literals.TASK_DESCRIPTOR__MANDATORY_INPUT);
 	}
 
 	/**
@@ -221,8 +248,8 @@ public class TaskDescriptorImpl extends WorkBreakdownElementImpl implements Task
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<String> getOptionalInput() {
-		return getGroup3().list(UmaPackage.Literals.TASK_DESCRIPTOR__OPTIONAL_INPUT);
+	public EList getOptionalInput() {
+		return getGroup2().list(UmaPackage.Literals.TASK_DESCRIPTOR__OPTIONAL_INPUT);
 	}
 
 	/**
@@ -230,8 +257,8 @@ public class TaskDescriptorImpl extends WorkBreakdownElementImpl implements Task
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<String> getOutput() {
-		return getGroup3().list(UmaPackage.Literals.TASK_DESCRIPTOR__OUTPUT);
+	public EList getOutput() {
+		return getGroup2().list(UmaPackage.Literals.TASK_DESCRIPTOR__OUTPUT);
 	}
 
 	/**
@@ -239,9 +266,9 @@ public class TaskDescriptorImpl extends WorkBreakdownElementImpl implements Task
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EList<Section> getStep() {
+	public EList getStep() {
 		if (step == null) {
-			step = new EObjectContainmentEList<Section>(Section.class, this, UmaPackage.TASK_DESCRIPTOR__STEP);
+			step = new EObjectContainmentEList(Section.class, this, UmaPackage.TASK_DESCRIPTOR__STEP);
 		}
 		return step;
 	}
@@ -297,13 +324,12 @@ public class TaskDescriptorImpl extends WorkBreakdownElementImpl implements Task
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
-			case UmaPackage.TASK_DESCRIPTOR__GROUP3:
-				return ((InternalEList<?>)getGroup3()).basicRemove(otherEnd, msgs);
+			case UmaPackage.TASK_DESCRIPTOR__GROUP2:
+				return ((InternalEList)getGroup2()).basicRemove(otherEnd, msgs);
 			case UmaPackage.TASK_DESCRIPTOR__STEP:
-				return ((InternalEList<?>)getStep()).basicRemove(otherEnd, msgs);
+				return ((InternalEList)getStep()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -313,16 +339,15 @@ public class TaskDescriptorImpl extends WorkBreakdownElementImpl implements Task
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 			case UmaPackage.TASK_DESCRIPTOR__TASK:
 				return getTask();
-			case UmaPackage.TASK_DESCRIPTOR__GROUP3:
-				if (coreType) return getGroup3();
-				return ((FeatureMap.Internal)getGroup3()).getWrapper();
 			case UmaPackage.TASK_DESCRIPTOR__PERFORMED_PRIMARILY_BY:
 				return getPerformedPrimarilyBy();
+			case UmaPackage.TASK_DESCRIPTOR__GROUP2:
+				if (coreType) return getGroup2();
+				return ((FeatureMap.Internal)getGroup2()).getWrapper();
 			case UmaPackage.TASK_DESCRIPTOR__ADDITIONALLY_PERFORMED_BY:
 				return getAdditionallyPerformedBy();
 			case UmaPackage.TASK_DESCRIPTOR__ASSISTED_BY:
@@ -348,47 +373,44 @@ public class TaskDescriptorImpl extends WorkBreakdownElementImpl implements Task
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-		@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 			case UmaPackage.TASK_DESCRIPTOR__TASK:
 				setTask((String)newValue);
 				return;
-			case UmaPackage.TASK_DESCRIPTOR__GROUP3:
-				((FeatureMap.Internal)getGroup3()).set(newValue);
-				return;
 			case UmaPackage.TASK_DESCRIPTOR__PERFORMED_PRIMARILY_BY:
-				getPerformedPrimarilyBy().clear();
-				getPerformedPrimarilyBy().addAll((Collection<? extends String>)newValue);
+				setPerformedPrimarilyBy((String)newValue);
+				return;
+			case UmaPackage.TASK_DESCRIPTOR__GROUP2:
+				((FeatureMap.Internal)getGroup2()).set(newValue);
 				return;
 			case UmaPackage.TASK_DESCRIPTOR__ADDITIONALLY_PERFORMED_BY:
 				getAdditionallyPerformedBy().clear();
-				getAdditionallyPerformedBy().addAll((Collection<? extends String>)newValue);
+				getAdditionallyPerformedBy().addAll((Collection)newValue);
 				return;
 			case UmaPackage.TASK_DESCRIPTOR__ASSISTED_BY:
 				getAssistedBy().clear();
-				getAssistedBy().addAll((Collection<? extends String>)newValue);
+				getAssistedBy().addAll((Collection)newValue);
 				return;
 			case UmaPackage.TASK_DESCRIPTOR__EXTERNAL_INPUT:
 				getExternalInput().clear();
-				getExternalInput().addAll((Collection<? extends String>)newValue);
+				getExternalInput().addAll((Collection)newValue);
 				return;
 			case UmaPackage.TASK_DESCRIPTOR__MANDATORY_INPUT:
 				getMandatoryInput().clear();
-				getMandatoryInput().addAll((Collection<? extends String>)newValue);
+				getMandatoryInput().addAll((Collection)newValue);
 				return;
 			case UmaPackage.TASK_DESCRIPTOR__OPTIONAL_INPUT:
 				getOptionalInput().clear();
-				getOptionalInput().addAll((Collection<? extends String>)newValue);
+				getOptionalInput().addAll((Collection)newValue);
 				return;
 			case UmaPackage.TASK_DESCRIPTOR__OUTPUT:
 				getOutput().clear();
-				getOutput().addAll((Collection<? extends String>)newValue);
+				getOutput().addAll((Collection)newValue);
 				return;
 			case UmaPackage.TASK_DESCRIPTOR__STEP:
 				getStep().clear();
-				getStep().addAll((Collection<? extends Section>)newValue);
+				getStep().addAll((Collection)newValue);
 				return;
 			case UmaPackage.TASK_DESCRIPTOR__IS_SYNCHRONIZED_WITH_SOURCE:
 				setIsSynchronizedWithSource(((Boolean)newValue).booleanValue());
@@ -402,17 +424,16 @@ public class TaskDescriptorImpl extends WorkBreakdownElementImpl implements Task
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 			case UmaPackage.TASK_DESCRIPTOR__TASK:
 				setTask(TASK_EDEFAULT);
 				return;
-			case UmaPackage.TASK_DESCRIPTOR__GROUP3:
-				getGroup3().clear();
-				return;
 			case UmaPackage.TASK_DESCRIPTOR__PERFORMED_PRIMARILY_BY:
-				getPerformedPrimarilyBy().clear();
+				setPerformedPrimarilyBy(PERFORMED_PRIMARILY_BY_EDEFAULT);
+				return;
+			case UmaPackage.TASK_DESCRIPTOR__GROUP2:
+				getGroup2().clear();
 				return;
 			case UmaPackage.TASK_DESCRIPTOR__ADDITIONALLY_PERFORMED_BY:
 				getAdditionallyPerformedBy().clear();
@@ -447,15 +468,14 @@ public class TaskDescriptorImpl extends WorkBreakdownElementImpl implements Task
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 			case UmaPackage.TASK_DESCRIPTOR__TASK:
 				return TASK_EDEFAULT == null ? task != null : !TASK_EDEFAULT.equals(task);
-			case UmaPackage.TASK_DESCRIPTOR__GROUP3:
-				return group3 != null && !group3.isEmpty();
 			case UmaPackage.TASK_DESCRIPTOR__PERFORMED_PRIMARILY_BY:
-				return !getPerformedPrimarilyBy().isEmpty();
+				return PERFORMED_PRIMARILY_BY_EDEFAULT == null ? performedPrimarilyBy != null : !PERFORMED_PRIMARILY_BY_EDEFAULT.equals(performedPrimarilyBy);
+			case UmaPackage.TASK_DESCRIPTOR__GROUP2:
+				return group2 != null && !group2.isEmpty();
 			case UmaPackage.TASK_DESCRIPTOR__ADDITIONALLY_PERFORMED_BY:
 				return !getAdditionallyPerformedBy().isEmpty();
 			case UmaPackage.TASK_DESCRIPTOR__ASSISTED_BY:
@@ -481,15 +501,16 @@ public class TaskDescriptorImpl extends WorkBreakdownElementImpl implements Task
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (task: ");
 		result.append(task);
-		result.append(", group3: ");
-		result.append(group3);
+		result.append(", performedPrimarilyBy: ");
+		result.append(performedPrimarilyBy);
+		result.append(", group2: ");
+		result.append(group2);
 		result.append(", isSynchronizedWithSource: ");
 		if (isSynchronizedWithSourceESet) result.append(isSynchronizedWithSource); else result.append("<unset>");
 		result.append(')');

@@ -48,17 +48,13 @@ import org.eclipse.epf.uma.Activity;
 import org.eclipse.epf.uma.BreakdownElement;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodElement;
-import org.eclipse.epf.uma.MethodLibrary;
-import org.eclipse.epf.uma.MethodPlugin;
 import org.eclipse.epf.uma.Process;
 import org.eclipse.epf.uma.ProcessComponent;
 import org.eclipse.epf.uma.ProcessPackage;
 import org.eclipse.epf.uma.edit.domain.TraceableAdapterFactoryEditingDomain;
-import org.eclipse.epf.uma.util.UmaUtil;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
@@ -254,7 +250,7 @@ public class NestedCommandProvider implements INestedCommandProvider {
 			if (addCommand instanceof AddCommand) {
 				EditingDomain ed = ((AddCommand) addCommand).getDomain();
 				
-				if (((AddCommand)addCommand).getOwner() instanceof ProcessPackage || ((AddCommand)addCommand).getOwner() instanceof MethodLibrary) {
+				if (((AddCommand)addCommand).getOwner() instanceof ProcessPackage) {
 					if (ed instanceof TraceableAdapterFactoryEditingDomain) {
 						Map copyToOriginalMap = ((TraceableAdapterFactoryEditingDomain) ed)
 								.getCopyToOriginalMap();
@@ -264,16 +260,6 @@ public class NestedCommandProvider implements INestedCommandProvider {
 									.hasNext();) {
 								MethodElement element = (MethodElement) iter
 										.next();
-								
-								if (element instanceof MethodPlugin) {
-									for (Process proc : TngUtil
-											.getAllProcesses(((MethodPlugin) element))) {
-										cmd.append(new CopyDiagramCommand(
-												copyToOriginalMap.keySet(),
-												copyToOriginalMap, proc));
-									}
-								}
-								
 								if (element instanceof ProcessComponent) {
 									cmd.append(new CopyDiagramCommand(
 											copyToOriginalMap.keySet(),
@@ -390,7 +376,11 @@ public class NestedCommandProvider implements INestedCommandProvider {
 		if(!deletedElements.isEmpty()){
 			for (Iterator iter = deletedElements.iterator(); iter.hasNext();) {
 				Object element = (Object) iter.next();
-				closeDiagramEditors(element);
+				if(element instanceof ProcessComponent){
+					ProcessComponent pc = (ProcessComponent)element;
+					Process process = pc.getProcess();
+					closeDiagramEditors(process);
+				}
 			}
 		}
 		if(!cmd.isEmpty()){
@@ -403,12 +393,9 @@ public class NestedCommandProvider implements INestedCommandProvider {
 	 * Closes Diagram Editors if the owning process is deleted.
 	 * @param process
 	 */
-	private void closeDiagramEditors(Object e) {
-		IWorkbenchWindow activeWorkbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		if(activeWorkbenchWindow == null) {
-			return;
-		}
-		IWorkbenchPage workbenchPage = activeWorkbenchWindow.getActivePage();
+	private void closeDiagramEditors(Process process) {
+		IWorkbenchPage workbenchPage = PlatformUI.getWorkbench()
+				.getActiveWorkbenchWindow().getActivePage();
 		IEditorReference[] editorReferences = workbenchPage
 				.getEditorReferences();
 		ArrayList<IEditorReference> editorsToClose = new ArrayList<IEditorReference>();
@@ -421,7 +408,7 @@ public class NestedCommandProvider implements INestedCommandProvider {
 					DiagramEditorInput input = ((DiagramEditorInputProxy) editorInput)
 							.getDiagramEditorInput();
 					Object wrapper = input.getWrapper();
-					Process owningProcess = null;
+					Object owningProcess = null;
 					if (wrapper != null) {
 						if (wrapper instanceof BreakdownElementWrapperItemProvider) {
 							owningProcess = TngUtil
@@ -434,17 +421,12 @@ public class NestedCommandProvider implements INestedCommandProvider {
 									.getOwningProcess(((BreakdownElement) wrapper));
 						}
 					}
-					if (owningProcess != null ) {
-						if (e == owningProcess)
-							editorsToClose.add(editorRef);
-						if ((owningProcess.eContainer() == null || UmaUtil
-									.isContainedBy(owningProcess, e))) {
-							editorsToClose.add(editorRef);
-						}
+					if (owningProcess == owningProcess) {
+						editorsToClose.add(editorRef);
 					}
 				}
-			} catch (PartInitException ex) {
-				DiagramCorePlugin.getDefault().getLogger().logError(ex);
+			} catch (PartInitException e) {
+				DiagramCorePlugin.getDefault().getLogger().logError(e);
 			}
 		}
 		if(!editorsToClose.isEmpty()) {

@@ -11,21 +11,22 @@
 package org.eclipse.epf.diagram.ad.edit.parts;
 
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.draw2d.RectangleFigure;
 import org.eclipse.draw2d.StackLayout;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.epf.diagram.ad.custom.policies.DynamicResizeDirectionsEditPolicy;
+import org.eclipse.epf.diagram.ad.edit.policies.JoinNodeCanonicalEditPolicy;
+import org.eclipse.epf.diagram.ad.edit.policies.JoinNodeGraphicalNodeEditPolicy;
 import org.eclipse.epf.diagram.ad.edit.policies.JoinNodeItemSemanticEditPolicy;
-import org.eclipse.epf.diagram.core.editparts.InternalNodeEditPart;
 import org.eclipse.epf.diagram.core.util.DiagramConstants;
-import org.eclipse.gef.ConnectionEditPart;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.editpolicies.LayoutEditPolicy;
 import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
+import org.eclipse.gef.editpolicies.ResizableEditPolicy;
 import org.eclipse.gef.requests.CreateRequest;
 import org.eclipse.gmf.runtime.diagram.ui.editparts.ShapeNodeEditPart;
 import org.eclipse.gmf.runtime.diagram.ui.editpolicies.EditPolicyRoles;
@@ -41,7 +42,7 @@ import org.eclipse.swt.graphics.Color;
 /**
  * @generated
  */
-public class JoinNodeEditPart extends ShapeNodeEditPart implements InternalNodeEditPart {
+public class JoinNodeEditPart extends ShapeNodeEditPart {
 
 	/**
 	 * @generated
@@ -129,15 +130,13 @@ public class JoinNodeEditPart extends ShapeNodeEditPart implements InternalNodeE
 	 * @generated
 	 */
 	public EditPolicy getPrimaryDragEditPolicy() {
-//		EditPolicy result = super.getPrimaryDragEditPolicy();
-//		if (result instanceof ResizableEditPolicy) {
-//			ResizableEditPolicy ep = (ResizableEditPolicy) result;
-//			ep.setResizeDirections(PositionConstants.WEST
-//					| PositionConstants.EAST);
-//		}
-//		return result;
-		
-		return new DynamicResizeDirectionsEditPolicy();
+		EditPolicy result = super.getPrimaryDragEditPolicy();
+		if (result instanceof ResizableEditPolicy) {
+			ResizableEditPolicy ep = (ResizableEditPolicy) result;
+			ep.setResizeDirections(PositionConstants.WEST
+					| PositionConstants.EAST);
+		}
+		return result;
 	}
 
 	/**
@@ -269,18 +268,6 @@ public class JoinNodeEditPart extends ShapeNodeEditPart implements InternalNodeE
 			handleMajorSemanticChange();
 		else
 			super.handleNotificationEvent(notification);
-	}
-
-	@Override
-	public void primAddSourceConnection(ConnectionEditPart connection,
-			int index) {
-		super.primAddSourceConnection(connection, index);
-	}
-	
-	@Override
-	public void primAddTargetConnection(ConnectionEditPart connection,
-			int index) {
-		super.primAddTargetConnection(connection, index);
 	}
 
 }

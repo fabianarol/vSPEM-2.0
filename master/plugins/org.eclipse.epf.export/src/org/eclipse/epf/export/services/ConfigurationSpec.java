@@ -13,8 +13,6 @@ package org.eclipse.epf.export.services;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.epf.uma.MethodElementProperty;
-
 /**
  * Models a library configuration specification.
  * 
@@ -36,14 +34,6 @@ public class ConfigurationSpec {
 	public List packageIds = new ArrayList();
 
 	public List viewIds = new ArrayList();
-	
-	public List addedCCIds = new ArrayList();
-	
-	public List substractCCIds = new ArrayList();
-	
-	public String defaultView;
-
-	public List<MethodElementProperty> mepList = new ArrayList<MethodElementProperty>();
 
 	/**
 	 * Creates a new instance.

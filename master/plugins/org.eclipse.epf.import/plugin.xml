@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
-   <extension-point id="importPluginWizard" name="Import Plugin Wizard Extension" schema="schema/importPluginWizard.exsd"/>
-   <extension-point id="importConfigurationWizard" name="Import Configuration Wizard Extension" schema="schema/importConfigurationWizard.exsd"/>
 
    <extension
          point="org.eclipse.ui.importWizards">
@@ -38,7 +36,7 @@
       <wizard id="org.eclipse.epf.importing.wizards.ImportConfigurationWizard"/>
    </extension>
    <extension
-         point="org.eclipse.epf.common.service.commandLineRunners">
+         point="org.eclipse.epf.common.commandLineRunners">
       <commandLineRunner
             class="org.eclipse.epf.importing.services.CommandLinePluginImporter"
             runnerId="commandLinePluginImporter"/>

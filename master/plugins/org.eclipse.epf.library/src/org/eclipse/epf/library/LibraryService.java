@@ -10,20 +10,23 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.library;
 
+import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
-import org.eclipse.epf.common.service.utils.CommandLineRunUtil;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.epf.common.utils.CommandLineRunUtil;
 import org.eclipse.epf.common.utils.FileUtil;
-import org.eclipse.epf.library.configuration.ConfigurationHelper;
-import org.eclipse.epf.library.edit.util.LibraryEditUtil;
+import org.eclipse.epf.common.utils.I18nUtil;
+import org.eclipse.epf.common.utils.StrUtil;
 import org.eclipse.epf.library.preferences.LibraryPreferences;
 import org.eclipse.epf.library.services.SafeUpdateController;
-import org.eclipse.epf.library.util.LibraryProblemMonitor;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodLibrary;
 import org.eclipse.epf.uma.UmaFactory;
@@ -70,7 +73,6 @@ public class LibraryService implements ILibraryService {
 	// If true, the current method library is being closed.
 	private boolean closingCurrentLibrary;
 
-	private LibraryProblemMonitor libraryProblemMonitor;
 	/**
 	 * Returns the shared instance.
 	 */
@@ -100,6 +102,9 @@ public class LibraryService implements ILibraryService {
 		// "org.eclipse.epf.library.libraryManagers" extension point.
 		LibraryManagerFactory.getInstance();
 
+		if (CommandLineRunUtil.getInstance().isNeedToRun()) {
+			return;
+		}
 	}
 
 	/**
@@ -252,10 +257,6 @@ public class LibraryService implements ILibraryService {
 	 * @return a method library or <code>null</code>
 	 */
 	public MethodLibrary openLastOpenedMethodLibrary() {
-		if (CommandLineRunUtil.getInstance().isNeedToRun()) {
-			return null;
-		}
-		
 		String savedMethodLibraryURI = LibraryPreferences
 				.getSavedMethodLibraryURI();
 		try {
@@ -305,7 +306,6 @@ public class LibraryService implements ILibraryService {
 				setCurrentMethodLibrary(library);
 
 				notifyListeners(library, EVENT_REOPEN_LIBRARY);
-				FileUtil.getValidateEdit().sychnConneciton();
 			} catch (Exception e) {
 				throw new LibraryServiceException(e);
 			}
@@ -455,20 +455,10 @@ public class LibraryService implements ILibraryService {
 	 *            a method library
 	 */
 	public void setCurrentMethodLibrary(MethodLibrary library) {
-		if (currentLibrary == library) {
-			return;
-		}
-		LibraryEditUtil.getInstance().fixUpDanglingCustomCategories(library);
 		currentLibrary = library;
-		if (library != null) {
-//			long t = System.currentTimeMillis();
-			ConfigurationHelper.getDelegate().fixupLoadCheckPackages(library);
-//			System.out.println("LD> time: " +  (System.currentTimeMillis() - t));
-			ConfigurationHelper.getDelegate().loadUserDefinedType();
-		}
 		notifyListeners(library, EVENT_SET_CURRENT_LIBRARY);
 	}
-	
+
 	/**
 	 * Gets the current method library location path.
 	 * <p>
@@ -554,8 +544,7 @@ public class LibraryService implements ILibraryService {
 		configs.add(config);
 		return config;
 	}
-	
-	
+
 	/**
 	 * Gets the current method configuration.
 	 * 
@@ -583,15 +572,11 @@ public class LibraryService implements ILibraryService {
 	 *            a method configuration
 	 * @return a configuration manager
 	 */
-	public synchronized IConfigurationManager getConfigurationManager(
+	public IConfigurationManager getConfigurationManager(
 			MethodConfiguration config) {
 		if (config == null) {
 			throw new IllegalArgumentException();
 		}
-//		if (config instanceof Scope || UmaUtil.getMethodLibrary(config) == null) {	//Don't cache it
-//			return new ConfigurationManager(config);
-//		}
-		
 		IConfigurationManager manager = (IConfigurationManager) configManagers
 				.get(config);
 		if (manager == null) {
@@ -623,17 +608,6 @@ public class LibraryService implements ILibraryService {
 		for (int i = 0; i < configs.length; i++) {
 			removeConfigurationManager(configs[i]);
 		}
-		
-		//Remove the rest
-		if (configManagers != null && !configManagers.isEmpty()) {
-			for (IConfigurationManager mgr : configManagers.values()) {
-				if (mgr != null) {
-					mgr.dispose();
-				}
-			}
-			configManagers.clear();
-		}
-		
 	}
 
 	/**
@@ -657,35 +631,35 @@ public class LibraryService implements ILibraryService {
 			final ILibraryServiceListener listener = it.next();
 			switch (eventId) {
 			case EVENT_CREATE_LIBRARY:
-				SafeUpdateController.asyncExec(new Runnable() {
+				SafeUpdateController.syncExec(new Runnable() {
 					public void run() {
 						listener.libraryCreated(library);
 					}
 				});
 				break;
 			case EVENT_OPEN_LIBRARY:
-				SafeUpdateController.asyncExec(new Runnable() {
+				SafeUpdateController.syncExec(new Runnable() {
 					public void run() {
 						listener.libraryOpened(library);
 					}
 				});
 				break;
 			case EVENT_REOPEN_LIBRARY:
-				SafeUpdateController.asyncExec(new Runnable() {
+				SafeUpdateController.syncExec(new Runnable() {
 					public void run() {
 						listener.libraryReopened(library);
 					}
 				});
 				break;
 			case EVENT_CLOSE_LIBRARY:
-				SafeUpdateController.asyncExec(new Runnable() {
+				SafeUpdateController.syncExec(new Runnable() {
 					public void run() {
 						listener.libraryClosed(library);
 					}
 				});
 				break;
 			case EVENT_SET_CURRENT_LIBRARY:
-				SafeUpdateController.asyncExec(new Runnable() {
+				SafeUpdateController.syncExec(new Runnable() {
 					public void run() {
 						listener.librarySet(library);
 					}
@@ -756,13 +730,6 @@ public class LibraryService implements ILibraryService {
 		//libMgr.closeMethodLibrary();
 		libMgr.unRegisterMethodLibrary();
 		libMgr.dispose();
-	}
-	
-	public LibraryProblemMonitor getLibraryProblemMonitor() {
-		if (libraryProblemMonitor == null) {
-			libraryProblemMonitor = new LibraryProblemMonitor();
-		}
-		return 	libraryProblemMonitor;
 	}
 
 }

@@ -155,11 +155,11 @@ altTopicOpen = "Topic\u0020open";
 			<li>
 				<xsl:choose>
 					<xsl:when test="count(Element) > 0 ">
-						<img src="images/plus.gif" class="collapsed" alt="" title="" showIcon="true"/>
+						<img src="images/plus.gif" class="collapsed" alt="" title=""/>
 					</xsl:when>
 					<xsl:otherwise>
 						<!-- <span style="width:12"></span> -->
-						<img src="images/noplus.gif" class="collapsed" alt="" title="" showIcon="false"/>
+						<img src="images/noplus.gif" class="collapsed" alt="" title=""/>
 					</xsl:otherwise>
 				</xsl:choose>
 				<a id="{$id}" parentId="{$parentId}" guid="{$guid}" href="{$url}">

@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: Section.java,v 1.5 2007/04/19 21:51:24 klow Exp $
+ */
 package org.eclipse.epf.xml.uma;
 
 
@@ -75,7 +71,7 @@ public interface Section extends MethodElement {
 	 * @return the value of the '<em>Predecessor</em>' attribute.
 	 * @see #setPredecessor(String)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getSection_Predecessor()
-	 * @model dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="kind='element' name='Predecessor'"
 	 * @generated
 	 */
@@ -101,7 +97,7 @@ public interface Section extends MethodElement {
 	 * @return the value of the '<em>Description</em>' attribute.
 	 * @see #setDescription(String)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getSection_Description()
-	 * @model dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="kind='element' name='Description'"
 	 * @generated
 	 */
@@ -127,7 +123,7 @@ public interface Section extends MethodElement {
 	 * @return the value of the '<em>Section Name</em>' attribute.
 	 * @see #setSectionName(String)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getSection_SectionName()
-	 * @model dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="kind='attribute' name='sectionName'"
 	 * @generated
 	 */
@@ -154,7 +150,7 @@ public interface Section extends MethodElement {
 	 * @return the value of the '<em>Variability Based On Element</em>' attribute.
 	 * @see #setVariabilityBasedOnElement(String)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getSection_VariabilityBasedOnElement()
-	 * @model dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="kind='attribute' name='variabilityBasedOnElement'"
 	 * @generated
 	 */
@@ -186,7 +182,7 @@ public interface Section extends MethodElement {
 	 * @see #unsetVariabilityType()
 	 * @see #setVariabilityType(VariabilityType)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getSection_VariabilityType()
-	 * @model default="na" unsettable="true"
+	 * @model default="na" unique="false" unsettable="true"
 	 *        extendedMetaData="kind='attribute' name='variabilityType'"
 	 * @generated
 	 */

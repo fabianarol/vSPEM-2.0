@@ -19,7 +19,7 @@ import org.eclipse.epf.authoring.ui.AuthoringUIPlugin;
 import org.eclipse.epf.authoring.ui.AuthoringUIResources;
 import org.eclipse.epf.authoring.ui.PerspectiveListUtil;
 import org.eclipse.epf.authoring.ui.wizards.NewPluginWizard;
-import org.eclipse.epf.common.ui.util.PerspectiveUtil;
+import org.eclipse.epf.common.utils.PerspectiveUtil;
 import org.eclipse.epf.library.LibraryService;
 import org.eclipse.epf.library.edit.ui.UserInteractionHelper;
 import org.eclipse.epf.library.ui.actions.LibraryLockingOperationRunner;

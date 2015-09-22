@@ -51,6 +51,13 @@ import org.eclipse.epf.uma.UmaPackage;
 public class ProcessComponentImpl extends ProcessPackageImpl implements
 		ProcessComponent {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The default value of the '{@link #getAuthors() <em>Authors</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -138,7 +145,7 @@ public class ProcessComponentImpl extends ProcessPackageImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected SupportingMaterial copyrightStatement;
+	protected SupportingMaterial copyrightStatement = null;
 
 	/**
 	 * The cached value of the '{@link #getInterfaces() <em>Interfaces</em>}' reference list.
@@ -148,7 +155,7 @@ public class ProcessComponentImpl extends ProcessPackageImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<ProcessComponentInterface> interfaces;
+	protected EList interfaces = null;
 
 	/**
 	 * The cached value of the '{@link #getProcess() <em>Process</em>}' containment reference.
@@ -158,7 +165,7 @@ public class ProcessComponentImpl extends ProcessPackageImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected org.eclipse.epf.uma.Process process;
+	protected org.eclipse.epf.uma.Process process = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -170,7 +177,7 @@ public class ProcessComponentImpl extends ProcessPackageImpl implements
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -178,7 +185,6 @@ public class ProcessComponentImpl extends ProcessPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.PROCESS_COMPONENT;
 	}
@@ -321,9 +327,9 @@ public class ProcessComponentImpl extends ProcessPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<ProcessComponentInterface> getInterfaces() {
+	public List getInterfaces() {
 		if (interfaces == null) {
-			interfaces = new EObjectResolvingEList<ProcessComponentInterface>(
+			interfaces = new EObjectResolvingEList(
 					ProcessComponentInterface.class, this,
 					UmaPackage.PROCESS_COMPONENT__INTERFACES);
 		}
@@ -424,7 +430,6 @@ public class ProcessComponentImpl extends ProcessPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
@@ -439,7 +444,6 @@ public class ProcessComponentImpl extends ProcessPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.PROCESS_COMPONENT__AUTHORS:
@@ -469,8 +473,6 @@ public class ProcessComponentImpl extends ProcessPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.PROCESS_COMPONENT__AUTHORS:
@@ -490,8 +492,7 @@ public class ProcessComponentImpl extends ProcessPackageImpl implements
 			return;
 		case UmaPackage.PROCESS_COMPONENT__INTERFACES:
 			getInterfaces().clear();
-			getInterfaces().addAll(
-					(Collection<? extends ProcessComponentInterface>) newValue);
+			getInterfaces().addAll((Collection) newValue);
 			return;
 		case UmaPackage.PROCESS_COMPONENT__PROCESS:
 			setProcess((org.eclipse.epf.uma.Process) newValue);
@@ -505,7 +506,6 @@ public class ProcessComponentImpl extends ProcessPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.PROCESS_COMPONENT__AUTHORS:
@@ -538,7 +538,6 @@ public class ProcessComponentImpl extends ProcessPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);
@@ -574,8 +573,7 @@ public class ProcessComponentImpl extends ProcessPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	public int eBaseStructuralFeatureID(int derivedFeatureID, Class<?> baseClass) {
+	public int eBaseStructuralFeatureID(int derivedFeatureID, Class baseClass) {
 		if (baseClass == MethodUnit.class) {
 			switch (derivedFeatureID) {
 			case UmaPackage.PROCESS_COMPONENT__AUTHORS:
@@ -600,8 +598,7 @@ public class ProcessComponentImpl extends ProcessPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	public int eDerivedStructuralFeatureID(int baseFeatureID, Class<?> baseClass) {
+	public int eDerivedStructuralFeatureID(int baseFeatureID, Class baseClass) {
 		if (baseClass == MethodUnit.class) {
 			switch (baseFeatureID) {
 			case UmaPackage.METHOD_UNIT__AUTHORS:
@@ -626,7 +623,6 @@ public class ProcessComponentImpl extends ProcessPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy())
 			return super.toString();

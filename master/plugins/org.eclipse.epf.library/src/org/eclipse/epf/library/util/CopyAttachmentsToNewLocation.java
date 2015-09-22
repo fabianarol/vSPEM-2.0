@@ -11,7 +11,6 @@
 package org.eclipse.epf.library.util;
 
 import java.io.File;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -31,17 +30,14 @@ import org.eclipse.epf.library.ILibraryResourceManager;
 import org.eclipse.epf.library.LibraryPlugin;
 import org.eclipse.epf.library.LibraryResources;
 import org.eclipse.epf.library.edit.command.MethodElementAddCommand.BasicResourceManager;
-import org.eclipse.epf.library.edit.meta.IMetaDef;
-import org.eclipse.epf.library.edit.meta.TypeDefUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.layout.IContentValidator;
-import org.eclipse.epf.persistence.FileManager;
+import org.eclipse.epf.uma.ActivityDescription;
 import org.eclipse.epf.uma.ContentDescription;
 import org.eclipse.epf.uma.DescribableElement;
 import org.eclipse.epf.uma.GuidanceDescription;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.MethodPlugin;
-import org.eclipse.epf.uma.util.ExtendedAttribute;
 import org.eclipse.epf.uma.util.UmaUtil;
 import org.eclipse.osgi.util.NLS;
 
@@ -114,23 +110,61 @@ public class CopyAttachmentsToNewLocation extends BasicResourceManager {
 					java.net.URI shapeIconUri = de.getShapeicon();
 					if (shapeIconUri != null) {
 						// To handle the shapeIcon/nodeIcon uri got changed, its relative to pluginPath.
-						java.net.URI newShapeIconUri = handleIconURI(de,
+						java.net.URI srcShapeUri = TngUtil.getFullPathURI(de,
 								shapeIconUri);
-						if (newShapeIconUri != null) {
-							de.setShapeicon(newShapeIconUri);
-							modifiedResourceSet.add(de.eResource());
+						String shapeIconPath = shapeIconUri.getPath();
+						if(shapeIconPath.indexOf(lastOldPlugin.getName()) < 0){
+							srcShapeUri = new File(ResourceHelper.getPluginPath(lastOldPlugin) + File.separator+ shapeIconPath).toURI();
 						}
+						File srcFile = new File(srcShapeUri);
+						File tgtFile = new File(srcFile.getAbsolutePath()
+								.replaceFirst(
+										"\\" + File.separator //$NON-NLS-1$
+												+ lastOldPlugin.getName()
+												+ "\\" + File.separator, //$NON-NLS-1$
+										"\\" //$NON-NLS-1$
+												+ File.separator
+												+ UmaUtil.getMethodPlugin(de)
+														.getName() + "\\" //$NON-NLS-1$
+												+ File.separator));
+						if (!tgtFile.exists()) {
+							FileUtil.copyFile(srcFile, tgtFile);
+						}
+						java.net.URI newShapeIconUri = new java.net.URI(NetUtil
+								.encodeFileURL(FileUtil.getRelativePath(
+										tgtFile, new File(ResourceHelper.getPluginPath(de)))));
+						de.setShapeicon(newShapeIconUri);
+						modifiedResourceSet.add(de.eResource());
 					}
 
 					// node icon
 					java.net.URI nodeIconUri = de.getNodeicon();
 					if (nodeIconUri != null) {
-						java.net.URI newNodeIconUri = handleIconURI(de,
+						java.net.URI srcNodeUri = TngUtil.getFullPathURI(de,
 								nodeIconUri);
-						if (newNodeIconUri != null) {
-							de.setNodeicon(newNodeIconUri);
-							modifiedResourceSet.add(de.eResource());
+						String nodeIconPath = nodeIconUri.getPath();
+						if(nodeIconPath.indexOf(lastOldPlugin.getName()) < 0){
+							srcNodeUri = new File(ResourceHelper.getPluginPath(lastOldPlugin) + File.separator+ nodeIconPath).toURI();
 						}
+						File srcFile = new File(srcNodeUri);
+						File tgtFile = new File(srcFile.getAbsolutePath()
+								.replaceFirst(
+										"\\" + File.separator //$NON-NLS-1$
+												+ lastOldPlugin.getName()
+												+ "\\" + File.separator, //$NON-NLS-1$
+										"\\" //$NON-NLS-1$
+												+ File.separator
+												+ UmaUtil.getMethodPlugin(de)
+														.getName() + "\\" //$NON-NLS-1$
+												+ File.separator));
+						if (!tgtFile.exists()) {
+							FileUtil.copyFile(srcFile, tgtFile);
+						}
+						java.net.URI newNodeIconUri = new java.net.URI(NetUtil
+								.encodeFileURL(FileUtil.getRelativePath(
+										tgtFile, new File(ResourceHelper.getPluginPath(de)))));
+						de.setNodeicon(newNodeIconUri);
+						modifiedResourceSet.add(de.eResource());
 					}
 				} catch (Exception ex) {
 					LibraryPlugin.getDefault().getLogger().logError(ex);
@@ -164,7 +198,7 @@ public class CopyAttachmentsToNewLocation extends BasicResourceManager {
 				ILibraryResourceManager resMgr = ResourceHelper.getResourceMgr(elementToProcess);
 				ILibraryResourceManager lastOldPluginResMgr = ResourceHelper.getResourceMgr(lastOldPlugin);
 				
-				ContentResourceScanner scanner = getScanner(elementToProcess, lastOldPlugin);
+				ContentResourceScanner scanner = getScanner(elementToProcess);
 
 				// iterate thru element's content
 				String contentPath = ResourceHelper
@@ -183,20 +217,11 @@ public class CopyAttachmentsToNewLocation extends BasicResourceManager {
 				String oldContentPath = contentPath.replaceFirst(UmaUtil
 						.getMethodPlugin(elementToProcess).getName(),
 						lastOldPlugin.getName());
-				
-				//Commented out the following and rolled back to the above to fix a bug
-				//with attached file in content paste. But why it was introduced? Without it
-				//the shape and node icon appear to be working fine.
-				//String oldContentPath = ResourceHelper
-				//	.getElementPath(lastOldPlugin);				
-
-//				Iterator iter = elementToProcess.eClass().getEAllAttributes()
-//						.iterator();
-				Iterator iter = TypeDefUtil.getInstance().getEAllAttributes(elementToProcess).iterator();
+				Iterator iter = elementToProcess.eClass().getEAllAttributes()
+						.iterator();
 				while (iter.hasNext()) {
 					EAttribute attrib = (EAttribute) iter.next();
-//					Object o = elementToProcess.eGet(attrib);
-					Object o = TypeDefUtil.getInstance().eGet(elementToProcess, attrib);
+					Object o = elementToProcess.eGet(attrib);
 					if (o instanceof String) {
 						String content = (String) o;
 						if (content.length() > 0) {
@@ -205,16 +230,9 @@ public class CopyAttachmentsToNewLocation extends BasicResourceManager {
 							if (newContent != null
 									&& newContent.trim().length() != 0
 									&& !content.equals(newContent)) {
-//								elementToProcess.eSet(attrib, newContent);
-								TypeDefUtil.getInstance().eSet(elementToProcess, attrib, newContent);
+								elementToProcess.eSet(attrib, newContent);
 								modifiedResourceSet.add(elementToProcess
 										.eResource());
-							}
-							
-							ExtendedAttribute eAtt = TypeDefUtil.getInstance().getAssociatedExtendedAttribute(attrib);
-							if (eAtt != null && IMetaDef.attachment.equalsIgnoreCase(eAtt.getValueType())) {
-								processAttachmentString(elementToProcess, resMgr,
-										lastOldPluginResMgr, oldContentPath, newContent);
 							}
 						}
 					}
@@ -225,95 +243,50 @@ public class CopyAttachmentsToNewLocation extends BasicResourceManager {
 				if (elementToProcess instanceof GuidanceDescription) {
 					String attachmentString = ((GuidanceDescription) elementToProcess)
 							.getAttachments();
-					processAttachmentString(elementToProcess, resMgr,
-							lastOldPluginResMgr, oldContentPath,
-							attachmentString);
+					List attachmentList = TngUtil
+							.convertGuidanceAttachmentsToList(attachmentString);
+					for (iter = attachmentList.iterator(); iter.hasNext();) {
+						String attachment = (String) iter.next();
+						if (attachment != null
+								&& attachment.trim().length() > 0) {
+							Matcher m = ResourceHelper.p_template_attachment_url.matcher(attachment);
+							if (!m.find()) {
+								File srcContentPath = new File(lastOldPluginResMgr.resolve(lastOldPlugin, oldContentPath));
+								File srcFile = new File(srcContentPath,
+										attachment);
+								File tgtContentPath = new File(resMgr.getPhysicalPath(elementToProcess));
+								File tgtFile = new File(tgtContentPath,
+										attachment);
+								if (!tgtFile.exists()) {
+									FileUtil.copyFile(srcFile, tgtFile);
+								}
+							}
+						}
+					}
 				}
 			}
 		}
 
 		// handle children
-		//Iterator iter = e.eAllContents();
-		if (e.eContents() == null) {
-			return;
-		}
-		Iterator iter = e.eContents().iterator();
+		Iterator iter = e.eAllContents();
 		while (iter.hasNext()) {
 			EObject child = (EObject) iter.next();
 			HandleAttachmentsPlugin(child);
 		}
 	}
 
-	private void processAttachmentString(MethodElement elementToProcess,
-			ILibraryResourceManager resMgr,
-			ILibraryResourceManager lastOldPluginResMgr, String oldContentPath,
-			String attachmentString) {
-		Iterator iter;
-		List attachmentList = TngUtil
-				.convertGuidanceAttachmentsToList(attachmentString);
-		for (iter = attachmentList.iterator(); iter.hasNext();) {
-			String attachment = (String) iter.next();
-			if (attachment != null
-					&& attachment.trim().length() > 0) {
-				Matcher m = ResourceHelper.p_template_attachment_url.matcher(attachment);
-				if (!m.find()) {
-					File srcContentPath = new File(lastOldPluginResMgr.resolve(lastOldPlugin, oldContentPath));
-					File srcFile = new File(srcContentPath,
-							attachment);
-					File tgtContentPath = new File(resMgr.getPhysicalPath(elementToProcess));
-					File tgtFile = new File(tgtContentPath,
-							attachment);
-					if (!tgtFile.exists()) {
-						FileManager.copyFile(srcFile, tgtFile);
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * 
-	 * @param de
-	 * @param iconUri
-	 * @return the new Icon URI (relative path, so its ready to be persisted to the model)
-	 * @throws URISyntaxException
-	 */
-	private java.net.URI handleIconURI(DescribableElement de,
-			java.net.URI iconUri) throws URISyntaxException {
-		java.net.URI srcUri = TngUtil.getFullPathURI(de,
-				iconUri);
-		String iconPath = NetUtil.decodedFileUrl(iconUri.getPath());
-		
-		if(iconPath.indexOf(lastOldPlugin.getName()) < 0){
-			srcUri = new File(ResourceHelper.getPluginPath(lastOldPlugin) + File.separator + iconPath).toURI();
-		}
-		File srcFile = new File(srcUri);
-		java.net.URI tgtUri = new File(ResourceHelper.getPluginPath(de) + File.separator + iconPath).toURI();
-		File tgtFile = new File(tgtUri);
-		if (!tgtFile.exists()) {
-			FileManager.copyFile(srcFile, tgtFile);
-		}
-		java.net.URI newIconUri = new java.net.URI(NetUtil
-				.encodeFileURL(FileUtil.getRelativePath(
-						tgtFile, new File(ResourceHelper.getPluginPath(de)))));
-		return newIconUri;
-	}
-
 	/**
 	 * Returns the content resource scanner for the element.
 	 */
-	private ContentResourceScanner getScanner(MethodElement owner, MethodPlugin sourcePlugin) {
+	private ContentResourceScanner getScanner(MethodElement owner) {
 		ILibraryResourceManager resMgr = ResourceHelper.getResourceMgr(owner);
 		if ( resMgr == null ) {
 			return null;
 		}
 		
 		String rootContentPath = resMgr.getLogicalPluginPath(owner);
-//		File src_root = new File(resMgr.getPhysicalPluginPath(owner));
-//		File tgt_root = src_root;
-		File tgt_root = new File(resMgr.getPhysicalPluginPath(owner));
-		File src_root = new File(resMgr.getPhysicalPluginPath(sourcePlugin));
-		
+		File src_root = new File(resMgr.getPhysicalPluginPath(owner));
+		File tgt_root = src_root;
 		ContentResourceScanner scanner = new ContentResourceScanner(src_root, tgt_root, rootContentPath, getValidator());
 
 		return scanner;

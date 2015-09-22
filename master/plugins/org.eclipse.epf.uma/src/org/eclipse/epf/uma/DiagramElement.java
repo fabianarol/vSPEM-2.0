@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.uma;
 
+import org.eclipse.emf.common.util.EList;
 import java.util.List;
 
 /**
@@ -21,7 +22,7 @@ import java.util.List;
  * The following features are supported:
  * <ul>
  *   <li>{@link org.eclipse.epf.uma.DiagramElement#getIsVisible <em>Is Visible</em>}</li>
- *   <li>{@link org.eclipse.epf.uma.DiagramElement#getContainer <em>Container</em>}</li>
+ *   <li>{@link org.eclipse.epf.uma.DiagramElement#getContainer_ <em>Container</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.DiagramElement#getReference <em>Reference</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.DiagramElement#getProperty <em>Property</em>}</li>
  * </ul>
@@ -44,7 +45,7 @@ public interface DiagramElement extends MethodElement {
 	 * @return the value of the '<em>Is Visible</em>' attribute.
 	 * @see #setIsVisible(Boolean)
 	 * @see org.eclipse.epf.uma.UmaPackage#getDiagramElement_IsVisible()
-	 * @model default="true" dataType="org.eclipse.epf.uma.Boolean" required="true" ordered="false"
+	 * @model default="true"
 	 * @generated
 	 */
 	Boolean getIsVisible();
@@ -72,17 +73,17 @@ public interface DiagramElement extends MethodElement {
 	 * @see #setContainer(GraphElement)
 	 * @see org.eclipse.epf.uma.UmaPackage#getDiagramElement_Container()
 	 * @see org.eclipse.epf.uma.GraphElement#getContained
-	 * @model opposite="contained" transient="false" ordered="false"
+	 * @model opposite="contained"
 	 * @generated
 	 */
-	GraphElement getContainer();
+	GraphElement getContainer_();
 
 	/**
-	 * Sets the value of the '{@link org.eclipse.epf.uma.DiagramElement#getContainer <em>Container</em>}' container reference.
+	 * Sets the value of the '{@link org.eclipse.epf.uma.DiagramElement#getContainer_ <em>Container</em>}' container reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @param value the new value of the '<em>Container</em>' container reference.
-	 * @see #getContainer()
+	 * @see #getContainer_()
 	 * @generated
 	 */
 	void setContainer(GraphElement value);
@@ -100,10 +101,10 @@ public interface DiagramElement extends MethodElement {
 	 * @return the value of the '<em>Reference</em>' reference list.
 	 * @see org.eclipse.epf.uma.UmaPackage#getDiagramElement_Reference()
 	 * @see org.eclipse.epf.uma.Reference#getReferenced
-	 * @model opposite="referenced" ordered="false"
+	 * @model type="org.eclipse.epf.uma.Reference" opposite="referenced" ordered="false"
 	 * @generated
 	 */
-	List<Reference> getReference();
+	List getReference();
 
 	/**
 	 * Returns the value of the '<em><b>Property</b></em>' containment reference list.
@@ -116,9 +117,9 @@ public interface DiagramElement extends MethodElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Property</em>' containment reference list.
 	 * @see org.eclipse.epf.uma.UmaPackage#getDiagramElement_Property()
-	 * @model containment="true" resolveProxies="true" ordered="false"
+	 * @model type="org.eclipse.epf.uma.Property" containment="true" resolveProxies="true" ordered="false"
 	 * @generated
 	 */
-	List<Property> getProperty();
+	List getProperty();
 
 } // DiagramElement

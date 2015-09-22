@@ -12,14 +12,12 @@ package org.eclipse.epf.library.edit.command;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.emf.common.command.AbstractCommand;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.epf.library.edit.ui.UserInteractionHelper;
 import org.eclipse.epf.library.edit.util.Misc;
@@ -63,7 +61,7 @@ public class AddToCategoryCommand extends AbstractCommand implements
 
 	private ContentPackage categoryPkg;
 
-	private Collection<Resource> modifiedResources;
+	private Collection modifiedResources;
 
 	private Object oldOppositeFeatureValue;
 	
@@ -97,16 +95,15 @@ public class AddToCategoryCommand extends AbstractCommand implements
 	public String getLabel() {
 		return "Add To Category"; //$NON-NLS-1$
 	}
-	
-	private void prepareCategory() {
+
+	public void execute() {
 		// create contributor for category if it is not in the same plugin with
 		// the element
 		//
 		MethodPlugin elementPlugin = UmaUtil.getMethodPlugin(element);
 		MethodPlugin categoryPlugin = UmaUtil.getMethodPlugin(category);
 		if (categoryPlugin != elementPlugin
-				&& Misc.isBaseOf(categoryPlugin, elementPlugin,
-						new HashMap<String, Boolean>())) {
+				&& Misc.isBaseOf(categoryPlugin, elementPlugin)) {
 			if (category.getVariabilityBasedOnElement() != null) {
 				throw new IllegalArgumentException(
 						"Could not add element to an extended category that is in a different plug-in: " + category); //$NON-NLS-1$
@@ -131,12 +128,8 @@ public class AddToCategoryCommand extends AbstractCommand implements
 		} else {
 			usedCategory = category;
 		}
-	}
 
-	public void execute() {
-		prepareCategory();
-
-		modifiedResources = new HashSet<Resource>();
+		modifiedResources = new HashSet();
 
 		redo();
 	}
@@ -146,7 +139,7 @@ public class AddToCategoryCommand extends AbstractCommand implements
 			ContentCategory contrib = (ContentCategory) UmaFactory.eINSTANCE
 					.create(category.eClass());
 			contrib.setVariabilityBasedOnElement(category);
-			contrib.setVariabilityType(VariabilityType.CONTRIBUTES);
+			contrib.setVariabilityType(VariabilityType.CONTRIBUTES_LITERAL);
 			categoryPkg.getContentElements().add(contrib);
 			usedCategory = contrib;
 			if (usedCategory instanceof CustomCategory) {
@@ -158,8 +151,6 @@ public class AddToCategoryCommand extends AbstractCommand implements
 			} else {
 				usedCategory.setName(category.getName());
 			}
-			// set presentation name empty for new contributors
-			usedCategory.setPresentationName("");
 		}
 		OppositeFeature oppositeFeature = OppositeFeature
 				.getOppositeFeature(feature);
@@ -244,11 +235,11 @@ public class AddToCategoryCommand extends AbstractCommand implements
 
 	}
 
-	public Collection<?> getAffectedObjects() {
+	public Collection getAffectedObjects() {
 		return Collections.singletonList(usedCategory);
 	}
 
-	public Collection<Resource> getModifiedResources() {
+	public Collection getModifiedResources() {
 		
 		// https://bugs.eclipse.org/bugs/show_bug.cgi?id=146662
 		// Below adding category's resource to modifiedResources is needed, 
@@ -256,22 +247,14 @@ public class AddToCategoryCommand extends AbstractCommand implements
 		// getModifiedResources() called before executing actual execute() in few cases.
 		// Useful in special cases like if resource is in version control.
 		//
-		if(modifiedResources == null) {
-			modifiedResources = new HashSet<Resource>();
-			prepareCategory();
-			if(usedCategory != null && usedCategory.eResource() != null) {
-				modifiedResources.add(usedCategory.eResource());
-			}
-			if(createNewContributor && usedCategory == null && element != null) {
-				MethodPlugin plugin = UmaUtil.getMethodPlugin(element);
-				if(plugin != null && plugin.eResource() != null) {
-					modifiedResources.add(plugin.eResource());
-				}
-			}
+		if(category != null && category.eResource() != null
+				&& modifiedResources == null){
+			modifiedResources = new HashSet();
+			modifiedResources.add(category.eResource());
 		}
 		
 		if (modifiedResources == null) {
-			return Collections.emptyList();
+			return Collections.EMPTY_LIST;
 		}
 		return modifiedResources;
 	}

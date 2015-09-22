@@ -37,13 +37,19 @@ import org.eclipse.epf.uma.UmaPackage;
  *   <li>{@link org.eclipse.epf.uma.impl.MethodPluginImpl#getUserChangeable <em>User Changeable</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.impl.MethodPluginImpl#getMethodPackages <em>Method Packages</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.impl.MethodPluginImpl#getBases <em>Bases</em>}</li>
- *   <li>{@link org.eclipse.epf.uma.impl.MethodPluginImpl#isSupporting <em>Supporting</em>}</li>
  * </ul>
  * </p>
  *
  * @generated
  */
 public class MethodPluginImpl extends MethodUnitImpl implements MethodPlugin {
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * The default value of the '{@link #getUserChangeable() <em>User Changeable</em>}' attribute.
 	 * <!-- begin-user-doc -->
@@ -72,7 +78,7 @@ public class MethodPluginImpl extends MethodUnitImpl implements MethodPlugin {
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<MethodPackage> methodPackages;
+	protected EList methodPackages = null;
 
 	/**
 	 * The cached value of the '{@link #getBases() <em>Bases</em>}' reference list.
@@ -82,27 +88,7 @@ public class MethodPluginImpl extends MethodUnitImpl implements MethodPlugin {
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<MethodPlugin> bases;
-
-	/**
-	 * The default value of the '{@link #isSupporting() <em>Supporting</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #isSupporting()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final boolean SUPPORTING_EDEFAULT = false;
-
-	/**
-	 * The cached value of the '{@link #isSupporting() <em>Supporting</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #isSupporting()
-	 * @generated
-	 * @ordered
-	 */
-	protected boolean supporting = SUPPORTING_EDEFAULT;
+	protected EList bases = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -114,7 +100,7 @@ public class MethodPluginImpl extends MethodUnitImpl implements MethodPlugin {
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -122,7 +108,6 @@ public class MethodPluginImpl extends MethodUnitImpl implements MethodPlugin {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.METHOD_PLUGIN;
 	}
@@ -155,9 +140,9 @@ public class MethodPluginImpl extends MethodUnitImpl implements MethodPlugin {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<MethodPackage> getMethodPackages() {
+	public List getMethodPackages() {
 		if (methodPackages == null) {
-			methodPackages = new EObjectContainmentEList.Resolving<MethodPackage>(
+			methodPackages = new EObjectContainmentEList.Resolving(
 					MethodPackage.class, this,
 					UmaPackage.METHOD_PLUGIN__METHOD_PACKAGES);
 		}
@@ -169,10 +154,10 @@ public class MethodPluginImpl extends MethodUnitImpl implements MethodPlugin {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<MethodPlugin> getBases() {
+	public List getBases() {
 		if (bases == null) {
-			bases = new EObjectResolvingEList<MethodPlugin>(MethodPlugin.class,
-					this, UmaPackage.METHOD_PLUGIN__BASES);
+			bases = new EObjectResolvingEList(MethodPlugin.class, this,
+					UmaPackage.METHOD_PLUGIN__BASES);
 		}
 		return bases;
 	}
@@ -182,36 +167,12 @@ public class MethodPluginImpl extends MethodUnitImpl implements MethodPlugin {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public boolean isSupporting() {
-		return supporting;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setSupporting(boolean newSupporting) {
-		boolean oldSupporting = supporting;
-		supporting = newSupporting;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					UmaPackage.METHOD_PLUGIN__SUPPORTING, oldSupporting,
-					supporting));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case UmaPackage.METHOD_PLUGIN__METHOD_PACKAGES:
-			return ((InternalEList<?>) getMethodPackages()).basicRemove(
-					otherEnd, msgs);
+			return ((InternalEList) getMethodPackages()).basicRemove(otherEnd,
+					msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -221,7 +182,6 @@ public class MethodPluginImpl extends MethodUnitImpl implements MethodPlugin {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.METHOD_PLUGIN__USER_CHANGEABLE:
@@ -230,8 +190,6 @@ public class MethodPluginImpl extends MethodUnitImpl implements MethodPlugin {
 			return getMethodPackages();
 		case UmaPackage.METHOD_PLUGIN__BASES:
 			return getBases();
-		case UmaPackage.METHOD_PLUGIN__SUPPORTING:
-			return isSupporting() ? Boolean.TRUE : Boolean.FALSE;
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -241,8 +199,6 @@ public class MethodPluginImpl extends MethodUnitImpl implements MethodPlugin {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.METHOD_PLUGIN__USER_CHANGEABLE:
@@ -250,15 +206,11 @@ public class MethodPluginImpl extends MethodUnitImpl implements MethodPlugin {
 			return;
 		case UmaPackage.METHOD_PLUGIN__METHOD_PACKAGES:
 			getMethodPackages().clear();
-			getMethodPackages().addAll(
-					(Collection<? extends MethodPackage>) newValue);
+			getMethodPackages().addAll((Collection) newValue);
 			return;
 		case UmaPackage.METHOD_PLUGIN__BASES:
 			getBases().clear();
-			getBases().addAll((Collection<? extends MethodPlugin>) newValue);
-			return;
-		case UmaPackage.METHOD_PLUGIN__SUPPORTING:
-			setSupporting(((Boolean) newValue).booleanValue());
+			getBases().addAll((Collection) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -269,7 +221,6 @@ public class MethodPluginImpl extends MethodUnitImpl implements MethodPlugin {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.METHOD_PLUGIN__USER_CHANGEABLE:
@@ -281,9 +232,6 @@ public class MethodPluginImpl extends MethodUnitImpl implements MethodPlugin {
 		case UmaPackage.METHOD_PLUGIN__BASES:
 			getBases().clear();
 			return;
-		case UmaPackage.METHOD_PLUGIN__SUPPORTING:
-			setSupporting(SUPPORTING_EDEFAULT);
-			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -293,7 +241,6 @@ public class MethodPluginImpl extends MethodUnitImpl implements MethodPlugin {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);
@@ -309,8 +256,6 @@ public class MethodPluginImpl extends MethodUnitImpl implements MethodPlugin {
 			return methodPackages != null && !methodPackages.isEmpty();
 		case UmaPackage.METHOD_PLUGIN__BASES:
 			return bases != null && !bases.isEmpty();
-		case UmaPackage.METHOD_PLUGIN__SUPPORTING:
-			return supporting != SUPPORTING_EDEFAULT;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -320,7 +265,6 @@ public class MethodPluginImpl extends MethodUnitImpl implements MethodPlugin {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy())
 			return super.toString();
@@ -328,8 +272,6 @@ public class MethodPluginImpl extends MethodUnitImpl implements MethodPlugin {
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (userChangeable: "); //$NON-NLS-1$
 		result.append(userChangeable);
-		result.append(", supporting: "); //$NON-NLS-1$
-		result.append(supporting);
 		result.append(')');
 		return result.toString();
 	}

@@ -52,8 +52,6 @@ public class AssignPrimaryPerformerToTaskDescriptor extends
 	private TaskDescriptor taskDesc;
 
 	private Collection modifiedResources;
-	
-	private Collection affectedObjects;
 
 	// private boolean descExists = false;
 
@@ -72,6 +70,7 @@ public class AssignPrimaryPerformerToTaskDescriptor extends
 
 		this.role = role;
 		this.taskDesc = taskDesc;
+		this.oldRoleDesc = taskDesc.getPerformedPrimarilyBy();
 		this.config = config;
 
 		roles = new ArrayList();
@@ -87,7 +86,6 @@ public class AssignPrimaryPerformerToTaskDescriptor extends
 		}
 
 		this.modifiedResources = new HashSet(); 
-		this.affectedObjects  = new HashSet();
 	}
 
 	/*
@@ -130,7 +128,7 @@ public class AssignPrimaryPerformerToTaskDescriptor extends
 	 */
 	public void redo() {
 
-		taskDesc.getPerformedPrimarilyBy().add(newRoleDesc);
+		taskDesc.setPerformedPrimarilyBy(newRoleDesc);
 
 		if (isNewRoleDescriptor) {
 			activity.getBreakdownElements().add(newRoleDesc);
@@ -147,7 +145,7 @@ public class AssignPrimaryPerformerToTaskDescriptor extends
 			// remove from configuration if added
 			super.undo();
 
-			taskDesc.getPerformedPrimarilyBy().remove(newRoleDesc);
+			taskDesc.setPerformedPrimarilyBy(oldRoleDesc);
 
 			if (isNewRoleDescriptor) {
 				activity.getBreakdownElements().remove(newRoleDesc);
@@ -174,14 +172,4 @@ public class AssignPrimaryPerformerToTaskDescriptor extends
 		}
 		return modifiedResources;
 	}
-	
-	public Collection getAffectedObjects() {
-		if (role != null) {
-			affectedObjects.add(activity);
-			affectedObjects.add(taskDesc);
-			return affectedObjects;
-		}
-		return super.getAffectedObjects();
-	}
-
 }

@@ -11,6 +11,7 @@
 package org.eclipse.epf.library.edit.util;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
@@ -44,10 +45,10 @@ import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
 import org.eclipse.emf.ecore.util.FeatureMap;
 import org.eclipse.emf.ecore.util.FeatureMapUtil;
 import org.eclipse.emf.ecore.util.InternalEList;
+import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
 import org.eclipse.emf.edit.command.AddCommand;
 import org.eclipse.emf.edit.command.MoveCommand;
 import org.eclipse.emf.edit.command.PasteFromClipboardCommand;
@@ -59,7 +60,6 @@ import org.eclipse.emf.edit.provider.FeatureMapEntryWrapperItemProvider;
 import org.eclipse.emf.edit.provider.IChangeNotifier;
 import org.eclipse.emf.edit.provider.IDisposable;
 import org.eclipse.emf.edit.provider.IItemLabelProvider;
-import org.eclipse.emf.edit.provider.INotifyChangedListener;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
 import org.eclipse.emf.edit.provider.IWrapperItemProvider;
 import org.eclipse.emf.edit.provider.ItemProviderAdapter;
@@ -75,12 +75,12 @@ import org.eclipse.epf.library.edit.LibraryEditResources;
 import org.eclipse.epf.library.edit.PresentationContext;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
 import org.eclipse.epf.library.edit.category.CustomCategoryItemProvider;
+import org.eclipse.epf.library.edit.category.DisciplineItemProvider;
+import org.eclipse.epf.library.edit.category.RoleSetItemProvider;
 import org.eclipse.epf.library.edit.category.StandardCategoriesItemProvider;
 import org.eclipse.epf.library.edit.command.IActionManager;
 import org.eclipse.epf.library.edit.command.IResourceAwareCommand;
 import org.eclipse.epf.library.edit.element.ContentPackageItemProvider;
-import org.eclipse.epf.library.edit.internal.IListenerProvider;
-import org.eclipse.epf.library.edit.meta.TypeDefUtil;
 import org.eclipse.epf.library.edit.navigator.ContentItemProvider;
 import org.eclipse.epf.library.edit.navigator.MethodPluginItemProvider;
 import org.eclipse.epf.library.edit.process.BreakdownElementWrapperItemProvider;
@@ -110,6 +110,7 @@ import org.eclipse.epf.uma.Discipline;
 import org.eclipse.epf.uma.Domain;
 import org.eclipse.epf.uma.Example;
 import org.eclipse.epf.uma.Guidance;
+import org.eclipse.epf.uma.LineProcess;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.MethodElementProperty;
@@ -117,9 +118,10 @@ import org.eclipse.epf.uma.MethodLibrary;
 import org.eclipse.epf.uma.MethodPackage;
 import org.eclipse.epf.uma.MethodPlugin;
 import org.eclipse.epf.uma.NamedElement;
-import org.eclipse.epf.uma.Practice;
 import org.eclipse.epf.uma.Process;
 import org.eclipse.epf.uma.ProcessComponent;
+import org.eclipse.epf.uma.ProcessLineComponent;
+import org.eclipse.epf.uma.ProcessLinesPackage;
 import org.eclipse.epf.uma.ProcessPackage;
 import org.eclipse.epf.uma.ProcessPlanningTemplate;
 import org.eclipse.epf.uma.ReusableAsset;
@@ -145,12 +147,9 @@ import org.eclipse.epf.uma.provider.MethodElementItemProvider;
 import org.eclipse.epf.uma.provider.UmaEditPlugin;
 import org.eclipse.epf.uma.provider.UmaItemProviderAdapterFactory;
 import org.eclipse.epf.uma.util.AssociationHelper;
-import org.eclipse.epf.uma.util.ExtendedReference;
 import org.eclipse.epf.uma.util.MessageException;
 import org.eclipse.epf.uma.util.UmaResources;
 import org.eclipse.epf.uma.util.UmaUtil;
-import org.eclipse.epf.uma.util.UserDefinedTypeMeta;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.osgi.util.NLS;
 
 import com.ibm.icu.util.StringTokenizer;
@@ -173,9 +172,6 @@ public final class TngUtil {
 	public static final String GUIDANCE_FILESTRING_SEPARATOR = "|"; //$NON-NLS-1$
 
 	private static final String GUIDANCE_FILESTRING_SEPARATOR_SPLITTER = "\\|"; //$NON-NLS-1$
-
-	public static final String COMMA_SEPARATOR = ","; //$NON-NLS-1$
-	private static final String COMMA_SEPARATOR_SPLITTER = "\\,"; //$NON-NLS-1$
 	
 	public static final String PUBLISH_CATEGORY_PROPERTY = "PUBLISH_CATEGORY"; //$NON-NLS-1$
 	
@@ -226,9 +222,7 @@ public final class TngUtil {
 				|| name.indexOf(':') != -1 || name.indexOf('*') != -1
 				|| name.indexOf('?') != -1 || name.indexOf('"') != -1
 				|| name.indexOf('<') != -1 || name.indexOf('>') != -1
-				|| name.indexOf('|') != -1 || name.indexOf(';') != -1
-				|| name.indexOf('[') != -1 || name.indexOf(']') != -1
-				|| name.indexOf('#') != -1)
+				|| name.indexOf('|') != -1 || name.indexOf(';') != -1)
 			return false;
 		return true;
 	}
@@ -427,7 +421,7 @@ public final class TngUtil {
 			return null;
 		return NameChecker.checkName(TngAdapterFactory.INSTANCE
 				.getWBS_ComposedAdapterFactory(), (BreakdownElement) act, Activity.class,
-				UmaPackage.eINSTANCE.getMethodElement_PresentationName(),
+				UmaPackage.eINSTANCE.getDescribableElement_PresentationName(),
 				name, suppression);
 	}
 
@@ -438,7 +432,7 @@ public final class TngUtil {
 		return NameChecker.checkName(TngAdapterFactory.INSTANCE
 				.getWBS_ComposedAdapterFactory(), (BreakdownElement) e,
 				WorkBreakdownElement.class, UmaPackage.eINSTANCE
-						.getMethodElement_PresentationName(), name, suppression);
+						.getDescribableElement_PresentationName(), name, suppression);
 	}
 
 	public static String checkWorkProductDescriptorPresentationName(Object e,
@@ -448,7 +442,7 @@ public final class TngUtil {
 		return NameChecker.checkName(TngAdapterFactory.INSTANCE
 				.getPBS_ComposedAdapterFactory(), (BreakdownElement) e,
 				WorkProductDescriptor.class, UmaPackage.eINSTANCE
-						.getMethodElement_PresentationName(), name, suppression);
+						.getDescribableElement_PresentationName(), name, suppression);
 	}
 
 	public static String checkRoleDescriptorPresentationName(Object e,
@@ -457,7 +451,7 @@ public final class TngUtil {
 			return null;
 		return NameChecker.checkName(TngAdapterFactory.INSTANCE
 				.getOBS_ComposedAdapterFactory(), (BreakdownElement) e, RoleDescriptor.class,
-				UmaPackage.eINSTANCE.getMethodElement_PresentationName(),
+				UmaPackage.eINSTANCE.getDescribableElement_PresentationName(),
 				name, suppression);
 	}
 
@@ -523,11 +517,11 @@ public final class TngUtil {
 		}
 		String label = null;
 		boolean showPresentationNames = PresentationContext.INSTANCE.isShowPresentationNames();
-		if (showPresentationNames && object instanceof ProcessComponent)
+		if (showPresentationNames && object instanceof DescribableElement)
+			label = ((DescribableElement) object).getPresentationName();
+		else if (showPresentationNames && object instanceof ProcessComponent)
 			label = ((ProcessComponent) object).getProcess()
 					.getPresentationName();
-		else if (showPresentationNames && object instanceof MethodElement)
-			label = ((MethodElement) object).getPresentationName();
 		if (label == null || label.trim().length() == 0)
 			label = ((NamedElement) object).getName();
 		return label == null || label.trim().length() == 0 ? alternativeLabel : label;
@@ -539,17 +533,17 @@ public final class TngUtil {
 		if (preferBase && object.getVariabilityBasedOnElement() != null) {
 			VariabilityType type = object.getVariabilityType();
 			String variabilityTxt = null;
-			if (type == VariabilityType.CONTRIBUTES) {
+			if (type == VariabilityType.CONTRIBUTES_LITERAL) {
 				variabilityTxt = LibraryEditResources.contributesTo_text; 
-			} else if (type == VariabilityType.LOCAL_CONTRIBUTION) {
+			} else if (type == VariabilityType.LOCAL_CONTRIBUTION_LITERAL) {
 					variabilityTxt = LibraryEditResources.localContributesTo_text; 
-			} else if (type == VariabilityType.EXTENDS) {
+			} else if (type == VariabilityType.EXTENDS_LITERAL) {
 				variabilityTxt = LibraryEditResources.extends_text; 
-			} else if (type == VariabilityType.REPLACES) {
+			} else if (type == VariabilityType.REPLACES_LITERAL) {
 				variabilityTxt = LibraryEditResources.replaces_text; 
-			} else if (type == VariabilityType.LOCAL_REPLACEMENT) {
+			} else if (type == VariabilityType.LOCAL_REPLACEMENT_LITERAL) {
 				variabilityTxt = LibraryEditResources.localReplaces_text; 
-			} else if (type == VariabilityType.EXTENDS_REPLACES){
+			} else if (type == VariabilityType.EXTENDS_REPLACES_LITERAL){
 				variabilityTxt = LibraryEditResources.extends_replaces_text;
 			}
 			if (variabilityTxt != null) {
@@ -854,7 +848,7 @@ public final class TngUtil {
 	 * @param baseName
 	 * @return baseName of baseName_X where is is the number starting from 2
 	 */
-	public static String getNextAvailableName(List<? extends MethodElement> elements, String baseName) {
+	public static String getNextAvailableName(List<MethodElement> elements, String baseName) {
 		if(isNameTaken(elements, null, baseName)) {
 			for (int i = 2; true; i++) {
 				String name = baseName + '_' + i;
@@ -867,7 +861,7 @@ public final class TngUtil {
 	}
 
 
-	public static void setDefaultName(List<? extends MethodElement> siblings, MethodElement e,
+	public static void setDefaultName(List<MethodElement> siblings, MethodElement e,
 			String baseName) {
 		if (e.getName() != null && e.getName().trim().length() > 0)
 			return;
@@ -919,7 +913,7 @@ public final class TngUtil {
 		}
 	}
 
-	private static boolean isNameTaken(List<? extends MethodElement> siblings, MethodElement e,
+	private static boolean isNameTaken(List<MethodElement> siblings, MethodElement e,
 			String name) {
 		for (int i = siblings.size() - 1; i > -1; i--) {
 			MethodElement sibling = (MethodElement) siblings.get(i);
@@ -940,18 +934,6 @@ public final class TngUtil {
 		}
 		return list;
 	}
-	
-	public static <T> List<T> extractType(Collection<? extends Object> collection, Class<T> cls) {
-		ArrayList<T> list = new ArrayList<T>();
-		for (Iterator<? extends Object> iter = collection.iterator(); iter.hasNext();) {
-			Object element = iter.next();
-			if (cls.isInstance(element)) {
-				list.add((T)element);
-			}
-		}
-		return list;
-	}
-
 
 	public static void setDefaultName(IDefaultNameSetter defaultNameSetter,
 			Notification msg) {
@@ -982,12 +964,11 @@ public final class TngUtil {
 	public static void addExtendedChildren(ContentCategory baseCategory,
 			MethodConfiguration methodConf, Collection children,
 			String[] categoryPkgPath) {
-		Map<String, Boolean> map = new HashMap<String, Boolean>(); 
 		MethodPlugin basePlugin = UmaUtil.getMethodPlugin(baseCategory);
 		for (Iterator iter = methodConf.getMethodPluginSelection().iterator(); iter
 				.hasNext();) {
 			MethodPlugin plugin = (MethodPlugin) iter.next();
-			if (Misc.isBaseOf(basePlugin, plugin, map)) {
+			if (Misc.isBaseOf(basePlugin, plugin)) {
 				ContentPackage categoryPkg = UmaUtil.findContentPackage(plugin,
 						categoryPkgPath);
 				if (categoryPkg != null
@@ -1187,6 +1168,82 @@ public final class TngUtil {
 
 		return packages;
 	}
+	//*------->Herramientas para Lineas de procesos<------*//
+	/**
+	 * Herramientas para lineas de procesos
+	 */
+	public static List getAvailableBaseLineProcesses(MethodPlugin plugin,
+			List processClasses) {
+		List processes = new ArrayList();
+		List allBasePlugins = Misc.getAllBase(plugin);
+		allBasePlugins.add(0, plugin);
+		for (Iterator iter = allBasePlugins.iterator(); iter.hasNext();) {
+			MethodPlugin basePlugin = (MethodPlugin) iter.next();
+			Collection packages = getRootProcessLinesPackages(basePlugin,
+					processClasses);
+			for (Iterator iterator = packages.iterator(); iterator.hasNext();) {
+				ProcessLinesPackage pkg = (ProcessLinesPackage) iterator.next();
+				for (Iterator iterator1 = pkg.getChildPackages().iterator(); iterator1
+						.hasNext();) {
+					Object childPkg = (Object) iterator1.next();
+					if (childPkg instanceof ProcessLineComponent) {
+						Process proc = ((ProcessLineComponent) childPkg)
+								.getProcessLine();
+						if (isInstanceOf(processClasses, proc)) {
+							processes.add(proc);
+						}
+					}
+				}
+			}
+		}
+		return processes;
+	}
+
+	private static String[] getRootProcessLinesPackagePath(Class procClass) {
+		if (procClass == LineProcess.class) {
+			return ModelStructure.DEFAULT.processLineElementPath;
+		}
+		return null;
+	}
+
+	private static Collection getAvailableBaseLineProcesses(MethodPlugin plugin,
+			Collection procClasses) {
+		List packages = new ArrayList();
+		for (Iterator iter = procClasses.iterator(); iter.hasNext();) {
+			Class clazz = (Class) iter.next();
+			String[] path = getRootProcessLinesPackagePath(clazz);
+			if (path != null) {
+				MethodPackage pkg = UmaUtil.findMethodPackage(plugin, path);
+				if (pkg instanceof ProcessLinesPackage) {
+					packages.add(pkg);
+				}
+			}
+		}
+
+		return packages;
+	}
+	
+	private static Collection getRootProcessLinesPackages(MethodPlugin plugin,
+			Collection procClasses) {
+		List packages = new ArrayList();
+		for (Iterator iter = procClasses.iterator(); iter.hasNext();) {
+			Class clazz = (Class) iter.next();
+			String[] path = getRootProcessLinesPackagePath(clazz);
+			if (path != null) {
+				MethodPackage pkg = UmaUtil.findMethodPackage(plugin, path);
+				if (pkg instanceof ProcessLinesPackage) {
+					packages.add(pkg);
+				}
+			}
+		}
+
+		return packages;
+	}
+	
+	/**
+	 * Fin de herramientas
+	 */
+	//*--------------->Fin de Herramientas<---------------*//
 	
 	/**
 	 * 
@@ -1209,7 +1266,8 @@ public final class TngUtil {
 
 	public static List<Process> getAllProcesses(MethodPlugin plugin) {
 		List<Process> processes = new ArrayList<Process>();
-		for (MethodPackage pkg : plugin.getMethodPackages()) {
+		for (Iterator<Process> it = plugin.getMethodPackages().iterator(); it.hasNext();) {
+			MethodPackage pkg = (MethodPackage) it.next();
 			_iteratePackageForProcesses(pkg, processes);
 		}
 
@@ -1218,7 +1276,7 @@ public final class TngUtil {
 
 	public static List<Process> getAllProcesses(MethodPackage pkg) {
 		List<Process>  processes = new ArrayList<Process> ();
-		_iteratePackageForProcesses(pkg, processes);
+			_iteratePackageForProcesses(pkg, processes);
 
 		return processes;
 	}
@@ -1302,18 +1360,6 @@ public final class TngUtil {
 		return obj;
 	}
 	
-	public static MethodElement getWrappedElement(Object obj) {
-		if (obj instanceof MethodElement) {
-			return (MethodElement) obj;
-		}
-		obj = unwrap(obj);
-		if (obj instanceof MethodElement) {
-			return (MethodElement) obj;
-		}
-		
-		return null;
-	}
-	
 	/**
 	 * Returns boolean value based on whether object is wrapper object or not
 	 * @param obj
@@ -1340,31 +1386,22 @@ public final class TngUtil {
 	 * 
 	 * @param elements
 	 * @param base
-	 * @param variabilityTypes variability types to check against, ignored if <code>null</code>
 	 * @return
 	 */
-	public static boolean isBase(List<?> elements, Object base, Set<VariabilityType> variabilityTypes) {
-		for (Iterator<?> iter = elements.iterator(); iter.hasNext();) {
+	public static boolean isBase(List elements, Object base) {
+		for (Iterator iter = elements.iterator(); iter.hasNext();) {
 			Object element = (Object) iter.next();
 			if (element instanceof VariabilityElement) {
-				VariabilityElement ve = ((VariabilityElement) element);
-				if (base == ve.getVariabilityBasedOnElement()
-						&& (variabilityTypes == null || variabilityTypes
-								.contains(ve.getVariabilityType()))) {
+				if (base == ((VariabilityElement) element)
+						.getVariabilityBasedOnElement()) {
 					return true;
 				}
 			}
 		}
 		return false;
 	}
-	
-	
 
 	public static String getPresentationName(Object e) {
-		return getPresentationName(e, null);
-	}
-	
-	public static String getPresentationName(Object e, PresentationNameHelper helper) {
 		if (e instanceof ContentDescription) {
 			e = ((ContentDescription) e).eContainer();
 		}
@@ -1374,17 +1411,12 @@ public final class TngUtil {
 		}
 
 		String name = null;
-		
-		if (e instanceof MethodElement) {
-			name = ((MethodElement) e).getPresentationName();
-			if (StrUtil.isBlank(name)) 	{
-				if (helper != null) {
-					name = helper.getPresentationName((MethodElement) e);
-				} 
-				if (helper == null || StrUtil.isBlank(name)) {
-					name = ((MethodElement) e).getName();
-				}
-			}
+		if (e instanceof DescribableElement) {
+			name = ((DescribableElement) e).getPresentationName();
+		}
+
+		if (e instanceof MethodElement && StrUtil.isBlank(name)) {
+			name = ((MethodElement) e).getName();
 		}
 
 		return name;
@@ -1429,7 +1461,7 @@ public final class TngUtil {
 		MethodPlugin sourcePlugin = UmaUtil.getMethodPlugin(source);
 		if (sourcePlugin == targetPlugin)
 			return true;
-		return Misc.isBaseOf(targetPlugin, sourcePlugin, new HashMap<String, Boolean>());
+		return Misc.isBaseOf(targetPlugin, sourcePlugin);
 	}
 
 	public static OrderInfo getOrderInfo(MethodElement e, String orderInfoName) {
@@ -1450,7 +1482,7 @@ public final class TngUtil {
 					return orderInfo;
 				}
 			}
-		} catch (Exception e1) {
+		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
 		return null;
@@ -1494,7 +1526,7 @@ public final class TngUtil {
 
 	public static boolean hasContributor(VariabilityElement e) {
 		return hasGeneralizer(e, Collections
-				.singleton(VariabilityType.CONTRIBUTES));
+				.singleton(VariabilityType.CONTRIBUTES_LITERAL));
 	}
 
 	public static boolean hasGeneralizer(VariabilityElement e,
@@ -1558,7 +1590,7 @@ public final class TngUtil {
 	}
 
 	public static Iterator getContributors(VariabilityElement e) {
-		return getGeneralizers(e, VariabilityType.CONTRIBUTES);
+		return getGeneralizers(e, VariabilityType.CONTRIBUTES_LITERAL);
 	}
 
 	public static ItemProviderAdapter getAdapter(MethodPlugin plugin,
@@ -1690,27 +1722,6 @@ public final class TngUtil {
 	}
 	
 	public static Object getImage(Object object) {
-		Object image = TngUtil.getCustomNodeIcon(object);
-		if(image != null) {
-			return image;
-		}
-		
-		//For user defined type
-//		if ((object instanceof Practice) && (PracticePropUtil.getPracticePropUtil().isUdtType((Practice)object))) {
-//			ImageDescriptor desc = getImageForUdt((Practice)object);
-//			if (desc != null) {
-//				return desc;
-//			}
-//		}
-		
-		if ((object instanceof Practice) && (PracticePropUtil.getPracticePropUtil().isUdtType((Practice)object))) {
-			URL url = getImageForUdt2((Practice)object);
-			if (url != null) {
-				return url;
-			}
-			return UmaEditPlugin.INSTANCE.getImage("full/obj16/UdtNode");
-		}	
-		
 		Object adapter = null;
 		try {
 			adapter = umaItemProviderAdapterFactory.adapt(object,
@@ -1724,47 +1735,6 @@ public final class TngUtil {
 				((IDisposable)adapter).dispose();
 			}
 		}
-		return null;
-	}
-	
-	public static ImageDescriptor getImageForUdt(Practice prac) {
-		try {
-			UserDefinedTypeMeta udtMeta = PracticePropUtil.getPracticePropUtil().getUtdData(prac);
-			String imageUrl = udtMeta.getRteNameMap().get(UserDefinedTypeMeta._icon);
-			if (imageUrl == null) {
-				return null;
-			}
-			return ImageDescriptor.createFromURL(new URL(imageUrl));
-		} catch (Exception e) {
-			LibraryEditPlugin.getDefault().getLogger().logError(e);
-		}
-		
-		return null;
-	}
-	
-	public static URL getImageForUdt2(Practice prac) {
-		try {
-			UserDefinedTypeMeta udtMeta = PracticePropUtil.getPracticePropUtil().getUtdData(prac);
-			String imageUrl = udtMeta.getRteNameMap().get(UserDefinedTypeMeta._icon);
-			if (imageUrl == null) {
-				return null;
-			}
-			return new URL(imageUrl);
-		} catch (Exception e) {
-			LibraryEditPlugin.getDefault().getLogger().logError(e);
-		}
-		
-		return null;
-	}
-	
-	private static String getTypeNameForUdt(Practice prac) {
-		try {
-			UserDefinedTypeMeta udtMeta = PracticePropUtil.getPracticePropUtil().getUtdData(prac);
-			return udtMeta.getRteNameMap().get(UserDefinedTypeMeta._typeName);
-		} catch (Exception e) {
-			LibraryEditPlugin.getDefault().getLogger().logError(e);
-		}
-		
 		return null;
 	}
 
@@ -1828,21 +1798,6 @@ public final class TngUtil {
 		return rootCustomCategory;
 	}
 
-	public static Set<CustomCategory> getAllCustomCategories(MethodPlugin plugin) {
-		Set<CustomCategory> set = new HashSet<CustomCategory>();
-		ContentPackage customCategoryPkg = UmaUtil.findContentPackage(plugin,
-				ModelStructure.DEFAULT.customCategoryPath);
-		if (customCategoryPkg != null) {
-			for (ContentElement element : customCategoryPkg
-					.getContentElements()) {
-				if (element instanceof CustomCategory) {
-					set.add((CustomCategory) element);
-				}
-			}
-		}
-		return set;
-	}
-	
 	public static CustomCategory getRootCustomCategory(MethodPlugin plugin) {
 		ContentPackage customCategoryPkg = UmaUtil.findContentPackage(plugin,
 				ModelStructure.DEFAULT.customCategoryPath);
@@ -1864,7 +1819,7 @@ public final class TngUtil {
 				.hasNext();) {
 			Object element = iter.next();
 			if (element instanceof CustomCategory) {
-				root.getCategorizedElements().add((DescribableElement) element);
+				root.getCategorizedElements().add(element);
 			}
 		}
 		return root;
@@ -2169,7 +2124,7 @@ public final class TngUtil {
 			List pkgs = TngUtil.getAllSystemPackages(plugin);
 			for (Iterator it = pkgs.iterator(); it.hasNext();) {
 				Object pkg = it.next();
-				if (!pkgSels.contains(pkg) && pkg instanceof ContentPackage) {
+				if (!pkgSels.contains(pkg) && pkg instanceof MethodPackage) {
 					pkgSels.add(pkg);
 					sysPackagesToAdd.add((MethodPackage)pkg);
 				}
@@ -2339,18 +2294,18 @@ public final class TngUtil {
 
 	public static boolean isContributor(VariabilityElement e) {
 		return e.getVariabilityBasedOnElement() != null
-		&& (e.getVariabilityType() == VariabilityType.CONTRIBUTES);
+		&& (e.getVariabilityType() == VariabilityType.CONTRIBUTES_LITERAL);
 	}
 	
 	public static boolean isReplacer(VariabilityElement e) {
 		return e.getVariabilityBasedOnElement() != null
-		&& (e.getVariabilityType() == VariabilityType.REPLACES);
+		&& (e.getVariabilityType() == VariabilityType.REPLACES_LITERAL);
 	}
 	
 	public static boolean isContributorOrReplacer(VariabilityElement e) {
 		VariabilityElement base = e.getVariabilityBasedOnElement();
 		VariabilityType type = e.getVariabilityType();
-		return base != null && (type == VariabilityType.CONTRIBUTES || type == VariabilityType.REPLACES);
+		return base != null && (type == VariabilityType.CONTRIBUTES_LITERAL || type == VariabilityType.REPLACES_LITERAL);
 	}
 
 	public static boolean isGeneralizer(Object obj, Collection types) {
@@ -2376,14 +2331,6 @@ public final class TngUtil {
 	 * Looks up the user friendly type name for a Method element.
 	 */
 	public static String getTypeText(EObject element) {
-		//For user defined type
-		if ((element instanceof Practice) && (PracticePropUtil.getPracticePropUtil().isUdtType((Practice)element))) {
-			String typeName = getTypeNameForUdt((Practice)element);
-			if (typeName != null) {
-				return typeName;
-			}
-		}		
-		
 		return getTypeText(element.eClass());
 	}
 	
@@ -2496,10 +2443,6 @@ public final class TngUtil {
 		case UmaPackage.TASK_DESCRIPTOR__ASSISTED_BY:
 			return LibraryEditResources.assists_text; 
 		}
-		ExtendedReference eRef = TypeDefUtil.getInstance().getAssociatedExtendedReference(feature);
-		if (eRef != null) {
-			return eRef.getName();
-		}
 
 		String featureKey;
 		if (feature instanceof EStructuralFeature) {
@@ -2569,26 +2512,6 @@ public final class TngUtil {
 
 		return uri;
 	}
-	
-	/**
-	 * 
-	 * @param object
-	 * @return custom node icon or null if the given object does not have one
-	 */
-	public static Object getCustomNodeIcon(Object object) {
-		if (object instanceof DescribableElement) {
-			if (((DescribableElement) object).getNodeicon() != null) {
-				URI imgUri = TngUtil.getFullPathofNodeorShapeIconURI(
-						(DescribableElement) object,
-						((DescribableElement) object).getNodeicon());
-				Object image = LibraryEditPlugin.INSTANCE
-						.getSharedImage(imgUri);
-				if (image != null)
-					return image;
-			}
-		}
-		return null;
-	}
 
 	
 	/**
@@ -2619,23 +2542,16 @@ public final class TngUtil {
 		}
 
 		// need to get the element's resource path
+		File f = getLibraryRootPath(o);
+		String path = uri.getPath();
 		MethodPlugin plugin = UmaUtil.getMethodPlugin(o);
 		if (plugin != null && UmaUtil.hasDirectResource(plugin)) {
-			File f = getLibraryRootPath(o);
-			String path = uri.getPath();
-			if (f != null && path.indexOf(plugin.getName() + "/") == 0) { //$NON-NLS-1$
+			File pluginDir = new File(plugin.eResource().getURI().toFileString()).getParentFile();
+			if (path.indexOf(plugin.getName()) > -1) {
 				return new File(f, NetUtil.decodedFileUrl(uri.toString()))
 						.toURI();
-			}
-			else {
-				IFileBasedLibraryPersister persister = (IFileBasedLibraryPersister) Services
-						.getLibraryPersister(Services.XMI_PERSISTENCE_TYPE);
-				File pluginDir = persister.getFile(plugin.eResource())
-						.getParentFile();
-
-				return new File(pluginDir, NetUtil.decodedFileUrl(uri
-						.toString())).toURI();
-
+			} else {
+				return new File(pluginDir, NetUtil.decodedFileUrl(uri.toString())).toURI();
 			}
 		}
 		return null;
@@ -2756,47 +2672,6 @@ public final class TngUtil {
 		return attachmentString;
 	}
 	
-	public static List<String> convertStringsToList(String string) {
-		ArrayList<String> strList = new ArrayList<String>();
-		if (string == null)
-			string = ""; //$NON-NLS-1$
-		String strings[] = string
-				.split(COMMA_SEPARATOR_SPLITTER);
-		for (int i = 0; i < strings.length; i++) {
-			if (strings[i].trim().length() > 0)
-				strList.add(strings[i].trim());
-		}
-		return strList;
-	}
-	
-	public static List<String> convertStringsToList(String string, String seperator) {
-		ArrayList<String> strList = new ArrayList<String>();
-		if (string == null)
-			string = ""; //$NON-NLS-1$
-		String strings[] = string
-				.split(seperator);
-		for (int i = 0; i < strings.length; i++) {
-			if (strings[i].trim().length() > 0)
-				strList.add(strings[i].trim());
-		}
-		return strList;
-	}
-
-	public static String convertListToString(List<String> strList) {
-		String string = ""; //$NON-NLS-1$
-		int i = 0;
-		if (strList != null) {
-			for (String aString: strList) {
-				if (i++ > 0)
-					string = string
-							.concat(COMMA_SEPARATOR);
-				string = string.concat(aString);
-			}
-		}
-		return string;
-	}
-
-	
 	/**
 	 * 
 	 * @param e
@@ -2882,7 +2757,7 @@ public final class TngUtil {
 	 */
 	public static boolean isContributorOf(Object base, VariabilityElement e) {
 		for(VariabilityElement ve = (VariabilityElement) e;
-		ve != null && ve.getVariabilityType() == VariabilityType.CONTRIBUTES && ve.getVariabilityBasedOnElement() != null;
+		ve != null && ve.getVariabilityType() == VariabilityType.CONTRIBUTES_LITERAL && ve.getVariabilityBasedOnElement() != null;
 		ve = ve.getVariabilityBasedOnElement()) {
 			if(ve.getVariabilityBasedOnElement() == base) {
 				return true;
@@ -3148,11 +3023,6 @@ public final class TngUtil {
 	
 	/**
 	 * Return publishing category property for method element
-	 * The meaning of this property is used for:
-	 * 
-	 * CustomCategory: Publish this category with the categorized method elements
-	 * Practice: Publish this practice with the referenced method elements
-	 * 
 	 * @param element
 	 * @return
 	 * 		 property if found, else null
@@ -3173,22 +3043,19 @@ public final class TngUtil {
 		return null;
 	}
 
-	public static List<INotifyChangedListener> getNotifyChangedListeners(AdapterFactory adapterFactory, Object obj) {
-		Object adapter = adapterFactory.adapt(obj, ITreeItemContentProvider.class);
-		if(adapter instanceof IListenerProvider) {
-			return ((IListenerProvider) adapter).getNotifyChangedListeners();
+	public static List getNotifyChangedListeners(AdapterFactory adapterFactory, Object obj) {
+		if (obj instanceof CustomCategory) {
+			CustomCategoryItemProvider adapter = (CustomCategoryItemProvider) adapterFactory.adapt(obj, ITreeItemContentProvider.class);
+			return adapter.getNotifyChangedListeners();
 		}
-		return Collections.emptyList();
-	}
-	
-	public static Collection<?> getWrappers(AdapterFactory adapterFactory, Object obj) {
-		HashSet<Object> wrappers = new HashSet<Object>();
-		for (INotifyChangedListener listener : getNotifyChangedListeners(adapterFactory, obj)) {
-			if(listener instanceof IWrapperItemProvider && unwrap(listener) == obj) {
-				wrappers.add(listener);
-			}
+		if (obj instanceof RoleSet) {
+			RoleSetItemProvider adapter = (RoleSetItemProvider) adapterFactory.adapt(obj, ITreeItemContentProvider.class);
+			return adapter.getNotifyChangedListeners();
+		} else if (obj instanceof Discipline) {
+			DisciplineItemProvider adapter = (DisciplineItemProvider) adapterFactory.adapt(obj, ITreeItemContentProvider.class);
+			return adapter.getNotifyChangedListeners();
 		}
-		return wrappers;
+		return Collections.EMPTY_LIST;
 	}
 
 	/**
@@ -3210,25 +3077,4 @@ public final class TngUtil {
 		}
 		return null;
 	}
-
-	public static Object getFeatureValueWrapperItemProviderForCC(AdapterFactory adapterFactory, CustomCategory cc) {
-		// get ITreeContentProvider adapater
-		CustomCategoryItemProvider adapter = (CustomCategoryItemProvider) adapterFactory.adapt(cc, ITreeItemContentProvider.class);
-		for (Iterator iter = adapter.getNotifyChangedListeners().iterator(); iter.hasNext();) {
-			Object listener = iter.next();
-			if (listener instanceof FeatureValueWrapperItemProvider
-					&& unwrap(listener) == cc) {
-				return (FeatureValueWrapperItemProvider)listener;
-			}
-		}
-		return cc;
-	}
-	
-	public static class PresentationNameHelper {
-		//to be overriden by subclass
-		public String getPresentationName(MethodElement element) {
-			return element.getPresentationName();
-		}
-	}
-	
 }

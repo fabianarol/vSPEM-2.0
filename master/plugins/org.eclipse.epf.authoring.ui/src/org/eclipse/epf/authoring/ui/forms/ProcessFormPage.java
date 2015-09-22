@@ -25,7 +25,7 @@ import org.eclipse.ui.forms.editor.FormEditor;
  * @author Kelvin Low
  * @since 1.0
  */
-public class ProcessFormPage extends DescriptionFormPage {
+public class ProcessFormPage extends BaseFormPage {
 
 	protected Process process;
 
@@ -48,11 +48,6 @@ public class ProcessFormPage extends DescriptionFormPage {
 	 */
 	public void init(IEditorSite site, IEditorInput input) {
 		super.init(site, input);
-		
-		//Always disable auto-gen-name for other sub classes other than ProcessDescription
-		if (! (this instanceof ProcessDescription)) {
-			setAutoGenName(false);
-		}
 
 		// Get the Process object from the editor input.
 		MethodElementEditorInput methodElementInput = (MethodElementEditorInput) input;
@@ -61,11 +56,6 @@ public class ProcessFormPage extends DescriptionFormPage {
 		if (obj instanceof ProcessComponent) {
 			process = ((ProcessComponent) obj).getProcess();
 		}
-	}
-
-	@Override
-	protected Object getContentElement() {
-		return process;
 	}
 
 }

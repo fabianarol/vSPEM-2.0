@@ -10,11 +10,11 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.rcp.ui.actions;
 
-import org.eclipse.epf.common.ui.util.PerspectiveUtil;
+import org.eclipse.epf.common.utils.PerspectiveUtil;
 import org.eclipse.jface.window.Window;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.internal.OpenPreferencesAction;
+import org.eclipse.ui.internal.actions.OpenPerspectiveDialogAction;
 import org.eclipse.ui.internal.dialogs.SelectPerspectiveDialog;
 
 /**
@@ -24,7 +24,7 @@ import org.eclipse.ui.internal.dialogs.SelectPerspectiveDialog;
  * @since 1.0
  */
 
-public class UIOpenPerspectiveDialogAction extends OpenPreferencesAction {
+public class UIOpenPerspectiveDialogAction extends OpenPerspectiveDialogAction {
 	private IWorkbenchWindow workbenchWindow;
 
 	/**

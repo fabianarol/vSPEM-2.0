@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.uma;
 
+import org.eclipse.emf.common.util.EList;
 import java.util.List;
 
 /**
@@ -47,7 +48,7 @@ public interface WorkBreakdownElement extends BreakdownElement {
 	 * @return the value of the '<em>Is Repeatable</em>' attribute.
 	 * @see #setIsRepeatable(Boolean)
 	 * @see org.eclipse.epf.uma.UmaPackage#getWorkBreakdownElement_IsRepeatable()
-	 * @model default="false" dataType="org.eclipse.epf.uma.Boolean" required="true" ordered="false"
+	 * @model default="false"
 	 * @generated
 	 */
 	Boolean getIsRepeatable();
@@ -73,7 +74,7 @@ public interface WorkBreakdownElement extends BreakdownElement {
 	 * @return the value of the '<em>Is Ongoing</em>' attribute.
 	 * @see #setIsOngoing(Boolean)
 	 * @see org.eclipse.epf.uma.UmaPackage#getWorkBreakdownElement_IsOngoing()
-	 * @model default="false" dataType="org.eclipse.epf.uma.Boolean" required="true" ordered="false"
+	 * @model default="false"
 	 * @generated
 	 */
 	Boolean getIsOngoing();
@@ -97,12 +98,11 @@ public interface WorkBreakdownElement extends BreakdownElement {
 	 * The isEventDriven attribute indicates that the Process Work Definition describes an instance of work which is not started because it has been scheduled to start at a certain point of time, because preceding work is being completed, or input work products are available, but because another specific event has occurred.  Examples for such events are exceptions or problem situations which require specific work to be performed as a result.  Also change management work can be modeled as event driven work analyzing a change request or defect and allocating work dynamically to resources to deal with it following the work described with such Process Work Definition.  The events themselves are not modeled in this version of the specification.  They shall be described as part of the normal descriptions fields available.
 	 * 
 	 * 
-	 * 
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Is Event Driven</em>' attribute.
 	 * @see #setIsEventDriven(Boolean)
 	 * @see org.eclipse.epf.uma.UmaPackage#getWorkBreakdownElement_IsEventDriven()
-	 * @model default="false" dataType="org.eclipse.epf.uma.Boolean" required="true" ordered="false"
+	 * @model default="false"
 	 * @generated
 	 */
 	Boolean getIsEventDriven();
@@ -128,9 +128,9 @@ public interface WorkBreakdownElement extends BreakdownElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Link To Predecessor</em>' reference list.
 	 * @see org.eclipse.epf.uma.UmaPackage#getWorkBreakdownElement_LinkToPredecessor()
-	 * @model ordered="false"
+	 * @model type="org.eclipse.epf.uma.WorkOrder" ordered="false"
 	 * @generated
 	 */
-	List<WorkOrder> getLinkToPredecessor();
+	List getLinkToPredecessor();
 
 } // WorkBreakdownElement

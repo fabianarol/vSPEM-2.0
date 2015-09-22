@@ -36,6 +36,13 @@ import org.eclipse.epf.uma.UmaPackage;
 public class UMASemanticModelBridgeImpl extends SemanticModelBridgeImpl
 		implements UMASemanticModelBridge {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The cached value of the '{@link #getElement() <em>Element</em>}' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -43,7 +50,7 @@ public class UMASemanticModelBridgeImpl extends SemanticModelBridgeImpl
 	 * @generated
 	 * @ordered
 	 */
-	protected MethodElement element;
+	protected MethodElement element = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -55,7 +62,7 @@ public class UMASemanticModelBridgeImpl extends SemanticModelBridgeImpl
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -63,7 +70,6 @@ public class UMASemanticModelBridgeImpl extends SemanticModelBridgeImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.UMA_SEMANTIC_MODEL_BRIDGE;
 	}
@@ -115,7 +121,6 @@ public class UMASemanticModelBridgeImpl extends SemanticModelBridgeImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.UMA_SEMANTIC_MODEL_BRIDGE__ELEMENT:
@@ -131,7 +136,6 @@ public class UMASemanticModelBridgeImpl extends SemanticModelBridgeImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.UMA_SEMANTIC_MODEL_BRIDGE__ELEMENT:
@@ -146,7 +150,6 @@ public class UMASemanticModelBridgeImpl extends SemanticModelBridgeImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.UMA_SEMANTIC_MODEL_BRIDGE__ELEMENT:
@@ -161,7 +164,6 @@ public class UMASemanticModelBridgeImpl extends SemanticModelBridgeImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);

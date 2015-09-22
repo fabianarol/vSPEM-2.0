@@ -85,7 +85,7 @@ public class LibraryViewerDragAdapter extends ViewerDragAdapter {
 						if (links.length() > 0) {
 							links += StrUtil.LINE_FEED;
 						}
-						links += linkText;
+						links += new String(StrUtil.getUTF8Bytes(linkText));						
 					}
 					else {
 						if (links.length() > 0) {

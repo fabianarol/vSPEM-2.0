@@ -14,8 +14,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryContentProvider;
 import org.eclipse.epf.authoring.ui.AuthoringUIPlugin;
@@ -24,28 +22,24 @@ import org.eclipse.epf.authoring.ui.AuthoringUIText;
 import org.eclipse.epf.authoring.ui.actions.LibraryViewDeleteAction;
 import org.eclipse.epf.authoring.ui.filters.AllFilter;
 import org.eclipse.epf.authoring.ui.views.LibraryView;
-import org.eclipse.epf.common.utils.StrUtil;
 import org.eclipse.epf.library.LibraryService;
 import org.eclipse.epf.library.edit.IFilter;
 import org.eclipse.epf.library.edit.LibraryEditResources;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
-import org.eclipse.epf.library.edit.command.IActionManager;
-import org.eclipse.epf.library.edit.command.MethodElementSetPropertyCommand;
+import org.eclipse.epf.library.edit.command.MoveInCategoryCommand;
 import org.eclipse.epf.library.edit.itemsfilter.FilterConstants;
 import org.eclipse.epf.library.edit.util.CategorySortHelper;
 import org.eclipse.epf.library.edit.util.ContentElementOrderList;
-import org.eclipse.epf.library.edit.util.MethodElementPropertyHelper;
 import org.eclipse.epf.library.edit.util.ModelStructure;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.edit.validation.DependencyChecker;
 import org.eclipse.epf.library.ui.LibraryUIManager;
 import org.eclipse.epf.library.util.LibraryManager;
-import org.eclipse.epf.library.util.LibraryUtil;
 import org.eclipse.epf.uma.Activity;
+import org.eclipse.epf.uma.ContentCategory;
 import org.eclipse.epf.uma.ContentElement;
 import org.eclipse.epf.uma.CustomCategory;
 import org.eclipse.epf.uma.MethodElement;
-import org.eclipse.epf.uma.MethodElementProperty;
 import org.eclipse.epf.uma.MethodPlugin;
 import org.eclipse.epf.uma.Milestone;
 import org.eclipse.epf.uma.Process;
@@ -56,25 +50,10 @@ import org.eclipse.epf.uma.UmaPackage;
 import org.eclipse.epf.uma.util.AssociationHelper;
 import org.eclipse.epf.uma.util.MessageException;
 import org.eclipse.epf.uma.util.UmaUtil;
-import org.eclipse.epf.uma.util.UserDefinedTypeMeta;
-import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.osgi.util.NLS;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Combo;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormEditor;
 
 
@@ -83,7 +62,6 @@ import org.eclipse.ui.forms.editor.FormEditor;
  * 
  * @author Shashidhar Kannoori
  * @author Kelvin Low
- * @author Phong Nguyen Le
  * @since 1.0
  */
 public class CustomCategoryAssignPage extends AssociationFormPage {
@@ -95,118 +73,13 @@ public class CustomCategoryAssignPage extends AssociationFormPage {
 	//private ContentElementOrderList allSteps;
 	private ContentElementOrderList allSteps;
 
-	private Button includeCheckBox;
-
-	private ComboViewer typeComboViewer;
-
 	/**
 	 * Creates a new instance.
 	 */
 	public CustomCategoryAssignPage(FormEditor editor) {
 		super(editor, FORM_PAGE_ID, AuthoringUIText.ASSIGN_PAGE_TITLE);
 	}
-	
-	@Override
-	protected void createFormContent(IManagedForm managedForm) {
-		super.createFormContent(managedForm);
-		
-		ctrl_add.setText(AuthoringUIResources.assignAction_text);
-		ctrl_remove.setText(AuthoringUIResources.unassignAction_text);
-		
-		createIncludeComposite();
-	}
 
-	private void createIncludeComposite() {
-		createCompositeForButtons(toolkit, aComposite);
-		Composite composite = createComposite(toolkit, aComposite, GridData.FILL_BOTH, 1, 1, 2);
-		includeCheckBox = toolkit.createButton(composite, AuthoringUIResources.CustomCategoryAssignPage_includeElementsOfType, SWT.CHECK);
-		includeCheckBox.setLayoutData(new GridData(GridData.BEGINNING));
-		Combo typeCombo = new Combo(composite, SWT.SINGLE | SWT.FLAT | SWT.READ_ONLY);
-		typeCombo.setLayoutData(new GridData(GridData.BEGINNING));
-		typeComboViewer = new ComboViewer(typeCombo);
-		typeComboViewer.setContentProvider(new ArrayContentProvider());
-		typeComboViewer.setLabelProvider(new LabelProvider() {
-			@Override
-			public String getText(Object element) {
-				if(element instanceof EClass) {
-					return TngUtil.getTypeText((EClass) element);
-				} else if (element instanceof UserDefinedTypeMeta) {
-					return ((UserDefinedTypeMeta)element).getRteNameMap().get(UserDefinedTypeMeta._typeName);
-				}
-				
-				return super.getText(element);
-			}
-		});
-		List<Object> allTypeValues = new ArrayList<Object>();
-		allTypeValues.addAll(LibraryUtil.getIncludedElementTypes());
-		allTypeValues.addAll(LibraryUtil.getAllUDTMetas());
-		typeComboViewer.setInput(allTypeValues.toArray());
-		
-		// populate data
-		//
-		MethodElementProperty prop = MethodElementPropertyHelper.getProperty(category, MethodElementPropertyHelper.CUSTOM_CATEGORY__INCLUDED_ELEMENTS);
-		if(prop != null) {
-			includeCheckBox.setSelection(true);
-			Object item = null;
-			EClassifier cls = UmaPackage.eINSTANCE.getEClassifier(prop.getValue());
-			if ((cls != null) && (cls instanceof EClass)) {
-				item = cls;
-			} else if (cls == null) {
-				item = LibraryUtil.getUDTMetaFromId(prop.getValue());
-			}
-			if (item != null) {
-				typeComboViewer.setSelection(new StructuredSelection(item));
-			}
-		} else {
-			typeCombo.setEnabled(false);
-		}
-		
-		// add listeners
-		//
-		includeCheckBox.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				typeComboViewer.getCombo().setEnabled(includeCheckBox.getSelection());
-				updateInclude();
-			}
-		});
-		typeComboViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-
-			public void selectionChanged(SelectionChangedEvent event) {
-				if(includeCheckBox.getSelection()) {
-					updateInclude();
-				}
-			}
-			
-		});
-	}
-
-	private void updateInclude() {
-		if(includeCheckBox.getSelection()) {
-			String type = null;
-			IStructuredSelection selection = (IStructuredSelection) typeComboViewer.getSelection();
-			if(selection.isEmpty()) {
-				type = StrUtil.EMPTY_STRING;
-			} else {
-				if (selection.getFirstElement() instanceof EClass) {
-					type = ((EClass) selection.getFirstElement()).getName();
-				} else if (selection.getFirstElement() instanceof UserDefinedTypeMeta) {
-					type = ((UserDefinedTypeMeta)selection.getFirstElement()).getRteNameMap().get(UserDefinedTypeMeta._typeId);
-				}
-			}
-			MethodElementSetPropertyCommand cmd = new MethodElementSetPropertyCommand(category,
-					MethodElementPropertyHelper.CUSTOM_CATEGORY__INCLUDED_ELEMENTS, type);
-			getActionManager().execute(cmd);
-		} else {
-			// remove property "include"
-			//
-			MethodElementProperty prop = MethodElementPropertyHelper.getProperty(category, MethodElementPropertyHelper.CUSTOM_CATEGORY__INCLUDED_ELEMENTS);
-			if (prop != null) {
-				getActionManager().doAction(IActionManager.REMOVE, category, UmaPackage.eINSTANCE.getMethodElement_MethodElementProperty(), prop, -1);
-			}
-		}
-	}
-	
 	/**
 	 * @see org.eclipse.epf.authoring.ui.forms.AssociationFormPage#init(org.eclipse.ui.IEditorSite, org.eclipse.ui.IEditorInput)
 	 */
@@ -228,16 +101,10 @@ public class CustomCategoryAssignPage extends AssociationFormPage {
 						.getNavigatorView_ComposedAdapterFactory()) {
 			public Object[] getElements(Object object) {
 				if (allSteps == null) {
-//					allSteps = new ContentElementOrderList(
-//							contentElement,
-//							ContentElementOrderList.CONTENT_ELEMENTS__FOR_ELEMENT_ONLY,
-//							getOrderFeature());
-					allSteps = getProviderExtender().newContentElementOrderList(contentElement, 
+					allSteps = new ContentElementOrderList(
+							contentElement,
 							ContentElementOrderList.CONTENT_ELEMENTS__FOR_ELEMENT_ONLY,
-							getOrderFeature(), 1);
-				}
-				if (getProviderExtender().useContentProviderAPIs()) {
-					return getProviderExtender().getElements(object, 1);
+							getContentCategoryOrderFeature());
 				}
 				List returnList = CategorySortHelper.sortCategoryElements(contentElement, allSteps.toArray());
 				return returnList.toArray();
@@ -250,19 +117,6 @@ public class CustomCategoryAssignPage extends AssociationFormPage {
 	 * @see org.eclipse.epf.authoring.ui.forms.AssociationFormPage#addItemsToModel1(ArrayList)
 	 */
 	protected void addItemsToModel1(ArrayList addItems) {
-		addItemsToModel1(addItems, category, usedCategories,
-				getActionManager(), getAncestors(category));
-		if (!addItems.isEmpty()) {
-			setDirty(true);
-		}
-	}
-		
-	public static void addItemsToModel1(ArrayList addItems, 
-			CustomCategory category,
-			ArrayList usedCategories,
-			IActionManager actionManager,
-			List<Object> ancestors
-			) {
 		boolean ok = DependencyChecker.checkCircularForMovingVariabilityElement(category, addItems);
 		if(! ok) {
 			String title = AuthoringUIResources.circular_dependency_error_title;
@@ -270,7 +124,7 @@ public class CustomCategoryAssignPage extends AssociationFormPage {
 			return;
 		}
 		
-		//List<Object> ancestors = getAncestors(category);
+		List<Object> ancestors = getAncestors(category);
 		if (!addItems.isEmpty()) {
 			for (Iterator it = addItems.iterator(); it.hasNext();) {
 				MethodElement customCategory = (MethodElement) it.next();
@@ -283,14 +137,14 @@ public class CustomCategoryAssignPage extends AssociationFormPage {
 						MethodElement object = ((ProcessComponent) customCategory)
 								.getProcess();
 						LibraryManager.getInstance().addToCustomCategory(
-								actionManager, category, object, usedCategories);
+								getActionManager(), category, object, usedCategories);
 					} else {
 						LibraryManager.getInstance().addToCustomCategory(
-								actionManager, category, customCategory, usedCategories);
+								getActionManager(), category, customCategory, usedCategories);
 					}
 				}
 			}
-			//setDirty(true);
+			setDirty(true);
 		}
 	}
 
@@ -298,19 +152,6 @@ public class CustomCategoryAssignPage extends AssociationFormPage {
 	 * @see org.eclipse.epf.authoring.ui.forms.AssociationFormPage#removeItemsFromModel1(ArrayList)
 	 */
 	protected void removeItemsFromModel1(ArrayList rmItems) {
-		removeItemsFromModel1(rmItems, category, usedCategories,
-				getActionManager(), getAncestors(category));
-		if (!rmItems.isEmpty()) {
-			setDirty(true);
-		}
-	}
-	
-	public static void removeItemsFromModel1(ArrayList rmItems,
-		CustomCategory category,
-		ArrayList usedCategories,
-		IActionManager actionManager,
-		List<Object> ancestors
-		) {
 		if (!rmItems.isEmpty()) {
 			ArrayList<MethodElement> customCategoriesToDelete = new ArrayList<MethodElement>();
 			MethodPlugin currentPlugin = UmaUtil.getMethodPlugin(category);
@@ -336,20 +177,12 @@ public class CustomCategoryAssignPage extends AssociationFormPage {
 					// the last super custom category of e in the current plugin
 					//
 					if(TngUtil.isInPluginWithLessThanOneSuperCustomCategory((CustomCategory) e, currentPlugin)) {
-//						customCategoriesToDelete.add(e);
-//						continue;
-						
-						//Now, don't delete it, but add it to the root instead
-						CustomCategory rootCC = TngUtil.getRootCustomCategory(currentPlugin);
-						if (rootCC == category) {
-							return;
-						}
-						LibraryManager.getInstance().addToCustomCategory(
-								actionManager, rootCC, e, new ArrayList());
+						customCategoriesToDelete.add(e);
+						continue;
 					}
 				}				
 				LibraryManager.getInstance().removeFromCustomCategory(
-						actionManager, category, e, usedCategories);
+						getActionManager(), category, e, usedCategories);
 			}
 
 			if (customCategoriesToDelete.size() > 0) {
@@ -404,14 +237,14 @@ public class CustomCategoryAssignPage extends AssociationFormPage {
 						customCategoriesToDelete));
 				deleteAction.run();
 			}
-			//setDirty(true);
+			setDirty(true);
 		}
 	}
 
 	/**
 	 * Returns the ancestors for the given Custom Category.
 	 */
-	public static List<Object> getAncestors(CustomCategory methodObject) {
+	private List<Object> getAncestors(CustomCategory methodObject) {
 		List<Object> ancestorList = new ArrayList<Object>();
 		List<Object> objList = new ArrayList<Object>();
 		objList.add(methodObject);
@@ -419,7 +252,7 @@ public class CustomCategoryAssignPage extends AssociationFormPage {
 		return ancestorList;
 	}
 
-	private static List<Object> getAncestors(List<Object> ancestorList, List<Object> methodObjectList) {
+	private List<Object> getAncestors(List<Object> ancestorList, List<Object> methodObjectList) {
 		if (methodObjectList.isEmpty())
 			return ancestorList;
 
@@ -541,7 +374,7 @@ public class CustomCategoryAssignPage extends AssociationFormPage {
 	}
 	
 	@Override
-	protected EStructuralFeature getOrderFeature() {
+	protected EStructuralFeature getContentCategoryOrderFeature() {
 		return UmaPackage.eINSTANCE.getCustomCategory_CategorizedElements();
 	}
 	
@@ -551,7 +384,7 @@ public class CustomCategoryAssignPage extends AssociationFormPage {
 	}
 	
 	@Override
-	public ContentElementOrderList getContentElementOrderList() {
+	protected ContentElementOrderList getContentElementOrderList() {
 		return allSteps;
 	}
 }

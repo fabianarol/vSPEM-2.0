@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.rcp.ui;
 
-import org.eclipse.epf.common.ui.AbstractPlugin;
+import org.eclipse.epf.common.plugin.AbstractPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -33,14 +33,14 @@ public class RCPUIPlugin extends AbstractPlugin {
 	}
 
 	/**
-	 * @see org.eclipse.epf.common.ui.AbstractPlugin#start(BundleContext)
+	 * @see org.eclipse.epf.common.plugin.AbstractPlugin#start(BundleContext)
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 	}
 
 	/**
-	 * @see org.eclipse.epf.common.ui.AbstractPlugin#stop(BundleContext)
+	 * @see org.eclipse.epf.common.plugin.AbstractPlugin#stop(BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
 		super.stop(context);

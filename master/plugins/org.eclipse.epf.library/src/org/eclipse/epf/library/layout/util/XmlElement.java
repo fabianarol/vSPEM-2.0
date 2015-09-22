@@ -66,22 +66,11 @@ public class XmlElement implements IXmlElement {
 		this.element_name = name;
 		
 		if (id == null ) {
-			//id = Integer.toHexString(this.toString().hashCode());
-			id = getNodeId();
+			id = Integer.toHexString(this.toString().hashCode());
 		}
 		
 		this.id = id;
 		setAttribute(NODE_ID, this.id);
-	}
-	
-	private String getNodeId() {			
-		int original_hash = this.toString().hashCode();
-		long confusion = System.currentTimeMillis();
-		int confusion_hash = (int)(confusion ^ (confusion >>> 32));
-		
-		int result = original_hash + confusion_hash;
-		
-		return Integer.toHexString(result);		
 	}
 	
 	/**
@@ -95,11 +84,6 @@ public class XmlElement implements IXmlElement {
 		return this;
 	}
 
-	public String getAttribute(String name) {
-		Object value = attributes.get(name);
-		return value instanceof String ? (String) value : null;
-	}
-	
 	/**
 	 * set the value of the element
 	 * @param value
@@ -131,17 +115,6 @@ public class XmlElement implements IXmlElement {
 		return this;
 	}
 
-	/**
-	 * @param child
-	 * @return
-	 */
-	public XmlElement removeChild(XmlElement child) {
-		if (children.remove(child)) {
-			return child;
-		}
-		return null;
-	}
-	
 	/**
 	 * create a new chiild element
 	 * @param name

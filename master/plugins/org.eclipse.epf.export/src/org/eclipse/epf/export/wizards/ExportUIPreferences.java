@@ -12,8 +12,8 @@ package org.eclipse.epf.export.wizards;
 
 import java.util.List;
 
-import org.eclipse.epf.common.ui.util.PreferenceUtil;
 import org.eclipse.epf.common.utils.FileUtil;
+import org.eclipse.epf.common.utils.PreferenceUtil;
 import org.eclipse.epf.export.ExportPlugin;
 import org.eclipse.epf.library.ui.preferences.LibraryUIPreferences;
 import org.eclipse.jface.preference.IPreferenceStore;

@@ -41,7 +41,6 @@ import org.eclipse.epf.uma.WorkProductDescriptor;
  *   <li>{@link org.eclipse.epf.uma.impl.WorkProductDescriptorImpl#getImpactedBy <em>Impacted By</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.impl.WorkProductDescriptorImpl#getImpacts <em>Impacts</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.impl.WorkProductDescriptorImpl#getDeliverableParts <em>Deliverable Parts</em>}</li>
- *   <li>{@link org.eclipse.epf.uma.impl.WorkProductDescriptorImpl#getDeliverablePartsExclude <em>Deliverable Parts Exclude</em>}</li>
  * </ul>
  * </p>
  *
@@ -49,6 +48,13 @@ import org.eclipse.epf.uma.WorkProductDescriptor;
  */
 public class WorkProductDescriptorImpl extends DescriptorImpl implements
 		WorkProductDescriptor {
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * The default value of the '{@link #getActivityEntryState() <em>Activity Entry State</em>}' attribute.
 	 * <!-- begin-user-doc -->
@@ -97,7 +103,7 @@ public class WorkProductDescriptorImpl extends DescriptorImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected WorkProduct workProduct;
+	protected WorkProduct workProduct = null;
 
 	/**
 	 * The cached value of the '{@link #getImpactedBy() <em>Impacted By</em>}' reference list.
@@ -107,7 +113,7 @@ public class WorkProductDescriptorImpl extends DescriptorImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<WorkProductDescriptor> impactedBy;
+	protected EList impactedBy = null;
 
 	/**
 	 * The cached value of the '{@link #getImpacts() <em>Impacts</em>}' reference list.
@@ -117,7 +123,7 @@ public class WorkProductDescriptorImpl extends DescriptorImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<WorkProductDescriptor> impacts;
+	protected EList impacts = null;
 
 	/**
 	 * The cached value of the '{@link #getDeliverableParts() <em>Deliverable Parts</em>}' reference list.
@@ -127,17 +133,7 @@ public class WorkProductDescriptorImpl extends DescriptorImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<WorkProductDescriptor> deliverableParts;
-
-	/**
-	 * The cached value of the '{@link #getDeliverablePartsExclude() <em>Deliverable Parts Exclude</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getDeliverablePartsExclude()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<WorkProduct> deliverablePartsExclude;
+	protected EList deliverableParts = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -149,7 +145,7 @@ public class WorkProductDescriptorImpl extends DescriptorImpl implements
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -157,7 +153,6 @@ public class WorkProductDescriptorImpl extends DescriptorImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.WORK_PRODUCT_DESCRIPTOR;
 	}
@@ -255,9 +250,9 @@ public class WorkProductDescriptorImpl extends DescriptorImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<WorkProductDescriptor> getImpactedBy() {
+	public List getImpactedBy() {
 		if (impactedBy == null) {
-			impactedBy = new EObjectWithInverseResolvingEList.ManyInverse<WorkProductDescriptor>(
+			impactedBy = new EObjectWithInverseResolvingEList.ManyInverse(
 					WorkProductDescriptor.class, this,
 					UmaPackage.WORK_PRODUCT_DESCRIPTOR__IMPACTED_BY,
 					UmaPackage.WORK_PRODUCT_DESCRIPTOR__IMPACTS);
@@ -270,9 +265,9 @@ public class WorkProductDescriptorImpl extends DescriptorImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<WorkProductDescriptor> getImpacts() {
+	public List getImpacts() {
 		if (impacts == null) {
-			impacts = new EObjectWithInverseResolvingEList.ManyInverse<WorkProductDescriptor>(
+			impacts = new EObjectWithInverseResolvingEList.ManyInverse(
 					WorkProductDescriptor.class, this,
 					UmaPackage.WORK_PRODUCT_DESCRIPTOR__IMPACTS,
 					UmaPackage.WORK_PRODUCT_DESCRIPTOR__IMPACTED_BY);
@@ -285,9 +280,9 @@ public class WorkProductDescriptorImpl extends DescriptorImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<WorkProductDescriptor> getDeliverableParts() {
+	public List getDeliverableParts() {
 		if (deliverableParts == null) {
-			deliverableParts = new EObjectResolvingEList<WorkProductDescriptor>(
+			deliverableParts = new EObjectResolvingEList(
 					WorkProductDescriptor.class, this,
 					UmaPackage.WORK_PRODUCT_DESCRIPTOR__DELIVERABLE_PARTS);
 		}
@@ -299,32 +294,13 @@ public class WorkProductDescriptorImpl extends DescriptorImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<WorkProduct> getDeliverablePartsExclude() {
-		if (deliverablePartsExclude == null) {
-			deliverablePartsExclude = new EObjectResolvingEList<WorkProduct>(
-					WorkProduct.class,
-					this,
-					UmaPackage.WORK_PRODUCT_DESCRIPTOR__DELIVERABLE_PARTS_EXCLUDE);
-		}
-		return deliverablePartsExclude;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@SuppressWarnings("unchecked")
-	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case UmaPackage.WORK_PRODUCT_DESCRIPTOR__IMPACTED_BY:
-			return ((InternalEList<InternalEObject>) (InternalEList<?>) getImpactedBy())
-					.basicAdd(otherEnd, msgs);
+			return ((InternalEList) getImpactedBy()).basicAdd(otherEnd, msgs);
 		case UmaPackage.WORK_PRODUCT_DESCRIPTOR__IMPACTS:
-			return ((InternalEList<InternalEObject>) (InternalEList<?>) getImpacts())
-					.basicAdd(otherEnd, msgs);
+			return ((InternalEList) getImpacts()).basicAdd(otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
@@ -334,16 +310,14 @@ public class WorkProductDescriptorImpl extends DescriptorImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case UmaPackage.WORK_PRODUCT_DESCRIPTOR__IMPACTED_BY:
-			return ((InternalEList<?>) getImpactedBy()).basicRemove(otherEnd,
-					msgs);
-		case UmaPackage.WORK_PRODUCT_DESCRIPTOR__IMPACTS:
-			return ((InternalEList<?>) getImpacts())
+			return ((InternalEList) getImpactedBy())
 					.basicRemove(otherEnd, msgs);
+		case UmaPackage.WORK_PRODUCT_DESCRIPTOR__IMPACTS:
+			return ((InternalEList) getImpacts()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -353,7 +327,6 @@ public class WorkProductDescriptorImpl extends DescriptorImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.WORK_PRODUCT_DESCRIPTOR__ACTIVITY_ENTRY_STATE:
@@ -370,8 +343,6 @@ public class WorkProductDescriptorImpl extends DescriptorImpl implements
 			return getImpacts();
 		case UmaPackage.WORK_PRODUCT_DESCRIPTOR__DELIVERABLE_PARTS:
 			return getDeliverableParts();
-		case UmaPackage.WORK_PRODUCT_DESCRIPTOR__DELIVERABLE_PARTS_EXCLUDE:
-			return getDeliverablePartsExclude();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -381,8 +352,6 @@ public class WorkProductDescriptorImpl extends DescriptorImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.WORK_PRODUCT_DESCRIPTOR__ACTIVITY_ENTRY_STATE:
@@ -396,23 +365,15 @@ public class WorkProductDescriptorImpl extends DescriptorImpl implements
 			return;
 		case UmaPackage.WORK_PRODUCT_DESCRIPTOR__IMPACTED_BY:
 			getImpactedBy().clear();
-			getImpactedBy().addAll(
-					(Collection<? extends WorkProductDescriptor>) newValue);
+			getImpactedBy().addAll((Collection) newValue);
 			return;
 		case UmaPackage.WORK_PRODUCT_DESCRIPTOR__IMPACTS:
 			getImpacts().clear();
-			getImpacts().addAll(
-					(Collection<? extends WorkProductDescriptor>) newValue);
+			getImpacts().addAll((Collection) newValue);
 			return;
 		case UmaPackage.WORK_PRODUCT_DESCRIPTOR__DELIVERABLE_PARTS:
 			getDeliverableParts().clear();
-			getDeliverableParts().addAll(
-					(Collection<? extends WorkProductDescriptor>) newValue);
-			return;
-		case UmaPackage.WORK_PRODUCT_DESCRIPTOR__DELIVERABLE_PARTS_EXCLUDE:
-			getDeliverablePartsExclude().clear();
-			getDeliverablePartsExclude().addAll(
-					(Collection<? extends WorkProduct>) newValue);
+			getDeliverableParts().addAll((Collection) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -423,7 +384,6 @@ public class WorkProductDescriptorImpl extends DescriptorImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.WORK_PRODUCT_DESCRIPTOR__ACTIVITY_ENTRY_STATE:
@@ -444,9 +404,6 @@ public class WorkProductDescriptorImpl extends DescriptorImpl implements
 		case UmaPackage.WORK_PRODUCT_DESCRIPTOR__DELIVERABLE_PARTS:
 			getDeliverableParts().clear();
 			return;
-		case UmaPackage.WORK_PRODUCT_DESCRIPTOR__DELIVERABLE_PARTS_EXCLUDE:
-			getDeliverablePartsExclude().clear();
-			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -456,7 +413,6 @@ public class WorkProductDescriptorImpl extends DescriptorImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);
@@ -479,9 +435,6 @@ public class WorkProductDescriptorImpl extends DescriptorImpl implements
 			return impacts != null && !impacts.isEmpty();
 		case UmaPackage.WORK_PRODUCT_DESCRIPTOR__DELIVERABLE_PARTS:
 			return deliverableParts != null && !deliverableParts.isEmpty();
-		case UmaPackage.WORK_PRODUCT_DESCRIPTOR__DELIVERABLE_PARTS_EXCLUDE:
-			return deliverablePartsExclude != null
-					&& !deliverablePartsExclude.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -491,7 +444,6 @@ public class WorkProductDescriptorImpl extends DescriptorImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy())
 			return super.toString();

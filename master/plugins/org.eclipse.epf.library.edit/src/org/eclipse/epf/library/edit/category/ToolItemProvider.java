@@ -10,7 +10,6 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.library.edit.category;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -20,20 +19,18 @@ import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.emf.edit.command.CopyCommand.Helper;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.epf.library.edit.ILibraryItemProvider;
 import org.eclipse.epf.library.edit.IStatefulItemProvider;
 import org.eclipse.epf.library.edit.LibraryEditPlugin;
 import org.eclipse.epf.library.edit.util.TngUtil;
-import org.eclipse.epf.uma.Artifact;
-import org.eclipse.epf.uma.Deliverable;
-import org.eclipse.epf.uma.DescribableElement;
 import org.eclipse.epf.uma.Discipline;
 import org.eclipse.epf.uma.MethodPlugin;
-import org.eclipse.epf.uma.Outcome;
 import org.eclipse.epf.uma.UmaPackage;
 import org.eclipse.epf.uma.VariabilityElement;
-import org.eclipse.epf.uma.provider.UmaEditPlugin;
+import org.eclipse.epf.uma.edit.command.MethodElementCreateCopyCommand;
+import org.eclipse.epf.uma.edit.command.MethodElementInitializeCopyCommand;
 import org.eclipse.epf.uma.util.UmaUtil;
 
 /**
@@ -59,28 +56,6 @@ public class ToolItemProvider extends org.eclipse.epf.uma.provider.ToolItemProvi
 		this.parent = parent;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.emf.edit.provider.ItemProviderAdapter#getImage(java.lang.Object)
-	 */
-	public Object getImage(Object object) {
-		if (object instanceof DescribableElement) {
-			if (((DescribableElement) object).getNodeicon() != null) {
-				URI imgUri = TngUtil.getFullPathofNodeorShapeIconURI(
-						(DescribableElement) object,
-						((DescribableElement) object).getNodeicon());
-				Object image = LibraryEditPlugin.INSTANCE
-						.getSharedImage(imgUri);
-				if (image != null)
-					return image;
-			}
-		}
-		
-		return super.getImage(object);
-	
-	}
-	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -179,6 +154,16 @@ public class ToolItemProvider extends org.eclipse.epf.uma.provider.ToolItemProvi
 	 */
 	public boolean hasChildren(Object object) {
 		return false;
+	}
+
+	protected Command createInitializeCopyCommand(EditingDomain domain,
+			EObject owner, Helper helper) {
+		return new MethodElementInitializeCopyCommand(domain, owner, helper);
+	}
+
+	protected Command createCreateCopyCommand(EditingDomain domain,
+			EObject owner, Helper helper) {
+		return new MethodElementCreateCopyCommand(domain, owner, helper);
 	}
 
 	protected Command createAddCommand(EditingDomain domain, EObject owner,

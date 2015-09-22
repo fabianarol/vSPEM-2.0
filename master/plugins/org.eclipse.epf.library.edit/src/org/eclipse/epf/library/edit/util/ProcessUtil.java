@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.impl.NotificationImpl;
+import org.eclipse.emf.common.ui.viewer.IViewerProvider;
 import org.eclipse.emf.common.util.AbstractTreeIterator;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EAttribute;
@@ -51,14 +52,12 @@ import org.eclipse.epf.library.edit.LibraryEditResources;
 import org.eclipse.epf.library.edit.Providers;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
 import org.eclipse.epf.library.edit.command.IActionManager;
-import org.eclipse.epf.library.edit.meta.TypeDefUtil;
 import org.eclipse.epf.library.edit.process.ActivityWrapperItemProvider;
 import org.eclipse.epf.library.edit.process.BSActivityItemProvider;
 import org.eclipse.epf.library.edit.process.BreakdownElementWrapperItemProvider;
 import org.eclipse.epf.library.edit.process.ComposedBreakdownElementWrapperItemProvider;
 import org.eclipse.epf.library.edit.process.DescribableElementWrapperItemProvider;
 import org.eclipse.epf.library.edit.process.IBSItemProvider;
-import org.eclipse.epf.library.edit.process.IBreakdownElementWrapperItemProviderFactory;
 import org.eclipse.epf.library.edit.process.RoleDescriptorWrapperItemProvider;
 import org.eclipse.epf.library.edit.process.TaskDescriptorWrapperItemProvider;
 import org.eclipse.epf.library.edit.process.WorkProductDescriptorWrapperItemProvider;
@@ -67,8 +66,6 @@ import org.eclipse.epf.library.edit.process.command.CopyHelper;
 import org.eclipse.epf.library.edit.process.command.ProcessCommandUtil;
 import org.eclipse.epf.library.edit.process.command.ProcessDeepCopyCommand;
 import org.eclipse.epf.library.edit.process.command.WBSDropCommand;
-import org.eclipse.epf.library.edit.process.internal.BreakdownElementWrapperItemProviderFactory;
-import org.eclipse.epf.library.edit.realization.IRealizationManager;
 import org.eclipse.epf.library.edit.ui.UserInteractionHelper;
 import org.eclipse.epf.library.edit.util.PredecessorList.DepthLevelItemProvider;
 import org.eclipse.epf.library.edit.validation.NameChecker;
@@ -77,12 +74,12 @@ import org.eclipse.epf.uma.Artifact;
 import org.eclipse.epf.uma.BreakdownElement;
 import org.eclipse.epf.uma.CompositeRole;
 import org.eclipse.epf.uma.ContentPackage;
+import org.eclipse.epf.uma.CoreProcessPackage;
 import org.eclipse.epf.uma.Deliverable;
 import org.eclipse.epf.uma.Descriptor;
 import org.eclipse.epf.uma.Guidance;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodElement;
-import org.eclipse.epf.uma.MethodElementProperty;
 import org.eclipse.epf.uma.MethodPlugin;
 import org.eclipse.epf.uma.Milestone;
 import org.eclipse.epf.uma.Process;
@@ -90,8 +87,6 @@ import org.eclipse.epf.uma.ProcessComponent;
 import org.eclipse.epf.uma.ProcessPackage;
 import org.eclipse.epf.uma.Role;
 import org.eclipse.epf.uma.RoleDescriptor;
-import org.eclipse.epf.uma.Section;
-import org.eclipse.epf.uma.Step;
 import org.eclipse.epf.uma.Task;
 import org.eclipse.epf.uma.TaskDescriptor;
 import org.eclipse.epf.uma.TeamProfile;
@@ -105,10 +100,9 @@ import org.eclipse.epf.uma.WorkProduct;
 import org.eclipse.epf.uma.WorkProductDescriptor;
 import org.eclipse.epf.uma.provider.UmaEditPlugin;
 import org.eclipse.epf.uma.util.AssociationHelper;
-import org.eclipse.epf.uma.util.ExtendedReference;
-import org.eclipse.epf.uma.util.ModifiedTypeMeta;
-import org.eclipse.epf.uma.util.Scope;
 import org.eclipse.epf.uma.util.UmaUtil;
+import org.eclipse.jface.viewers.IContentProvider;
+import org.eclipse.jface.viewers.Viewer;
 
 import com.ibm.icu.text.MessageFormat;
 import com.ibm.icu.util.StringTokenizer;
@@ -121,8 +115,7 @@ import com.ibm.icu.util.StringTokenizer;
  * @author Shilpa Toraskar
  * @since 1.0
  */
-public final class ProcessUtil { 
-
+public final class ProcessUtil {
 	private static Collection<EClass> OBSEclasses = null;
 
 	private static Collection<EClass> WBSEclasses = null;
@@ -130,19 +123,14 @@ public final class ProcessUtil {
 	private static Collection<EClass> PBSEclasses = null;
 
 	private static Collection<VariabilityType> extendAndLocalContributionVariabilityTypes = null;
-	
-	public static boolean isSynFree() {
-		boolean synFree = LibraryEditUtil.getInstance().isSynFree();
-		return synFree;
-	}
 
 	private static Collection<VariabilityType> getExtendAndLocalContributionVariabilityTypes() {
 		if (extendAndLocalContributionVariabilityTypes == null) {
 			extendAndLocalContributionVariabilityTypes = new ArrayList<VariabilityType>();
 			extendAndLocalContributionVariabilityTypes
-					.add(VariabilityType.EXTENDS);
+					.add(VariabilityType.EXTENDS_LITERAL);
 			extendAndLocalContributionVariabilityTypes
-					.add(VariabilityType.LOCAL_CONTRIBUTION);
+					.add(VariabilityType.LOCAL_CONTRIBUTION_LITERAL);
 		}
 		return extendAndLocalContributionVariabilityTypes;
 	}
@@ -172,14 +160,14 @@ public final class ProcessUtil {
 			}
 		}
 		return NameChecker.checkName(adapterFactory, e, UmaPackage.eINSTANCE
-				.getMethodElement_PresentationName(), name, suppression);
+				.getDescribableElement_PresentationName(), name, suppression);
 	}
 	
 	public static String checkBreakdownElementPresentationName(
 			AdapterFactory adapterFactory, BreakdownElement e, String name, Suppression suppression, boolean ignoreSuppressed) {
 
 		return NameChecker.checkName(adapterFactory, e, UmaPackage.eINSTANCE
-				.getMethodElement_PresentationName(), name, suppression, ignoreSuppressed);
+				.getDescribableElement_PresentationName(), name, suppression, ignoreSuppressed);
 	}
 
 	public static Object getRootProcess(AdapterFactory adapterFactory,
@@ -462,16 +450,6 @@ public final class ProcessUtil {
 	 * @return
 	 */
 	public static RoleDescriptor createRoleDescriptor(Role role) {
-		return createRoleDescriptor(role, false);
-	}
-	
-	/**
-	 * Creates a new RoleDescriptor from the given role.
-	 * 
-	 * @param role
-	 * @return
-	 */
-	public static RoleDescriptor createRoleDescriptor(Role role, boolean isDynamic) {
 		RoleDescriptor roleDesc = UmaFactory.eINSTANCE.createRoleDescriptor();
 		roleDesc.setRole(role);
 		String presentationName = role.getPresentationName();
@@ -479,19 +457,11 @@ public final class ProcessUtil {
 		roleDesc.setPresentationName(StrUtil.isBlank(presentationName) ? role
 				.getName() : presentationName);
 		// roleDesc.setBriefDescription(role.getBriefDescription());
-		if (isSynFree() && isDynamic) {
-			DescriptorPropUtil.getDesciptorPropUtil().setCreatedByReference(roleDesc, true);
-		}
 		return roleDesc;
 	}
 
 	public static WorkProductDescriptor createWorkProductDescriptor(
 			WorkProduct wp) {
-		return createWorkProductDescriptor(wp, false);
-	}
-	
-	public static WorkProductDescriptor createWorkProductDescriptor(
-			WorkProduct wp, boolean isDynamic) {
 		WorkProductDescriptor wpDesc = UmaFactory.eINSTANCE
 				.createWorkProductDescriptor();
 		wpDesc.setWorkProduct(wp);
@@ -501,15 +471,59 @@ public final class ProcessUtil {
 						.getName()
 						: wp.getPresentationName());
 		// wpDesc.setBriefDescription(wp.getBriefDescription());
-		if (isSynFree() && isDynamic) {
-			DescriptorPropUtil.getDesciptorPropUtil().setCreatedByReference(wpDesc, true);
-		}
 		return wpDesc;
+	}
+
+	public static Viewer getViewer(AdapterFactory adapterFactory, Process proc) {
+		if (adapterFactory instanceof ExposedAdapterFactory) {
+			for (Iterator iter = Collections.unmodifiableList(
+					((ExposedAdapterFactory) adapterFactory)
+							.getChangeListeners()).iterator(); iter.hasNext();) {
+				Object listener = iter.next();
+				if (listener instanceof IContentProvider && listener instanceof IViewerProvider) {					
+					Viewer viewer = ((IViewerProvider) listener).getViewer();
+					if (viewer.getInput() instanceof ProcessComponent
+							&& ((ProcessComponent) viewer.getInput())
+									.getProcess() == proc)
+						return viewer;
+				}
+			}
+		}
+		return null;
 	}
 
 	public static boolean refreshNeeded(AdapterFactory adapterFactory,
 			BSActivityItemProvider itemProvider) {
-		return UserInteractionHelper.getUIHelper().refreshNeeded(adapterFactory, itemProvider);
+		Process process = (Process) itemProvider.getTopItem();
+		if (process == null)
+			return false;
+
+		// check if the given process is currently opened in editor
+		//
+		Viewer viewer = getViewer(adapterFactory, process);
+		if (viewer != null && viewer.getControl() != null
+				&& !viewer.getControl().isDisposed()) {
+			return true;
+		}
+
+		for (Iterator iter = TngUtil.getContributors(process); iter.hasNext();) {
+			Object element = iter.next();
+			BSActivityItemProvider adapter = (BSActivityItemProvider) adapterFactory
+					.adapt(element, ITreeItemContentProvider.class);
+			if (refreshNeeded(adapterFactory, adapter))
+				return true;
+		}
+
+		for (Iterator iter = TngUtil.getGeneralizers(process,
+				VariabilityType.EXTENDS_LITERAL); iter.hasNext();) {
+			Object element = iter.next();
+			BSActivityItemProvider adapter = (BSActivityItemProvider) adapterFactory
+					.adapt(element, ITreeItemContentProvider.class);
+			if (refreshNeeded(adapterFactory, adapter))
+				return true;
+		}
+
+		return false;
 	}
 	
 	public static void refreshPredeccessorLists(AdapterFactory factory, Process proc) {
@@ -563,7 +577,17 @@ public final class ProcessUtil {
 	}
 
 	public static void refreshViewer(AdapterFactory factory, Process proc) {
-		UserInteractionHelper.getUIHelper().refreshViewer(factory, proc);
+		final Viewer viewer = getViewer(factory, proc);
+		if (viewer != null && viewer.getControl() != null
+				&& !viewer.getControl().isDisposed()) {
+			UserInteractionHelper.runInUIThread(new Runnable() {
+
+				public void run() {
+					viewer.refresh();
+				}
+				
+			});
+		}
 	}
 
 	/**
@@ -572,11 +596,53 @@ public final class ProcessUtil {
 	 * @param adapterFactory
 	 */
 	public static void refreshIDsInViewers(final ExposedAdapterFactory adapterFactory) {
-		UserInteractionHelper.getUIHelper().refreshIDsInViewer(adapterFactory);
+		UserInteractionHelper.runInUIThread(new Runnable() {
+
+			public void run() {
+				for (Iterator iter = Collections.unmodifiableList(
+						adapterFactory.getChangeListeners()).iterator(); iter.hasNext();) {
+					Object listener = iter.next();
+					if (listener instanceof IContentProvider && listener instanceof IViewerProvider) {					
+						Viewer viewer = ((IViewerProvider) listener).getViewer();
+						if (viewer != null && viewer.getControl() != null
+								&& !viewer.getControl().isDisposed()
+								&& viewer.getInput() instanceof ProcessComponent) {
+							Process proc = ((ProcessComponent) viewer.getInput())
+									.getProcess();
+							BSActivityItemProvider itemProvider = (BSActivityItemProvider) adapterFactory
+									.adapt(proc, ITreeItemContentProvider.class);
+							if (itemProvider.isRefreshAllIDsRequired()) {
+								updateIDs(adapterFactory, proc);
+								viewer.refresh();
+								itemProvider.setRefreshAllIDsRequired(false);
+							}
+						}
+					}
+				}
+			}
+			
+		});
 	}
 
 	public static void refreshAllViewers(final ExposedAdapterFactory adapterFactory) {
-		UserInteractionHelper.getUIHelper().refreshAllViewers(adapterFactory);
+		UserInteractionHelper.runInUIThread(new Runnable() {
+
+			public void run() {
+				for (Iterator iter = Collections.unmodifiableList(
+						adapterFactory.getChangeListeners()).iterator(); iter.hasNext();) {
+					Object listener = iter.next();
+					if (listener instanceof IContentProvider && listener instanceof IViewerProvider) {					
+						Viewer viewer = ((IViewerProvider) listener).getViewer();
+						if (viewer != null && viewer.getControl() != null
+								&& !viewer.getControl().isDisposed()
+								&& viewer.getInput() instanceof ProcessComponent) {
+							viewer.refresh();
+						}
+					}
+				}
+			}
+			
+		});
 	}
 	
 	/**
@@ -793,11 +859,11 @@ public final class ProcessUtil {
 		//
 
 		// add roles
-		ArrayList<EObject> dependencies = new ArrayList<EObject>();
+		ArrayList dependencies = new ArrayList();
 		dependencies.addAll(task.getAdditionallyPerformedBy());
-		dependencies.addAll(task.getPerformedBy());
-		for (EObject eObject : dependencies) {
-			TngUtil.addToConfiguration(config, eObject,
+		dependencies.add(task.getPerformedBy());
+		for (Iterator iter = dependencies.iterator(); iter.hasNext();) {
+			TngUtil.addToConfiguration(config, (EObject) iter.next(),
 					addedObjects);
 		}
 
@@ -807,13 +873,14 @@ public final class ProcessUtil {
 			dependencies.addAll(task.getOptionalInput());
 			dependencies.addAll(task.getOutput());
 			dependencies.addAll(task.getMandatoryInput());
-			for (EObject eObject : dependencies) {
-				addWPToDefaultConfiguration(proc, (WorkProduct) eObject,
+			for (Iterator iter = dependencies.iterator(); iter.hasNext();) {
+				addWPToDefaultConfiguration(proc, (WorkProduct) iter.next(),
 						addedObjects);
 			}
 		}
 
-		for (Section step : task.getSteps()) {			
+		for (Iterator iter = task.getSteps().iterator(); iter.hasNext();) {
+			VariabilityElement step = (VariabilityElement) iter.next();
 			EObject base = step.getVariabilityBasedOnElement();
 			if (base != null) {
 				TngUtil.addToConfiguration(config, base, addedObjects);
@@ -863,12 +930,13 @@ public final class ProcessUtil {
 				.getConfigurationApplicator();
 		MethodConfiguration config = TngUtil.getOwningProcess(activity)
 				.getDefaultContext();
-		List<Step> steps = (List<Step>) configApplicator.getReference(task,
+		List steps = (List) configApplicator.getReference(task,
 				UmaPackage.eINSTANCE.getTask_Steps(), config);
 
 		// add those steps to TaskDescriptor if they are not there yet.
 		//
-		for (Step step : steps) {
+		for (Iterator iter = steps.iterator(); iter.hasNext();) {
+			Object step = iter.next();
 			if (!taskDesc.getSelectedSteps().contains(step)) {
 				taskDesc.getSelectedSteps().add(step);
 			}
@@ -1106,15 +1174,15 @@ public final class ProcessUtil {
 					modelInfo.append("; "); //$NON-NLS-1$
 				}
 				String pattern = null;
-				if (type == VariabilityType.CONTRIBUTES) {
+				if (type == VariabilityType.CONTRIBUTES_LITERAL) {
 					pattern = LibraryEditResources.util_ProcessUtil_contributesto; 
-				} else if (type == VariabilityType.LOCAL_CONTRIBUTION) {
+				} else if (type == VariabilityType.LOCAL_CONTRIBUTION_LITERAL) {
 					pattern = LibraryEditResources.util_ProcessUtil_localContributesto; 
-				} else if (type == VariabilityType.EXTENDS) {
+				} else if (type == VariabilityType.EXTENDS_LITERAL) {
 					pattern = LibraryEditResources.process_extends; 
-				} else if (type == VariabilityType.REPLACES) {
+				} else if (type == VariabilityType.REPLACES_LITERAL) {
 					pattern = LibraryEditResources.process_replaces; 
-				} else if (type == VariabilityType.LOCAL_REPLACEMENT) {
+				} else if (type == VariabilityType.LOCAL_REPLACEMENT_LITERAL) {
 					pattern = LibraryEditResources.process_localReplaces; 
 				}
 
@@ -1165,9 +1233,7 @@ public final class ProcessUtil {
 				if (wrapper instanceof WorkProductDescriptorWrapperItemProvider) {
 //					getModelInfoForWorkProductDescriptor(modelInfo,
 //							(WorkProductDescriptor) TngUtil.unwrap(wrapper));
-					
 					getWPDModelInfo(modelInfo, wrapper, wrapper);
-					
 				}
 			}
 		}
@@ -1429,7 +1495,7 @@ public final class ProcessUtil {
 					.valueOf(txt), -1);
 		} else if (prop == IBSItemProvider.COL_PRESENTATION_NAME) {
 			actionMgr.doAction(IActionManager.SET, e, UmaPackage.eINSTANCE
-					.getMethodElement_PresentationName(), txt, -1);
+					.getDescribableElement_PresentationName(), txt, -1);
 		} else if (prop == IBSItemProvider.COL_IS_OPTIONAL) {
 			actionMgr
 					.doAction(IActionManager.SET, e, UmaPackage.eINSTANCE
@@ -1459,7 +1525,7 @@ public final class ProcessUtil {
 	public static Activity generalize(Activity base, VariabilityType type) {		
 		Activity act = (Activity) UmaFactory.eINSTANCE.create(base.eClass());
 		act.setName(base.getName());
-		if (type == VariabilityType.LOCAL_REPLACEMENT) {
+		if (type == VariabilityType.LOCAL_REPLACEMENT_LITERAL) {
 			String presentationName = getPresentationName(base);
 			act.setPresentationName(StrUtil.isBlank(presentationName) ? base
 					.getName() : presentationName);
@@ -1467,7 +1533,7 @@ public final class ProcessUtil {
 		act.setVariabilityBasedOnElement(base);
 		act.setVariabilityType(type);
 
-		if (type == VariabilityType.EXTENDS) {
+		if (type == VariabilityType.EXTENDS_LITERAL) {
 			// inherit boolean attributes from base
 			//
 			for (Iterator iter = base.eClass().getEAllAttributes().iterator(); iter
@@ -1710,7 +1776,7 @@ public final class ProcessUtil {
 			RoleDescriptor refObject = (RoleDescriptor) obj;
 			List list = new ArrayList();
 			list.addAll(AssociationHelper.getAssistedTaskDescriptors(refObject));
-//			list.addAll(refObject.getResponsibleFor());
+			list.addAll(refObject.getResponsibleFor());
 			list.addAll(AssociationHelper.getAdditionalTaskDescriptors(refObject));
 			list.addAll(AssociationHelper.getPrimaryTaskDescriptors(refObject));
 			list.addAll(AssociationHelper.getTeamProfiles(refObject));
@@ -1736,7 +1802,7 @@ public final class ProcessUtil {
 			list.addAll(refObject.getMandatoryInput());
 			list.addAll(refObject.getOptionalInput());
 			list.addAll(refObject.getOutput());
-			list.addAll(refObject.getPerformedPrimarilyBy());
+			list.add(refObject.getPerformedPrimarilyBy());
 
 			for (Iterator refItor = list.iterator(); refItor.hasNext();) {
 				Object refItorObject = (Object) refItor.next();
@@ -1914,6 +1980,35 @@ public final class ProcessUtil {
 		}
 		return false;
 	}
+	
+	public static boolean hasCoreProcessNotOfType(CoreProcessPackage pkg,
+			EClass processType) {
+		if (pkg instanceof ProcessComponent) {
+			Process proc = ((ProcessComponent) pkg).getProcess();
+			if (proc != null && !processType.isInstance(proc)) {
+				return true;
+			}
+		}
+		for (Iterator iterator = pkg.getChildPackages().iterator(); iterator
+				.hasNext();) {
+			Object childPkg = iterator.next();
+			if (childPkg instanceof ProcessComponent) {
+				Process proc = ((ProcessComponent) childPkg).getProcess();
+				if (proc != null && !processType.isInstance(proc)) {
+					return true;
+				}
+			} else if (childPkg instanceof CoreProcessPackage) {
+				if (hasCoreProcessNotOfType((CoreProcessPackage) childPkg, processType)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	
+	
+	
 
 	/**
 	 * Find correspoding roleDescriptor in team since we maintain two role
@@ -2000,7 +2095,7 @@ public final class ProcessUtil {
 //		if (owner instanceof Activity) {
 //			Activity activity = (Activity) owner;
 //			while (!activity.getVariabilityType().equals(
-//					VariabilityType.NA)) {
+//					VariabilityType.NA_LITERAL)) {
 //				VariabilityElement element = activity
 //						.getVariabilityBasedOnElement();
 //
@@ -2109,76 +2204,11 @@ public final class ProcessUtil {
 					createdActivities);
 		}
 		Activity act = ProcessUtil.generialize(adapter,
-				VariabilityType.LOCAL_CONTRIBUTION, prevAndNext);
+				VariabilityType.LOCAL_CONTRIBUTION_LITERAL, prevAndNext);
 		Activity parentAct = ((Activity) parent);
 		addToActivity(parentAct, act, prevAndNext);
-		
-		try {
-			copySuppressions(adapter, act);
-		} catch (Throwable e) {
-			LibraryEditPlugin.getDefault().getLogger().logError(e);
-		}
-		
 		createdActivities.add(act);
 		return act;
-	}
-		
-	private static void copySuppressions(
-			BreakdownElementWrapperItemProvider adapterForBaseAct,
-			Activity contributerAct) {
-		IBreakdownElementWrapperItemProviderFactory factory = BreakdownElementWrapperItemProviderFactory.INSTANCE;
-		BreakdownElementWrapperItemProvider newAdapter = (BreakdownElementWrapperItemProvider) factory
-				.createWrapper(contributerAct, adapterForBaseAct.getOwner(),
-						adapterForBaseAct.getAdapterFactory());
-		Map<BreakdownElement, BreakdownElementWrapperItemProvider> newElementProviderMap = new HashMap<BreakdownElement, BreakdownElementWrapperItemProvider>();
-		for (Object newItem : newAdapter.getChildren(null)) {
-			if (newItem instanceof BreakdownElementWrapperItemProvider) {
-				Object unwrapped = TngUtil.unwrap(newItem);
-				if (unwrapped instanceof BreakdownElement) {
-					newElementProviderMap.put((BreakdownElement) unwrapped,
-							(BreakdownElementWrapperItemProvider) newItem);
-				}
-			}
-		}
-
-		Object top = adapterForBaseAct.getTopItem();
-		Process process = top instanceof Process ? (Process) top : null;
-		Suppression sup = process == null ? null : Suppression
-				.getSuppression(process);
-		if (sup == null) {
-			return;
-		}
-		List<BreakdownElementWrapperItemProvider> toSuppressList = new ArrayList<BreakdownElementWrapperItemProvider>();
-		List<BreakdownElementWrapperItemProvider> toRevealList = new ArrayList<BreakdownElementWrapperItemProvider>();
-		for (Object oldItem : adapterForBaseAct.getChildren(null)) {
-			if (!(oldItem instanceof BreakdownElementWrapperItemProvider)) {
-				continue;
-			}
-			Object unwrapped = TngUtil.unwrap(oldItem);
-			if (!(unwrapped instanceof BreakdownElement)) {
-				continue;
-			}
-			BreakdownElementWrapperItemProvider newProvider = newElementProviderMap.get(unwrapped);
-			if (newProvider == null) {
-				continue;
-			}
-			BreakdownElementWrapperItemProvider oldProvider = (BreakdownElementWrapperItemProvider) oldItem;
-			boolean oldSup = sup.isSuppressed(oldProvider);
-			boolean newSup = sup.isSuppressed(newProvider);
-			if (oldSup != newSup) {
-				if (oldSup) {
-					toSuppressList.add(newProvider);
-				} else {
-					toRevealList.add(newProvider);
-				}
-			}
-		}
-		if (! toSuppressList.isEmpty()) {
-			sup.suppress(toSuppressList);
-		}
-		if (! toRevealList.isEmpty()) {
-			sup.reveal(toRevealList);
-		}
 	}
 
 	/**
@@ -2198,7 +2228,7 @@ public final class ProcessUtil {
 					createdActivities);
 		}
 		Activity act = ProcessUtil.generialize(adapter,
-				VariabilityType.LOCAL_REPLACEMENT, prevAndNext);
+				VariabilityType.LOCAL_REPLACEMENT_LITERAL, prevAndNext);
 		Activity parentAct = ((Activity) parent);
 		addToActivity(parentAct, act, prevAndNext);
 		createdActivities.add(act);
@@ -2537,20 +2567,6 @@ public final class ProcessUtil {
 						if(AssociationHelper.getOutputFrom(wpd).contains(parentDescriptor)) {
 							features.add(UmaPackage.eINSTANCE.getTaskDescriptor_Output());
 						}
-						
-						ModifiedTypeMeta meta = TypeDefUtil.getMdtMeta(UmaPackage.eINSTANCE.getTask());
-						if (meta != null) {
-						TaskDescriptor td = (TaskDescriptor) parentDescriptor;
-							for (ExtendedReference eRef : meta.getReferences()) {
-								if (ExtendedReference.WorkProducts.equals(eRef.getContributeTo())) {
-									List list = PropUtil.getPropUtil().getExtendedReferenceList(td, eRef, false);
-									if (list.contains(wpd)) {
-										features.add(eRef.getReference());
-									}
-								}
-							}
-						}
-						
 						if(!features.isEmpty()) {
 							if (modelInfo.toString().length() > 0) {
 								modelInfo.append(","); //$NON-NLS-1$
@@ -2599,20 +2615,6 @@ public final class ProcessUtil {
 			}
 			modelInfo.append(UmaEditPlugin.INSTANCE
 					.getString("_UI_TaskDescriptor_output_feature")); //$NON-NLS-1$
-		}
-		ModifiedTypeMeta meta = TypeDefUtil.getMdtMeta(UmaPackage.eINSTANCE.getTask());
-		if (meta != null) {
-			for (ExtendedReference eRef : meta.getReferences()) {
-				if (ExtendedReference.WorkProducts.equals(eRef.getContributeTo())) {
-					List list = PropUtil.getPropUtil().getReferencingList(object, eRef);
-					if (list != null && !list.isEmpty()) {
-						if (modelInfo.toString().length() > 0) {
-							modelInfo.append(comma);
-						}
-						modelInfo.append(eRef.getName());
-					}
-				}
-			}
 		}
 	}
 
@@ -2704,7 +2706,7 @@ public final class ProcessUtil {
 				VariabilityElement ve = act.getVariabilityBasedOnElement();
 				if(ve != null) {
 					VariabilityType type = act.getVariabilityType();
-					if(type == VariabilityType.EXTENDS || type == VariabilityType.LOCAL_CONTRIBUTION) {
+					if(type == VariabilityType.EXTENDS_LITERAL || type == VariabilityType.LOCAL_CONTRIBUTION_LITERAL) {
 						return true;
 					}
 				}
@@ -2923,8 +2925,8 @@ public final class ProcessUtil {
 		
 		return UmaUtil.isContainedBy(child.getWorkProduct(), parent.getWorkProduct());
 	}
-	
-	public static List removeSubartifactsFromChildren(MethodConfiguration config, final Collection children, boolean unwrap) {
+
+	public static List removeSubartifactsFromChildren(final Collection children, boolean unwrap) {
 		List artifactList = new ArrayList();
 	
 		// get the artifact list
@@ -2960,10 +2962,10 @@ public final class ProcessUtil {
 				Artifact artifact = (Artifact) iter.next();
 				found = false;
 				// if(candidate.getContainedArtifacts().contains(artifact)) {
-				if (LibraryEditUtil.getInstance().isContainedBy(artifact, candidate, config)) {
+				if (UmaUtil.isContainedBy(artifact, candidate)) {
 					iter.remove();
 				}
-				else if (LibraryEditUtil.getInstance().isContainedBy(candidate, artifact, config)) {
+				else if (UmaUtil.isContainedBy(candidate, artifact)) {
 					iter.remove();
 					candidate = artifact;
 					found = true;
@@ -3035,14 +3037,6 @@ public final class ProcessUtil {
 			}
 		}
 		
-		MethodConfiguration config = null;
-		if (adapterFactory != null) {
-			IFilter filter = getFilter(adapterFactory);
-			if (filter instanceof IConfigurator) {
-				config = ((IConfigurator) filter).getMethodConfiguration();
-			}
-		}		
-		
 		// process the artifact list to get the top-most ones
 		//
 		Set topMostArtifactDescList = new HashSet();
@@ -3059,13 +3053,10 @@ public final class ProcessUtil {
 			for (Iterator iter = artifactDescList.iterator(); iter.hasNext();) {
 				WorkProductDescriptor artifactDesc = (WorkProductDescriptor) iter.next();
 				found = false;
-//				if (ProcessUtil.isContainedBy(candidate, artifactDesc, artifactDescriptors)) {
-				if (LibraryEditUtil.getInstance().isContainedBy(artifactDesc.getWorkProduct(), candidate.getWorkProduct(), config)) {
-					
+				if (ProcessUtil.isContainedBy(candidate, artifactDesc, artifactDescriptors)) {
 					iter.remove();
 				}
-//				else if (ProcessUtil.isContainedBy(artifactDesc, candidate, artifactDescriptors)) {
-				else if (LibraryEditUtil.getInstance().isContainedBy(artifactDesc.getWorkProduct(), candidate.getWorkProduct(), config)) {
+				else if (ProcessUtil.isContainedBy(artifactDesc, candidate, artifactDescriptors)) {
 					iter.remove();
 					candidate = artifactDesc;
 
@@ -3232,7 +3223,7 @@ public final class ProcessUtil {
 			VariabilityElement ve = (VariabilityElement) iter.next();
 			VariabilityElement base = ve.getVariabilityBasedOnElement();
 			VariabilityType vType = ve.getVariabilityType();
-			if(base != null && (vType == VariabilityType.CONTRIBUTES || vType == VariabilityType.REPLACES)) {
+			if(base != null && (vType == VariabilityType.CONTRIBUTES_LITERAL || vType == VariabilityType.REPLACES_LITERAL)) {
 //				Process proc = TngUtil.getOwningProcess((BreakdownElement) base);
 //				if(proc != process) {
 //					return true;
@@ -3393,7 +3384,7 @@ public final class ProcessUtil {
 	 */
 	public static boolean isRolledUpDescriptor(Object o,
 			AdapterFactory adapterFactory) {
-		if(adapterFactory != null && TngUtil.unwrap(o) instanceof Descriptor) {
+		if(TngUtil.unwrap(o) instanceof Descriptor) {
 			ITreeItemContentProvider adapter = (ITreeItemContentProvider) adapterFactory.adapt(o, ITreeItemContentProvider.class);
 			Object parent = adapter.getParent(o);
 			if(TngUtil.unwrap(parent) instanceof Activity) {
@@ -3405,30 +3396,30 @@ public final class ProcessUtil {
 		return false;
 	}
 
-//	/**
-//	 * Creates a deep copy of a process to the specified process package.
-//	 * 
-//	 * @param monitor
-//	 * @param process
-//	 * @prarm newProcessName
-//	 * @param deepCopyConfig
-//	 * @param targetPackage
-//	 * @return Process the newly created process
-//	 */
-//	public static org.eclipse.epf.uma.Process deepCopy(
-//			IProgressMonitor monitor, 
-//			org.eclipse.epf.uma.Process process, 
-//			String newProcessName,
-//			MethodConfiguration deepCopyConfig, 
-//			ProcessPackage targetPackage) {
-//		CopyHelper helper = new CopyHelper();	
-//		try {
-//			return deepCopy(monitor, process, newProcessName, deepCopyConfig, targetPackage, helper);
-//		}
-//		finally {
-//			helper.clear();
-//		}
-//	}
+	/**
+	 * Creates a deep copy of a process to the specified process package.
+	 * 
+	 * @param monitor
+	 * @param process
+	 * @prarm newProcessName
+	 * @param deepCopyConfig
+	 * @param targetPackage
+	 * @return Process the newly created process
+	 */
+	public static org.eclipse.epf.uma.Process deepCopy(
+			IProgressMonitor monitor, 
+			org.eclipse.epf.uma.Process process, 
+			String newProcessName,
+			MethodConfiguration deepCopyConfig, 
+			ProcessPackage targetPackage) {
+		CopyHelper helper = new CopyHelper();	
+		try {
+			return deepCopy(monitor, process, newProcessName, deepCopyConfig, targetPackage, helper);
+		}
+		finally {
+			helper.clear();
+		}
+	}
 		
 	public static Process deepCopy(
 			IProgressMonitor monitor, 
@@ -3436,39 +3427,7 @@ public final class ProcessUtil {
 			String newProcessName,
 			MethodConfiguration deepCopyConfig, 
 			ProcessPackage targetPackage,
-			CopyHelper copyHelper,
-			IConfigurator configurator, boolean handleAutoSyn) {
-		
-		if (handleAutoSyn) {
-			if (deepCopyConfig instanceof Scope) {
-				MethodConfiguration tempConfig = UmaFactory.eINSTANCE.createMethodConfiguration();
-				for (MethodPlugin plugin : deepCopyConfig.getMethodPluginSelection()) {
-					tempConfig.getMethodPluginSelection().add(plugin);
-					tempConfig.getMethodPackageSelection().addAll(UmaUtil.getAllMethodPackages(plugin));
-				}
-				deepCopyConfig = tempConfig;
-				configurator.setMethodConfiguration(deepCopyConfig);
-			}
-						
-			IRealizationManager mgr = LibraryEditUtil.getInstance()
-					.getRealizationManager(deepCopyConfig);
-			mgr.updateProcessModel(process);
-		}
-		
-		Process proc = deepCopy_(monitor, process, newProcessName,
-				deepCopyConfig, targetPackage, copyHelper, configurator, handleAutoSyn);
-		
-		return proc;
-	}
-	
-	private static  Process deepCopy_(
-			IProgressMonitor monitor, 
-			org.eclipse.epf.uma.Process process, 
-			String newProcessName,
-			MethodConfiguration deepCopyConfig, 
-			ProcessPackage targetPackage,
-			CopyHelper copyHelper,
-			IConfigurator configurator, boolean handleAutoSyn) {		
+			CopyHelper copyHelper) {		
 		// if the targetPackage is null, use the same package of the source process
 		if ( targetPackage == null ) {
 			targetPackage = (ProcessPackage)process.eContainer().eContainer();
@@ -3481,8 +3440,7 @@ public final class ProcessUtil {
 			monitor = new NullProgressMonitor();
 		}
 
-		ProcessDeepCopyCommand cmd = new ProcessDeepCopyCommand(process, newProcessName, 
-				copyHelper, deepCopyConfig, targetPackage, monitor,configurator);
+		ProcessDeepCopyCommand cmd = new ProcessDeepCopyCommand(process, newProcessName, copyHelper, deepCopyConfig, targetPackage, monitor);
 		try {
 			cmd.execute();
 			Collection result = cmd.getResult();
@@ -3497,7 +3455,6 @@ public final class ProcessUtil {
 		finally {
 			cmd.dispose();
 		}
-		ActivityHandler.fixGuidReferences(copyHelper);	
 		
 		return newProcess;
 	}
@@ -3517,7 +3474,7 @@ public final class ProcessUtil {
 				return true;
 			}
 		}
-		else if(type == VariabilityType.EXTENDS || type == VariabilityType.LOCAL_CONTRIBUTION || type == VariabilityType.LOCAL_REPLACEMENT)
+		else if(type == VariabilityType.EXTENDS_LITERAL || type == VariabilityType.LOCAL_CONTRIBUTION_LITERAL || type == VariabilityType.LOCAL_REPLACEMENT_LITERAL)
 		{
 			// check owning process of base activity only for extends and local contribution/replacement
 			//
@@ -3528,8 +3485,8 @@ public final class ProcessUtil {
 				base = (Activity) base.getVariabilityBasedOnElement();
 			} while (ret
 					&& base != null
-					&& (type == VariabilityType.EXTENDS
-							|| type == VariabilityType.LOCAL_CONTRIBUTION || type == VariabilityType.LOCAL_REPLACEMENT));
+					&& (type == VariabilityType.EXTENDS_LITERAL
+							|| type == VariabilityType.LOCAL_CONTRIBUTION_LITERAL || type == VariabilityType.LOCAL_REPLACEMENT_LITERAL));
 			return ret;
 		}
 		else {
@@ -3550,78 +3507,4 @@ public final class ProcessUtil {
 		}
 		return null;
 	}
-	
-	/**
-	 * Returns the Process to which a breakdownElement belongs
-	 * @param activity
-	 * @return
-	 */
-	public static Process getProcessForBreakdownElement(BreakdownElement breakdownElement) {
-		if (breakdownElement instanceof Activity) {
-			return getProcess((Activity) breakdownElement);
-		}
-		Activity superAct = breakdownElement.getSuperActivities();		
-		return superAct == null ? null : getProcess(superAct);
-	}
-	
-	/**
-	 * Finds WorkOrder instance for the specified <code>inheritedChild</code>
-	 * of the specified parent activity with the given predecessor.
-	 * 
-	 * If the inherited (read-only) work breakdown elements of an activity are
-	 * allowed to have additional predecessors, the information about these
-	 * predecessors will be stored in WorkOrder objects that will be saved in
-	 * process package of the activity. The GUID of inherited children will be
-	 * stored in property (@link {@link MethodElementProperty} named "successor" 
-	 * ({@link MethodElementPropertyHelper#WORK_ORDER__SUCCESSOR} of the WorkOrder.
-	 * 
-	 * @param parent
-	 * @param inheritedChild
-	 * @param predecessor
-	 * @return
-	 */
-	public static WorkOrder findWorkOrder(Activity parent, WorkBreakdownElement inheritedChild, WorkBreakdownElement predecessor)  {
-		ProcessPackage pkg = (ProcessPackage) parent.eContainer();
-		for (Object element : pkg.getProcessElements()) {
-			if(element instanceof WorkOrder) {
-				WorkOrder workOrder = (WorkOrder) element;
-				if(workOrder.getPred() == predecessor) {
-					MethodElementProperty prop = MethodElementPropertyHelper.getProperty(workOrder, MethodElementPropertyHelper.WORK_ORDER__SUCCESSOR);
-					if(prop != null && inheritedChild.getGuid().equals(prop.getValue())) {
-						return workOrder;
-					}
-				}
-			}
-		}
-		return null;
-	}
-	
-	public static WorkOrder createDefaultWorkOrderForInheritedChild(Activity parent, WorkBreakdownElement inheritedChild, WorkBreakdownElement predecessor) {
-		WorkOrder workOrder = UmaFactory.eINSTANCE.createWorkOrder();
-		workOrder.setPred(predecessor);
-		MethodElementPropertyHelper.setProperty(workOrder, MethodElementPropertyHelper.WORK_ORDER__SUCCESSOR, inheritedChild.getGuid());
-		return workOrder;
-	}
-
-	public static boolean isCustomWorkOrder(WorkOrder object) {
-		return MethodElementPropertyHelper.getProperty(object, MethodElementPropertyHelper.WORK_ORDER__SUCCESSOR) != null;
-	}
-	
-	public static boolean isCustomWorkOrderOf(WorkOrder wo, WorkBreakdownElement e) {
-		MethodElementProperty prop = MethodElementPropertyHelper.getProperty(wo, MethodElementPropertyHelper.WORK_ORDER__SUCCESSOR);
-		return prop != null && e.getGuid().equals(prop.getValue());
-	}
-	
-	public static boolean processDeepcopyDiagarm = false;
-	public static boolean isProcessDeepcopyDiagarm() {
-		return processDeepcopyDiagarm;
-	}
-
-	public static void setProcessDeepcopyDiagarm(boolean processDeepcopyDiagarm) {
-		ProcessUtil.processDeepcopyDiagarm = processDeepcopyDiagarm;
-	}
-	
-	
-	
-	
 }

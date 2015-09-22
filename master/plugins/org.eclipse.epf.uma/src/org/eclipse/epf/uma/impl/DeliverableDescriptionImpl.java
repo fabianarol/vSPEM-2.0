@@ -34,6 +34,13 @@ import org.eclipse.epf.uma.UmaPackage;
 public class DeliverableDescriptionImpl extends WorkProductDescriptionImpl
 		implements DeliverableDescription {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The default value of the '{@link #getExternalDescription() <em>External Description</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -83,7 +90,7 @@ public class DeliverableDescriptionImpl extends WorkProductDescriptionImpl
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -91,7 +98,6 @@ public class DeliverableDescriptionImpl extends WorkProductDescriptionImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.DELIVERABLE_DESCRIPTION;
 	}
@@ -147,7 +153,6 @@ public class DeliverableDescriptionImpl extends WorkProductDescriptionImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.DELIVERABLE_DESCRIPTION__EXTERNAL_DESCRIPTION:
@@ -163,7 +168,6 @@ public class DeliverableDescriptionImpl extends WorkProductDescriptionImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.DELIVERABLE_DESCRIPTION__EXTERNAL_DESCRIPTION:
@@ -181,7 +185,6 @@ public class DeliverableDescriptionImpl extends WorkProductDescriptionImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.DELIVERABLE_DESCRIPTION__EXTERNAL_DESCRIPTION:
@@ -199,7 +202,6 @@ public class DeliverableDescriptionImpl extends WorkProductDescriptionImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);
@@ -224,7 +226,6 @@ public class DeliverableDescriptionImpl extends WorkProductDescriptionImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy())
 			return super.toString();

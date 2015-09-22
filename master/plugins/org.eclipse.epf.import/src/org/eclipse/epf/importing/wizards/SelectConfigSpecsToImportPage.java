@@ -12,7 +12,6 @@ package org.eclipse.epf.importing.wizards;
 
 import java.util.Iterator;
 
-import org.eclipse.epf.authoring.ui.AuthoringUIResources;
 import org.eclipse.epf.importing.ImportPlugin;
 import org.eclipse.epf.importing.ImportResources;
 import org.eclipse.epf.importing.services.ConfigSpecs;
@@ -30,12 +29,9 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -77,10 +73,6 @@ public class SelectConfigSpecsToImportPage extends BaseWizardPage implements
 	private Composite container;
 
 	private ConfigurationImportData data;
-	
-	private Button selectAllButton;
-	
-	private Button deselectAllButton;
 
 	/**
 	 * Creates a new instance.
@@ -106,22 +98,9 @@ public class SelectConfigSpecsToImportPage extends BaseWizardPage implements
 		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.horizontalSpan = 2;
 		tableContainer.setLayoutData(gridData);
-		
-		Composite container1 = new Composite(tableContainer, SWT.NONE);
-		container1.setLayout(new GridLayout(3, false));
-		//createLabel(container1,
-		//		ImportResources.SelectConfigSpecsToImportPage_label_configs, 2);
-		createLabel(container1,
-				ImportResources.SelectConfigSpecsToImportPage_label_configs);
 
-		selectAllButton = createButton(
-				container1,
-				AuthoringUIResources.AuthoringUIPlugin_SaveAllEditorsPage_SelectAllButtonLabel);
-		deselectAllButton = createButton(
-				container1,
-				AuthoringUIResources.AuthoringUIPlugin_SaveAllEditorsPage_DeselectAllButtonLabel);
-
-		
+		createLabel(tableContainer,
+				ImportResources.SelectConfigSpecsToImportPage_label_configs, 2);
 		ctrl_chkboxTableViewer = createCheckboxTableViewer(tableContainer, 1);
 
 		ILabelProvider labelProvider = new LabelProvider() {
@@ -177,32 +156,6 @@ public class SelectConfigSpecsToImportPage extends BaseWizardPage implements
 	private void addListeners() {
 		ctrl_chkboxTableViewer.addSelectionChangedListener(this);
 		ctrl_chkboxTableViewer.addCheckStateListener(this);
-		
-		selectAllButton.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent e) {
-				ctrl_chkboxTableViewer.setAllChecked(true);
-				setPageComplete(isPageComplete());
-				getWizard().getContainer().updateButtons();
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-
-		});
-
-		deselectAllButton.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent e) {
-				ctrl_chkboxTableViewer.setAllChecked(false);
-				setPageComplete(isPageComplete());
-				getWizard().getContainer().updateButtons();
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-
-		});
 	}
 
 	/**

@@ -28,12 +28,12 @@ import org.eclipse.epf.uma.UmaPackage;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link org.eclipse.epf.uma.impl.EllipseImpl#getCenter <em>Center</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.impl.EllipseImpl#getRadiusX <em>Radius X</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.impl.EllipseImpl#getRadiusY <em>Radius Y</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.impl.EllipseImpl#getRotation <em>Rotation</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.impl.EllipseImpl#getStartAngle <em>Start Angle</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.impl.EllipseImpl#getEndAngle <em>End Angle</em>}</li>
+ *   <li>{@link org.eclipse.epf.uma.impl.EllipseImpl#getCenter <em>Center</em>}</li>
  * </ul>
  * </p>
  *
@@ -41,14 +41,11 @@ import org.eclipse.epf.uma.UmaPackage;
  */
 public class EllipseImpl extends GraphicPrimitiveImpl implements Ellipse {
 	/**
-	 * The cached value of the '{@link #getCenter() <em>Center</em>}' reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getCenter()
 	 * @generated
-	 * @ordered
 	 */
-	protected Point center;
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * The default value of the '{@link #getRadiusX() <em>Radius X</em>}' attribute.
@@ -151,6 +148,16 @@ public class EllipseImpl extends GraphicPrimitiveImpl implements Ellipse {
 	protected Double endAngle = END_ANGLE_EDEFAULT;
 
 	/**
+	 * The cached value of the '{@link #getCenter() <em>Center</em>}' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getCenter()
+	 * @generated
+	 * @ordered
+	 */
+	protected Point center = null;
+
+	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -160,7 +167,7 @@ public class EllipseImpl extends GraphicPrimitiveImpl implements Ellipse {
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -168,7 +175,6 @@ public class EllipseImpl extends GraphicPrimitiveImpl implements Ellipse {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.ELLIPSE;
 	}
@@ -293,6 +299,16 @@ public class EllipseImpl extends GraphicPrimitiveImpl implements Ellipse {
 			InternalEObject oldCenter = (InternalEObject) center;
 			center = (Point) eResolveProxy(oldCenter);
 			if (center != oldCenter) {
+				InternalEObject newCenter = (InternalEObject) center;
+				NotificationChain msgs = oldCenter.eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE - UmaPackage.ELLIPSE__CENTER,
+						null, null);
+				if (newCenter.eInternalContainer() == null) {
+					msgs = newCenter.eInverseAdd(this, EOPPOSITE_FEATURE_BASE
+							- UmaPackage.ELLIPSE__CENTER, null, msgs);
+				}
+				if (msgs != null)
+					msgs.dispatch();
 				if (eNotificationRequired())
 					eNotify(new ENotificationImpl(this, Notification.RESOLVE,
 							UmaPackage.ELLIPSE__CENTER, oldCenter, center));
@@ -315,12 +331,20 @@ public class EllipseImpl extends GraphicPrimitiveImpl implements Ellipse {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setCenter(Point newCenter) {
+	public NotificationChain basicSetCenter(Point newCenter,
+			NotificationChain msgs) {
 		Point oldCenter = center;
 		center = newCenter;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					UmaPackage.ELLIPSE__CENTER, oldCenter, center));
+		if (eNotificationRequired()) {
+			ENotificationImpl notification = new ENotificationImpl(this,
+					Notification.SET, UmaPackage.ELLIPSE__CENTER, oldCenter,
+					newCenter);
+			if (msgs == null)
+				msgs = notification;
+			else
+				msgs.add(notification);
+		}
+		return msgs;
 	}
 
 	/**
@@ -328,13 +352,46 @@ public class EllipseImpl extends GraphicPrimitiveImpl implements Ellipse {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	public Object eGet(int featureID, boolean resolve, boolean coreType) {
+	public void setCenter(Point newCenter) {
+		if (newCenter != center) {
+			NotificationChain msgs = null;
+			if (center != null)
+				msgs = ((InternalEObject) center).eInverseRemove(this,
+						EOPPOSITE_FEATURE_BASE - UmaPackage.ELLIPSE__CENTER,
+						null, msgs);
+			if (newCenter != null)
+				msgs = ((InternalEObject) newCenter).eInverseAdd(this,
+						EOPPOSITE_FEATURE_BASE - UmaPackage.ELLIPSE__CENTER,
+						null, msgs);
+			msgs = basicSetCenter(newCenter, msgs);
+			if (msgs != null)
+				msgs.dispatch();
+		} else if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET,
+					UmaPackage.ELLIPSE__CENTER, newCenter, newCenter));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public NotificationChain eInverseRemove(InternalEObject otherEnd,
+			int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case UmaPackage.ELLIPSE__CENTER:
-			if (resolve)
-				return getCenter();
-			return basicGetCenter();
+			return basicSetCenter(null, msgs);
+		}
+		return super.eInverseRemove(otherEnd, featureID, msgs);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Object eGet(int featureID, boolean resolve, boolean coreType) {
+		switch (featureID) {
 		case UmaPackage.ELLIPSE__RADIUS_X:
 			return getRadiusX();
 		case UmaPackage.ELLIPSE__RADIUS_Y:
@@ -345,6 +402,10 @@ public class EllipseImpl extends GraphicPrimitiveImpl implements Ellipse {
 			return getStartAngle();
 		case UmaPackage.ELLIPSE__END_ANGLE:
 			return getEndAngle();
+		case UmaPackage.ELLIPSE__CENTER:
+			if (resolve)
+				return getCenter();
+			return basicGetCenter();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -354,12 +415,8 @@ public class EllipseImpl extends GraphicPrimitiveImpl implements Ellipse {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-		case UmaPackage.ELLIPSE__CENTER:
-			setCenter((Point) newValue);
-			return;
 		case UmaPackage.ELLIPSE__RADIUS_X:
 			setRadiusX((Double) newValue);
 			return;
@@ -375,6 +432,9 @@ public class EllipseImpl extends GraphicPrimitiveImpl implements Ellipse {
 		case UmaPackage.ELLIPSE__END_ANGLE:
 			setEndAngle((Double) newValue);
 			return;
+		case UmaPackage.ELLIPSE__CENTER:
+			setCenter((Point) newValue);
+			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -384,12 +444,8 @@ public class EllipseImpl extends GraphicPrimitiveImpl implements Ellipse {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case UmaPackage.ELLIPSE__CENTER:
-			setCenter((Point) null);
-			return;
 		case UmaPackage.ELLIPSE__RADIUS_X:
 			setRadiusX(RADIUS_X_EDEFAULT);
 			return;
@@ -405,6 +461,9 @@ public class EllipseImpl extends GraphicPrimitiveImpl implements Ellipse {
 		case UmaPackage.ELLIPSE__END_ANGLE:
 			setEndAngle(END_ANGLE_EDEFAULT);
 			return;
+		case UmaPackage.ELLIPSE__CENTER:
+			setCenter((Point) null);
+			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -414,7 +473,6 @@ public class EllipseImpl extends GraphicPrimitiveImpl implements Ellipse {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);
@@ -423,8 +481,6 @@ public class EllipseImpl extends GraphicPrimitiveImpl implements Ellipse {
 		}
 		//UMA<--		
 		switch (featureID) {
-		case UmaPackage.ELLIPSE__CENTER:
-			return center != null;
 		case UmaPackage.ELLIPSE__RADIUS_X:
 			return RADIUS_X_EDEFAULT == null ? radiusX != null
 					: !RADIUS_X_EDEFAULT.equals(radiusX);
@@ -440,6 +496,8 @@ public class EllipseImpl extends GraphicPrimitiveImpl implements Ellipse {
 		case UmaPackage.ELLIPSE__END_ANGLE:
 			return END_ANGLE_EDEFAULT == null ? endAngle != null
 					: !END_ANGLE_EDEFAULT.equals(endAngle);
+		case UmaPackage.ELLIPSE__CENTER:
+			return center != null;
 		}
 		return super.eIsSet(featureID);
 	}
@@ -449,7 +507,6 @@ public class EllipseImpl extends GraphicPrimitiveImpl implements Ellipse {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy())
 			return super.toString();

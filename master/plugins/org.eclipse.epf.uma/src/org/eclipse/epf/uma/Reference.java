@@ -30,7 +30,6 @@ package org.eclipse.epf.uma;
 public interface Reference extends DiagramElement {
 	/**
 	 * Returns the value of the '<em><b>Is Individual Representation</b></em>' attribute.
-	 * The default value is <code>"false"</code>.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Is Individual Representation</em>' attribute isn't clear,
@@ -40,7 +39,7 @@ public interface Reference extends DiagramElement {
 	 * @return the value of the '<em>Is Individual Representation</em>' attribute.
 	 * @see #setIsIndividualRepresentation(Boolean)
 	 * @see org.eclipse.epf.uma.UmaPackage#getReference_IsIndividualRepresentation()
-	 * @model default="false" dataType="org.eclipse.epf.uma.Boolean" required="true" ordered="false"
+	 * @model
 	 * @generated
 	 */
 	Boolean getIsIndividualRepresentation();
@@ -68,7 +67,7 @@ public interface Reference extends DiagramElement {
 	 * @see #setReferenced(DiagramElement)
 	 * @see org.eclipse.epf.uma.UmaPackage#getReference_Referenced()
 	 * @see org.eclipse.epf.uma.DiagramElement#getReference
-	 * @model opposite="reference" required="true" ordered="false"
+	 * @model opposite="reference" required="true"
 	 * @generated
 	 */
 	DiagramElement getReferenced();

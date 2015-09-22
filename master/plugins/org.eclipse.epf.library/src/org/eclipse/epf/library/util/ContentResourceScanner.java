@@ -21,9 +21,7 @@ import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.epf.common.utils.FileUtil;
-import org.eclipse.epf.library.edit.meta.TypeDefUtil;
 import org.eclipse.epf.library.layout.IContentValidator;
-import org.eclipse.epf.persistence.FileManager;
 import org.eclipse.epf.uma.ContentDescription;
 import org.eclipse.epf.uma.DescribableElement;
 import org.eclipse.epf.uma.MethodElement;
@@ -227,7 +225,7 @@ public class ContentResourceScanner {
 		}
 		dest = new File(this.targetRootPath, imageFile);
 
-		FileManager.copyFile(source, dest);
+		FileUtil.copyFile(source, dest);
 
 		return newUrl;
 	}
@@ -270,7 +268,7 @@ public class ContentResourceScanner {
 			// 3. contents
 			ContentDescription desc = de.getPresentation();
 			if ( desc.eContainer() != null ) {
-				List features = LibraryUtil.getStructuralFeatures(desc, true);
+				List features = LibraryUtil.getStructuralFeatures(desc);
 //				List properties = desc.getInstanceProperties();
 								
 				// get all string type attributes
@@ -281,8 +279,7 @@ public class ContentResourceScanner {
 						continue;
 					}
 					
-//					Object value = desc.eGet(feature);
-					Object value = TypeDefUtil.getInstance().eGet(desc, feature);
+					Object value = desc.eGet(feature);
 					if ( value == null ) {
 						continue;
 					}

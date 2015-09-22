@@ -24,11 +24,9 @@ package org.eclipse.epf.diagram.core.part;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.runtime.CoreException;
@@ -39,12 +37,9 @@ import org.eclipse.draw2d.PositionConstants;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.epf.common.CommonPlugin;
-import org.eclipse.epf.common.utils.StrUtil;
 import org.eclipse.epf.diagram.core.DiagramCorePlugin;
 import org.eclipse.epf.diagram.core.DiagramCoreResources;
 import org.eclipse.epf.diagram.core.actions.AccessibilityMoveAction;
@@ -60,7 +55,6 @@ import org.eclipse.epf.diagram.core.services.DiagramManager;
 import org.eclipse.epf.diagram.core.services.DiagramService;
 import org.eclipse.epf.diagram.core.util.DiagramConstants;
 import org.eclipse.epf.diagram.model.NamedNode;
-import org.eclipse.epf.diagram.model.util.TxUtil;
 import org.eclipse.epf.library.ILibraryManager;
 import org.eclipse.epf.library.ILibraryServiceListener;
 import org.eclipse.epf.library.LibraryService;
@@ -72,7 +66,6 @@ import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.events.ILibraryChangeListener;
 import org.eclipse.epf.library.ui.IMethodElementProvider;
 import org.eclipse.epf.services.ILibraryPersister;
-import org.eclipse.epf.services.Services;
 import org.eclipse.epf.ui.editors.IMethodEditor;
 import org.eclipse.epf.uma.Activity;
 import org.eclipse.epf.uma.MethodConfiguration;
@@ -123,8 +116,6 @@ import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.ide.IGotoMarker;
 import org.eclipse.ui.services.IDisposable;
 import org.eclipse.uml2.uml.ActivityNode;
-import org.eclipse.uml2.uml.ActivityParameterNode;
-import org.eclipse.uml2.uml.StructuredActivityNode;
 
 /**
  * @author Phong Nguyen Le
@@ -485,18 +476,12 @@ public abstract class AbstractDiagramEditor extends FileDiagramEditor implements
 			IActionManager actionMgr = getDiagramAdapter().getActionManager();
 			if (actionMgr != null && actionMgr.isSaveNeeded()) {
 				try {
-					progressMonitor.beginTask(NLS.bind(DiagramCoreResources.Progress_Saving_message, StrUtil.EMPTY_STRING), IProgressMonitor.UNKNOWN); //$NON-NLS-1$
+					progressMonitor.beginTask("Saving", IProgressMonitor.UNKNOWN); //$NON-NLS-1$
 					ILibraryPersister.FailSafeMethodLibraryPersister persister = LibraryServiceUtil
 					.getCurrentPersister().getFailSafePersister();
-					Collection<?> modifiedResources = actionMgr.getModifiedResources();					
-					// check for modifiable
-					//
-					IStatus status = Services.getAccessController().checkModify(modifiedResources.toArray(new Resource[0]), getSite().getShell());
-					if(!status.isOK()) {
-						return;
-					}
 					try {
-						for (Iterator<?> iter = modifiedResources.iterator(); iter.hasNext();) {
+						for (Iterator iter = actionMgr.getModifiedResources()
+								.iterator(); iter.hasNext();) {
 							Resource resource = (Resource) iter.next();
 							progressMonitor.setTaskName(NLS.bind(DiagramCoreResources.Progress_Saving_message,
 									resource.getURI().isFile() ? resource.getURI()
@@ -516,21 +501,10 @@ public abstract class AbstractDiagramEditor extends FileDiagramEditor implements
 							//						.getShell());
 							return;
 						}
-						
-						/*
-						 * NO UI module should not involve with UI classes
-						 * use callback to handle such kind of situation
-						 * Jinhua Xi, 01/13/08
-						*/
-//						CommonPlugin.getDefault().getMsgDialog().displayWarning(
-//								getSite().getShell().getText(),
-//								DiagramCoreResources.Warning_Saving_Diagram, e.getMessage(),
-//								e);
-						CommonPlugin.getDefault().getMsgCallback().displayWarning(
-								CommonPlugin.getDefault(), 
+						CommonPlugin.getDefault().getMsgDialog().displayWarning(
+								getSite().getShell().getText(),
 								DiagramCoreResources.Warning_Saving_Diagram, e.getMessage(),
 								e);
-					
 						return;
 					}
 
@@ -540,50 +514,10 @@ public abstract class AbstractDiagramEditor extends FileDiagramEditor implements
 
 			}
 		}
-		
-		cleanUp();
-		super.doSave(progressMonitor);		
 
-		//Alex: to fix RATLC00430370 
-		getDiagramManager().backupDiagram(activity, getDiagram());
+		super.doSave(progressMonitor);
 	}
 	
-	protected void cleanUp() {
-		// remove any orphan UML elements
-		//
-		Diagram diagram = getDiagram();
-		EObject model = diagram.getElement();
-		if(model != null) {
-			final HashSet<EObject> orphans = new HashSet<EObject>();
-			for (Iterator<EObject> iter = model.eAllContents(); iter.hasNext();) {
-				EObject object = iter.next();
-				if(isOrphan(object)) {
-					orphans.add(object);
-				}
-			}
-			if(!orphans.isEmpty()) {
-				try {
-					TxUtil.runInTransaction(diagram, new Runnable() {
-
-						public void run() {
-							for (EObject orphan : orphans) {
-								EcoreUtil.remove(orphan);
-							}
-						}
-						
-					});
-				} catch (ExecutionException e) {
-					DiagramCorePlugin.getDefault().getLogger().logError(e);
-				}
-			}
-		}
-
-	}
-
-	protected boolean isOrphan(EObject modelElement) {
-		return false;
-	}
-
 	private class DiagramGraphicalViewerEx extends DiagramGraphicalViewer implements IDiagramEditorInputProvider {
 
 		public DiagramEditorInput getDiagramEditorInput() {

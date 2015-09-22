@@ -39,7 +39,7 @@ public interface DeliverableDescription extends WorkProductDescription {
 	 * @return the value of the '<em>External Description</em>' attribute.
 	 * @see #setExternalDescription(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getDeliverableDescription_ExternalDescription()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getExternalDescription();
@@ -65,7 +65,7 @@ public interface DeliverableDescription extends WorkProductDescription {
 	 * @return the value of the '<em>Packaging Guidance</em>' attribute.
 	 * @see #setPackagingGuidance(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getDeliverableDescription_PackagingGuidance()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getPackagingGuidance();

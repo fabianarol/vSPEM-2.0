@@ -17,10 +17,8 @@ import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.util.ResourceLocator;
 import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.emf.edit.provider.ComposeableAdapterFactory;
 import org.eclipse.emf.edit.provider.IEditingDomainItemProvider;
 import org.eclipse.emf.edit.provider.IItemLabelProvider;
-import org.eclipse.emf.edit.provider.IItemPropertyDescriptor;
 import org.eclipse.emf.edit.provider.IItemPropertySource;
 import org.eclipse.emf.edit.provider.IStructuredItemContentProvider;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
@@ -54,33 +52,12 @@ public class GraphElementItemProvider extends DiagramElementItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	public List<IItemPropertyDescriptor> getPropertyDescriptors(Object object) {
+	public List getPropertyDescriptors(Object object) {
 		if (itemPropertyDescriptors == null) {
 			super.getPropertyDescriptors(object);
 
-			addPositionPropertyDescriptor(object);
 		}
 		return itemPropertyDescriptors;
-	}
-
-	/**
-	 * This adds a property descriptor for the Position feature.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected void addPositionPropertyDescriptor(Object object) {
-		itemPropertyDescriptors
-				.add(createItemPropertyDescriptor(
-						((ComposeableAdapterFactory) adapterFactory)
-								.getRootAdapterFactory(),
-						getResourceLocator(),
-						getString("_UI_GraphElement_position_feature"), //$NON-NLS-1$
-						getString(
-								"_UI_PropertyDescriptor_description", "_UI_GraphElement_position_feature", "_UI_GraphElement_type"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						UmaPackage.Literals.GRAPH_ELEMENT__POSITION, true,
-						false, true, null, null, null));
 	}
 
 	/**
@@ -91,11 +68,10 @@ public class GraphElementItemProvider extends DiagramElementItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	public Collection<? extends EStructuralFeature> getChildrenFeatures(
-			Object object) {
+	public Collection getChildrenFeatures(Object object) {
 		if (childrenFeatures == null) {
 			super.getChildrenFeatures(object);
+			childrenFeatures.add(UmaPackage.Literals.GRAPH_ELEMENT__POSITION);
 			childrenFeatures.add(UmaPackage.Literals.GRAPH_ELEMENT__CONTAINED);
 			childrenFeatures.add(UmaPackage.Literals.GRAPH_ELEMENT__LINK);
 			childrenFeatures.add(UmaPackage.Literals.GRAPH_ELEMENT__ANCHORAGE);
@@ -110,7 +86,6 @@ public class GraphElementItemProvider extends DiagramElementItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EStructuralFeature getChildFeature(Object object, Object child) {
 		// Check the type of the specified child object and return the proper feature to use for
 		// adding (see {@link AddCommand}) it as a child.
@@ -124,7 +99,6 @@ public class GraphElementItemProvider extends DiagramElementItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String getText(Object object) {
 		String label = ((GraphElement) object).getName();
 		return label == null || label.length() == 0 ? getString("_UI_GraphElement_type") : //$NON-NLS-1$
@@ -138,11 +112,11 @@ public class GraphElementItemProvider extends DiagramElementItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void notifyChanged(Notification notification) {
 		updateChildren(notification);
 
 		switch (notification.getFeatureID(GraphElement.class)) {
+		case UmaPackage.GRAPH_ELEMENT__POSITION:
 		case UmaPackage.GRAPH_ELEMENT__CONTAINED:
 		case UmaPackage.GRAPH_ELEMENT__LINK:
 		case UmaPackage.GRAPH_ELEMENT__ANCHORAGE:
@@ -161,26 +135,13 @@ public class GraphElementItemProvider extends DiagramElementItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	protected void collectNewChildDescriptors(
-			Collection<Object> newChildDescriptors, Object object) {
+	protected void collectNewChildDescriptors(Collection newChildDescriptors,
+			Object object) {
 		super.collectNewChildDescriptors(newChildDescriptors, object);
 
 		newChildDescriptors.add(createChildParameter(
-				UmaPackage.Literals.GRAPH_ELEMENT__CONTAINED,
-				UmaFactory.eINSTANCE.createGraphNode()));
-
-		newChildDescriptors.add(createChildParameter(
-				UmaPackage.Literals.GRAPH_ELEMENT__CONTAINED,
-				UmaFactory.eINSTANCE.createDiagram()));
-
-		newChildDescriptors.add(createChildParameter(
-				UmaPackage.Literals.GRAPH_ELEMENT__CONTAINED,
-				UmaFactory.eINSTANCE.createReference()));
-
-		newChildDescriptors.add(createChildParameter(
-				UmaPackage.Literals.GRAPH_ELEMENT__CONTAINED,
-				UmaFactory.eINSTANCE.createProperty()));
+				UmaPackage.Literals.GRAPH_ELEMENT__POSITION,
+				UmaFactory.eINSTANCE.createPoint()));
 
 		newChildDescriptors.add(createChildParameter(
 				UmaPackage.Literals.GRAPH_ELEMENT__CONTAINED,
@@ -192,7 +153,23 @@ public class GraphElementItemProvider extends DiagramElementItemProvider
 
 		newChildDescriptors.add(createChildParameter(
 				UmaPackage.Literals.GRAPH_ELEMENT__CONTAINED,
+				UmaFactory.eINSTANCE.createReference()));
+
+		newChildDescriptors.add(createChildParameter(
+				UmaPackage.Literals.GRAPH_ELEMENT__CONTAINED,
+				UmaFactory.eINSTANCE.createProperty()));
+
+		newChildDescriptors.add(createChildParameter(
+				UmaPackage.Literals.GRAPH_ELEMENT__CONTAINED,
 				UmaFactory.eINSTANCE.createGraphEdge()));
+
+		newChildDescriptors.add(createChildParameter(
+				UmaPackage.Literals.GRAPH_ELEMENT__CONTAINED,
+				UmaFactory.eINSTANCE.createGraphNode()));
+
+		newChildDescriptors.add(createChildParameter(
+				UmaPackage.Literals.GRAPH_ELEMENT__CONTAINED,
+				UmaFactory.eINSTANCE.createDiagram()));
 
 		newChildDescriptors.add(createChildParameter(
 				UmaPackage.Literals.GRAPH_ELEMENT__CONTAINED,
@@ -249,9 +226,8 @@ public class GraphElementItemProvider extends DiagramElementItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String getCreateChildText(Object owner, Object feature,
-			Object child, Collection<?> selection) {
+			Object child, Collection selection) {
 		Object childFeature = feature;
 		Object childObject = child;
 
@@ -275,7 +251,6 @@ public class GraphElementItemProvider extends DiagramElementItemProvider
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public ResourceLocator getResourceLocator() {
 		return UmaEditPlugin.INSTANCE;
 	}

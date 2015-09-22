@@ -43,6 +43,13 @@ import org.eclipse.epf.uma.UmaPackage;
 public abstract class ProcessImpl extends ActivityImpl implements
 		org.eclipse.epf.uma.Process {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The cached value of the '{@link #getIncludesPatterns() <em>Includes Patterns</em>}' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -50,7 +57,7 @@ public abstract class ProcessImpl extends ActivityImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<CapabilityPattern> includesPatterns;
+	protected EList includesPatterns = null;
 
 	/**
 	 * The cached value of the '{@link #getDefaultContext() <em>Default Context</em>}' reference.
@@ -60,7 +67,7 @@ public abstract class ProcessImpl extends ActivityImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected MethodConfiguration defaultContext;
+	protected MethodConfiguration defaultContext = null;
 
 	/**
 	 * The cached value of the '{@link #getValidContext() <em>Valid Context</em>}' reference list.
@@ -70,7 +77,7 @@ public abstract class ProcessImpl extends ActivityImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<MethodConfiguration> validContext;
+	protected EList validContext = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -82,7 +89,7 @@ public abstract class ProcessImpl extends ActivityImpl implements
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -90,7 +97,6 @@ public abstract class ProcessImpl extends ActivityImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.PROCESS;
 	}
@@ -100,9 +106,9 @@ public abstract class ProcessImpl extends ActivityImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<CapabilityPattern> getIncludesPatterns() {
+	public List getIncludesPatterns() {
 		if (includesPatterns == null) {
-			includesPatterns = new EObjectResolvingEList<CapabilityPattern>(
+			includesPatterns = new EObjectResolvingEList(
 					CapabilityPattern.class, this,
 					UmaPackage.PROCESS__INCLUDES_PATTERNS);
 		}
@@ -156,11 +162,10 @@ public abstract class ProcessImpl extends ActivityImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<MethodConfiguration> getValidContext() {
+	public List getValidContext() {
 		if (validContext == null) {
-			validContext = new EObjectResolvingEList<MethodConfiguration>(
-					MethodConfiguration.class, this,
-					UmaPackage.PROCESS__VALID_CONTEXT);
+			validContext = new EObjectResolvingEList(MethodConfiguration.class,
+					this, UmaPackage.PROCESS__VALID_CONTEXT);
 		}
 		return validContext;
 	}
@@ -170,7 +175,6 @@ public abstract class ProcessImpl extends ActivityImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.PROCESS__INCLUDES_PATTERNS:
@@ -190,22 +194,18 @@ public abstract class ProcessImpl extends ActivityImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.PROCESS__INCLUDES_PATTERNS:
 			getIncludesPatterns().clear();
-			getIncludesPatterns().addAll(
-					(Collection<? extends CapabilityPattern>) newValue);
+			getIncludesPatterns().addAll((Collection) newValue);
 			return;
 		case UmaPackage.PROCESS__DEFAULT_CONTEXT:
 			setDefaultContext((MethodConfiguration) newValue);
 			return;
 		case UmaPackage.PROCESS__VALID_CONTEXT:
 			getValidContext().clear();
-			getValidContext().addAll(
-					(Collection<? extends MethodConfiguration>) newValue);
+			getValidContext().addAll((Collection) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -216,7 +216,6 @@ public abstract class ProcessImpl extends ActivityImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.PROCESS__INCLUDES_PATTERNS:
@@ -237,7 +236,6 @@ public abstract class ProcessImpl extends ActivityImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);

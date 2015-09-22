@@ -17,8 +17,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -26,23 +24,14 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.util.AbstractTreeIterator;
-import org.eclipse.emf.ecore.EAttribute;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.xml.type.XMLTypePackage.Literals;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
-import org.eclipse.epf.library.edit.IConfigurator;
 import org.eclipse.epf.library.edit.LibraryEditPlugin;
 import org.eclipse.epf.library.edit.LibraryEditResources;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
 import org.eclipse.epf.library.edit.ui.IActionTypeProvider;
 import org.eclipse.epf.library.edit.ui.UserInteractionHelper;
 import org.eclipse.epf.library.edit.util.ActivityHandler;
-import org.eclipse.epf.library.edit.util.ExtensionManager;
-import org.eclipse.epf.library.edit.util.IResourceScanner;
-import org.eclipse.epf.library.edit.util.IRunnableWithProgress;
-import org.eclipse.epf.library.edit.util.ITextReferenceReplacer;
 import org.eclipse.epf.library.edit.util.ProcessUtil;
-import org.eclipse.epf.library.edit.util.ResourceFileCopyHandler;
 import org.eclipse.epf.library.edit.util.Suppression;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.edit.validation.DependencyChecker;
@@ -54,12 +43,11 @@ import org.eclipse.epf.uma.DescribableElement;
 import org.eclipse.epf.uma.Descriptor;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodElement;
-import org.eclipse.epf.uma.MethodPackage;
-import org.eclipse.epf.uma.MethodPlugin;
 import org.eclipse.epf.uma.Process;
 import org.eclipse.epf.uma.ProcessPackage;
 import org.eclipse.epf.uma.TeamProfile;
-import org.eclipse.epf.uma.util.UmaUtil;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.viewers.Viewer;
 
 
 /**
@@ -70,7 +58,7 @@ import org.eclipse.epf.uma.util.UmaUtil;
  */
 public class ActivityDropCommand extends BSDropCommand {
 
-	private Object viewer;
+	private Viewer viewer;
 
 	private List<CapabilityPattern> oldPatterns;
 
@@ -91,12 +79,8 @@ public class ActivityDropCommand extends BSDropCommand {
 	protected boolean preExecuted;
 
 	protected HashSet<?> addedObjects;
-	
-	protected IConfigurator activityDeepCopyConfigurator;
-	
-	private ResourceFileCopyHandler resourceFileCopyHandler;
 
-	public ActivityDropCommand(Activity target, List activities, Object viewer, AdapterFactory adapterFactory) {
+	public ActivityDropCommand(Activity target, List activities, Viewer viewer, AdapterFactory adapterFactory) {
 		super(target, activities);
 		setLabel(LibraryEditResources.ActivityDropCommand_label); 
 		this.viewer = viewer;
@@ -108,94 +92,6 @@ public class ActivityDropCommand extends BSDropCommand {
 			oldPatterns = new ArrayList(((DeliveryProcess) targetProcess)
 					.getIncludesPatterns());
 		}
-		
-		initResouceFileCopyHandler(activities);
-		
-	}
-
-	private void initResouceFileCopyHandler(List activities) {
-		if (activities != null && ! activities.isEmpty() &&
-				 activities.get(0) instanceof BreakdownElement) {
-			BreakdownElement dropElement0 = (BreakdownElement) activities.get(0);
-			
-			MethodPlugin srcPlugin = UmaUtil.getMethodPlugin(targetProcess);
-			MethodPlugin tgtPlugin = UmaUtil.getMethodPlugin(dropElement0);
-			
-			boolean toCreateHandler = true;
-			if (srcPlugin == tgtPlugin) {
-				Process sourceProcess = TngUtil.getOwningProcess(dropElement0);
-				boolean sIsDeliveryProcess = sourceProcess instanceof DeliveryProcess;
-				if (isDeliveryProcess == sIsDeliveryProcess) {
-					toCreateHandler = false;
-				}
-			}
-			
-			if (toCreateHandler) {
-				ITextReferenceReplacer txtRefReplacer = ExtensionManager.getTextReferenceReplacer();
-				if (txtRefReplacer != null) {
-					IResourceScanner resourceScanner = txtRefReplacer.getResourceScanner();				
-					resourceScanner.init(srcPlugin, tgtPlugin);				
-					resourceFileCopyHandler = new ResourceFileCopyHandler(resourceScanner);
-				}
-			}
-		}
-	}
-
-		
-	/**
-	 * If textual descriptions in the copied elements contain references (URLs)
-	 * to other elements within the same copied process then replace these
-	 * references with references that point to the new elements in the copied
-	 * structures.
-	 */
-	private Collection replaceTextReferences(Map<MethodElement, MethodElement> originalToCopyMap_
-			) {
-		Collection modifiedResources = new HashSet();
-		ITextReferenceReplacer txtRefReplacer = ExtensionManager
-				.getTextReferenceReplacer();
-		if (txtRefReplacer == null)
-			return modifiedResources;
-		
-		for (Map.Entry<MethodElement, MethodElement> entry: originalToCopyMap_.entrySet()) {		
-			if (entry.getValue() instanceof BreakdownElement) {
-				EObject element = (EObject) entry.getValue();
-				for (Iterator childIter = element.eAllContents(); childIter
-						.hasNext();) {
-					EObject child = (EObject) childIter.next();
-					for (Iterator attributes = child.eClass()
-							.getEAllAttributes().iterator(); attributes
-							.hasNext();) {
-						EAttribute attribute = (EAttribute) attributes.next();
-						if (attribute.isChangeable()
-								&& !attribute.isDerived()
-								&& (attribute.isMany() || child
-										.eIsSet(attribute))
-								&& attribute.getEAttributeType()
-										.getInstanceClass() == Literals.STRING
-										.getInstanceClass()) {
-							String text = (String) child.eGet(attribute);
-							if (text != null) {
-								String newtext = txtRefReplacer.replace(text,
-										child, originalToCopyMap_);
-								if (!newtext.equals(text)) {
-									child.eSet(attribute, newtext);
-									modifiedResources.add(child.eResource());
-								}
-							}
-						}
-					}
-				}
-			}		
-		}
-		originalToCopyMap_ = null;
-		return modifiedResources;
-	}
-	
-	
-	public ActivityDropCommand(Activity target, List activities, Object viewer, 
-			AdapterFactory adapterFactory,IConfigurator deepCopyConfigurator){
-		this(target, activities, viewer, adapterFactory);
-		this.activityDeepCopyConfigurator = deepCopyConfigurator;
 	}
 	
 	@Override
@@ -323,31 +219,12 @@ public class ActivityDropCommand extends BSDropCommand {
 			} else {
 				super.execute();
 			}
-		} finally {			
-			originalToCopyMap = activityHandler.cloneOrignaltoCopyMap();
-			if (originalToCopyMap != null && !originalToCopyMap.isEmpty()) {
-				Set<Object> excludedKeySet =  new HashSet<Object>();
-				
-				for (Object key : originalToCopyMap.keySet()) {
-					if (! (key instanceof MethodElement)) {
-						excludedKeySet.add(key);
-					}
-				}
-				for (Object key : excludedKeySet) {
-					originalToCopyMap.remove(key);
-				}
-			}
-			
+		} finally {
 			activityHandler.dispose();
 		}
 		
-		if (type == IActionTypeProvider.COPY) {
-			replaceTextReferences(originalToCopyMap);
-		}
-		
-		
 		if(TngUtil.DEBUG) {
-			System.out.println("ActivityDropCommand.execute(): done"); //$NON-NLS-1$
+			System.out.println("ActivityDropCommand.execute(): done");
 		}
 	}
 
@@ -363,24 +240,10 @@ public class ActivityDropCommand extends BSDropCommand {
 			deepCopyConfig = UserInteractionHelper.chooseDeepCopyConfiguration(targetProcess, adapterFactory);
 		}
 		catch(OperationCanceledException e) {
-			getModifiedResources().clear();
 			return;
 		}
-		
-		boolean copyExternalVariations;
-		try {
-			copyExternalVariations = UserInteractionHelper.copyExternalVariationsAllowed(targetProcess, adapterFactory);
-		}
-		catch(OperationCanceledException e) {
-			getModifiedResources().clear();
-			return;			
-		}
-		activityHandler.setCopyExternalVariations(copyExternalVariations);
 		activityHandler.setDeepCopyConfig(deepCopyConfig);
 		activityHandler.setTargetProcess(targetProcess);
-		
-		// Set a configurator to resolve and deep copy contributors and replacers
-		activityHandler.setActivityDeepCopyConfigurator(activityDeepCopyConfigurator);
 		
 		IRunnableWithProgress runnable = new IRunnableWithProgress() {
 
@@ -475,12 +338,13 @@ public class ActivityDropCommand extends BSDropCommand {
 
 			if (act.eContainer() != null
 					&& act.eContainer().eContainer() != pkg) {
-				pkg.getChildPackages().add((MethodPackage) act.eContainer());
+				pkg.getChildPackages().add(act.eContainer());
 			}
 
 			if (patterns != null && !patterns.isEmpty()) {
 				DeliveryProcess proc = (DeliveryProcess) targetProcess;
-				for (CapabilityPattern pattern : patterns) {
+				for (Iterator iter = patterns.iterator(); iter.hasNext();) {
+					Object pattern = iter.next();
 					if (!proc.getIncludesPatterns().contains(pattern)) {
 						proc.getIncludesPatterns().add(pattern);
 					}
@@ -493,7 +357,7 @@ public class ActivityDropCommand extends BSDropCommand {
 		}
 		activity.getBreakdownElements().addAll(appliedActivities);
 		if(TngUtil.DEBUG) {
-			System.out.println("ActivityDropCommand.doExecute(): new activities added. " + (System.currentTimeMillis() - time)); //$NON-NLS-1$
+			System.out.println("ActivityDropCommand.doExecute(): new activities added. " + (System.currentTimeMillis() - time));
 		}
 		if(!activityHandler.getDeepCopies().isEmpty()) {
 			if(TngUtil.DEBUG) {
@@ -501,7 +365,7 @@ public class ActivityDropCommand extends BSDropCommand {
 			}
 			postDeepCopy();
 			if(TngUtil.DEBUG) {
-				System.out.println("ActivityDropCommand.doExecute(): postDeepCopy(). " + (System.currentTimeMillis() - time)); //$NON-NLS-1$
+				System.out.println("ActivityDropCommand.doExecute(): postDeepCopy(). " + (System.currentTimeMillis() - time));
 			}
 		}
 
@@ -559,13 +423,7 @@ public class ActivityDropCommand extends BSDropCommand {
 							int size = addedObjects.size();
 							ProcessUtil.addToDefaultConfiguration(targetProcess, me, addedObjects);
 							if(!defaultConfigChanged && (size != addedObjects.size())) {
-								if (targetProcess.getDefaultContext() != null
-										&& targetProcess.getDefaultContext()
-												.eResource() != null) {
-									getModifiedResources().add(
-											targetProcess.getDefaultContext()
-													.eResource());
-								}
+								getModifiedResources().add(targetProcess.getDefaultContext().eResource());
 								defaultConfigChanged = true;
 							}
 						}
@@ -581,24 +439,28 @@ public class ActivityDropCommand extends BSDropCommand {
 		
 		UserInteractionHelper.runWithProgress(runnable, getLabel());
 		
-		// synchronize the deep copies with default configuration of the target process				
-		//
-		final SynchronizeCommand synchCmd = new SynchronizeCommand(activityHandler.getDeepCopies(), targetProcess.getDefaultContext(), null, false);
-		try {
-			runnable = new Runnable() {
+		MethodConfiguration deepCopyConfig = activityHandler.getDeepCopyConfig();			
 
-				public void run() {
-					synchCmd.initilize();
+		if(deepCopyConfig != null) {
+			// synchronize the deep copies with deep copy configuration				
+			//
+			final SynchronizeCommand synchCmd = new SynchronizeCommand(activityHandler.getDeepCopies(), deepCopyConfig, null, false);
+			try {
+				runnable = new Runnable() {
+
+					public void run() {
+						synchCmd.initilize();
+					}
+					
+				};
+				UserInteractionHelper.runWithProgress(runnable, LibraryEditResources.ProcessAutoSynchronizeAction_prepare);
+				if(synchCmd.isIntialized()) {
+					synchCmd.execute();
 				}
-				
-			};
-			UserInteractionHelper.runWithProgress(runnable, LibraryEditResources.ProcessAutoSynchronizeAction_prepare);
-			if(synchCmd.isIntialized()) {
-				synchCmd.execute();
 			}
-		}
-		finally {
-			synchCmd.dispose();
+			finally {
+				synchCmd.dispose();
+			}
 		}
 	}
 	
@@ -757,30 +619,6 @@ public class ActivityDropCommand extends BSDropCommand {
 	public int getType(){
 		return type;
 	}
+	
 
-	public void setActivityDeepCopyConfigurator(
-			IConfigurator activityDeepCopyConfigurator) {
-		this.activityDeepCopyConfigurator = activityDeepCopyConfigurator;
-	}
-	
-	private Map originalToCopyMap;
-	
-	public void scanAndCopyResources() {
-		if (resourceFileCopyHandler == null) {
-			return;
-		}
-		try {
-			resourceFileCopyHandler.execute(originalToCopyMap);
-		} catch (Throwable e){
-			LibraryEditPlugin.getDefault().getLogger().logError(e);
-		} finally {
-			resourceFileCopyHandler.getScanner().init(null, null);
-			originalToCopyMap = null;
-		}
-	}
-
-	public ResourceFileCopyHandler getResourceFileCopyHandler() {
-		return resourceFileCopyHandler;
-	}
-	
 }

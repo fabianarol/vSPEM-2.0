@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.uma;
 
+import org.eclipse.emf.common.util.EList;
 import java.util.List;
 
 /**
@@ -42,7 +43,7 @@ public interface Polyline extends GraphicPrimitive {
 	 * @return the value of the '<em>Closed</em>' attribute.
 	 * @see #setClosed(Boolean)
 	 * @see org.eclipse.epf.uma.UmaPackage#getPolyline_Closed()
-	 * @model default="true" dataType="org.eclipse.epf.uma.Boolean" required="true" ordered="false"
+	 * @model default="true"
 	 * @generated
 	 */
 	Boolean getClosed();
@@ -68,9 +69,9 @@ public interface Polyline extends GraphicPrimitive {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Waypoints</em>' containment reference list.
 	 * @see org.eclipse.epf.uma.UmaPackage#getPolyline_Waypoints()
-	 * @model containment="true" resolveProxies="true" lower="2" ordered="false"
+	 * @model type="org.eclipse.epf.uma.Point" containment="true" resolveProxies="true" lower="2" ordered="false"
 	 * @generated
 	 */
-	List<Point> getWaypoints();
+	List getWaypoints();
 
 } // Polyline

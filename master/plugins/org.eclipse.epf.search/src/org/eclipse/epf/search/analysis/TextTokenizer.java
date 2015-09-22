@@ -65,7 +65,7 @@ public final class TextTokenizer extends Tokenizer {
 				int end = iterator.next();
 				if (end != BreakIterator.DONE) {
 					String tokenText = text.substring(start, end).toLowerCase();
-					if (!tokenText.equals(" ")&&!tokenText.equals(":")) { //$NON-NLS-1$
+					if (!tokenText.equals(" ")) { //$NON-NLS-1$
 						if (tokenText.endsWith("'s")) { //$NON-NLS-1$
 							tokenText = tokenText.substring(0, tokenText
 									.length() - 2);

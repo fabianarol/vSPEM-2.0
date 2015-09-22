@@ -10,30 +10,16 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.uma.impl;
 
-import java.util.Collection;
-import java.util.List;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 import org.eclipse.epf.uma.Activity;
 import org.eclipse.epf.uma.BreakdownElement;
-import org.eclipse.epf.uma.Checklist;
-import org.eclipse.epf.uma.Concept;
-import org.eclipse.epf.uma.EstimationConsiderations;
-import org.eclipse.epf.uma.Example;
-import org.eclipse.epf.uma.Guideline;
 import org.eclipse.epf.uma.PlanningData;
-import org.eclipse.epf.uma.Report;
-import org.eclipse.epf.uma.ReusableAsset;
-import org.eclipse.epf.uma.SupportingMaterial;
-import org.eclipse.epf.uma.Template;
-import org.eclipse.epf.uma.ToolMentor;
 import org.eclipse.epf.uma.UmaPackage;
 
 /**
@@ -51,16 +37,6 @@ import org.eclipse.epf.uma.UmaPackage;
  *   <li>{@link org.eclipse.epf.uma.impl.BreakdownElementImpl#getPresentedBefore <em>Presented Before</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.impl.BreakdownElementImpl#getPlanningData <em>Planning Data</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.impl.BreakdownElementImpl#getSuperActivities <em>Super Activities</em>}</li>
- *   <li>{@link org.eclipse.epf.uma.impl.BreakdownElementImpl#getChecklists <em>Checklists</em>}</li>
- *   <li>{@link org.eclipse.epf.uma.impl.BreakdownElementImpl#getConcepts <em>Concepts</em>}</li>
- *   <li>{@link org.eclipse.epf.uma.impl.BreakdownElementImpl#getExamples <em>Examples</em>}</li>
- *   <li>{@link org.eclipse.epf.uma.impl.BreakdownElementImpl#getGuidelines <em>Guidelines</em>}</li>
- *   <li>{@link org.eclipse.epf.uma.impl.BreakdownElementImpl#getReusableAssets <em>Reusable Assets</em>}</li>
- *   <li>{@link org.eclipse.epf.uma.impl.BreakdownElementImpl#getSupportingMaterials <em>Supporting Materials</em>}</li>
- *   <li>{@link org.eclipse.epf.uma.impl.BreakdownElementImpl#getTemplates <em>Templates</em>}</li>
- *   <li>{@link org.eclipse.epf.uma.impl.BreakdownElementImpl#getReports <em>Reports</em>}</li>
- *   <li>{@link org.eclipse.epf.uma.impl.BreakdownElementImpl#getEstimationconsiderations <em>Estimationconsiderations</em>}</li>
- *   <li>{@link org.eclipse.epf.uma.impl.BreakdownElementImpl#getToolmentor <em>Toolmentor</em>}</li>
  * </ul>
  * </p>
  *
@@ -68,6 +44,13 @@ import org.eclipse.epf.uma.UmaPackage;
  */
 public abstract class BreakdownElementImpl extends ProcessElementImpl implements
 		BreakdownElement {
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * The default value of the '{@link #getPrefix() <em>Prefix</em>}' attribute.
 	 * <!-- begin-user-doc -->
@@ -156,7 +139,7 @@ public abstract class BreakdownElementImpl extends ProcessElementImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected BreakdownElement presentedAfter;
+	protected BreakdownElement presentedAfter = null;
 
 	/**
 	 * The cached value of the '{@link #getPresentedBefore() <em>Presented Before</em>}' reference.
@@ -166,7 +149,7 @@ public abstract class BreakdownElementImpl extends ProcessElementImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected BreakdownElement presentedBefore;
+	protected BreakdownElement presentedBefore = null;
 
 	/**
 	 * The cached value of the '{@link #getPlanningData() <em>Planning Data</em>}' containment reference.
@@ -176,7 +159,7 @@ public abstract class BreakdownElementImpl extends ProcessElementImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected PlanningData planningData;
+	protected PlanningData planningData = null;
 
 	/**
 	 * The cached value of the '{@link #getSuperActivities() <em>Super Activities</em>}' reference.
@@ -186,107 +169,7 @@ public abstract class BreakdownElementImpl extends ProcessElementImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected Activity superActivities;
-
-	/**
-	 * The cached value of the '{@link #getChecklists() <em>Checklists</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getChecklists()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Checklist> checklists;
-
-	/**
-	 * The cached value of the '{@link #getConcepts() <em>Concepts</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getConcepts()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Concept> concepts;
-
-	/**
-	 * The cached value of the '{@link #getExamples() <em>Examples</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getExamples()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Example> examples;
-
-	/**
-	 * The cached value of the '{@link #getGuidelines() <em>Guidelines</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getGuidelines()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Guideline> guidelines;
-
-	/**
-	 * The cached value of the '{@link #getReusableAssets() <em>Reusable Assets</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getReusableAssets()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<ReusableAsset> reusableAssets;
-
-	/**
-	 * The cached value of the '{@link #getSupportingMaterials() <em>Supporting Materials</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getSupportingMaterials()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<SupportingMaterial> supportingMaterials;
-
-	/**
-	 * The cached value of the '{@link #getTemplates() <em>Templates</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getTemplates()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Template> templates;
-
-	/**
-	 * The cached value of the '{@link #getReports() <em>Reports</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getReports()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Report> reports;
-
-	/**
-	 * The cached value of the '{@link #getEstimationconsiderations() <em>Estimationconsiderations</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getEstimationconsiderations()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<EstimationConsiderations> estimationconsiderations;
-
-	/**
-	 * The cached value of the '{@link #getToolmentor() <em>Toolmentor</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getToolmentor()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<ToolMentor> toolmentor;
+	protected Activity superActivities = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -298,7 +181,7 @@ public abstract class BreakdownElementImpl extends ProcessElementImpl implements
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -306,7 +189,6 @@ public abstract class BreakdownElementImpl extends ProcessElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.BREAKDOWN_ELEMENT;
 	}
@@ -658,141 +540,6 @@ public abstract class BreakdownElementImpl extends ProcessElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<Checklist> getChecklists() {
-		if (checklists == null) {
-			checklists = new EObjectResolvingEList<Checklist>(Checklist.class,
-					this, UmaPackage.BREAKDOWN_ELEMENT__CHECKLISTS);
-		}
-		return checklists;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public List<Concept> getConcepts() {
-		if (concepts == null) {
-			concepts = new EObjectResolvingEList<Concept>(Concept.class, this,
-					UmaPackage.BREAKDOWN_ELEMENT__CONCEPTS);
-		}
-		return concepts;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public List<Example> getExamples() {
-		if (examples == null) {
-			examples = new EObjectResolvingEList<Example>(Example.class, this,
-					UmaPackage.BREAKDOWN_ELEMENT__EXAMPLES);
-		}
-		return examples;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public List<Guideline> getGuidelines() {
-		if (guidelines == null) {
-			guidelines = new EObjectResolvingEList<Guideline>(Guideline.class,
-					this, UmaPackage.BREAKDOWN_ELEMENT__GUIDELINES);
-		}
-		return guidelines;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public List<ReusableAsset> getReusableAssets() {
-		if (reusableAssets == null) {
-			reusableAssets = new EObjectResolvingEList<ReusableAsset>(
-					ReusableAsset.class, this,
-					UmaPackage.BREAKDOWN_ELEMENT__REUSABLE_ASSETS);
-		}
-		return reusableAssets;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public List<SupportingMaterial> getSupportingMaterials() {
-		if (supportingMaterials == null) {
-			supportingMaterials = new EObjectResolvingEList<SupportingMaterial>(
-					SupportingMaterial.class, this,
-					UmaPackage.BREAKDOWN_ELEMENT__SUPPORTING_MATERIALS);
-		}
-		return supportingMaterials;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public List<Template> getTemplates() {
-		if (templates == null) {
-			templates = new EObjectResolvingEList<Template>(Template.class,
-					this, UmaPackage.BREAKDOWN_ELEMENT__TEMPLATES);
-		}
-		return templates;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public List<Report> getReports() {
-		if (reports == null) {
-			reports = new EObjectResolvingEList<Report>(Report.class, this,
-					UmaPackage.BREAKDOWN_ELEMENT__REPORTS);
-		}
-		return reports;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public List<EstimationConsiderations> getEstimationconsiderations() {
-		if (estimationconsiderations == null) {
-			estimationconsiderations = new EObjectResolvingEList<EstimationConsiderations>(
-					EstimationConsiderations.class, this,
-					UmaPackage.BREAKDOWN_ELEMENT__ESTIMATIONCONSIDERATIONS);
-		}
-		return estimationconsiderations;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public List<ToolMentor> getToolmentor() {
-		if (toolmentor == null) {
-			toolmentor = new EObjectResolvingEList<ToolMentor>(
-					ToolMentor.class, this,
-					UmaPackage.BREAKDOWN_ELEMENT__TOOLMENTOR);
-		}
-		return toolmentor;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
@@ -811,7 +558,6 @@ public abstract class BreakdownElementImpl extends ProcessElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
@@ -828,7 +574,6 @@ public abstract class BreakdownElementImpl extends ProcessElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.BREAKDOWN_ELEMENT__PREFIX:
@@ -855,26 +600,6 @@ public abstract class BreakdownElementImpl extends ProcessElementImpl implements
 			if (resolve)
 				return getSuperActivities();
 			return basicGetSuperActivities();
-		case UmaPackage.BREAKDOWN_ELEMENT__CHECKLISTS:
-			return getChecklists();
-		case UmaPackage.BREAKDOWN_ELEMENT__CONCEPTS:
-			return getConcepts();
-		case UmaPackage.BREAKDOWN_ELEMENT__EXAMPLES:
-			return getExamples();
-		case UmaPackage.BREAKDOWN_ELEMENT__GUIDELINES:
-			return getGuidelines();
-		case UmaPackage.BREAKDOWN_ELEMENT__REUSABLE_ASSETS:
-			return getReusableAssets();
-		case UmaPackage.BREAKDOWN_ELEMENT__SUPPORTING_MATERIALS:
-			return getSupportingMaterials();
-		case UmaPackage.BREAKDOWN_ELEMENT__TEMPLATES:
-			return getTemplates();
-		case UmaPackage.BREAKDOWN_ELEMENT__REPORTS:
-			return getReports();
-		case UmaPackage.BREAKDOWN_ELEMENT__ESTIMATIONCONSIDERATIONS:
-			return getEstimationconsiderations();
-		case UmaPackage.BREAKDOWN_ELEMENT__TOOLMENTOR:
-			return getToolmentor();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -884,8 +609,6 @@ public abstract class BreakdownElementImpl extends ProcessElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.BREAKDOWN_ELEMENT__PREFIX:
@@ -912,49 +635,6 @@ public abstract class BreakdownElementImpl extends ProcessElementImpl implements
 		case UmaPackage.BREAKDOWN_ELEMENT__SUPER_ACTIVITIES:
 			setSuperActivities((Activity) newValue);
 			return;
-		case UmaPackage.BREAKDOWN_ELEMENT__CHECKLISTS:
-			getChecklists().clear();
-			getChecklists().addAll((Collection<? extends Checklist>) newValue);
-			return;
-		case UmaPackage.BREAKDOWN_ELEMENT__CONCEPTS:
-			getConcepts().clear();
-			getConcepts().addAll((Collection<? extends Concept>) newValue);
-			return;
-		case UmaPackage.BREAKDOWN_ELEMENT__EXAMPLES:
-			getExamples().clear();
-			getExamples().addAll((Collection<? extends Example>) newValue);
-			return;
-		case UmaPackage.BREAKDOWN_ELEMENT__GUIDELINES:
-			getGuidelines().clear();
-			getGuidelines().addAll((Collection<? extends Guideline>) newValue);
-			return;
-		case UmaPackage.BREAKDOWN_ELEMENT__REUSABLE_ASSETS:
-			getReusableAssets().clear();
-			getReusableAssets().addAll(
-					(Collection<? extends ReusableAsset>) newValue);
-			return;
-		case UmaPackage.BREAKDOWN_ELEMENT__SUPPORTING_MATERIALS:
-			getSupportingMaterials().clear();
-			getSupportingMaterials().addAll(
-					(Collection<? extends SupportingMaterial>) newValue);
-			return;
-		case UmaPackage.BREAKDOWN_ELEMENT__TEMPLATES:
-			getTemplates().clear();
-			getTemplates().addAll((Collection<? extends Template>) newValue);
-			return;
-		case UmaPackage.BREAKDOWN_ELEMENT__REPORTS:
-			getReports().clear();
-			getReports().addAll((Collection<? extends Report>) newValue);
-			return;
-		case UmaPackage.BREAKDOWN_ELEMENT__ESTIMATIONCONSIDERATIONS:
-			getEstimationconsiderations().clear();
-			getEstimationconsiderations().addAll(
-					(Collection<? extends EstimationConsiderations>) newValue);
-			return;
-		case UmaPackage.BREAKDOWN_ELEMENT__TOOLMENTOR:
-			getToolmentor().clear();
-			getToolmentor().addAll((Collection<? extends ToolMentor>) newValue);
-			return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -964,7 +644,6 @@ public abstract class BreakdownElementImpl extends ProcessElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.BREAKDOWN_ELEMENT__PREFIX:
@@ -991,36 +670,6 @@ public abstract class BreakdownElementImpl extends ProcessElementImpl implements
 		case UmaPackage.BREAKDOWN_ELEMENT__SUPER_ACTIVITIES:
 			setSuperActivities((Activity) null);
 			return;
-		case UmaPackage.BREAKDOWN_ELEMENT__CHECKLISTS:
-			getChecklists().clear();
-			return;
-		case UmaPackage.BREAKDOWN_ELEMENT__CONCEPTS:
-			getConcepts().clear();
-			return;
-		case UmaPackage.BREAKDOWN_ELEMENT__EXAMPLES:
-			getExamples().clear();
-			return;
-		case UmaPackage.BREAKDOWN_ELEMENT__GUIDELINES:
-			getGuidelines().clear();
-			return;
-		case UmaPackage.BREAKDOWN_ELEMENT__REUSABLE_ASSETS:
-			getReusableAssets().clear();
-			return;
-		case UmaPackage.BREAKDOWN_ELEMENT__SUPPORTING_MATERIALS:
-			getSupportingMaterials().clear();
-			return;
-		case UmaPackage.BREAKDOWN_ELEMENT__TEMPLATES:
-			getTemplates().clear();
-			return;
-		case UmaPackage.BREAKDOWN_ELEMENT__REPORTS:
-			getReports().clear();
-			return;
-		case UmaPackage.BREAKDOWN_ELEMENT__ESTIMATIONCONSIDERATIONS:
-			getEstimationconsiderations().clear();
-			return;
-		case UmaPackage.BREAKDOWN_ELEMENT__TOOLMENTOR:
-			getToolmentor().clear();
-			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -1030,7 +679,6 @@ public abstract class BreakdownElementImpl extends ProcessElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);
@@ -1060,28 +708,6 @@ public abstract class BreakdownElementImpl extends ProcessElementImpl implements
 			return planningData != null;
 		case UmaPackage.BREAKDOWN_ELEMENT__SUPER_ACTIVITIES:
 			return superActivities != null;
-		case UmaPackage.BREAKDOWN_ELEMENT__CHECKLISTS:
-			return checklists != null && !checklists.isEmpty();
-		case UmaPackage.BREAKDOWN_ELEMENT__CONCEPTS:
-			return concepts != null && !concepts.isEmpty();
-		case UmaPackage.BREAKDOWN_ELEMENT__EXAMPLES:
-			return examples != null && !examples.isEmpty();
-		case UmaPackage.BREAKDOWN_ELEMENT__GUIDELINES:
-			return guidelines != null && !guidelines.isEmpty();
-		case UmaPackage.BREAKDOWN_ELEMENT__REUSABLE_ASSETS:
-			return reusableAssets != null && !reusableAssets.isEmpty();
-		case UmaPackage.BREAKDOWN_ELEMENT__SUPPORTING_MATERIALS:
-			return supportingMaterials != null
-					&& !supportingMaterials.isEmpty();
-		case UmaPackage.BREAKDOWN_ELEMENT__TEMPLATES:
-			return templates != null && !templates.isEmpty();
-		case UmaPackage.BREAKDOWN_ELEMENT__REPORTS:
-			return reports != null && !reports.isEmpty();
-		case UmaPackage.BREAKDOWN_ELEMENT__ESTIMATIONCONSIDERATIONS:
-			return estimationconsiderations != null
-					&& !estimationconsiderations.isEmpty();
-		case UmaPackage.BREAKDOWN_ELEMENT__TOOLMENTOR:
-			return toolmentor != null && !toolmentor.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -1091,7 +717,6 @@ public abstract class BreakdownElementImpl extends ProcessElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy())
 			return super.toString();

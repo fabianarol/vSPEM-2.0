@@ -10,8 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.importing.xml;
 
-import org.eclipse.epf.common.ui.AbstractPlugin;
-import org.eclipse.epf.xml.uma.UmaPackage;
+import org.eclipse.epf.common.plugin.AbstractPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -25,16 +24,12 @@ public class ImportXMLPlugin extends AbstractPlugin {
 
 	//The shared instance.
 	private static ImportXMLPlugin plugin;
-	private UmaPackage umaPackage;
 	
 	/**
 	 * The constructor.
 	 */
 	public ImportXMLPlugin() {
 		plugin = this;
-		
-		//Allow UmaPackage be initialized before any import action
-		umaPackage = UmaPackage.eINSTANCE;
 	}
 
 	/**

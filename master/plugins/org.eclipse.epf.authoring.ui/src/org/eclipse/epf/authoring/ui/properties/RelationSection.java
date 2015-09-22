@@ -11,24 +11,16 @@
 package org.eclipse.epf.authoring.ui.properties;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import org.eclipse.emf.ecore.EReference;
 import org.eclipse.epf.authoring.ui.dialogs.ItemsFilterDialog;
-import org.eclipse.epf.library.configuration.ConfigurationHelper;
-import org.eclipse.epf.library.configuration.DefaultElementRealizer;
-import org.eclipse.epf.library.configuration.ElementRealizer;
 import org.eclipse.epf.library.edit.IFilter;
 import org.eclipse.epf.library.edit.command.IActionManager;
-import org.eclipse.epf.library.edit.util.DescriptorPropUtil;
-import org.eclipse.epf.library.edit.util.ProcessScopeUtil;
 import org.eclipse.epf.library.edit.util.ProcessUtil;
-import org.eclipse.epf.uma.BreakdownElement;
 import org.eclipse.epf.uma.Descriptor;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.Process;
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -58,21 +50,21 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  * 
  */
 public class RelationSection extends AbstractSection {
-//	protected ILabelProvider labelProvider = null;
+	protected ILabelProvider labelProvider = null;
 
 	protected IStructuredContentProvider contentProvider = null;
 
 	// element
-	protected BreakdownElement element;
+	protected Descriptor element;
 
 	// action manager
 	protected IActionManager actionMgr;
 
-	protected FormToolkit toolkit;
+	private FormToolkit toolkit;
 
-	protected Button ctrl_add_1, ctrl_add_2, ctrl_add_3, ctrl_add_4;
+	private Button ctrl_add_1, ctrl_add_2, ctrl_add_3, ctrl_add_4;
 
-	protected Button ctrl_remove_1, ctrl_remove_2, ctrl_remove_3, ctrl_remove_4;
+	private Button ctrl_remove_1, ctrl_remove_2, ctrl_remove_3, ctrl_remove_4;
 
 	private Button ctrl_add_proc_1, ctrl_add_proc_2, ctrl_add_proc_3,
 			ctrl_add_proc_4;;
@@ -82,9 +74,9 @@ public class RelationSection extends AbstractSection {
 	protected TableViewer tableViewer1, tableViewer2, tableViewer3,
 			tableViewer4;
 
-	protected Text ctrl_brief_desc;
+	private Text ctrl_brief_desc;
 
-	protected String tabString;
+	private String tabString;
 	
 	private String title, desc, table1, table2, table3, table4;
 
@@ -95,9 +87,7 @@ public class RelationSection extends AbstractSection {
 	Process process;
 
 	IFilter descriptorProcessfilter;
-	
-	protected DescriptorPropUtil propUtil = DescriptorPropUtil.getDesciptorPropUtil();
-	
+
 	protected Process getProcess() {
 		return process;
 	}
@@ -131,6 +121,7 @@ public class RelationSection extends AbstractSection {
 
 		// update controls
 		updateControls();
+
 	}
 
 	protected void setTabData(String title, String desc, String table1, String table2, String table3, String table4, String tabString) {
@@ -151,7 +142,7 @@ public class RelationSection extends AbstractSection {
 
 	protected void init() {
 		// get descriptor object
-		element = (BreakdownElement) getElement();
+		element = (Descriptor) getElement();
 
 		// get toolkit
 		toolkit = getWidgetFactory();
@@ -166,18 +157,13 @@ public class RelationSection extends AbstractSection {
 	 */
 	public void refresh() {
 		try {
-			if (getElement() instanceof BreakdownElement) {
-				element = (BreakdownElement) getElement();
+			if (getElement() instanceof Descriptor) {
+				element = (Descriptor) getElement();
 
 				initContentProvider1();
 				initContentProvider2();
 				initContentProvider3();
 				initContentProvider4();
-				
-				initLabelProvider1();
-				initLabelProvider2();
-				initLabelProvider3();
-				initLabelProvider4();
 
 				// hide/show controls based on editable
 				updateControls();
@@ -257,9 +243,9 @@ public class RelationSection extends AbstractSection {
 	 */
 	public void dispose() {
 		super.dispose();
-//		if (labelProvider != null) {
-//			labelProvider.dispose();
-//		}
+		if (labelProvider != null) {
+			labelProvider.dispose();
+		}
 		if (contentProvider != null) {
 			contentProvider.dispose();
 		}
@@ -292,22 +278,6 @@ public class RelationSection extends AbstractSection {
 	 */
 	protected void initContentProvider4() {
 	}
-	
-	protected void initLabelProvider1() {
-		
-	}
-	
-	protected void initLabelProvider2() {
-		
-	}
-
-	protected void initLabelProvider3() {
-		
-	}
-	
-	protected void initLabelProvider4() {
-		
-	}
 
 	/**
 	 * Get list of descriptors from the process
@@ -331,9 +301,6 @@ public class RelationSection extends AbstractSection {
 		int tableHeight = 80;
 
 		// create section
-		if (isSyncFree()) {
-			desc = desc + " " + PropertiesResources.Process_SyncFree_FontStyle;  //$NON-NLS-1$
-		}		
 		Section aSection = FormUI.createSection(toolkit, composite,
 				title, desc);
 
@@ -351,7 +318,8 @@ public class RelationSection extends AbstractSection {
 			ctrl_table_1 = FormUI.createTable(toolkit, pane1, tableHeight);
 			tableViewer1 = new TableViewer(ctrl_table_1);
 			initContentProvider1();
-			initLabelProvider1();			
+
+			tableViewer1.setLabelProvider(labelProvider);
 			tableViewer1.setInput(element);
 
 			// create buttons for table1
@@ -367,8 +335,6 @@ public class RelationSection extends AbstractSection {
 				ctrl_remove_1 = FormUI.createButton(toolkit, pane2,
 						PropertiesResources.Process_Remove); 
 				ctrl_remove_1.setEnabled(false);
-				
-				createAddtionalButton1(pane2);
 			}
 			toolkit.paintBordersFor(pane1);
 		}
@@ -383,7 +349,8 @@ public class RelationSection extends AbstractSection {
 			ctrl_table_2 = FormUI.createTable(toolkit, pane3, tableHeight);
 			tableViewer2 = new TableViewer(ctrl_table_2);
 			initContentProvider2();
-			initLabelProvider2();
+
+			tableViewer2.setLabelProvider(labelProvider);
 			tableViewer2.setInput(element);
 
 			// create buttons for table2
@@ -398,8 +365,6 @@ public class RelationSection extends AbstractSection {
 				ctrl_remove_2 = FormUI.createButton(toolkit, pane4,
 						PropertiesResources.Process_Remove); 
 				ctrl_remove_2.setEnabled(false);
-				
-				createAddtionalButton2(pane4);
 			}
 			toolkit.paintBordersFor(pane3);
 		}
@@ -415,7 +380,8 @@ public class RelationSection extends AbstractSection {
 			ctrl_table_3 = FormUI.createTable(toolkit, pane5, tableHeight);
 			tableViewer3 = new TableViewer(ctrl_table_3);
 			initContentProvider3();
-			initLabelProvider3();
+
+			tableViewer3.setLabelProvider(labelProvider);
 			tableViewer3.setInput(element);
 
 			// create buttons for table2
@@ -430,8 +396,6 @@ public class RelationSection extends AbstractSection {
 				ctrl_remove_3 = FormUI.createButton(toolkit, pane6,
 						PropertiesResources.Process_Remove); 
 				ctrl_remove_3.setEnabled(false);
-				
-				createAddtionalButton3(pane6);
 			}
 			toolkit.paintBordersFor(pane5);
 		}
@@ -445,7 +409,8 @@ public class RelationSection extends AbstractSection {
 			ctrl_table_4 = FormUI.createTable(toolkit, pane7, tableHeight);
 			tableViewer4 = new TableViewer(ctrl_table_4);
 			initContentProvider4();
-			initLabelProvider4();
+
+			tableViewer4.setLabelProvider(labelProvider);
 			tableViewer4.setInput(element);
 
 			// create buttons for table4
@@ -460,8 +425,6 @@ public class RelationSection extends AbstractSection {
 				ctrl_remove_4 = FormUI.createButton(toolkit, pane8,
 						PropertiesResources.Process_Remove); 
 				ctrl_remove_4.setEnabled(false);
-				
-				createAddtionalButton4(pane8);
 			}
 			toolkit.paintBordersFor(pane8);
 
@@ -502,14 +465,8 @@ public class RelationSection extends AbstractSection {
 						public void selectionChanged(SelectionChangedEvent event) {
 							IStructuredSelection selection = (IStructuredSelection) tableViewer1
 									.getSelection();
-							if ((selection.size() > 0) & editable) {
-								if (isSyncFree()) {
-									syncFreeUpdateBtnStatus1(selection);
-								} else {
-									ctrl_remove_1.setEnabled(true);
-								}
-							}
-							
+							if ((selection.size() > 0) & editable)
+								ctrl_remove_1.setEnabled(true);
 							if (selection.size() == 1) {
 								String desc = ((MethodElement) selection
 										.getFirstElement())
@@ -528,21 +485,10 @@ public class RelationSection extends AbstractSection {
 			if (changesAllowed[count]) {
 				ctrl_add_1.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
-						if (isSyncFree()) {
-							IStructuredSelection selection = (IStructuredSelection) tableViewer1.getSelection();
-							if (syncFreeAdd1(selection)) { 
-								tableViewer1.refresh();
-								return;
-							}
-						}
-						
 						IFilter filter = getFilter();
-						List existingElements = null;
-						if (isSyncFree()) {
-							existingElements = getExistingContentElements1();
-						} else {
-							existingElements = ProcessUtil.getAssociatedElementList(getExistingElements1());
-						}
+						List existingElements = ProcessUtil
+								.getAssociatedElementList(getExistingElements1());
+
 						ItemsFilterDialog fd = new ItemsFilterDialog(PlatformUI
 								.getWorkbench().getActiveWorkbenchWindow()
 								.getShell(), filter, element, tabString,
@@ -550,17 +496,15 @@ public class RelationSection extends AbstractSection {
 
 						fd.setBlockOnOpen(true);
 						fd.setTitle(tabString);
-						fd.setEnableProcessScope(true);
-						fd.setSection(getSection());
 						fd.open();
 						addItems1(fd.getSelectedItems());
 						tableViewer1.refresh();
+
 					}
-					
 				});
 
 				ctrl_add_proc_1.addSelectionListener(new SelectionAdapter() {
-					public void widgetSelected(SelectionEvent e) {						
+					public void widgetSelected(SelectionEvent e) {
 						descriptorProcessfilter = getFilterForDescriptors();
 						process = getProcess();
 						if (descriptorProcessfilter != null && process != null) {
@@ -576,21 +520,13 @@ public class RelationSection extends AbstractSection {
 							fd.open();
 							addFromProcessItems1(fd.getSelectedItems());
 							tableViewer1.refresh();
-						}						
+						}
+
 					}
 				});
 
 				ctrl_remove_1.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
-						if (isSyncFree()) {
-							IStructuredSelection selection = (IStructuredSelection) tableViewer1.getSelection();
-							if (syncFreeRemove1(selection)) {
-								tableViewer1.refresh();
-								ctrl_remove_1.setEnabled(false);
-								return;
-							}							
-						} 
-						
 						IStructuredSelection selection = (IStructuredSelection) tableViewer1
 								.getSelection();
 						if (selection.size() > 0) {
@@ -606,7 +542,6 @@ public class RelationSection extends AbstractSection {
 						}
 						ctrl_remove_1.setEnabled(false);
 					}
-				
 				});
 			}
 		}
@@ -633,11 +568,8 @@ public class RelationSection extends AbstractSection {
 							IStructuredSelection selection = (IStructuredSelection) tableViewer2
 									.getSelection();
 							if ((selection.size() > 0) && editable) {
-								if (isSyncFree()) {
-									syncFreeUpdateBtnStatus2(selection);
-								} else {
+								if (ctrl_remove_2 != null)
 									ctrl_remove_2.setEnabled(true);
-								}
 							}
 							if (selection.size() == 1) {
 								String desc = ((MethodElement) selection
@@ -657,21 +589,9 @@ public class RelationSection extends AbstractSection {
 			if (changesAllowed[count]) {
 				ctrl_add_2.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
-						if (isSyncFree()) {
-							IStructuredSelection selection = (IStructuredSelection) tableViewer2.getSelection();
-							if (syncFreeAdd2(selection)) {								 	
-								tableViewer2.refresh();
-								return;
-							}
-						} 
-						
 						IFilter filter = getFilter();
-						List existingElements = null;
-						if (isSyncFree()) {
-							existingElements = getExistingContentElements2();
-						} else {
-							existingElements = ProcessUtil.getAssociatedElementList(getExistingElements2());
-						}
+						List existingElements = ProcessUtil
+								.getAssociatedElementList(getExistingElements2());
 						ItemsFilterDialog fd = new ItemsFilterDialog(PlatformUI
 								.getWorkbench().getActiveWorkbenchWindow()
 								.getShell(), filter, element, tabString,
@@ -679,8 +599,6 @@ public class RelationSection extends AbstractSection {
 
 						fd.setBlockOnOpen(true);
 						fd.setTitle(tabString);
-						fd.setEnableProcessScope(true);
-						fd.setSection(getSection());
 						fd.open();
 						addItems2(fd.getSelectedItems());
 						tableViewer2.refresh();
@@ -710,15 +628,6 @@ public class RelationSection extends AbstractSection {
 
 				ctrl_remove_2.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
-						if (isSyncFree()) {
-							IStructuredSelection selection = (IStructuredSelection) tableViewer2.getSelection();
-							if (syncFreeRemove2(selection)) {
-								tableViewer2.refresh();
-								ctrl_remove_2.setEnabled(false);
-								return;
-							}							
-						}						
-						
 						IStructuredSelection selection = (IStructuredSelection) tableViewer2
 								.getSelection();
 						if (selection.size() > 0) {
@@ -787,8 +696,6 @@ public class RelationSection extends AbstractSection {
 
 						fd.setBlockOnOpen(true);
 						fd.setTitle(tabString);
-						fd.setEnableProcessScope(true);
-						fd.setSection(getSection());
 						fd.open();
 						addItems3(fd.getSelectedItems());
 						tableViewer3.refresh();
@@ -858,13 +765,8 @@ public class RelationSection extends AbstractSection {
 						public void selectionChanged(SelectionChangedEvent event) {
 							IStructuredSelection selection = (IStructuredSelection) tableViewer4
 									.getSelection();
-							if ((selection.size() > 0) & editable) {
-								if (isSyncFree()) {
-									syncFreeUpdateBtnStatus4(selection);
-								} else {
-									ctrl_remove_4.setEnabled(true);
-								}
-							}
+							if ((selection.size() > 0) && editable)
+								ctrl_remove_4.setEnabled(true);
 							if (selection.size() == 1) {
 								String desc = ((MethodElement) selection
 										.getFirstElement())
@@ -883,21 +785,9 @@ public class RelationSection extends AbstractSection {
 			if ((new Boolean(changesAllowed[count])).booleanValue()) {
 				ctrl_add_4.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
-						if (isSyncFree()) {
-							IStructuredSelection selection = (IStructuredSelection) tableViewer4.getSelection();
-							if (syncFreeAdd4(selection)) {								 	
-								tableViewer4.refresh();
-								return;
-							}
-						} 
-						
 						IFilter filter = getFilter();
-						List existingElements = null;
-						if (isSyncFree()) {
-							existingElements = getExistingContentElements4();
-						} else {
-							existingElements = ProcessUtil.getAssociatedElementList(getExistingElements4());
-						}
+						List existingElements = ProcessUtil
+								.getAssociatedElementList(getExistingElements4());
 						ItemsFilterDialog fd = new ItemsFilterDialog(PlatformUI
 								.getWorkbench().getActiveWorkbenchWindow()
 								.getShell(), filter, element, tabString,
@@ -905,8 +795,6 @@ public class RelationSection extends AbstractSection {
 
 						fd.setBlockOnOpen(true);
 						fd.setTitle(tabString);
-						fd.setEnableProcessScope(true);
-						fd.setSection(getSection());
 						fd.open();
 						addItems4(fd.getSelectedItems());
 						tableViewer4.refresh();
@@ -936,15 +824,6 @@ public class RelationSection extends AbstractSection {
 
 				ctrl_remove_4.addSelectionListener(new SelectionAdapter() {
 					public void widgetSelected(SelectionEvent e) {
-						if (isSyncFree()) {
-							IStructuredSelection selection = (IStructuredSelection) tableViewer4.getSelection();
-							if (syncFreeRemove4(selection)) {
-								tableViewer4.refresh();
-								ctrl_remove_4.setEnabled(false);
-								return;
-							}							
-						}
-						
 						IStructuredSelection selection = (IStructuredSelection) tableViewer4
 								.getSelection();
 						if (selection.size() > 0) {
@@ -964,7 +843,7 @@ public class RelationSection extends AbstractSection {
 			}
 		}
 	}
-	
+
 	protected void addItems1(List list) {
 	};
 
@@ -1016,119 +895,5 @@ public class RelationSection extends AbstractSection {
 	protected List getExistingElements4() {
 		return null;
 	};
-	
-	protected List getExistingContentElements1() {
-		return null;
-	}
-	
-	protected List getExistingContentElements2() {
-		return null;
-	}
-	
-	protected List getExistingContentElements4() {
-		return null;
-	}
-	
-	protected boolean syncFreeAdd1(IStructuredSelection selection) {
-		return false;
-	}
-	
-	protected boolean syncFreeAdd2(IStructuredSelection selection) {
-		return false;
-	}
-	
-	protected boolean syncFreeAdd4(IStructuredSelection selection) {
-		return false;
-	}
-	
-	protected boolean syncFreeRemove1(IStructuredSelection selection) {
-		return false;
-	}
-	
-	protected boolean syncFreeRemove2(IStructuredSelection selection) {
-		return false;
-	}
-	
-	protected boolean syncFreeRemove4(IStructuredSelection selection) {
-		return false;
-	}
-	
-	protected void syncFreeUpdateBtnStatus1(IStructuredSelection selection) {
-		
-	}
-	
-	protected void syncFreeUpdateBtnStatus2(IStructuredSelection selection) {
-		
-	}
-	
-	protected void syncFreeUpdateBtnStatus4(IStructuredSelection selection) {
-		
-	}
-	
-	protected void createAddtionalButton1(Composite parent) {
-		
-	}
-	
-	protected void createAddtionalButton2(Composite parent) {
-		
-	}
-	
-	protected void createAddtionalButton3(Composite parent) {
-		
-	}
-	
-	protected void createAddtionalButton4(Composite parent) {
-		
-	}
-	
-	protected void mixWithExcluded(Descriptor des,
-			List<MethodElement> elements, EReference linkedElementFeature,
-			EReference excludedFeature, EReference desFeature) {
-		ElementRealizer realizer = DefaultElementRealizer
-				.newElementRealizer(getConfiguration());
-		MethodElement element = ProcessUtil.getAssociatedElement(des);
-		if (element == null) {
-			return;
-		}
-		List<MethodElement> elementList = ConfigurationHelper
-				.calc0nFeatureValue(element, linkedElementFeature, realizer);
-		List<MethodElement> excludedList = (List<MethodElement>) des
-				.eGet(excludedFeature);
-		for (MethodElement e : excludedList) {
-			if (elementList.contains(e)) {
-				elements.add(e);
-			}
-		}
-		
-		// The following handle additional logic for config-free process - only
-		// showing the non-realized results, since realization results could get
-		// set into the model in memory due to browsing and publishing.
-		Process process = ProcessUtil.getProcess(des.getSuperActivities());
-		if (ProcessScopeUtil.getInstance().isConfigFree(process)) {
-			DescriptorPropUtil propUtil = DescriptorPropUtil
-					.getDesciptorPropUtil();
-			Set<Object> set = new HashSet<Object>();
-			Object value = element.eGet(linkedElementFeature);			//not realized value
-			if (value instanceof List) {
-				set.addAll((List) value);
-			}			
-			List<MethodElement> modifiedElements = new ArrayList<MethodElement>();
-			for (MethodElement item : elements) {
-				if (item instanceof Descriptor) {
-					Descriptor desItem = (Descriptor) item;
-					MethodElement elemItem = ProcessUtil
-							.getAssociatedElement(desItem);
-					if (elemItem == null || set.contains(elemItem)
-							|| propUtil.localUse(desItem, des, desFeature)) {
-						modifiedElements.add(desItem);
-					}
-				} else {
-					modifiedElements.add(item);
-				}
-			}
-			elements.clear();
-			elements.addAll(modifiedElements);
-		}
-	}
-	
+
 }

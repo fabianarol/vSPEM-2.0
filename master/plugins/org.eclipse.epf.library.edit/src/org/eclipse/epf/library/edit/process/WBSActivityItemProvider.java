@@ -73,6 +73,54 @@ public class WBSActivityItemProvider extends BSActivityItemProvider {
 		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
 				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
 				.createMilestone()));
+		
+		/********Variation points********/
+		/*Añadimos puntos de variación*/
+		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
+				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
+				.createvpActivity()));
+		
+		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
+				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
+				.createvpPhase()));
+		
+		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
+				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
+				.createvpIteration()));
+		
+		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
+				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
+				.createvpTaskDescriptor()));
+		
+		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
+				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
+				.createvpMilestone()));
+		
+		/***/
+		
+		
+		/*******Variants*******/
+		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
+				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
+				.createVarActivity()));//Var Activity
+		
+		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
+				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
+				.createVarPhase()));
+		
+		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
+				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
+				.createVarIteration()));
+		
+		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
+				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
+				.createVarTaskDescriptor()));
+		
+		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
+				.getActivity_BreakdownElements(), UmaFactory.eINSTANCE
+				.createVarMilestone()));
+		/***/
+		
 
 	}
 
@@ -248,6 +296,6 @@ public class WBSActivityItemProvider extends BSActivityItemProvider {
 					|| property == IBSItemProvider.COL_MODEL_INFO;
 			}
 		};
-	}	
+	}
 	
 }

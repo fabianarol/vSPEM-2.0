@@ -12,18 +12,18 @@ package org.eclipse.epf.authoring.ui.views;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URLDecoder;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.epf.authoring.ui.AuthoringUIPlugin;
-import org.eclipse.epf.authoring.ui.AuthoringUIResources;
-import org.eclipse.epf.library.configuration.ConfigurationHelper;
+import org.eclipse.epf.library.edit.process.ActivityWrapperItemProvider;
 import org.eclipse.epf.library.layout.BrowsingLayoutSettings;
 import org.eclipse.epf.library.layout.ElementLayoutManager;
 import org.eclipse.epf.library.layout.HtmlBuilder;
+import org.eclipse.epf.library.layout.IElementLayout;
+import org.eclipse.epf.library.layout.elements.AbstractProcessElementLayout;
+import org.eclipse.epf.library.util.LibraryUtil;
 import org.eclipse.epf.library.util.ResourceHelper;
-import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.LocationAdapter;
@@ -38,7 +38,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.PlatformUI;
 
 
 /**
@@ -124,21 +123,9 @@ public class ElementHTMLViewer {
 					//System.out.println("location changing...");
 					// Get the current location.
 					String location = getElementUrl(e.location);
-//					System.out.println("e.location: " + e.location);
-//					System.out.println("location: " + location);
 					if ( location == null || location.startsWith(ResourceHelper.URL_STR_JAVASCRIPT))
 					{
-						int ix = e.location.indexOf(".html?proc=");//$NON-NLS-1$
-						if (ix > 0) {
-							String str =  e.location.substring(0, ix + 5);
-//							System.out.println("str: " + str);
-							 location = getElementUrl(str);
-							 if (location == null) {
-								 return;
-							 }
-						} else {
-							return;
-						}
+						return;
 					}
 					if (isLocationChanged(location)) {
 						// Save the current location for printing purposes.
@@ -325,66 +312,69 @@ public class ElementHTMLViewer {
 	/**
 	 * Displays the HTML representation for a Method element.
 	 */
-	public void showElementContent(final Object raw_element) {
-		final String[] fileUrlHolder = new String[1];
+	public void showElementContent(Object raw_element) {
+
+		startWait();
+
 		try {
-			PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
-
-				public void run(IProgressMonitor monitor)
-				throws InvocationTargetException, InterruptedException {
-					try {
-						monitor.beginTask(AuthoringUIResources.ElementHTMLViewer_0, IProgressMonitor.UNKNOWN);
-						fileUrlHolder[0] = generateHtml(raw_element, getHtmlBuilder());
-					} finally {
-						monitor.done();
-					}
-
+			IElementLayout layout = null;
+			String file_url = "about:blank"; //$NON-NLS-1$
+			Object element = LibraryUtil.unwrap(raw_element);
+			if ( raw_element instanceof ActivityWrapperItemProvider ) {
+				ActivityWrapperItemProvider wrapper = (ActivityWrapperItemProvider)raw_element;
+				Object proc = wrapper.getTopItem();
+				if ( element instanceof MethodElement && proc instanceof org.eclipse.epf.uma.Process ) {
+					String path = AbstractProcessElementLayout.getPath(wrapper);
+					//System.out.println(topItem);
+					layout = getHtmlBuilder().getLayoutManager()
+						.createLayout((MethodElement)element, 
+								(org.eclipse.epf.uma.Process)proc, path);
+					file_url = getHtmlBuilder().generateHtml(layout);
 				}
-
-			});
-		} catch (InvocationTargetException e) {
-			AuthoringUIPlugin.getDefault().getLogger().logError(e);
-		} catch (InterruptedException e1) {
-			return;
-		}
-		if(fileUrlHolder[0] != null) {
+			} else if (element instanceof MethodElement) {
+					file_url = getHtmlBuilder().generateHtml((MethodElement)element);
+			}
+			
+			if ( file_url == null ) {
+				file_url = "about:blank"; //$NON-NLS-1$
+			}
+			// on linux, the file path need to be specified as file, otherwise it will be treated as url
+			// and casuign encoding/decoding issue
+			// Linux: Configuration names containing accented characters cannot be browsed.
+			else {			
+				if (!SWT.getPlatform().equals("win32") && !file_url.startsWith("file://") && //$NON-NLS-1$ //$NON-NLS-2$
+					!file_url.equals("about:blank")) //$NON-NLS-1$
+				{
+					file_url = "file://" + file_url; //$NON-NLS-1$
+				}
+				
+				// Bug 201335 - Refresh does not work correctly for process pages in browsing mode
+				// need to append the query string
+				if ( layout instanceof AbstractProcessElementLayout ) {
+					file_url += ((AbstractProcessElementLayout)layout).getQueryString();
+				}
+			}
+		
 			// Set the current location to avoid re-generating the HTML file in
 			// respond to a location change.
-			currentLocation = fileUrlHolder[0];
-			browser.setUrl(currentLocation);
-		}
-	}
-
-	private String generateHtml(Object raw_element, HtmlBuilder htmlBuilder) {
-		return ConfigurationHelper.getDelegate().generateHtml(raw_element, htmlBuilder);
-	}
-
-	private void generateHtml(final String url) {
-		try {
-			PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
-
-				public void run(IProgressMonitor monitor)
-				throws InvocationTargetException, InterruptedException {
-					boolean oldValue = ConfigurationHelper.getDelegate().isGenerateHtmlMode();
-					try {
-						monitor.beginTask(AuthoringUIResources.ElementHTMLViewer_0, IProgressMonitor.UNKNOWN);
-						ConfigurationHelper.getDelegate().setGenerateHtmlMode(true);
-						getHtmlBuilder().generateHtml(url);		
-					} finally {
-						if (! oldValue) {
-							ConfigurationHelper.getDelegate().setGenerateHtmlMode(false);	
-						}
-						monitor.done();
-					}
-
-				}
-
-			});
-		} catch (InvocationTargetException e) {
+			currentLocation = file_url;
+			browser.setUrl(file_url);
+		} catch (RuntimeException e) {
 			AuthoringUIPlugin.getDefault().getLogger().logError(e);
-		} catch (InterruptedException e1) {
-			return;
 		}
+
+		endWait();
+	}
+
+	private void generateHtml(String url) {
+		startWait();
+		try {
+			getHtmlBuilder().generateHtml(url);
+		} catch (RuntimeException e) {
+			AuthoringUIPlugin.getDefault().getLogger().logError(e);
+		}
+
+		endWait();
 	}
 
 	/**
@@ -430,14 +420,7 @@ public class ElementHTMLViewer {
 
 	private String fixPath(String path) {
 		try {
-			String platform = SWT.getPlatform();
-			if ("win32".equals(platform) || "wpf".equals(platform)) { //$NON-NLS-1$ //$NON-NLS-2$
-			// org.eclipse.swt.browser.IE
-				path = URLDecoder.decode(path, "ISO-8859-1"); //$NON-NLS-1$
-			} else {
-				// org.eclipse.swt.browser.Mozilla
-				path = URLDecoder.decode(path, "UTF-8"); //$NON-NLS-1$
-			}
+			path = URLDecoder.decode(path, "utf-8"); //$NON-NLS-1$
 			if (File.separatorChar != '/') {
 				return path.replace(File.separatorChar, '/');
 			}

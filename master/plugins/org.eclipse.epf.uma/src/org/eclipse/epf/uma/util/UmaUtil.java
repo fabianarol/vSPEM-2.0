@@ -10,7 +10,6 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.uma.util;
 
-import java.lang.reflect.Method;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -19,17 +18,12 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.util.TreeIterator;
-import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.emf.ecore.ETypedElement;
-import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EContentsEList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -37,33 +31,56 @@ import org.eclipse.epf.uma.Activity;
 import org.eclipse.epf.uma.BreakdownElement;
 import org.eclipse.epf.uma.ContentElement;
 import org.eclipse.epf.uma.ContentPackage;
+import org.eclipse.epf.uma.CoreProcessPackage;
+import org.eclipse.epf.uma.Dependences;
 import org.eclipse.epf.uma.Diagram;
 import org.eclipse.epf.uma.Discipline;
 import org.eclipse.epf.uma.DisciplineGrouping;
 import org.eclipse.epf.uma.Domain;
 import org.eclipse.epf.uma.Guidance;
+import org.eclipse.epf.uma.Iteration;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.MethodLibrary;
 import org.eclipse.epf.uma.MethodPackage;
 import org.eclipse.epf.uma.MethodPlugin;
 import org.eclipse.epf.uma.MethodUnit;
-import org.eclipse.epf.uma.Process;
+import org.eclipse.epf.uma.Milestone;
+import org.eclipse.epf.uma.Phase;
 import org.eclipse.epf.uma.ProcessComponent;
 import org.eclipse.epf.uma.ProcessElement;
+import org.eclipse.epf.uma.ProcessLineComponent;
+import org.eclipse.epf.uma.ProcessLinesPackage;
 import org.eclipse.epf.uma.ProcessPackage;
 import org.eclipse.epf.uma.Role;
+import org.eclipse.epf.uma.RoleDescriptor;
 import org.eclipse.epf.uma.RoleSet;
 import org.eclipse.epf.uma.RoleSetGrouping;
+import org.eclipse.epf.uma.TailoredCoreProcessPackage;
+import org.eclipse.epf.uma.TailoredProcessComponent;
+import org.eclipse.epf.uma.TailoredProcessesPackage;
 import org.eclipse.epf.uma.Task;
+import org.eclipse.epf.uma.TaskDescriptor;
+import org.eclipse.epf.uma.TeamProfile;
 import org.eclipse.epf.uma.UmaFactory;
 import org.eclipse.epf.uma.UmaPackage;
+import org.eclipse.epf.uma.VarElement;
+import org.eclipse.epf.uma.VarPoint;
+import org.eclipse.epf.uma.VarPointsPackage;
 import org.eclipse.epf.uma.VariabilityElement;
 import org.eclipse.epf.uma.VariabilityType;
+import org.eclipse.epf.uma.Variant;
+import org.eclipse.epf.uma.VariantsPackage;
+import org.eclipse.epf.uma.VariationsPackage;
 import org.eclipse.epf.uma.WorkBreakdownElement;
 import org.eclipse.epf.uma.WorkOrder;
 import org.eclipse.epf.uma.WorkProduct;
+import org.eclipse.epf.uma.WorkProductDescriptor;
 import org.eclipse.epf.uma.WorkProductType;
-import org.eclipse.epf.uma.ecore.util.OppositeFeature;
+import org.eclipse.epf.uma.varP2varP;
+import org.eclipse.epf.uma.variant2varP;
+import org.eclipse.epf.uma.variant2variant;
+import org.eclipse.epf.uma.varp2variant;
+
 
 /**
  * Utility class for accessing and updating the UMA model objects.
@@ -74,60 +91,6 @@ import org.eclipse.epf.uma.ecore.util.OppositeFeature;
  */
 public class UmaUtil {
 
-	public static EReference createReference(String name) {
-		EReference ref =  EcoreFactory.eINSTANCE.createEReference();
-		ref.eSetDeliver(false);
-		ref.setName(name);
-		ref.setContainment(false);
-		ref.setUpperBound(ETypedElement.UNBOUNDED_MULTIPLICITY);
-		ref.setEType(UmaPackage.eINSTANCE.getMethodElement());
-		return ref;
-	}
-	
-	public static EAttribute createAttribute(String name) {
-		EAttribute att =  EcoreFactory.eINSTANCE.createEAttribute();
-		att.eSetDeliver(false);
-		att.setName(name);
-		att.setEType(UmaPackage.eINSTANCE.getContentDescription_MainDescription().getEType());
-		return att;
-	}
-	
-	public static EReference MethodElement_UdtList = createReference("udtList");	//$NON-NLS-1$
-	public static OppositeFeature UdtListOpposite = new OppositeFeature(MethodElement.class, "udtListOpposite", MethodElement_UdtList, true);	//$NON-NLS-1$
-	
-	public static final String Unresolved = new String("unresolved");		//$NON-NLS-1$  Don' use Unresolved = "unresolved";
-	
-	private static IUmaUtilProvider provider;
-	public static Set<String> unresolvedGuidSet = new HashSet<String>();
-	
-	private static IUmaUtilProvider getProvider() {
-		return provider;
-	}
-
-	public static void setProvider(IUmaUtilProvider provider) {
-		UmaUtil.provider = provider;
-	}
-
-	public static void setUnresolved(MethodElement element) {
-		element.setName(Unresolved);
-	}
-	
-	public static boolean isUnresolved(MethodElement element) {
-		return element.getName() == Unresolved;		//Don't use "equals" !
-	}
-	
-	public static List<MethodElement> filterOutUnresolved(List<MethodElement> list) {
-		List<MethodElement> filteredList = new ArrayList<MethodElement>();
-		if (list != null && !list.isEmpty()) {
-			for (MethodElement element : list) {
-				if (! isUnresolved(element) && isInLibrary(element)) {
-					filteredList.add(element);
-				}
-			}
-		}
-		return filteredList;
-	}
-	
 	/**
 	 * Replaces the feature values of an old method element with the
 	 * corresponding feature values of a new method element.
@@ -270,6 +233,829 @@ public class UmaUtil {
 		return pkg;
 	}
 
+
+	
+	
+	
+	/********vEPF*********/
+	
+	/**
+	 * Metodo que busca un coreProcess a partir de una ruta (Delivery o Capability generalmente)
+	 */
+	public static CoreProcessPackage getVPackageProcess(MethodPackage pkg, String[] path){
+		Boolean found= false;
+		for (EObject obj = pkg; obj != null; obj = obj.eContainer()) {
+			if ( (obj instanceof MethodPlugin) && (obj instanceof ProcessLineComponent) ) {//Encontramos el processLine
+				ProcessLineComponent processLine = (ProcessLineComponent) obj;
+				for(Iterator iterator = processLine.getChildPackages().iterator(); iterator.hasNext() && !found;){
+					EObject pkgCoreEObj = (EObject) iterator.next();
+					if(pkgCoreEObj instanceof CoreProcessPackage){
+						CoreProcessPackage pkgCore = (CoreProcessPackage) pkgCoreEObj;
+						if(pkgCore.getName().equals(path[0])){
+							found=true;
+							return pkgCore;
+						}
+					}
+				}
+			}
+		}
+		return null;
+	}
+	/**
+	 * Obtiene el methodplugin para un tailoredProcess
+	 */
+	public static MethodPlugin getMethodPluginForTailoredProcess(EObject element) {
+		for (EObject obj = element; obj != null; obj = obj.eContainer()) {
+			if ((obj instanceof MethodPlugin) && (obj instanceof ProcessLineComponent)) {
+				return (MethodPlugin) obj;
+			}
+		}
+		return null;
+	}
+	
+	
+	
+	/**
+	 * Obtiene el methodplugin para una linea de proceso
+	 */
+	public static MethodPlugin getMethodPluginForProcessLine(EObject element) {
+		for (EObject obj = element; obj != null; obj = obj.eContainer()) {
+			if ((obj instanceof MethodPlugin) && !(obj instanceof ProcessLineComponent)) {
+				return (MethodPlugin) obj;
+			}
+		}
+		return null;
+	}
+	/**
+	 * Metodo que comprueba si un nombre de proceso existe y le añade un número (Modo copia sin reemplazo)
+	 */
+	public static String checkName(String name , TailoredCoreProcessPackage pkg, int contador){
+		String newName=name;
+		Boolean found=false;
+		
+		for(Iterator iterator = pkg.getChildPackages().iterator(); iterator.hasNext() && !found;){
+			EObject processObj = (EObject) iterator.next();
+			if(processObj instanceof ProcessComponent){
+				ProcessComponent processComponent = (ProcessComponent) processObj;
+				if(processComponent.getName().equals(name+Integer.toString(contador))){
+					found = true;
+					newName=checkName(name, pkg, contador+1);
+				}
+			}
+		}
+		if(found == false){
+			newName=name+Integer.toString(contador);
+		}
+		
+		return newName;
+	}
+	/**
+	 * Metodo que comprueba si un proceso existe y devuelva true o false
+	 * @param name
+	 * @param pkg
+	 * @return
+	 */
+	public static Boolean checkProcess(String name , TailoredCoreProcessPackage pkg){
+		Boolean found=false;
+		
+		for(Iterator iterator = pkg.getChildPackages().iterator(); iterator.hasNext() && !found;){
+			EObject processObj = (EObject) iterator.next();
+			if(processObj instanceof ProcessComponent){
+				ProcessComponent processComponent = (ProcessComponent) processObj;
+				if(processComponent.getName().equals(name)){
+					found = true;
+				}
+			}
+		}
+		
+		return found;
+	}
+	/**
+	 * Metodo que obtiene un proceso adaptado ya creado a partir de su nombre
+	 * @param name
+	 * @param pkg
+	 * @return
+	 */
+	public static ProcessComponent getProcess(String name , TailoredCoreProcessPackage pkg){
+		Boolean found=false;
+		ProcessComponent processComponentFound = null;
+		
+		for(Iterator iterator = pkg.getChildPackages().iterator(); iterator.hasNext() && !found;){
+			EObject processObj = (EObject) iterator.next();
+			if(processObj instanceof ProcessComponent){
+				ProcessComponent processComponent = (ProcessComponent) processObj;
+				if(processComponent.getName().equals(name)){
+					found = true;
+					processComponentFound = processComponent;
+				}
+			}
+		}
+		return processComponentFound;
+		
+	}
+	
+	/**
+	 * Metodo que limpia los procesos de variantes y puntos de variacion y deja unicamente los elementos de SPEM
+	 */
+	public static void cleanCopyProcess(Collection collectionProcesses){
+		
+		for(Iterator iterator = collectionProcesses.iterator(); iterator.hasNext();){
+			ProcessComponent process = (ProcessComponent) iterator.next();
+			
+			for(Iterator iter = process.getChildPackages().iterator(); iter.hasNext();){
+				EObject element = (EObject) iter.next();
+				
+				if(element instanceof ProcessPackage){//Encapsulacion
+					ProcessPackage elementPkg = (ProcessPackage) element;
+					if( (elementPkg.getProcessElements().get(0) instanceof VarPoint) || (elementPkg.getProcessElements().get(0) instanceof Variant)){
+						iter.remove();
+					}
+				}
+			}
+		}
+	}
+	
+	/***
+	 * Metodo que limpia las dependencias cuando un elemento es borrado (tanto clientes como suppliers, todas las referencias)
+	 */
+	public static void cleanDependencesElement(VarElement varElementDelete){
+		//Parte Cliente
+		if(varElementDelete.getClient().size() > 0){
+			for(Iterator iterator = varElementDelete.getClient().iterator(); iterator.hasNext();){
+				Dependences depObj = (Dependences) iterator.next();
+				if( (depObj instanceof variant2varP)){
+					variant2varP dep = (variant2varP) depObj;
+					deleteSupplierDependence(dep.getSupplier(), varElementDelete);
+				}
+				else if( (depObj instanceof variant2variant)){
+					variant2variant dep = (variant2variant) depObj;
+					deleteSupplierDependence(dep.getSupplier(), varElementDelete);
+				}
+				else if( (depObj instanceof varp2variant)){
+					varp2variant dep = (varp2variant) depObj;
+					deleteSupplierDependence(dep.getSupplier(), varElementDelete);
+				}
+				else if( (depObj instanceof varP2varP)){
+					varP2varP dep = (varP2varP) depObj;
+					deleteSupplierDependence(dep.getSupplier(), varElementDelete);
+				}
+			}
+		}
+		//Parte Supplier
+		if(varElementDelete.getSupplier().size() > 0){
+			for(Iterator iterator = varElementDelete.getSupplier().iterator(); iterator.hasNext();){
+				Dependences depObj = (Dependences) iterator.next();
+				if( (depObj instanceof variant2varP)){
+					variant2varP dep = (variant2varP) depObj;
+					deleteClientDependence(dep.getClient(), varElementDelete);
+				}
+				else if( (depObj instanceof variant2variant)){
+					variant2variant dep = (variant2variant) depObj;
+					deleteClientDependence(dep.getClient(), varElementDelete);
+
+				}
+				else if( (depObj instanceof varp2variant)){
+					varp2variant dep = (varp2variant) depObj;
+					deleteClientDependence(dep.getClient(), varElementDelete);
+					
+
+				}
+				else if( (depObj instanceof varP2varP)){
+					varP2varP dep = (varP2varP) depObj;
+					deleteClientDependence(dep.getClient(), varElementDelete);
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Método que borra de un VarElement A la dependencia client que pueda tener con B (Mantiene la consistencia entre las dependencias)
+	 */
+	public static Boolean deleteClientDependence(VarElement elementToModify, VarElement elementTarget){
+		Boolean delete = false;
+		Collection clientDepElementToModify = elementToModify.getClient();
+		
+		if(clientDepElementToModify.size() > 0){
+			for(Iterator iterator = clientDepElementToModify.iterator(); iterator.hasNext() && !delete;){
+				EObject clientDepObj = (EObject) iterator.next();
+				if(clientDepObj instanceof Dependences){
+					Dependences clientDep = (Dependences) clientDepObj;	
+					if( (clientDep instanceof variant2varP)){
+						variant2varP dep = (variant2varP) clientDep;
+						if(dep.getSupplier().equals(elementTarget)){
+							iterator.remove();
+							delete = true;
+						}
+					}
+					else if( (clientDep instanceof variant2variant)){
+						variant2variant dep = (variant2variant) clientDep;
+						if(dep.getSupplier().equals(elementTarget)){
+							iterator.remove();
+							delete = true;
+						}
+					}
+					else if( (clientDep instanceof varp2variant)){
+						varp2variant dep = (varp2variant) clientDep;
+						if(dep.getSupplier().equals(elementTarget)){
+							iterator.remove();
+							delete = true;
+						}
+					}
+					else if( (clientDep instanceof varP2varP)){
+						varP2varP dep = (varP2varP) clientDep;
+						if(dep.getSupplier().equals(elementTarget)){
+							iterator.remove();
+							delete = true;
+						}
+					}
+				}
+			}
+		}
+		
+		return delete;
+	}
+	
+	/**
+	 * Método que borra de un VarElement A la dependencia supplier que pueda tener con B (Mantiene la consistencia entre las dependencias)
+	 */
+	public static Boolean deleteSupplierDependence(VarElement elementToModify, VarElement elementTarget){
+		Boolean delete = false;
+		Collection supplierDepElementToModify = elementToModify.getSupplier();
+		
+		if(supplierDepElementToModify.size() > 0){
+			for(Iterator iterator = supplierDepElementToModify.iterator(); iterator.hasNext() && !delete;){
+				EObject supplierDepObj = (EObject) iterator.next();
+				if(supplierDepObj instanceof Dependences){
+					Dependences supplierDep = (Dependences) supplierDepObj;	
+					if( (supplierDep instanceof variant2varP)){
+						variant2varP dep = (variant2varP) supplierDep;
+						if(dep.getClient().equals(elementTarget)){
+							iterator.remove();
+							delete = true;
+						}
+					}
+					else if( (supplierDep instanceof variant2variant)){
+						variant2variant dep = (variant2variant) supplierDep;
+						if(dep.getClient().equals(elementTarget)){
+							iterator.remove();
+							delete = true;
+						}
+					}
+					else if( (supplierDep instanceof varp2variant)){
+						varp2variant dep = (varp2variant) supplierDep;
+						if(dep.getClient().equals(elementTarget)){
+							iterator.remove();
+							delete = true;
+						}
+					}
+					else if( (supplierDep instanceof varP2varP)){
+						varP2varP dep = (varP2varP) supplierDep;
+						if(dep.getClient().equals(elementTarget)){
+							iterator.remove();
+							delete = true;
+						}
+					}
+				}
+			}
+		}
+		
+		return delete;
+	}
+	
+	/**
+	 * Método devuelve si una dependencia esta contenida dentro de una lista de dependencias (Evita generar un metodo equals en UMA)
+	 */
+	public static Boolean collectionContainsDependence(Collection dependences, Dependences dependenceTarget){
+		Boolean found = false;
+		for(Iterator iterator = dependences.iterator(); iterator.hasNext() && !found;){
+			EObject dependenceObj = (EObject) iterator.next();
+			if(dependenceObj instanceof Dependences){
+				Dependences dependenceOrig = (Dependences) dependenceObj;
+				if( (dependenceTarget instanceof variant2varP) && (dependenceOrig instanceof variant2varP)){
+					variant2varP depOrig = (variant2varP) dependenceOrig;
+					variant2varP depTarget =  (variant2varP) dependenceTarget;
+					if(depOrig.isIsInclusive() == depTarget.isIsInclusive()){
+						if(depOrig.getClient().equals(depTarget.getClient()) &&
+								depOrig.getSupplier().equals(depTarget.getSupplier())){
+							found = true;
+						}
+					}
+				}
+				else if( (dependenceTarget instanceof variant2variant) && (dependenceOrig instanceof variant2variant)){
+					variant2variant depOrig = (variant2variant) dependenceOrig;
+					variant2variant depTarget =  (variant2variant) dependenceTarget;
+					if(depOrig.isIsInclusive() == depTarget.isIsInclusive()){
+						if(depOrig.getClient().equals(depTarget.getClient()) &&
+								depOrig.getSupplier().equals(depTarget.getSupplier())){
+							found = true;
+						}
+					}
+				}
+				else if( (dependenceTarget instanceof varp2variant) && (dependenceOrig instanceof varp2variant)){
+					varp2variant depOrig = (varp2variant) dependenceOrig;
+					varp2variant depTarget =  (varp2variant) dependenceTarget;
+					if(depOrig.isIsInclusive() == depTarget.isIsInclusive()){
+						if(depOrig.getClient().equals(depTarget.getClient()) &&
+								depOrig.getSupplier().equals(depTarget.getSupplier())){
+							found = true;
+						}
+					}
+				}
+				else if( (dependenceTarget instanceof varP2varP) && (dependenceOrig instanceof varP2varP)){
+					varP2varP depOrig = (varP2varP) dependenceOrig;
+					varP2varP depTarget =  (varP2varP) dependenceTarget;
+					if(depOrig.isIsInclusive() == depTarget.isIsInclusive()){
+						if(depOrig.getClient().equals(depTarget.getClient()) &&
+								depOrig.getSupplier().equals(depTarget.getSupplier())){
+							found = true;
+						}
+					}
+				}
+			}
+		}
+		
+		return found;
+	}
+	
+	/**
+	 * Metodo que busca el paquete de Variaciones dentro de un tailored Process
+	 * @param tailoredProcess
+	 * @return
+	 */
+	public static VariationsPackage findVariationsPackage(TailoredProcessComponent tailoredProcess){
+		
+		VariationsPackage pkgVariations = null;
+		if(tailoredProcess.getChildPackages().size() > 0){
+			Boolean found = false;
+			for(Iterator iterator = tailoredProcess.getChildPackages().iterator(); iterator.hasNext() && !found;){
+				EObject iterObj = (EObject) iterator.next();
+				if(iterObj instanceof VariationsPackage){
+					found = true;
+					pkgVariations = (VariationsPackage) iterObj;
+				}
+			}
+		}
+		return pkgVariations;
+	}
+	/**
+	 * Metodo que obtiene el tipo de un punto de variación
+	 * @param varPoint
+	 * @return
+	 */
+	public static String findVarPointType(VarPoint varPoint){
+		String typeName="";
+		
+		if(varPoint instanceof Phase){
+			typeName = "Phase";
+		}
+		else if(varPoint instanceof Iteration){
+			typeName = "Iteration";
+		}
+		else if(varPoint instanceof Activity){
+			typeName = "Activity";
+		}
+		else if(varPoint instanceof Milestone){
+			typeName = "Milestone";
+		}
+		else if(varPoint instanceof TeamProfile){
+			typeName = "TeamProfile";
+		}
+		else if(varPoint instanceof TaskDescriptor){
+			typeName = "TaskDescriptor";
+		}
+		else if(varPoint instanceof WorkProductDescriptor){
+			typeName = "WorkProductDescriptor";
+		}
+		else if(varPoint instanceof RoleDescriptor){
+			typeName = "RoleDescriptor";
+		}
+		else{
+			typeName = "Unknown";
+		}
+		return typeName;
+	}
+	
+	/**
+	 * Metodo que encuentra una linea de proceso y la devuelve
+	 */
+	public static MethodPackage findProcessLinePackage(List methodPackages,
+			String name) {
+		MethodPackage pkgLine = null;
+		
+		for (int i = methodPackages.size() - 1; i > -1; i--) {
+			Object obj = methodPackages.get(i);
+			if (obj instanceof ProcessLinesPackage && obj instanceof MethodPackage) {
+				MethodPackage pkg = (MethodPackage) obj;
+				Collection processLineComponentList = new ArrayList();
+				processLineComponentList = pkg.getChildPackages();//Recojo las lineas de procesos
+				for(Iterator iterator = processLineComponentList.iterator(); iterator.hasNext();){
+					EObject processLineElementObj = (EObject) iterator.next();
+					if (processLineElementObj instanceof ProcessLineComponent){
+						ProcessLineComponent processLineElement = (ProcessLineComponent) processLineElementObj;
+						if (processLineElement.getName().equals(name)){
+							pkgLine = processLineElement;
+						}
+					}
+				}
+			}
+		}
+		return pkgLine;
+	}
+	
+	
+	
+	/**
+	 * Método que encuentra/crea un paquete CoreProcess.
+	 * 
+	 * @param methodPlugin
+	 * @param path
+	 * @param lineProcessName
+	 * @return
+	 */
+	public static MethodPackage createCoreProcessPackage(MethodPlugin methodPlugin,
+			String[] path, String lineProcessName) {
+		
+		MethodPackage pkgLine = null;
+		MethodPackage newPackage = null;
+		
+		List list = methodPlugin.getMethodPackages();
+		for (int i = 0; i < path.length; i++) {
+			pkgLine = findProcessLinePackage(list, lineProcessName);//Buscamos la linea de proceso
+			//Si no esta creamos el paquete nuevo
+			if (pkgLine != null) {
+
+				Boolean exists = false;
+				for(Iterator iterator = pkgLine.getChildPackages().iterator(); iterator.hasNext();){
+					EObject packetTargetObj = (EObject) iterator.next();
+					if (packetTargetObj !=null){
+						if(packetTargetObj instanceof MethodPackage){
+							MethodPackage packetTarget = (MethodPackage) packetTargetObj;
+							if(packetTarget.getName().equals(path[i])){
+								exists = true;
+								newPackage = packetTarget;
+							}
+						}
+					}
+				}
+				//Si no existe lo creamos
+				if(exists == false){
+					CoreProcessPackage pkgCoreProcessPackage = UmaFactory.eINSTANCE.createCoreProcessPackage();
+					pkgCoreProcessPackage.setName(path[i]); 
+					pkgLine.getChildPackages().add(pkgCoreProcessPackage);
+					newPackage = pkgCoreProcessPackage;
+				}
+				
+			}
+			list = pkgLine.getChildPackages();
+		}
+		return newPackage;
+	}	
+	
+	/**
+	 * Metodo que encuentra/crea un paquete TailoredCoreProcess
+	 * @param tailoredProcess
+	 * @param path
+	 * @return
+	 */
+	
+	public static MethodPackage createTailoredCoreProcessPackage(TailoredProcessComponent tailoredProcess, String path[]) {
+		
+		MethodPackage pkgLine = null;
+		MethodPackage newPackage = null;
+		
+		//Buscamos si existe -> No lo creamos, si no existe -> Lo creamos
+		for (int i = 0; i < path.length; i++) {
+			
+			Boolean found = false;
+			
+			for(Iterator iterator = tailoredProcess.getChildPackages().iterator(); iterator.hasNext() && !found;){
+				EObject tailoredCoreProcessPackageObj = (EObject) iterator.next();
+				
+				if(tailoredCoreProcessPackageObj instanceof TailoredCoreProcessPackage){
+					TailoredCoreProcessPackage tailoredCoreProcessPackage = (TailoredCoreProcessPackage) tailoredCoreProcessPackageObj;
+					if(tailoredCoreProcessPackage.getName().equals(path[i])){
+						found = true;
+						newPackage = tailoredCoreProcessPackage;
+					}
+				}
+			}
+			if(!found){
+				TailoredCoreProcessPackage pkgTailoredCoreProcessPackage = UmaFactory.eINSTANCE.createTailoredCoreProcessPackage();
+				pkgTailoredCoreProcessPackage.setName(path[i]);
+				tailoredProcess.getChildPackages().add(pkgTailoredCoreProcessPackage);
+				newPackage = pkgTailoredCoreProcessPackage;
+			}
+		}
+		return newPackage;
+	}
+	
+	/**
+	 * Metodo que encuentra/crea un paquete VariationsPackage
+	 * @param tailoredProcess
+	 * @param path
+	 * @return
+	 */
+	
+	public static MethodPackage createVariationsPackage(TailoredProcessComponent tailoredProcess, String path[]) {
+		
+		MethodPackage pkgLine = null;
+		MethodPackage newPackage = null;
+		
+		//Buscamos si existe -> No lo creamos, si no existe -> Lo creamos
+		for (int i = 0; i < path.length; i++) {
+			
+			Boolean found = false;
+			
+			for(Iterator iterator = tailoredProcess.getChildPackages().iterator(); iterator.hasNext() && !found;){
+				EObject variationsPackageObj = (EObject) iterator.next();
+				
+				if(variationsPackageObj instanceof VariationsPackage){
+					VariationsPackage variationsProcessPackage = (VariationsPackage) variationsPackageObj;
+					if(variationsProcessPackage.getName().equals(path[i])){
+						found = true;
+						newPackage = variationsProcessPackage;
+					}
+				}
+			}
+			if(!found){
+				VariationsPackage pkgVariationsPackage = UmaFactory.eINSTANCE.createVariationsPackage();
+				pkgVariationsPackage.setName(path[i]);
+				tailoredProcess.getChildPackages().add(pkgVariationsPackage);
+				newPackage = pkgVariationsPackage;
+			}
+		}
+		return newPackage;
+	}
+	
+	
+	/***
+	 * Metodo para encontrar un core process !FIXME Codigo replicado
+	 * @param methodPlugin
+	 * @param path
+	 * @param lineProcessName
+	 * @return
+	 */
+	public static MethodPackage findCorePackage(MethodPlugin methodPlugin,
+			String[] path, String lineProcessName) {
+
+		MethodPackage pkgLine = null;
+		MethodPackage newPackage = null;
+		
+		List list = methodPlugin.getMethodPackages();
+		for (int i = 0; i < path.length; i++) {
+			pkgLine = findProcessLinePackage(list, lineProcessName);//Buscamos la linea de proceso
+			//Si no esta creamos el paquete nuevo
+			if (pkgLine != null) {
+				for(Iterator iterator = pkgLine.getChildPackages().iterator(); iterator.hasNext();){
+					EObject coreProcessPackageObj = (EObject) iterator.next();
+					if(coreProcessPackageObj instanceof CoreProcessPackage){
+						CoreProcessPackage coreProcessPackage = (CoreProcessPackage) coreProcessPackageObj;
+						if(coreProcessPackage.getName().equals(path[i])){
+							newPackage = coreProcessPackage;
+						}
+					}
+				}
+				list = pkgLine.getChildPackages();
+			}
+			
+			
+		}
+		return newPackage;
+	}
+	/***
+	 * Método encargado de crear paquetes de variantes !FIXME Codigo replicado
+	 * @param methodPlugin
+	 * @param path
+	 * @param lineProcessName
+	 * @return
+	 */
+	
+	public static MethodPackage createVariantsPackage(MethodPlugin methodPlugin,
+			String[] path, String lineProcessName) {
+		
+		MethodPackage pkgLine = null;
+		MethodPackage newPackage = null;
+		
+		List list = methodPlugin.getMethodPackages();
+		for (int i = 0; i < path.length; i++) {
+			pkgLine = findProcessLinePackage(list, lineProcessName);//Buscamos la linea de proceso
+			//Si no esta creamos el paquete nuevo
+			if (pkgLine != null) {
+
+				
+				Boolean exists = false;
+				for(Iterator iterator = pkgLine.getChildPackages().iterator(); iterator.hasNext();){
+					EObject packetTargetObj = (EObject) iterator.next();
+					if (packetTargetObj !=null){
+						if(packetTargetObj instanceof MethodPackage){
+							MethodPackage packetTarget = (MethodPackage) packetTargetObj;
+							if(packetTarget.getName().equals(path[i])){
+								exists = true;
+								newPackage = packetTarget;
+							}
+						}
+					}
+				}
+				//Si no existe lo creamos
+				if(exists == false){
+					VariantsPackage pkgVariants = UmaFactory.eINSTANCE.createVariantsPackage();
+					pkgVariants.setName(path[i]); 
+					pkgLine.getChildPackages().add(pkgVariants);
+					newPackage = pkgVariants;
+				}
+			}
+			list = pkgLine.getChildPackages();
+		}
+		return newPackage;
+	}
+	/**
+	 * Recoje el MethodPlugin de una linea de proceso
+	 * @param element
+	 * @return
+	 */
+	
+	
+	public static MethodPlugin getMethodPluginFromProcessLine(EObject element) {
+		for (EObject obj = element; obj != null; obj = obj.eContainer()) {
+			if (obj instanceof MethodPlugin && !(obj instanceof ProcessLineComponent)) {
+				return (MethodPlugin) obj;
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * Devuelve el ProcessLine de un elemento dado
+	 * @return
+	 */
+	public static ProcessLineComponent getProcessLine(EObject element){
+		for (EObject obj = element; obj != null; obj = obj.eContainer()) {
+			if ((obj instanceof ProcessLineComponent)) {
+				return (ProcessLineComponent) obj;
+			}
+		}
+		return null;
+		
+	}
+	
+	/**
+	 * Metodo para encontrar un paquete de variantes !FIXME Codigo replicado
+	 * @param methodPlugin
+	 * @param path
+	 * @param lineProcessName
+	 * @return
+	 */
+	public static MethodPackage findVariantsPackage(MethodPlugin methodPlugin,
+			String[] path, String lineProcessName) {		
+		
+			ProcessLineComponent pkgLine = null;
+			MethodPackage newPackage = null;
+		
+
+			if(methodPlugin instanceof ProcessLineComponent){
+				pkgLine = (ProcessLineComponent)methodPlugin;
+
+				if (pkgLine != null) {
+					for(Iterator iterator = pkgLine.getChildPackages().iterator(); iterator.hasNext();){
+						EObject variantsPackageObj = (EObject) iterator.next();
+						if(variantsPackageObj instanceof VariantsPackage){
+							VariantsPackage variantsPackage = (VariantsPackage) variantsPackageObj;
+							if(variantsPackage.getName().equals(path[0])){
+								newPackage = variantsPackage;
+							}
+						}
+					}
+				}
+			}
+			
+		
+		return newPackage;
+	}
+	
+	/**
+	 * Metodo para encontrar un paquete de puntos de variacion
+	 * @param methodPlugin
+	 * @param path
+	 * @param lineProcessName
+	 * @return
+	 */
+	public static MethodPackage findVarPointsPackage(MethodPlugin methodPlugin,
+			String[] path, String lineProcessName) {
+		
+		ProcessLineComponent pkgLine = null;
+		MethodPackage newPackage = null;
+
+		if(methodPlugin instanceof ProcessLineComponent){
+			pkgLine = (ProcessLineComponent)methodPlugin;
+			if (pkgLine != null) {
+				for(Iterator iterator = pkgLine.getChildPackages().iterator(); iterator.hasNext();){
+					EObject varPointsPackageObj = (EObject) iterator.next();
+					if(varPointsPackageObj instanceof VarPointsPackage){
+						VarPointsPackage varPointsPackage = (VarPointsPackage) varPointsPackageObj;
+						if(varPointsPackage.getName().equals(path[0])){
+							newPackage = varPointsPackage;
+						}
+					}
+				}
+			}
+		}
+		return newPackage;
+	}
+	
+	
+	
+	/***
+	 * Método encargado de crear un paquete procesos adaptados
+	 * @param methodPlugin
+	 * @param path
+	 * @param lineProcessName
+	 * @return
+	 */
+	
+	public static MethodPackage createTailoredProcessPackage(MethodPlugin methodPlugin,
+			String[] path, String lineProcessName) {
+		MethodPackage pkgLine = null;
+		MethodPackage newPackage = null;
+		
+		List list = methodPlugin.getMethodPackages();
+		for (int i = 0; i < path.length; i++) {
+			pkgLine = findProcessLinePackage(list, lineProcessName);//Buscamos la linea de proceso
+			//Si no esta creamos el paquete nuevo
+			if (pkgLine != null) {
+
+				Boolean exists = false;
+				for(Iterator iterator = pkgLine.getChildPackages().iterator(); iterator.hasNext();){
+					EObject packetTargetObj = (EObject) iterator.next();
+					if (packetTargetObj !=null){
+						if(packetTargetObj instanceof MethodPackage){
+							MethodPackage packetTarget = (MethodPackage) packetTargetObj;
+							if(packetTarget.getName().equals(path[i])){
+								exists = true;
+								newPackage = packetTarget;
+							}
+						}
+					}
+				}
+				//Si no existe lo creamos
+				if(exists == false){
+					TailoredProcessesPackage pkgTailored = UmaFactory.eINSTANCE.createTailoredProcessesPackage();
+					pkgTailored.setName(path[i]); 
+					pkgLine.getChildPackages().add(pkgTailored);
+					newPackage = pkgTailored;
+				}
+				
+			}
+			list = pkgLine.getChildPackages();
+		}
+		return newPackage;
+	}
+	
+	
+	public static MethodPackage createVarPointsPackage(MethodPlugin methodPlugin,
+			String[] path, String lineProcessName) {
+		
+		MethodPackage pkgLine = null;
+		MethodPackage newPackage = null;
+		
+		List list = methodPlugin.getMethodPackages();
+		for (int i = 0; i < path.length; i++) {
+			pkgLine = findProcessLinePackage(list, lineProcessName);//Buscamos la linea de proceso
+			//Si no esta creamos el paquete nuevo
+			if (pkgLine != null) {
+
+				
+				Boolean exists = false;
+				for(Iterator iterator = pkgLine.getChildPackages().iterator(); iterator.hasNext();){
+					EObject packetTargetObj = (EObject) iterator.next();
+					if (packetTargetObj !=null){
+						if(packetTargetObj instanceof MethodPackage){
+							MethodPackage packetTarget = (MethodPackage) packetTargetObj;
+							if(packetTarget.getName().equals(path[i])){
+								exists = true;
+								newPackage = packetTarget;
+							}
+						}
+					}
+				}
+				//Si no existe lo creamos
+				if(exists == false){
+					VarPointsPackage pkgVarPoints = UmaFactory.eINSTANCE.createVarPointsPackage();
+					pkgVarPoints.setName(path[i]); 
+					pkgLine.getChildPackages().add(pkgVarPoints);
+					newPackage = pkgVarPoints;
+				}
+			}
+			list = pkgLine.getChildPackages();
+		}
+		return newPackage;
+	}
+	
+	
+	
+	/*******************************************/
+	
+	
+	
 	/**
 	 * Gets the parent activity of a breakdown element.
 	 * 
@@ -866,156 +1652,7 @@ public class UmaUtil {
 	public static void main(String[] args) {
 		System.out.println(generateGUID());
 	}
-	
-	public static boolean isSynFree() {
-		IUmaUtilProvider p = getProvider();
-		return p == null ? true : p.isSynFree();
-	}
-	
-	public static boolean isSynFreeLibrary(MethodLibrary lib) {
-		IUmaUtilProvider p = getProvider();
-		return p == null ? true : p.isSynFreeLibrary(lib);
-	}
-	
-	public static boolean isSynFreePlugin(MethodPlugin plugin) {
-		IUmaUtilProvider p = getProvider();
-		return p == null ? true : p.isSynFreePlugin(plugin);
-	}
-	
-	public static boolean isSynFreeProcess(Process proc) {
-		IUmaUtilProvider p = getProvider();
-		return p == null ? true : p.isSynFreeProcess(proc);	
-	}
-	
-	public static void setSynFreeLibrary(MethodLibrary lib, boolean value) {
-		IUmaUtilProvider p = getProvider();
-		if (p == null) {
-			return;
-		}
-		p.setSynFreeLibrary(lib, value);
-	}
-	
-	public static void setSynFreePlugin(MethodPlugin plugin, boolean value) {
-		IUmaUtilProvider p = getProvider();
-		if (p == null) {
-			return;
-		}
-		p.setSynFreePlugin(plugin, value);
-	}
-	
-	public static void setSynFreeProcess(Process proc, boolean value) {
-		IUmaUtilProvider p = getProvider();
-		if (p == null) {
-			return;
-		}
-		p.setSynFreeProcess(proc, value);
-	}
-	
-	public static boolean isInLibrary(MethodElement element) {
-		if (element == null) {
-			return false;
-		}
-		EObject cont = element.eContainer();
-		while (cont instanceof MethodElement) {
-			if (cont instanceof MethodLibrary) {
-				return true;
-			}
-			cont = cont.eContainer();
-		}
-		
-		return false;
-	}
-	
-	public static Set<MethodPackage> getDecendentPackages(MethodPackage pkg) {		
-		Set<MethodPackage> set = new HashSet<MethodPackage>();
-		for (MethodPackage childPkg : pkg.getChildPackages()) {
-			set.add(childPkg);
-			set.addAll(getDecendentPackages(childPkg));
-		}
-		return set;
-	}
-	
-	public static Set<MethodPackage> getAllMethodPackages(MethodPlugin plugin) {
-		Set<MethodPackage> set = new HashSet<MethodPackage>();
-		for (MethodPackage pkg : plugin.getMethodPackages()) {
-			set.add(pkg);
-			set.addAll(getDecendentPackages(pkg));
-		}
-		return set;
-	}
-	
-	public static Process getProcess(MethodElement e) {
-		ProcessComponent procComp = UmaUtil.getProcessComponent(e);
-		if (procComp != null) {
-			org.eclipse.epf.uma.Process proc = procComp.getProcess();
-			return proc;
-		}
-		return null;
-	}
-	
-	public static Scope getScope(Process proc) {
-		if (proc == null || !(proc.getDefaultContext() instanceof Scope)) {
-			return null;
-		}
-		
-		Scope scope = (Scope) proc.getDefaultContext();		
-		return scope;
-	}
-	
-	public static boolean isConfigFree(Process process) {
-		if (getScope(process) != null) {
-			return true;
-		}
-	
-		if (process.getDefaultContext() == null && process
-						.getValidContext().isEmpty()) {
-			return true;
-		}
-		if (! process.getValidContext().isEmpty()) {
-			return process.getValidContext().get(0) instanceof Scope;
-		}
-				
-		return false;
-	}
 
-	public static void dumpUmaTypes() {
-		Set<Class> set = new HashSet<Class>();
-		List<String> types = new ArrayList<String>();
-		for (Method m : UmaFactory.eINSTANCE.getClass().getDeclaredMethods()) {
-			Class cls = m.getReturnType();
-			if (cls != null && set.add(cls)) {
-				types.add(cls.getName());
-			}
-		}
-		Collections.sort(types);
-		for (String type : types) {
-			System.out.println(type);
-		}
-	}
 	
-	public static Set<Resource> getElementResources(Set<? extends MethodElement> elements) {
-		if (elements == null || elements.isEmpty()) {
-			return Collections.EMPTY_SET;
-		}
-		Set<Resource> resources = new HashSet<Resource>();
-		for (MethodElement element : elements) {
-			Resource res = element.eResource();
-			if (res != null) {
-				resources.add(res);
-			}
-		}		
-		return resources;
-	}
-	
-	public static List<String> getResourceFilePaths(Set<Resource> resources) {
-		if (resources == null || resources.isEmpty()) {
-			return Collections.EMPTY_LIST;
-		}
-		List<String> ret = new ArrayList();
-		for (Resource res : resources) {
-			ret.add(res.getURI().toFileString());
-		}
-		return ret;
-	}	
-	
+
 }

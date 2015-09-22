@@ -28,26 +28,28 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.edit.command.CreateChildCommand;
 import org.eclipse.emf.edit.domain.EditingDomain;
+import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
+import org.eclipse.epf.common.serviceability.MsgBox;
 import org.eclipse.epf.library.edit.LibraryEditPlugin;
 import org.eclipse.epf.library.edit.LibraryEditResources;
-import org.eclipse.epf.library.edit.PresentationContext;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
 import org.eclipse.epf.library.edit.command.IUserInteractionHandler;
 import org.eclipse.epf.library.edit.command.MethodElementAddCommand;
 import org.eclipse.epf.library.edit.command.UserInput;
+import org.eclipse.epf.library.edit.navigator.CoreProcessPackageItemProvider;
 import org.eclipse.epf.library.edit.navigator.ProcessPackageItemProvider;
+import org.eclipse.epf.library.edit.navigator.TailoredCoreProcessPackageItemProvider;
+import org.eclipse.epf.library.edit.process.command.CreateCoreProcessComponentCommand.CompareByName;
+import org.eclipse.epf.library.edit.process.command.CreateCoreProcessComponentCommand.ConfigValidator;
 import org.eclipse.epf.library.edit.ui.UserInteractionHelper;
-import org.eclipse.epf.library.edit.uma.ScopeFactory;
-import org.eclipse.epf.library.edit.util.AdapterFactoryItemLabelProvider;
 import org.eclipse.epf.library.edit.util.ExtensionManager;
-import org.eclipse.epf.library.edit.util.ItemLabelProvider;
-import org.eclipse.epf.library.edit.util.ProcessScopeUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.edit.validation.IValidator;
 import org.eclipse.epf.library.edit.validation.IValidatorFactory;
 import org.eclipse.epf.services.ILibraryPersister;
 import org.eclipse.epf.services.Services;
 import org.eclipse.epf.uma.CapabilityPattern;
+import org.eclipse.epf.uma.CoreProcessPackage;
 import org.eclipse.epf.uma.DeliveryProcess;
 import org.eclipse.epf.uma.Element;
 import org.eclipse.epf.uma.MethodConfiguration;
@@ -59,13 +61,15 @@ import org.eclipse.epf.uma.Process;
 import org.eclipse.epf.uma.ProcessComponent;
 import org.eclipse.epf.uma.ProcessFamily;
 import org.eclipse.epf.uma.ProcessPlanningTemplate;
+import org.eclipse.epf.uma.TailoredCoreProcessPackage;
 import org.eclipse.epf.uma.UmaFactory;
 import org.eclipse.epf.uma.UmaPackage;
 import org.eclipse.epf.uma.util.ContentDescriptionFactory;
 import org.eclipse.epf.uma.util.MessageException;
-import org.eclipse.epf.uma.util.Scope;
 import org.eclipse.epf.uma.util.UmaUtil;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.widgets.Shell;
 
 
 /**
@@ -91,14 +95,8 @@ public class CreateProcessComponentCommand extends CreateChildCommand {
 	public static class CompareByName implements Comparator<MethodElement> {
 
 		public int compare(MethodElement obj1, MethodElement obj2) {
-			String name1, name2;
-			if (PresentationContext.INSTANCE.isShowPresentationNames()) {
-				name1 = TngUtil.getPresentationName(obj1);
-				name2 = TngUtil.getPresentationName(obj2);
-			} else {
-				name1 = ((MethodElement) obj1).getName();
-				name2 = ((MethodElement) obj2).getName();		
-			}
+			String name1 = ((MethodElement) obj1).getName();
+			String name2 = ((MethodElement) obj2).getName();
 			return name1.compareToIgnoreCase(name2);
 		}
 	}
@@ -132,238 +130,622 @@ public class CreateProcessComponentCommand extends CreateChildCommand {
 	}
 
 	public void execute() {
-		MethodLibrary lib = UmaUtil.getMethodLibrary(owner);
-		
-		Object shell = LibraryEditPlugin.getDefault().getContext();
-		
-		// The owner must be updatable.
-		//
-		status = UserInteractionHelper.checkModify(owner, shell);
-		if (!status.isOK()) {
-			return;
-		}
-
-		List configs = lib.getPredefinedConfigurations();
-		List methodConfigs = new ArrayList();
-		
-		Scope scope = ScopeFactory.getInstance().newProcessScope(null);
-		methodConfigs.add(scope);
-		
-		for (Iterator iter = configs.iterator(); iter.hasNext();) {
-			Object element = iter.next();
-			if (!(element instanceof ProcessFamily)) {
-				methodConfigs.add(element);
-			}
-		}
-
-		if (methodConfigs.isEmpty()) {
-			status = new Status(IStatus.ERROR, LibraryEditPlugin.getDefault().getId(),
-								0, LibraryEditResources.noConfigError_msg, null);
-//			Messenger.INSTANCE.showError(
-//					LibraryEditResources.createProcess_text,
-//					LibraryEditResources.noConfigError_msg);			
-			return;
-		}
-
-		ProcessPackageItemProvider adapter = (ProcessPackageItemProvider) helper;
-
-		ArrayList procClasses = new ArrayList();
-		if (adapter.getProcessType() == UmaPackage.eINSTANCE
-				.getProcessPlanningTemplate()) {
-			procClasses.add(DeliveryProcess.class);
-			procClasses.add(CapabilityPattern.class);
-		}
-		MethodPlugin plugin = UmaUtil.getMethodPlugin((Element) owner);		
-		List baseProcList = TngUtil.getAvailableBaseProcesses(plugin,
-				procClasses);
-
-		// sort by name
-		Collections.sort(methodConfigs, new CompareByName());
-
-		MethodConfiguration[] procCtxs = new MethodConfiguration[methodConfigs
-				.size()];
-		methodConfigs.toArray(procCtxs);
-
-		Process[] baseProcesses = new Process[baseProcList.size()];
-		baseProcList.toArray(baseProcesses);
-
-		final ProcessComponent procComp = (ProcessComponent) child;
-		EClass procType = adapter.getProcessType();
-		procComp.setProcess((Process) UmaFactory.eINSTANCE.create(procType));
-		
-		IUserInteractionHandler uiHandler = ExtensionManager.getDefaultUserInteractionHandler();
-		List userInputs = new ArrayList();
-		IValidator nameValidator = IValidatorFactory.INSTANCE.createNameValidator(
-				owner, procComp);
-		// name
-		UserInput nameInput = new UserInput(LibraryEditResources.nameLabel_text, UserInput.TEXT,
-				false, null, null, nameValidator, null);
-		userInputs.add(nameInput);
-		
-		// default configuration
-		//
-		UserInput defaultConfigInput = new UserInput(LibraryEditResources.defaultConfigLabel_text, UserInput.SELECTION,
-				false, methodConfigs, new ItemLabelProvider() {
-			public String getText(Object element) {
-				if (element instanceof MethodElement) {
-					if (PresentationContext.INSTANCE.isShowPresentationNames())
-						return TngUtil.getPresentationName(element);
-					else return ((MethodElement) element).getName();
-				} else {
-					return element.toString();
-				}
-			}
-		}, new ConfigValidator(), null);
-		userInputs.add(defaultConfigInput);
-		// base process
-		UserInput baseProcInput = null;
-		
-		if(procComp.getProcess() instanceof ProcessPlanningTemplate) {
-			baseProcInput = new UserInput(LibraryEditResources.basedOnProcessesLabel_text, UserInput.SELECTION,
-					true, baseProcList, new AdapterFactoryItemLabelProvider(TngAdapterFactory.INSTANCE
-							.getNavigatorView_ComposedAdapterFactory()),  null);
-			userInputs.add(baseProcInput);
-		}
-		
-		boolean canExecute = false;
-		
-//		String msg = NLS.bind(LibraryEditResources.CreateProcessComponentCommand_Message, 
-//				TngUtil.getTypeText(procType.getName()).toLowerCase());
-		
-		String msg = ""; //$NON-NLS-1$
-		if (procType.getName().equals("DeliveryProcess")) { //$NON-NLS-1$
-			msg = NLS.bind(LibraryEditResources.CreateProcessComponentCommand_Message,
-					LibraryEditResources.DeliveryProcessLabel);
-		} else if (procType.getName().equals("CapabilityPattern")) { //$NON-NLS-1$
-			msg = NLS.bind(LibraryEditResources.CreateProcessComponentCommand_Message,
-					LibraryEditResources.CapabilityPatternLabel);
-		}		
-		
-		// request input
-		if (uiHandler.requestInput(LibraryEditResources.newProcessComponentDialog_title, 
-				msg, userInputs)) {
-			String name = (String) nameInput.getInput();
-			procComp.setName(name);
-			process = procComp.getProcess();
-			process.setName(name);
-			process.setPresentationName(name);
-			process.setDefaultContext((MethodConfiguration) defaultConfigInput.getInput());
-			if(baseProcInput != null) {
-				List list = (List) baseProcInput.getInput();
-				if(!list.isEmpty()) {
-					((ProcessPlanningTemplate)procComp).getBasedOnProcesses().addAll(list);
-				}
-			}
-			canExecute = true;
-		}
-
-		if (canExecute) {
-			// create process component need to update the configuration that
-			// has been selected as
-			// default context of its process. Check if the configuration file
-			// is updatable
+		if(owner instanceof CoreProcessPackage){
+			
+			MethodLibrary lib = UmaUtil.getMethodLibrary(owner);
+			
+			Shell shell = MsgBox.getDefaultShell();
+			
+			// The owner must be updatable.
 			//
-			status = UserInteractionHelper.checkModify(procComp.getProcess()
-					.getDefaultContext(), shell);
+			status = UserInteractionHelper.checkModify(owner, shell);
 			if (!status.isOK()) {
 				return;
 			}
-			
-			super.execute();
 
-			Command cmd = getCommand();
-			if (cmd instanceof MethodElementAddCommand) {
-				IStatus status = ((MethodElementAddCommand) cmd).getStatus();
-				if (status != null && !status.isOK()) {
-					this.status = status;
-					return;
+			List configs = lib.getPredefinedConfigurations();
+			List methodConfigs = new ArrayList();
+			for (Iterator iter = configs.iterator(); iter.hasNext();) {
+				Object element = iter.next();
+				if (!(element instanceof ProcessFamily)) {
+					methodConfigs.add(element);
 				}
 			}
 
-			final MethodConfiguration procCtx = process.getDefaultContext();
-			
-			// need to add the parent packages and plugin into the configuration
-			// as well
-			// New process in new plug-in not automatically visible in
-			// configuration view
-			List pkgs = procCtx.getMethodPackageSelection();
-			for (EObject obj = procComp; obj != null; obj = obj.eContainer()) {
-				if (obj instanceof MethodPackage) {
-					pkgs.add(obj);
-				}
+			if (methodConfigs.isEmpty()) {
+				status = new Status(IStatus.ERROR, LibraryEditPlugin.getDefault().getId(),
+									0, LibraryEditResources.noConfigError_msg, null);
+//				Messenger.INSTANCE.showError(
+//						LibraryEditResources.createProcess_text,
+//						LibraryEditResources.noConfigError_msg);			
+				return;
 			}
-			procCtx.getMethodPluginSelection().add(plugin);
-			
-			process.getValidContext().add(procCtx);
-			
-			Scope processScope = ProcessScopeUtil.getInstance().getScope(process);
-			if (processScope != null) {
-				process.setDefaultContext(null);
-				process.getValidContext().clear();
+
+			CoreProcessPackageItemProvider adapter = (CoreProcessPackageItemProvider) helper;
+
+			ArrayList procClasses = new ArrayList();
+			if (adapter.getProcessType() == UmaPackage.eINSTANCE
+					.getProcessPlanningTemplate()) {
+				procClasses.add(DeliveryProcess.class);
+				procClasses.add(CapabilityPattern.class);
 			}
+			MethodPlugin plugin = UmaUtil.getMethodPlugin((Element) owner);		
+			List baseProcList = TngUtil.getAvailableBaseProcesses(plugin,
+					procClasses);
+
+			// sort by name
+			Collections.sort(methodConfigs, new CompareByName());
+
+			MethodConfiguration[] procCtxs = new MethodConfiguration[methodConfigs
+					.size()];
+			methodConfigs.toArray(procCtxs);
+
+			Process[] baseProcesses = new Process[baseProcList.size()];
+			baseProcList.toArray(baseProcesses);
+
+			final ProcessComponent procComp = (ProcessComponent) child;
+			EClass procType = adapter.getProcessType();
+			procComp.setProcess((Process) UmaFactory.eINSTANCE.create(procType));
 			
-			process.setPresentation(ContentDescriptionFactory
-					.createContentDescription(process));
-
-			Runnable runnable = new Runnable() {
-				public void run() {
-					// save the resource of parent ProcessPackage
-					Resource resource = ((EObject) owner).eResource();
-					if (resource != null) {
-						ILibraryPersister.FailSafeMethodLibraryPersister persister = Services.getDefaultLibraryPersister()
-								.getFailSafePersister();
-						try {
-							// save the resource of newly created
-							// ProcessComponent again after creating process's
-							// presentation
-							persister.save(procComp.eResource());
-
-							persister.save(resource);
-
-							// save the resource of the process's default
-							// context
-							persister.save(procCtx.eResource());
-
-							persister.commit();
-							
-							// create new diagram file
-							//
-							
-						} catch (Exception e) {
-							try {
-								persister.rollback();
-							} catch (Exception ex) {
-								LibraryEditPlugin.INSTANCE.log(ex);
-								LibraryEditPlugin.INSTANCE.log(e);
-							}
-							
-							status = Status.CANCEL_STATUS;
-							throw new MessageException(
-									NLS
-											.bind(
-													LibraryEditResources.saveProcessError_reason,
-													procComp.getName()), e);
-						}
+			IUserInteractionHandler uiHandler = ExtensionManager.getDefaultUserInteractionHandler();
+			List userInputs = new ArrayList();
+			IValidator nameValidator = IValidatorFactory.INSTANCE.createNameValidator(
+					owner, procComp);
+			// name
+			UserInput nameInput = new UserInput(LibraryEditResources.nameLabel_text, UserInput.TEXT,
+					false, null, null, nameValidator, null);
+			userInputs.add(nameInput);
+			
+			// default configuration
+			//
+			UserInput defaultConfigInput = new UserInput(LibraryEditResources.defaultConfigLabel_text, UserInput.SELECTION,
+					false, methodConfigs, new LabelProvider() {
+				public String getText(Object element) {
+					if (element instanceof MethodElement) {
+						return ((MethodElement) element).getName();
+					} else {
+						return element.toString();
 					}
 				}
-			};
-
-			UserInteractionHelper
-					.runWithProgress(
-							runnable,
-							MessageFormat
-									.format(
-											LibraryEditResources.creatingProcessComponentTask_name,
-											new Object[] { procComp.getName() }));
+			}, new ConfigValidator(), null);
+			userInputs.add(defaultConfigInput);
+			// base process
+			UserInput baseProcInput = null;
 			
-			if (processScope != null) {
-				process.setDefaultContext(processScope);
-				process.getValidContext().add(processScope);
-				ProcessScopeUtil.getInstance().addReferenceToScope(
-						processScope, process, new HashSet<MethodElement>());
+			if(procComp.getProcess() instanceof ProcessPlanningTemplate) {
+				baseProcInput = new UserInput(LibraryEditResources.basedOnProcessesLabel_text, UserInput.SELECTION,
+						true, baseProcList, new AdapterFactoryLabelProvider(TngAdapterFactory.INSTANCE
+								.getNavigatorView_ComposedAdapterFactory()),  null);
+				userInputs.add(baseProcInput);
 			}
 			
+			boolean canExecute = false;
+			String msg = NLS.bind(LibraryEditResources.CreateProcessComponentCommand_Message, 
+					TngUtil.getTypeText(procType.getName()).toLowerCase());
+			
+			// request input - Monta la interfaz
+			if (uiHandler.requestInput(LibraryEditResources.newProcessComponentDialog_title, 
+					msg, userInputs)) {
+				String name = (String) nameInput.getInput();
+				procComp.setName(name);
+				process = procComp.getProcess();
+				process.setName(name);
+				process.setPresentationName(name);
+				process.setDefaultContext((MethodConfiguration) defaultConfigInput.getInput());
+				process.setProcessLineName(adapter.getProcessLineOwner());//Le doy el nombre de la linea de proceso
+				if(baseProcInput != null) {
+					List list = (List) baseProcInput.getInput();
+					if(!list.isEmpty()) {
+						((ProcessPlanningTemplate)procComp).getBasedOnProcesses().addAll(list);
+					}
+				}
+				canExecute = true;
+			}
+
+			if (canExecute) {
+				// create process component need to update the configuration that
+				// has been selected as
+				// default context of its process. Check if the configuration file
+				// is updatable
+				//
+				status = UserInteractionHelper.checkModify(procComp.getProcess()
+						.getDefaultContext(), shell);
+				if (!status.isOK()) {
+					return;
+				}
+				
+				super.execute();
+
+				Command cmd = getCommand();
+				if (cmd instanceof MethodElementAddCommand) {
+					IStatus status = ((MethodElementAddCommand) cmd).getStatus();
+					if (status != null && !status.isOK()) {
+						this.status = status;
+						return;
+					}
+				}
+
+				final MethodConfiguration procCtx = process.getDefaultContext();
+				
+				// need to add the parent packages and plugin into the configuration
+				// as well
+				// New process in new plug-in not automatically visible in
+				// configuration view
+				List pkgs = procCtx.getMethodPackageSelection();
+				for (EObject obj = procComp; obj != null; obj = obj.eContainer()) {
+					if (obj instanceof MethodPackage) {
+						pkgs.add(obj);
+					}
+				}
+				procCtx.getMethodPluginSelection().add(plugin);
+				
+				process.getValidContext().add(procCtx);
+				process.setPresentation(ContentDescriptionFactory
+						.createContentDescription(process));
+
+				Runnable runnable = new Runnable() {
+					public void run() {
+						// save the resource of parent CoreProcessPackage
+						Resource resource = ((EObject) owner).eResource();
+						if (resource != null) {
+							ILibraryPersister.FailSafeMethodLibraryPersister persister = Services.getDefaultLibraryPersister()
+									.getFailSafePersister();
+							try {
+								// save the resource of newly created
+								// ProcessComponent again after creating process's
+								// presentation
+								persister.save(procComp.eResource());
+
+								persister.save(resource);
+
+								// save the resource of the process's default
+								// context
+								persister.save(procCtx.eResource());
+
+								persister.commit();
+								
+								// create new diagram file
+								//
+								
+							} catch (Exception e) {
+								try {
+									persister.rollback();
+								} catch (Exception ex) {
+									LibraryEditPlugin.INSTANCE.log(ex);
+									LibraryEditPlugin.INSTANCE.log(e);
+								}
+								
+								status = Status.CANCEL_STATUS;
+								throw new MessageException(
+										NLS
+												.bind(
+														LibraryEditResources.saveProcessError_reason,
+														procComp.getName()), e);
+							}
+						}
+					}
+				};
+
+				UserInteractionHelper
+						.runWithProgress(
+								runnable,
+								MessageFormat
+										.format(
+												LibraryEditResources.creatingProcessComponentTask_name,
+												new Object[] { procComp.getName() })); 
+			}
+			
+			
+			
 		}
+		else if(owner instanceof TailoredCoreProcessPackage){
+			MethodLibrary lib = UmaUtil.getMethodLibrary(owner);
+			
+			Shell shell = MsgBox.getDefaultShell();
+			
+			// The owner must be updatable.
+			//
+			status = UserInteractionHelper.checkModify(owner, shell);
+			if (!status.isOK()) {
+				return;
+			}
+
+			List configs = lib.getPredefinedConfigurations();
+			List methodConfigs = new ArrayList();
+			for (Iterator iter = configs.iterator(); iter.hasNext();) {
+				Object element = iter.next();
+				if (!(element instanceof ProcessFamily)) {
+					methodConfigs.add(element);
+				}
+			}
+
+			if (methodConfigs.isEmpty()) {
+				status = new Status(IStatus.ERROR, LibraryEditPlugin.getDefault().getId(),
+									0, LibraryEditResources.noConfigError_msg, null);
+//				Messenger.INSTANCE.showError(
+//						LibraryEditResources.createProcess_text,
+//						LibraryEditResources.noConfigError_msg);			
+				return;
+			}
+
+			TailoredCoreProcessPackageItemProvider adapter = (TailoredCoreProcessPackageItemProvider) helper;
+
+			ArrayList procClasses = new ArrayList();
+			if (adapter.getProcessType() == UmaPackage.eINSTANCE
+					.getProcessPlanningTemplate()) {
+				procClasses.add(DeliveryProcess.class);
+				procClasses.add(CapabilityPattern.class);
+			}
+			MethodPlugin plugin = UmaUtil.getMethodPlugin((Element) owner);		
+			List baseProcList = TngUtil.getAvailableBaseProcesses(plugin,
+					procClasses);
+
+			// sort by name
+			Collections.sort(methodConfigs, new CompareByName());
+
+			MethodConfiguration[] procCtxs = new MethodConfiguration[methodConfigs
+					.size()];
+			methodConfigs.toArray(procCtxs);
+
+			Process[] baseProcesses = new Process[baseProcList.size()];
+			baseProcList.toArray(baseProcesses);
+
+			final ProcessComponent procComp = (ProcessComponent) child;
+			EClass procType = adapter.getProcessType();
+			procComp.setProcess((Process) UmaFactory.eINSTANCE.create(procType));
+			
+			IUserInteractionHandler uiHandler = ExtensionManager.getDefaultUserInteractionHandler();
+			List userInputs = new ArrayList();
+			IValidator nameValidator = IValidatorFactory.INSTANCE.createNameValidator(
+					owner, procComp);
+			// name
+			UserInput nameInput = new UserInput(LibraryEditResources.nameLabel_text, UserInput.TEXT,
+					false, null, null, nameValidator, null);
+			userInputs.add(nameInput);
+			
+			// default configuration
+			//
+			UserInput defaultConfigInput = new UserInput(LibraryEditResources.defaultConfigLabel_text, UserInput.SELECTION,
+					false, methodConfigs, new LabelProvider() {
+				public String getText(Object element) {
+					if (element instanceof MethodElement) {
+						return ((MethodElement) element).getName();
+					} else {
+						return element.toString();
+					}
+				}
+			}, new ConfigValidator(), null);
+			userInputs.add(defaultConfigInput);
+			// base process
+			UserInput baseProcInput = null;
+			
+			if(procComp.getProcess() instanceof ProcessPlanningTemplate) {
+				baseProcInput = new UserInput(LibraryEditResources.basedOnProcessesLabel_text, UserInput.SELECTION,
+						true, baseProcList, new AdapterFactoryLabelProvider(TngAdapterFactory.INSTANCE
+								.getNavigatorView_ComposedAdapterFactory()),  null);
+				userInputs.add(baseProcInput);
+			}
+			
+			boolean canExecute = false;
+			String msg = NLS.bind(LibraryEditResources.CreateProcessComponentCommand_Message, 
+					TngUtil.getTypeText(procType.getName()).toLowerCase());
+			
+			// request input - Monta la interfaz
+			if (uiHandler.requestInput(LibraryEditResources.newProcessComponentDialog_title, 
+					msg, userInputs)) {
+				String name = (String) nameInput.getInput();
+				procComp.setName(name);
+				process = procComp.getProcess();
+				process.setName(name);
+				process.setPresentationName(name);
+				process.setDefaultContext((MethodConfiguration) defaultConfigInput.getInput());
+				process.setProcessLineName(adapter.getProcessLineOwner());//Le doy el nombre de la linea de proceso
+				process.setTailoredProcessName(adapter.getTailoredProcessOwner());//Le doy el nombre del proceso adaptado
+				if(baseProcInput != null) {
+					List list = (List) baseProcInput.getInput();
+					if(!list.isEmpty()) {
+						((ProcessPlanningTemplate)procComp).getBasedOnProcesses().addAll(list);
+					}
+				}
+				canExecute = true;
+			}
+
+			if (canExecute) {
+				// create process component need to update the configuration that
+				// has been selected as
+				// default context of its process. Check if the configuration file
+				// is updatable
+				//
+				status = UserInteractionHelper.checkModify(procComp.getProcess()
+						.getDefaultContext(), shell);
+				if (!status.isOK()) {
+					return;
+				}
+				
+				super.execute();
+
+				Command cmd = getCommand();
+				if (cmd instanceof MethodElementAddCommand) {
+					IStatus status = ((MethodElementAddCommand) cmd).getStatus();
+					if (status != null && !status.isOK()) {
+						this.status = status;
+						return;
+					}
+				}
+
+				final MethodConfiguration procCtx = process.getDefaultContext();
+				
+				// need to add the parent packages and plugin into the configuration
+				// as well
+				// New process in new plug-in not automatically visible in
+				// configuration view
+				List pkgs = procCtx.getMethodPackageSelection();
+				for (EObject obj = procComp; obj != null; obj = obj.eContainer()) {
+					if (obj instanceof MethodPackage) {
+						pkgs.add(obj);
+					}
+				}
+				procCtx.getMethodPluginSelection().add(plugin);
+				
+				process.getValidContext().add(procCtx);
+				process.setPresentation(ContentDescriptionFactory
+						.createContentDescription(process));
+
+				Runnable runnable = new Runnable() {
+					public void run() {
+						// save the resource of parent CoreProcessPackage
+						Resource resource = ((EObject) owner).eResource();
+						if (resource != null) {
+							ILibraryPersister.FailSafeMethodLibraryPersister persister = Services.getDefaultLibraryPersister()
+									.getFailSafePersister();
+							try {
+								// save the resource of newly created
+								// ProcessComponent again after creating process's
+								// presentation
+								persister.save(procComp.eResource());
+
+								persister.save(resource);
+
+								// save the resource of the process's default
+								// context
+								persister.save(procCtx.eResource());
+
+								persister.commit();
+								
+								// create new diagram file
+								//
+								
+							} catch (Exception e) {
+								try {
+									persister.rollback();
+								} catch (Exception ex) {
+									LibraryEditPlugin.INSTANCE.log(ex);
+									LibraryEditPlugin.INSTANCE.log(e);
+								}
+								
+								status = Status.CANCEL_STATUS;
+								throw new MessageException(
+										NLS
+												.bind(
+														LibraryEditResources.saveProcessError_reason,
+														procComp.getName()), e);
+							}
+						}
+					}
+				};
+
+				UserInteractionHelper
+						.runWithProgress(
+								runnable,
+								MessageFormat
+										.format(
+												LibraryEditResources.creatingProcessComponentTask_name,
+												new Object[] { procComp.getName() })); 
+			}
+		}
+		else{
+				MethodLibrary lib = UmaUtil.getMethodLibrary(owner);
+				
+				Shell shell = MsgBox.getDefaultShell();
+				
+				// The owner must be updatable.
+				//
+				status = UserInteractionHelper.checkModify(owner, shell);
+				if (!status.isOK()) {
+					return;
+				}
+		
+				List configs = lib.getPredefinedConfigurations();
+				List methodConfigs = new ArrayList();
+				for (Iterator iter = configs.iterator(); iter.hasNext();) {
+					Object element = iter.next();
+					if (!(element instanceof ProcessFamily)) {
+						methodConfigs.add(element);
+					}
+				}
+		
+				if (methodConfigs.isEmpty()) {
+					status = new Status(IStatus.ERROR, LibraryEditPlugin.getDefault().getId(),
+										0, LibraryEditResources.noConfigError_msg, null);
+		//			Messenger.INSTANCE.showError(
+		//					LibraryEditResources.createProcess_text,
+		//					LibraryEditResources.noConfigError_msg);			
+					return;
+				}
+		
+				ProcessPackageItemProvider adapter = (ProcessPackageItemProvider) helper;
+		
+				ArrayList procClasses = new ArrayList();
+				if (adapter.getProcessType() == UmaPackage.eINSTANCE
+						.getProcessPlanningTemplate()) {
+					procClasses.add(DeliveryProcess.class);
+					procClasses.add(CapabilityPattern.class);
+				}
+				MethodPlugin plugin = UmaUtil.getMethodPlugin((Element) owner);		
+				List baseProcList = TngUtil.getAvailableBaseProcesses(plugin,
+						procClasses);
+		
+				// sort by name
+				Collections.sort(methodConfigs, new CompareByName());
+		
+				MethodConfiguration[] procCtxs = new MethodConfiguration[methodConfigs
+						.size()];
+				methodConfigs.toArray(procCtxs);
+		
+				Process[] baseProcesses = new Process[baseProcList.size()];
+				baseProcList.toArray(baseProcesses);
+		
+				final ProcessComponent procComp = (ProcessComponent) child;
+				EClass procType = adapter.getProcessType();
+				procComp.setProcess((Process) UmaFactory.eINSTANCE.create(procType));
+				
+				IUserInteractionHandler uiHandler = ExtensionManager.getDefaultUserInteractionHandler();
+				List userInputs = new ArrayList();
+				IValidator nameValidator = IValidatorFactory.INSTANCE.createNameValidator(
+						owner, procComp);
+				// name
+				UserInput nameInput = new UserInput(LibraryEditResources.nameLabel_text, UserInput.TEXT,
+						false, null, null, nameValidator, null);
+				userInputs.add(nameInput);
+				
+				// default configuration
+				//
+				UserInput defaultConfigInput = new UserInput(LibraryEditResources.defaultConfigLabel_text, UserInput.SELECTION,
+						false, methodConfigs, new LabelProvider() {
+					public String getText(Object element) {
+						if (element instanceof MethodElement) {
+							return ((MethodElement) element).getName();
+						} else {
+							return element.toString();
+						}
+					}
+				}, new ConfigValidator(), null);
+				userInputs.add(defaultConfigInput);
+				// base process
+				UserInput baseProcInput = null;
+				
+				if(procComp.getProcess() instanceof ProcessPlanningTemplate) {
+					baseProcInput = new UserInput(LibraryEditResources.basedOnProcessesLabel_text, UserInput.SELECTION,
+							true, baseProcList, new AdapterFactoryLabelProvider(TngAdapterFactory.INSTANCE
+									.getNavigatorView_ComposedAdapterFactory()),  null);
+					userInputs.add(baseProcInput);
+				}
+				
+				boolean canExecute = false;
+				String msg = NLS.bind(LibraryEditResources.CreateProcessComponentCommand_Message, 
+						TngUtil.getTypeText(procType.getName()).toLowerCase());
+				
+				// request input - Monta la interfaz
+				if (uiHandler.requestInput(LibraryEditResources.newProcessComponentDialog_title, 
+						msg, userInputs)) {
+					String name = (String) nameInput.getInput();
+					procComp.setName(name);
+					process = procComp.getProcess();
+					process.setName(name);
+					process.setPresentationName(name);
+					process.setDefaultContext((MethodConfiguration) defaultConfigInput.getInput());
+					if(baseProcInput != null) {
+						List list = (List) baseProcInput.getInput();
+						if(!list.isEmpty()) {
+							((ProcessPlanningTemplate)procComp).getBasedOnProcesses().addAll(list);
+						}
+					}
+					canExecute = true;
+				}
+		
+				if (canExecute) {
+					// create process component need to update the configuration that
+					// has been selected as
+					// default context of its process. Check if the configuration file
+					// is updatable
+					//
+					status = UserInteractionHelper.checkModify(procComp.getProcess()
+							.getDefaultContext(), shell);
+					if (!status.isOK()) {
+						return;
+					}
+					
+					super.execute();
+		
+					Command cmd = getCommand();
+					if (cmd instanceof MethodElementAddCommand) {
+						IStatus status = ((MethodElementAddCommand) cmd).getStatus();
+						if (status != null && !status.isOK()) {
+							this.status = status;
+							return;
+						}
+					}
+		
+					final MethodConfiguration procCtx = process.getDefaultContext();
+					
+					// need to add the parent packages and plugin into the configuration
+					// as well
+					// New process in new plug-in not automatically visible in
+					// configuration view
+					List pkgs = procCtx.getMethodPackageSelection();
+					for (EObject obj = procComp; obj != null; obj = obj.eContainer()) {
+						if (obj instanceof MethodPackage) {
+							pkgs.add(obj);
+						}
+					}
+					procCtx.getMethodPluginSelection().add(plugin);
+					
+					process.getValidContext().add(procCtx);
+					process.setPresentation(ContentDescriptionFactory
+							.createContentDescription(process));
+		
+					Runnable runnable = new Runnable() {
+						public void run() {
+							// save the resource of parent ProcessPackage
+							Resource resource = ((EObject) owner).eResource();
+							if (resource != null) {
+								ILibraryPersister.FailSafeMethodLibraryPersister persister = Services.getDefaultLibraryPersister()
+										.getFailSafePersister();
+								try {
+									// save the resource of newly created
+									// ProcessComponent again after creating process's
+									// presentation
+									persister.save(procComp.eResource());
+		
+									persister.save(resource);
+		
+									// save the resource of the process's default
+									// context
+									persister.save(procCtx.eResource());
+		
+									persister.commit();
+									
+									// create new diagram file
+									//
+									
+								} catch (Exception e) {
+									try {
+										persister.rollback();
+									} catch (Exception ex) {
+										LibraryEditPlugin.INSTANCE.log(ex);
+										LibraryEditPlugin.INSTANCE.log(e);
+									}
+									
+									status = Status.CANCEL_STATUS;
+									throw new MessageException(
+											NLS
+													.bind(
+															LibraryEditResources.saveProcessError_reason,
+															procComp.getName()), e);
+								}
+							}
+						}
+					};
+		
+					UserInteractionHelper
+							.runWithProgress(
+									runnable,
+									MessageFormat
+											.format(
+													LibraryEditResources.creatingProcessComponentTask_name,
+													new Object[] { procComp.getName() })); 
+				}
+		}		
 	}
 
 	public void redo() {

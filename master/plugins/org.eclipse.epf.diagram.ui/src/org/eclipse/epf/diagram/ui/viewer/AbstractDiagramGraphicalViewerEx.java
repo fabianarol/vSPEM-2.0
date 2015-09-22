@@ -45,15 +45,11 @@ import org.eclipse.epf.diagram.ui.DiagramUIPlugin;
 import org.eclipse.epf.diagram.ui.service.DiagramImageService;
 import org.eclipse.epf.library.configuration.ProcessConfigurator;
 import org.eclipse.epf.library.edit.IFilter;
-import org.eclipse.epf.library.edit.util.DescriptorPropUtil;
-import org.eclipse.epf.library.edit.util.LibraryEditUtil;
-import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.library.edit.util.Suppression;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.layout.diagram.DiagramInfo;
 import org.eclipse.epf.library.util.ResourceHelper;
 import org.eclipse.epf.uma.Activity;
-import org.eclipse.epf.uma.Descriptor;
 import org.eclipse.epf.uma.DiagramElement;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodElement;
@@ -154,11 +150,9 @@ public abstract class AbstractDiagramGraphicalViewerEx extends
 				for (Iterator<?> iterator = editPart.getChildren().iterator(); iterator.hasNext();) {
 					EditPart name = (EditPart) iterator.next();
 					View view = (View)name.getModel();
-					if (debug) {
-						System.out.println(view.getType() +":" + ViewUtil.getStructuralFeatureValue(view,		//$NON-NLS-1$
-								NotationPackage.eINSTANCE.getLocation_X()) + "," + ViewUtil.getStructuralFeatureValue(view,		//$NON-NLS-1$
+					System.out.println(view.getType() +":" + ViewUtil.getStructuralFeatureValue(view,
+						NotationPackage.eINSTANCE.getLocation_X()) + "," + ViewUtil.getStructuralFeatureValue(view,
 								NotationPackage.eINSTANCE.getLocation_Y()));
-					}
 				}
 			}
 		}
@@ -400,8 +394,6 @@ public abstract class AbstractDiagramGraphicalViewerEx extends
 					if (f instanceof WrapLabel) {
 						altTag = ((WrapLabel) f).getText();
 					}
-					
-					e = getElementForAddArea((MethodElement) e);
 					diagramInfo.addArea((MethodElement) e, bounds.x, bounds.y,
 							bounds.width, bounds.height, altTag, suppressed);
 
@@ -409,21 +401,6 @@ public abstract class AbstractDiagramGraphicalViewerEx extends
 			} else {
 			}
 		}
-	}
-	
-	
-	protected MethodElement getElementForAddArea(MethodElement e) {
-		if (DescriptorPropUtil.useLinkedElementInDiagram && e instanceof Descriptor) {
-			MethodElement e1 = ProcessUtil.getAssociatedElement((Descriptor) e);
-			if (e1 != null) {
-				e1 = LibraryEditUtil.getInstance().getCalcualtedElement(e1, getMethodConfiguration());
-				if (e1 != null) {
-					return e1;
-				}
-			}
-		}
-		
-		return e;
 	}
 	
 	@Override
@@ -463,7 +440,7 @@ public abstract class AbstractDiagramGraphicalViewerEx extends
 					(org.eclipse.epf.diagram.model.Diagram) model.getElement();
 				d.setSuppression(sup);
 				if(filter == null && configuration != null){
-					ProcessConfigurator p = new ProcessConfigurator(config);
+					ProcessConfigurator p = new ProcessConfigurator(config, null);
 					d.setFilter(p);
 				}else{
 					d.setFilter(filter);

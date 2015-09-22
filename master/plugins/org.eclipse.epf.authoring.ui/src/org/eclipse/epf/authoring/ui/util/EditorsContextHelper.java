@@ -12,14 +12,11 @@ package org.eclipse.epf.authoring.ui.util;
 
 import org.eclipse.epf.authoring.ui.AuthoringUIHelpContexts;
 import org.eclipse.epf.library.util.LibraryUtil;
-import org.eclipse.epf.uma.ContentPackage;
 import org.eclipse.epf.uma.CustomCategory;
 import org.eclipse.epf.uma.Discipline;
 import org.eclipse.epf.uma.DisciplineGrouping;
 import org.eclipse.epf.uma.Domain;
 import org.eclipse.epf.uma.Guidance;
-import org.eclipse.epf.uma.MethodConfiguration;
-import org.eclipse.epf.uma.MethodPlugin;
 import org.eclipse.epf.uma.Role;
 import org.eclipse.epf.uma.RoleSet;
 import org.eclipse.epf.uma.RoleSetGrouping;
@@ -130,22 +127,6 @@ public class EditorsContextHelper {
 							AuthoringUIHelpContexts.EDITOR_CUSTOM_CATEGORY_CONTEXT_HELP_ID);
 			return;
 		}
-		if ((obj instanceof MethodPlugin)) {
-			PlatformUI.getWorkbench().getHelpSystem().setHelp(uiComposite,
-					AuthoringUIHelpContexts.PLUGIN_EDITOR_DESCRIPTION_ALL_CONTEXT);
-			return;
-		}
-		if (obj instanceof ContentPackage) {
-			PlatformUI.getWorkbench().getHelpSystem().setHelp(uiComposite,
-					AuthoringUIHelpContexts.CONTENT_PACKAGE_EDITOR_ALL_CONTEXT);
-			return;
-		}
-		if (obj instanceof MethodConfiguration) {
-			PlatformUI.getWorkbench().getHelpSystem().setHelp(uiComposite,
-					AuthoringUIHelpContexts.CONFIGURATION_EDITOR_ALL_CONTEXT);
-			return;
-		}
-		
 	}
 
 	/**

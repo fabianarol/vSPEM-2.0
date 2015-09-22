@@ -1,13 +1,6 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+//------------------------------------------------------------------------------
+// Copyright (c) 2004, 2005 IBM Corporation.  All Rights Reserved.
+//------------------------------------------------------------------------------
 package org.eclipse.epf.library.edit.process.command;
 
 import java.util.Arrays;
@@ -21,16 +14,12 @@ import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.uma.Activity;
 import org.eclipse.epf.uma.Checklist;
 import org.eclipse.epf.uma.Concept;
-import org.eclipse.epf.uma.EstimationConsiderations;
 import org.eclipse.epf.uma.Example;
 import org.eclipse.epf.uma.Guidance;
 import org.eclipse.epf.uma.Guideline;
-import org.eclipse.epf.uma.Report;
 import org.eclipse.epf.uma.ReusableAsset;
 import org.eclipse.epf.uma.Roadmap;
 import org.eclipse.epf.uma.SupportingMaterial;
-import org.eclipse.epf.uma.Template;
-import org.eclipse.epf.uma.ToolMentor;
 
 
 /**
@@ -86,27 +75,19 @@ public class AddGuidanceToActivityCommand extends AddMethodElementCommand {
 
 					// guidances for content element
 					if (item instanceof Checklist) {
-						activity.getChecklists().add((Checklist) item);
+						activity.getChecklists().add(item);
 					} else if (item instanceof Concept) {
-						activity.getConcepts().add((Concept) item);
+						activity.getConcepts().add(item);
 					} else if (item instanceof Example) {
-						activity.getExamples().add((Example) item);
+						activity.getExamples().add(item);
 					} else if (item instanceof SupportingMaterial) {
-						activity.getSupportingMaterials().add((SupportingMaterial) item);
+						activity.getSupportingMaterials().add(item);
 					} else if (item instanceof Guideline) {
-						activity.getGuidelines().add((Guideline) item);
+						activity.getGuidelines().add(item);
 					} else if (item instanceof ReusableAsset) {
-						activity.getReusableAssets().add((ReusableAsset) item);
-					} else if (item instanceof Template) {
-						activity.getTemplates().add((Template) item);
-					} else if (item instanceof Report) {
-						activity.getReports().add((Report) item);
-					} else if (item instanceof EstimationConsiderations) {
-						activity.getEstimationconsiderations().add((EstimationConsiderations) item);
-					} else if (item instanceof ToolMentor) {
-						activity.getToolmentor().add((ToolMentor) item);
+						activity.getReusableAssets().add(item);
 					} else if (item instanceof Roadmap) {
-						activity.getRoadmaps().add((Roadmap) item);
+						activity.getRoadmaps().add(item);
 					} else {
 						LibraryEditPlugin.getDefault().getLogger()
 								.logError("Cant set guidance " + item.getType().getName() + ":" + item.getName()); //$NON-NLS-1$ //$NON-NLS-2$
@@ -144,14 +125,6 @@ public class AddGuidanceToActivityCommand extends AddMethodElementCommand {
 						activity.getGuidelines().remove(item);
 					} else if (item instanceof ReusableAsset) {
 						activity.getReusableAssets().remove(item);
-					} else if (item instanceof Template) {
-						activity.getTemplates().remove((Template) item);
-					} else if (item instanceof Report) {
-						activity.getReports().remove((Report) item);
-					} else if (item instanceof EstimationConsiderations) {
-						activity.getEstimationconsiderations().remove((EstimationConsiderations) item);
-					} else if (item instanceof ToolMentor) {
-						activity.getToolmentor().remove((ToolMentor) item);
 					} else if (item instanceof Roadmap) {
 						activity.getRoadmaps().remove(item);
 					} else {

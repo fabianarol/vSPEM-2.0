@@ -25,7 +25,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.IExportWizard;
+import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
 
 /**
@@ -35,7 +35,7 @@ import org.eclipse.ui.IWorkbench;
  * @author Kelvin Low
  * @since 1.0
  */
-public class ExportConfigurationWizard extends Wizard implements IExportWizard {
+public class ExportConfigurationWizard extends Wizard implements IImportWizard {
 
 	protected ExportConfigChooseMode modePage;
 
@@ -133,7 +133,7 @@ public class ExportConfigurationWizard extends Wizard implements IExportWizard {
 									.run(monitor);
 						} else {
 							// Export a configuration closure.
-							(ConfigurationExportService.newInstance(data)).run(monitor);
+							(new ConfigurationExportService(data)).run(monitor);
 						}
 					}
 				} catch (Exception e) {

@@ -20,12 +20,9 @@ import org.eclipse.epf.authoring.ui.AuthoringUIText;
 import org.eclipse.epf.authoring.ui.filters.GuidanceFilter;
 import org.eclipse.epf.library.edit.IFilter;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
-import org.eclipse.epf.library.edit.command.ChangeUdtCommand;
 import org.eclipse.epf.library.edit.command.IActionManager;
-import org.eclipse.epf.library.edit.command.MethodElementSetPropertyCommand;
 import org.eclipse.epf.library.edit.itemsfilter.FilterConstants;
 import org.eclipse.epf.library.edit.util.MethodElementUtil;
-import org.eclipse.epf.library.edit.util.PracticePropUtil;
 import org.eclipse.epf.uma.Checklist;
 import org.eclipse.epf.uma.Concept;
 import org.eclipse.epf.uma.Example;
@@ -105,8 +102,6 @@ public class CategoryGuidancePage extends AssociationFormPage {
 	 */
 	protected void addItemsToModel1(ArrayList addItems) {
 		// Update the model.
-		
-		List<Practice> utdItems = new ArrayList<Practice>();
 		if (!addItems.isEmpty()) {
 			for (Iterator it = addItems.iterator(); it.hasNext();) {
 				Guidance item = (Guidance) it.next();
@@ -152,10 +147,6 @@ public class CategoryGuidancePage extends AssociationFormPage {
 							contentElement,
 							UmaPackage.eINSTANCE.getContentElement_Assets(),
 							(ReusableAsset) item, -1);
-				} else if (item instanceof Practice) {
-					if (PracticePropUtil.getPracticePropUtil().isUdtType((Practice) item)) {
-						utdItems.add((Practice) item);
-					}
 				} else {
 					AuthoringUIPlugin
 							.getDefault()
@@ -170,9 +161,6 @@ public class CategoryGuidancePage extends AssociationFormPage {
 			}
 			setDirty(true);
 		}
-		if (! utdItems.isEmpty()) {
-			editor.getActionManager().execute(new ChangeUdtCommand(contentElement, utdItems, false));
-		}
 	}
 
 	/**
@@ -180,7 +168,6 @@ public class CategoryGuidancePage extends AssociationFormPage {
 	 */
 	protected void removeItemsFromModel1(ArrayList rmItems) {
 		// Update the model.
-		List<Practice> utdItems = new ArrayList<Practice>();
 		if (!rmItems.isEmpty()) {
 			for (Iterator it = rmItems.iterator(); it.hasNext();) {
 				Guidance item = (Guidance) it.next();
@@ -226,10 +213,6 @@ public class CategoryGuidancePage extends AssociationFormPage {
 							contentElement,
 							UmaPackage.eINSTANCE.getContentElement_Assets(),
 							(ReusableAsset) item, -1);
-				} else if (item instanceof Practice) {
-					if (PracticePropUtil.getPracticePropUtil().isUdtType((Practice) item)) {
-						utdItems.add((Practice) item);
-					}
 				} else {
 					AuthoringUIPlugin
 							.getDefault()
@@ -244,10 +227,6 @@ public class CategoryGuidancePage extends AssociationFormPage {
 			}
 			setDirty(true);
 		}
-		if (! utdItems.isEmpty()) {
-			editor.getActionManager().execute(new ChangeUdtCommand(contentElement, utdItems, true));
-		}
-
 	}
 
 	/**

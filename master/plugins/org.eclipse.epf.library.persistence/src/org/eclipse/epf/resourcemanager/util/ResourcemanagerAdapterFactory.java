@@ -14,7 +14,6 @@ import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.common.notify.impl.AdapterFactoryImpl;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.epf.resourcemanager.*;
 import org.eclipse.epf.resourcemanager.ResourceDescriptor;
 import org.eclipse.epf.resourcemanager.ResourceManager;
 import org.eclipse.epf.resourcemanager.ResourcemanagerPackage;
@@ -57,8 +56,7 @@ public class ResourcemanagerAdapterFactory extends AdapterFactoryImpl {
 	 * @return whether this factory is applicable for the type of the object.
 	 * @generated
 	 */
-    @Override
-				public boolean isFactoryForType(Object object) {
+    public boolean isFactoryForType(Object object) {
 		if (object == modelPackage) {
 			return true;
 		}
@@ -74,18 +72,15 @@ public class ResourcemanagerAdapterFactory extends AdapterFactoryImpl {
      * <!-- end-user-doc -->
 	 * @generated
 	 */
-    protected ResourcemanagerSwitch<Adapter> modelSwitch =
-		new ResourcemanagerSwitch<Adapter>() {
-			@Override
-			public Adapter caseResourceDescriptor(ResourceDescriptor object) {
+    protected ResourcemanagerSwitch modelSwitch =
+		new ResourcemanagerSwitch() {
+			public Object caseResourceDescriptor(ResourceDescriptor object) {
 				return createResourceDescriptorAdapter();
 			}
-			@Override
-			public Adapter caseResourceManager(ResourceManager object) {
+			public Object caseResourceManager(ResourceManager object) {
 				return createResourceManagerAdapter();
 			}
-			@Override
-			public Adapter defaultCase(EObject object) {
+			public Object defaultCase(EObject object) {
 				return createEObjectAdapter();
 			}
 		};
@@ -98,9 +93,8 @@ public class ResourcemanagerAdapterFactory extends AdapterFactoryImpl {
 	 * @return the adapter for the <code>target</code>.
 	 * @generated
 	 */
-    @Override
-				public Adapter createAdapter(Notifier target) {
-		return modelSwitch.doSwitch((EObject)target);
+    public Adapter createAdapter(Notifier target) {
+		return (Adapter)modelSwitch.doSwitch((EObject)target);
 	}
 
 

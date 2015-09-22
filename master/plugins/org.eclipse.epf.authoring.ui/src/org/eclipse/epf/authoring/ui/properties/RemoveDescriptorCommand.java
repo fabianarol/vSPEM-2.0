@@ -18,11 +18,9 @@ import java.util.List;
 
 import org.eclipse.emf.common.command.AbstractCommand;
 import org.eclipse.emf.common.command.Command;
-import org.eclipse.emf.ecore.EReference;
 import org.eclipse.epf.library.edit.command.IResourceAwareCommand;
 import org.eclipse.epf.library.edit.process.command.DeleteUnusedDescriptorsCommand;
 import org.eclipse.epf.library.edit.ui.ReferenceSelection;
-import org.eclipse.epf.library.edit.util.DescriptorPropUtil;
 import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.library.ui.actions.ProcessDeleteAction;
 import org.eclipse.epf.uma.Activity;
@@ -54,31 +52,21 @@ public class RemoveDescriptorCommand extends AbstractCommand implements
 	private int featureID;
 
 	private List references;
-	
-	private boolean localUse;
-	
-	private DescriptorPropUtil propUtil;
-	
-	public RemoveDescriptorCommand(Descriptor desc, List elements, int featureID) {
-		this(desc, elements, featureID, true);
-	}
 
 	/**
 	 * Remove relationships
 	 */
-	public RemoveDescriptorCommand(Descriptor desc, List elements, int featureID, boolean localUse) {
+	public RemoveDescriptorCommand(Descriptor desc, List elements, int featureID) {
 
 		super();
 
 		this.elements = elements;
 		this.desc = desc;
 		this.featureID = featureID;
-		this.localUse = localUse;
-		this.propUtil = DescriptorPropUtil.getDesciptorPropUtil();
 
 		this.modifiedResources = new HashSet();
 	}
-	
+
 	/**
 	 * @see org.eclipse.emf.common.command.Command#execute()
 	 */
@@ -121,9 +109,7 @@ public class RemoveDescriptorCommand extends AbstractCommand implements
 		{
 			switch (featureID) {
 			case UmaPackage.TASK_DESCRIPTOR__PERFORMED_PRIMARILY_BY:
-//				((TaskDescriptor) desc).setPerformedPrimarilyBy(null);
-				((TaskDescriptor) desc).getPerformedPrimarilyBy().removeAll(
-						elements);
+				((TaskDescriptor) desc).setPerformedPrimarilyBy(null);
 				break;
 			case UmaPackage.TASK_DESCRIPTOR__ADDITIONALLY_PERFORMED_BY:
 				((TaskDescriptor) desc).getAdditionallyPerformedBy().removeAll(
@@ -152,18 +138,6 @@ public class RemoveDescriptorCommand extends AbstractCommand implements
 			case UmaPackage.ROLE_DESCRIPTOR__RESPONSIBLE_FOR:
 				((RoleDescriptor) desc).getResponsibleFor().removeAll(elements);
 				break;
-			}
-		} else if (desc instanceof WorkProductDescriptor) {
-			switch (featureID){
-			case UmaPackage.WORK_PRODUCT_DESCRIPTOR__DELIVERABLE_PARTS:
-				((WorkProductDescriptor) desc).getDeliverableParts().removeAll(elements);
-				break;
-			}
-		}
-		
-		if (ProcessUtil.isSynFree()) {
-			if (localUse) {
-				propUtil.removeLocalUsingInfo(elements, desc, (EReference)desc.eClass().getEStructuralFeature(featureID));
 			}
 		}
 
@@ -199,11 +173,9 @@ public class RemoveDescriptorCommand extends AbstractCommand implements
 		{
 			switch (featureID) {
 			case UmaPackage.TASK_DESCRIPTOR__PERFORMED_PRIMARILY_BY:
-//				Object o = elements.get(0);
-//				if (o instanceof RoleDescriptor)
-//					((TaskDescriptor) desc).setPerformedPrimarilyBy((RoleDescriptor)o);
-				((TaskDescriptor) desc).getPerformedPrimarilyBy().addAll(
-						elements);
+				Object o = elements.get(0);
+				if (o instanceof RoleDescriptor)
+					((TaskDescriptor) desc).setPerformedPrimarilyBy((RoleDescriptor)o);
 				break;
 			case UmaPackage.TASK_DESCRIPTOR__ADDITIONALLY_PERFORMED_BY:
 				((TaskDescriptor) desc).getAdditionallyPerformedBy().addAll(
@@ -233,20 +205,8 @@ public class RemoveDescriptorCommand extends AbstractCommand implements
 				((RoleDescriptor) desc).getResponsibleFor().addAll(elements);
 				break;
 			}
-		} else if (desc instanceof WorkProductDescriptor) {
-			switch (featureID){
-			case UmaPackage.WORK_PRODUCT_DESCRIPTOR__DELIVERABLE_PARTS:
-				((WorkProductDescriptor) desc).getDeliverableParts().addAll(elements);
-				break;
-			}
 		}
-		
-		if (ProcessUtil.isSynFree()) {
-			if (localUse) {
-				propUtil.addLocalUsingInfo(elements, desc, (EReference)desc.eClass().getEStructuralFeature(featureID));
-			}
-		}
-		
+
 		if (references != null && !references.isEmpty()) {
 			try {
 				if (deleteUnusedDescriptorsCommand != null)
@@ -287,17 +247,6 @@ public class RemoveDescriptorCommand extends AbstractCommand implements
 	 */
 	public Collection getModifiedResources() {
 		return modifiedResources;
-	}
-	
-	public Collection getAffectedObjects() {
-		if (desc != null) {
-			return Arrays.asList(new Object[] { desc });
-		}
-		return super.getAffectedObjects();
-	}
-	
-	protected int getFeatureID() {
-		return featureID;
 	}
 
 }

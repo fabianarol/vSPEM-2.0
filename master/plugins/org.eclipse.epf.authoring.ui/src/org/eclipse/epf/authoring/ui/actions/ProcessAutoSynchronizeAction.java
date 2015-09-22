@@ -37,6 +37,7 @@ import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.Process;
 import org.eclipse.epf.uma.ProcessComponent;
 import org.eclipse.epf.uma.TeamProfile;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.IEditorInput;
@@ -174,7 +175,7 @@ implements IWorkbenchPartAction, IModifyingAction
 	 * @see org.eclipse.emf.edit.ui.action.CommandActionHandler#run()
 	 */
 	public void run() {
-		org.eclipse.epf.library.edit.util.IRunnableWithProgress runnable = new org.eclipse.epf.library.edit.util.IRunnableWithProgress() {
+		IRunnableWithProgress runnable = new IRunnableWithProgress() {
 			/*
 			 * (non-Javadoc)
 			 * 

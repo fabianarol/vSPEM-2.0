@@ -13,7 +13,6 @@ package org.eclipse.epf.persistence.refresh;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -26,7 +25,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
@@ -46,7 +44,6 @@ import org.eclipse.epf.persistence.util.PersistenceUtil;
 import org.eclipse.epf.uma.ContentDescription;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.MethodLibrary;
-import org.eclipse.epf.uma.ecore.impl.MultiResourceEObject;
 
 /**
  * Background job that keeps notifying refresh handlers about changes in
@@ -208,10 +205,7 @@ public class RefreshJob extends WorkspaceJob implements IResourceChangeListener 
 		return null;
 	}
 
-	private void scheduleRefresh() {	
-		if (isSuspendRefresh()) {
-			return;
-		}
+	private void scheduleRefresh() {		
 		if (getState() == Job.NONE) {
 			MethodLibrary lib = getMethodLibrary();
 			if(lib != null) {
@@ -230,14 +224,6 @@ public class RefreshJob extends WorkspaceJob implements IResourceChangeListener 
 		if (refreshHandler == null)
 			return Status.OK_STATUS;
 
-		// wait for all workspace refresh jobs to finish first
-		//
-		try {
-			getJobManager().join(ResourcesPlugin.FAMILY_AUTO_REFRESH, new NullProgressMonitor());
-		} catch (OperationCanceledException e1) {
-		} catch (InterruptedException e1) {
-		}
-		
 		long start = System.currentTimeMillis();
 		Throwable error = null;
 		try {
@@ -348,25 +334,14 @@ public class RefreshJob extends WorkspaceJob implements IResourceChangeListener 
 				private ArrayList<IResource> addedWorkspaceResources = new ArrayList<IResource>();
 				
 				public boolean visit(IResourceDelta delta) throws CoreException {
-					Resource resource = null;
-//					System.out.println("type=" + delta.getResource().getType());
-//					System.out.println("kind=" + delta.getKind());
-//					System.out.println(delta.getFlags() != IResourceDelta.MARKERS);
-//					if(delta.getResource().getFullPath().toString().endsWith("plugin.xmi")) {
-//						System.out.println(delta.getResource().getFullPath().toString());
-//					}
-					if (delta.getResource().getType() == IResource.FILE) {
+					Resource resource;
+					if ((delta.getFlags() & IResourceDelta.MARKERS) != IResourceDelta.MARKERS
+							&& delta.getResource().getType() == IResource.FILE) {
 						switch (delta.getKind()) {
 						case IResourceDelta.ADDED:
 							// handle added resource
 							//
-							try {
-								resource = getResource(delta.getResource());
-							} catch (Exception e) {
-								if (MultiResourceEObject.epfDebug(1)) {
-									CommonPlugin.INSTANCE.log(e);
-								}
-							}
+							resource = getResource(delta.getResource());
 							if (resource != null) {
 								if (!resource.isLoaded()) {
 									// the resource was created but not
@@ -393,7 +368,7 @@ public class RefreshJob extends WorkspaceJob implements IResourceChangeListener 
 							
 							// handle file move
 							//
-							if ((IResourceDelta.MOVED_FROM & delta.getFlags()) != 0) {
+							if ((IResourceDelta.MOVED_TO & delta.getFlags()) != 0) {
 //								resource = getResource(delta.getResource());          
 //								if (resource != null) {                           
 //									movedResources.add(resource);                 
@@ -430,8 +405,6 @@ public class RefreshJob extends WorkspaceJob implements IResourceChangeListener 
 							}
 							break;
 						}
-						
-						notiFyfileChangeListeners(delta);
 					}
 					
 					return true;
@@ -471,43 +444,5 @@ public class RefreshJob extends WorkspaceJob implements IResourceChangeListener 
 	}
 
 	private static RefreshJob instance = new RefreshJob();
-	
-	private boolean suspendRefresh = false;
-	public boolean isSuspendRefresh() {
-		return suspendRefresh;
-	}
 
-	public void setSuspendRefresh(boolean suspendRefresh) {
-		this.suspendRefresh = suspendRefresh;
-	}
-	
-	public void resumeRefresh() {
-		if (shouldRefresh()) {
-			scheduleRefresh();
-		}
-	}
-	
-	public static class FileChangeListener {
-		//Make sure that notifyChange method is a very quick and short execution
-		//Otherwise, use some other mechanism
-		public void notifyChange(IResourceDelta delta) {			
-		}
-	}
-	
-	private List<FileChangeListener> fileChangeListeners = new ArrayList<FileChangeListener>();
-	
-	public void addFileChangeListener(FileChangeListener listener) {
-		fileChangeListeners.add(listener);
-	}
-	
-	public void removeFileChangeListener(FileChangeListener listener) {
-		fileChangeListeners.remove(listener);
-	}
-	
-	private void notiFyfileChangeListeners(IResourceDelta delta) {
-		for (FileChangeListener lis : fileChangeListeners) {
-			lis.notifyChange(delta);
-		}		
-	}
-	
 }

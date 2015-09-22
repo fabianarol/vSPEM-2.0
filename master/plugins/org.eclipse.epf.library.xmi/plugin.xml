@@ -12,6 +12,15 @@
       </libraryManager>     
    </extension>
    <extension
+         point="org.eclipse.epf.library.persistence.migrators">
+      <migrator
+            class="org.eclipse.epf.library.xmi.internal.migration.Migrator102_103"
+            libNsURI="http://www.ibm.com/uma/1.0.2/uma.ecore"/>
+      <migrator
+            class="org.eclipse.epf.library.xmi.internal.migration.Migrator103"
+            libNsURI="http://www.eclipse.org/epf/uma/1.0.3/uma.ecore"/>
+   </extension>
+   <extension
          point="org.eclipse.epf.library.edit.oppositeFeatureLoaders">
       <oppositeFeatureLoader class="org.eclipse.epf.library.xmi.internal.XMIOppositeFeatureLoader"/>
    </extension>

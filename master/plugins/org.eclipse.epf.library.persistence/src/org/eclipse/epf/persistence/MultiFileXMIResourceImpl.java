@@ -51,16 +51,11 @@ import org.eclipse.epf.uma.ContentDescription;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.MethodLibrary;
-import org.eclipse.epf.uma.MethodPlugin;
-import org.eclipse.epf.uma.Process;
-import org.eclipse.epf.uma.ProcessComponent;
 import org.eclipse.epf.uma.Section;
 import org.eclipse.epf.uma.UmaPackage;
 import org.eclipse.epf.uma.ecore.impl.MultiResourceEObject;
 import org.eclipse.epf.uma.ecore.util.DefaultValueManager;
 import org.eclipse.epf.uma.ecore.util.OppositeFeatureNotification;
-import org.eclipse.epf.uma.util.Scope;
-import org.eclipse.epf.uma.util.UmaUtil;
 import org.eclipse.osgi.util.NLS;
 
 /**
@@ -143,6 +138,9 @@ implements ILibraryResource, IFailSafeSavable
 		Object oldID = id != null ? getEObjectToIDMap().put(eObject, id)
 				: getEObjectToIDMap().remove(eObject);
 
+		if(getResourceSet() == null) {
+			System.out.println();
+		}
 		Map guidToMethodElementMap = ((MultiFileResourceSetImpl) getResourceSet())
 				.getGuidToMethodElementMap();
 
@@ -744,10 +742,6 @@ implements ILibraryResource, IFailSafeSavable
 
 	public void save(Map options) throws IOException {
 		boolean old = DefaultValueManager.INSTANCE.isUseStatic();
-		
-		Process proc = null;
-		Scope scope = null;
-		
 		try {
 			DefaultValueManager.INSTANCE.setUseStatic(true);
 			
@@ -755,31 +749,12 @@ implements ILibraryResource, IFailSafeSavable
 				options = MultiFileResourceSetImpl.DEFAULT_SAVE_OPTIONS;
 			}
 
-			MethodElement e = PersistenceUtil.getMethodElement(this);
-			if (e instanceof ProcessComponent) {
-				proc = ((ProcessComponent) e).getProcess();
-				if (proc != null && proc.getDefaultContext() instanceof Scope) {
-					boolean oldDeliver = proc.eDeliver();
-					try {
-						proc.eSetDeliver(false);
-						scope = (Scope) proc.getDefaultContext();
-						proc.setDefaultContext(null);
-						proc.getValidContext().clear();
-					} finally {
-						proc.eSetDeliver(oldDeliver);
-					}
-				}
-			}			
-			
-			handleSynFreeFlag(e);
-			
 			super.save(options);
 
 			// Special handling for saving MethodLibrary to remove all references to
 			// MethodConfigurations from library file.
 			//
-			//MethodElement e = PersistenceUtil.getMethodElement(this);
-			
+			MethodElement e = PersistenceUtil.getMethodElement(this);
 			if (e instanceof MethodLibrary) {
 				MethodLibrary lib = (MethodLibrary) e;
 				// remove ResourceDescriptors of configuration files
@@ -815,16 +790,6 @@ implements ILibraryResource, IFailSafeSavable
 		}
 		finally {
 			DefaultValueManager.INSTANCE.setUseStatic(old);
-			if (proc != null && scope != null) {
-				boolean oldDeliver = proc.eDeliver();
-				try {
-					proc.eSetDeliver(false);
-					proc.setDefaultContext(scope);
-					proc.getValidContext().add(scope);
-				} finally {
-					proc.eSetDeliver(oldDeliver);
-				}
-			}
 		}
 	}
 
@@ -942,6 +907,7 @@ implements ILibraryResource, IFailSafeSavable
 			if(!wasMove) {
 				setModified(false);
 			}
+			FileManager.getInstance().refresh(this);
 			updateTimeStamps();
 			if(!wasMove) {
 				MultiFileResourceSetImpl resourceSet = (MultiFileResourceSetImpl) getResourceSet();
@@ -1216,10 +1182,6 @@ implements ILibraryResource, IFailSafeSavable
 	void setResourceDescriptor(ResourceDescriptor resDesc) {
 		resourceDescriptor = resDesc;
 	}
-	
-	public ResourceDescriptor getResourceDescriptor() {
-		return resourceDescriptor;
-	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.epf.library.persistence.ILibraryResource#getLoadStamp()
@@ -1246,33 +1208,5 @@ implements ILibraryResource, IFailSafeSavable
 	
 	private ILibraryPersister getLibraryPersister() {
 		return ((MultiFileResourceSetImpl)resourceSet).getPersister();
-	}
-	
-	private void handleSynFreeFlag(MethodElement e) {
-		if (e instanceof MethodPlugin || e instanceof ProcessComponent) {
-			MethodLibrary lib = UmaUtil.getMethodLibrary(e);
-			if (lib == null) {
-				lib = ((MultiFileResourceSetImpl)resourceSet).getMethodLibrary();
-			}
-			if (lib != null) {
-				boolean isSynFree = UmaUtil.isSynFreeLibrary(lib);
-				if (isSynFree) {
-					if (e instanceof MethodPlugin) {
-						MethodPlugin p = (MethodPlugin) e;
-						if (! UmaUtil.isSynFreePlugin(p)) {
-							boolean oldD = p.eDeliver();
-							try {
-								p.eSetDeliver(false);
-								UmaUtil.setSynFreePlugin(p, true);
-							} finally {
-								if (oldD) {
-									p.eSetDeliver(oldD);
-								}
-							}
-						}					
-					}
-				}
-			}
-		}
 	}
 }

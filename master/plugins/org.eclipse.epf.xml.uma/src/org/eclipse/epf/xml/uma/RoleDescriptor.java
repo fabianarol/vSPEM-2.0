@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: RoleDescriptor.java,v 1.2 2006/06/23 00:01:27 jxi Exp $
+ */
 package org.eclipse.epf.xml.uma;
 
 import org.eclipse.emf.common.util.EList;
@@ -45,7 +41,7 @@ public interface RoleDescriptor extends Descriptor {
 	 * @return the value of the '<em>Role</em>' attribute.
 	 * @see #setRole(String)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getRoleDescriptor_Role()
-	 * @model dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="kind='element' name='Role'"
 	 * @generated
 	 */
@@ -72,10 +68,10 @@ public interface RoleDescriptor extends Descriptor {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Responsible For</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getRoleDescriptor_ResponsibleFor()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="kind='element' name='ResponsibleFor'"
 	 * @generated
 	 */
-	EList<String> getResponsibleFor();
+	EList getResponsibleFor();
 
 } // RoleDescriptor

@@ -15,17 +15,11 @@ import java.util.List;
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryContentProvider;
 import org.eclipse.epf.library.configuration.ConfigurationData;
-import org.eclipse.epf.library.configuration.ConfigurationProperties;
-import org.eclipse.epf.library.configuration.SupportingElementData;
 import org.eclipse.epf.library.configuration.closure.ConfigurationClosure;
 import org.eclipse.epf.library.configuration.closure.DependencyManager;
-import org.eclipse.epf.library.edit.realization.IRealizationManager;
-import org.eclipse.epf.library.edit.util.MethodElementPropertyMgr;
 import org.eclipse.epf.library.layout.ElementLayoutManager;
-import org.eclipse.epf.library.realization.RealizationManagerFactory;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodLibrary;
-import org.eclipse.epf.uma.util.Scope;
 
 /**
  * Manages a method configuration.
@@ -43,10 +37,6 @@ public class ConfigurationManager implements IConfigurationManager {
 	
 	// The managed configuraiton data.
 	private ConfigurationData configData;
-	
-	private SupportingElementData supportingElementData;
-	
-	private ConfigurationProperties configProps;
 
 	// The containing method library for the managed method configuration.
 	protected MethodLibrary library;
@@ -64,8 +54,6 @@ public class ConfigurationManager implements IConfigurationManager {
 	protected ConfigurationClosure closure;
 
 	protected AdapterFactoryContentProvider afcp;
-	
-	private IRealizationManager realizationManager;
 
 	/**
 	 * Creates a new instance.
@@ -75,39 +63,22 @@ public class ConfigurationManager implements IConfigurationManager {
 	 */
 	public ConfigurationManager(MethodConfiguration config) {
 		this.config = config;
-		
-		configData = ConfigurationData.newConfigurationData(config);
-		if (! ConfigurationData.ignoreSupportingPlugin) {
-			supportingElementData = configData.newSupportingElementData();
-		}
-				
-		configProps = new ConfigurationProperties(config);
-		MethodElementPropertyMgr.getInstance().register(config, configProps);
+		configData = new ConfigurationData(config);
 
-		if (config instanceof Scope) {
-			library = LibraryService.getInstance().getCurrentMethodLibrary();
-		} else {
-			library = LibraryServiceUtil.getMethodLibrary(config);
-			if (library == null) {
-				library = LibraryService.getInstance().getCurrentMethodLibrary();
-			}
-		}
+		library = LibraryServiceUtil.getMethodLibrary(config);
 
 		libraryManager = LibraryService.getInstance()
 				.getLibraryManager(library);
 		afcp = new AdapterFactoryContentProvider(libraryManager
 				.getAdapterFactory());
 
-		dependencyManager = new DependencyManager(library, config);
+		dependencyManager = new DependencyManager(library);
 
 		if (config == null) {
 			layoutManager = new ElementLayoutManager();
 		} else {
 			layoutManager = new ElementLayoutManager(config);
 			// closure = new ConfigurationClosure(this, config);
-			realizationManager = RealizationManagerFactory.getInstance()
-					.newRealizationManager(config);
-
 		}
 	}
 
@@ -125,10 +96,6 @@ public class ConfigurationManager implements IConfigurationManager {
 	 */
 	public ConfigurationData getConfigurationData() {
 		return configData;
-	}
-	
-	public SupportingElementData getSupportingElementData() {
-		return supportingElementData;
 	}
 	
 	/**
@@ -173,9 +140,6 @@ public class ConfigurationManager implements IConfigurationManager {
 	 * @return an element layout manager
 	 */
 	public ElementLayoutManager getElementLayoutManager() {
-		if (layoutManager != null) {
-			layoutManager.buildPublishDir(null);
-		}
 		return layoutManager;
 	}
 
@@ -216,29 +180,8 @@ public class ConfigurationManager implements IConfigurationManager {
 		library = null;
 		libraryManager = null;
 		dependencyManager = null;
-		if (layoutManager != null) {
-			layoutManager.clear();
-		}
 		layoutManager = null;
 		closure = null;
-		MethodElementPropertyMgr.getInstance().unregister(config);
-		configProps = null;
-		
-		if (realizationManager != null) {
-			realizationManager.dispose();
-			realizationManager = null;
-		}
-	}
-
-	public ConfigurationProperties getConfigurationProperties() {
-		return configProps;
-	}
-	
-	/**
-	 * @return an IRealizationManager instance
-	 */
-	public IRealizationManager getRealizationManager() {
-		return realizationManager;
 	}
 
 }

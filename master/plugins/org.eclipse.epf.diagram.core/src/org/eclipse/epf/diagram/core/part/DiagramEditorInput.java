@@ -72,7 +72,6 @@ public class DiagramEditorInput implements IEditorInput {
 		if (object instanceof BreakdownElementWrapperItemProvider) {
 			wrapper = (BreakdownElementWrapperItemProvider) object;
 		}
-
 		this.suppression = suppression;
 		this.diagramType = diagramType;
 	}

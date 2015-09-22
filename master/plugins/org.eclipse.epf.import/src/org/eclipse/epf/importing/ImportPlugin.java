@@ -10,13 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.importing;
 
-import java.util.List;
-
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.epf.common.ui.AbstractPlugin;
-import org.eclipse.epf.common.utils.FileUtil;
-import org.eclipse.epf.common.utils.FileUtil.FileChecker;
-import org.eclipse.epf.importing.services.FileModifyChecker;
+import org.eclipse.epf.common.plugin.AbstractPlugin;
 import org.osgi.framework.BundleContext;
 
 
@@ -44,12 +38,6 @@ public class ImportPlugin extends AbstractPlugin {
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		FileChecker fileChecker = new FileChecker() {
-			public IStatus syncExecCheckModify(List modifiedFiles) {
-				return FileModifyChecker.syncExecCheckModify(modifiedFiles);
-			}
-		};		
-		FileUtil.setFileChecker(fileChecker);		
 	}
 
 	/**

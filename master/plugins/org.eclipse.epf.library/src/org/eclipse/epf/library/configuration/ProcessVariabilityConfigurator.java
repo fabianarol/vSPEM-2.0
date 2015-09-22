@@ -14,6 +14,7 @@ import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.uma.Activity;
 import org.eclipse.epf.uma.BreakdownElement;
 import org.eclipse.epf.uma.MethodConfiguration;
+import org.eclipse.jface.viewers.Viewer;
 
 /**
  * 
@@ -27,8 +28,9 @@ public class ProcessVariabilityConfigurator extends ProcessConfigurator {
 	 * @param methodConfig
 	 * @param viewer
 	 */
-	public ProcessVariabilityConfigurator(MethodConfiguration methodConfig) {
-		super(methodConfig);
+	public ProcessVariabilityConfigurator(MethodConfiguration methodConfig,
+			Viewer viewer) {
+		super(methodConfig, viewer);
 	}
 
 	public void setMethodConfiguration(MethodConfiguration newConfig) {

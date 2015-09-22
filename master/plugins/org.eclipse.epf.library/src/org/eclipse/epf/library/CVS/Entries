@@ -1,0 +1,31 @@
+/AbstractLibraryManager.java/1.19/Fri Aug 24 19:28:29 2007/-kk/
+/ConfigurationAlreadyExistsException.java/1.8/Wed Mar 21 19:24:34 2007//
+/ConfigurationManager.java/1.11/Tue Apr 24 21:27:26 2007//
+/CreateLibraryManagerException.java/1.8/Wed Mar 21 19:24:34 2007//
+/IConfigurationClosure.java/1.9/Tue Apr 24 21:27:26 2007//
+/IConfigurationManager.java/1.9/Mon Apr 23 19:49:34 2007//
+/ILibraryManager.java/1.25/Thu Jun  7 21:09:41 2007//
+/ILibraryResourceManager.java/1.2/Thu May 24 20:12:27 2007//
+/ILibraryService.java/1.16/Thu Jun  7 19:14:49 2007//
+/ILibraryServiceListener.java/1.9/Wed Mar 21 19:24:35 2007//
+/InvalidMethodElementNameException.java/1.8/Wed Mar 21 19:24:35 2007//
+/LibraryAlreadyExistsException.java/1.8/Wed Mar 21 19:24:34 2007//
+/LibraryManagerFactory.java/1.11/Thu Apr  5 23:27:37 2007//
+/LibraryNotFoundException.java/1.8/Wed Mar 21 19:24:35 2007//
+/LibraryPlugin.java/1.9/Wed May 30 06:37:40 2007//
+/LibraryResources.java/1.14/Fri Jul  6 02:31:11 2007//
+/LibraryService.java/1.32/Mon Aug  6 19:47:06 2007//
+/LibraryServiceException.java/1.8/Wed Mar 21 19:24:34 2007//
+/LibraryServiceListener.java/1.6/Sat Mar 24 00:59:09 2007/-kk/
+/LibraryServiceUtil.java/1.21/Fri Jun 29 22:46:21 2007//
+/Resources.properties/1.16/Fri Jul  6 02:31:11 2007//
+D/configuration////
+D/events////
+D/internal////
+D/layout////
+/package.html/1.3/Sat Oct 28 23:31:36 2006//
+D/preferences////
+D/prefs////
+D/project////
+D/services////
+D/util////

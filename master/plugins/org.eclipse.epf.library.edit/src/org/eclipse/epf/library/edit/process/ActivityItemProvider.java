@@ -71,5 +71,4 @@ public class ActivityItemProvider extends BSActivityItemProvider {
 	 */
 	public void setRolledUp(boolean b) {
 	}
-	
 }

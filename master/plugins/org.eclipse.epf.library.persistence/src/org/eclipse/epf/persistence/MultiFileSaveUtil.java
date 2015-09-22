@@ -38,6 +38,7 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.util.InternalEList;
 import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl;
+import org.eclipse.epf.common.serviceability.MsgBox;
 import org.eclipse.epf.common.utils.StrUtil;
 import org.eclipse.epf.library.persistence.ILibraryResourceSet;
 import org.eclipse.epf.library.persistence.LibraryResourceException;
@@ -52,12 +53,15 @@ import org.eclipse.epf.uma.BreakdownElementDescription;
 import org.eclipse.epf.uma.CapabilityPattern;
 import org.eclipse.epf.uma.ContentDescription;
 import org.eclipse.epf.uma.DeliveryProcess;
+import org.eclipse.epf.uma.LineProcess;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.MethodLibrary;
 import org.eclipse.epf.uma.MethodPlugin;
 import org.eclipse.epf.uma.MethodUnit;
 import org.eclipse.epf.uma.ProcessComponent;
+import org.eclipse.epf.uma.ProcessLineComponent;
+import org.eclipse.epf.uma.TailoredProcessComponent;
 import org.eclipse.epf.uma.ecore.impl.MultiResourceEObject;
 import org.eclipse.epf.uma.util.UmaUtil;
 import org.eclipse.osgi.util.NLS;
@@ -69,7 +73,6 @@ import com.ibm.icu.util.Calendar;
  * Utility class with static routines for XMI persistence
  * 
  * @author Phong Nguyen Le
- * @author Jinhua Xi
  * @since 1.0
  */
 public final class MultiFileSaveUtil {
@@ -96,6 +99,11 @@ public final class MultiFileSaveUtil {
 
 	public static final String METHOD_CONFIGURATION_FOLDER_NAME = "configurations"; //$NON-NLS-1$
 
+	public static final String LINE_PROCESS_PATH = "lineprocess";
+	
+	public static final String TAILORED_PROCESS_PATH = "tailoredprocess";
+	
+	
 	public static final boolean DEBUG = PersistencePlugin.getDefault()
 			.isDebugging();
 
@@ -103,6 +111,7 @@ public final class MultiFileSaveUtil {
 
 	private static final SimpleDateFormat dateFormatter = new SimpleDateFormat(
 			"yyMMddHHmmss.S"); //$NON-NLS-1$
+
 
 	public static boolean isValidFileName(String name) {
 		if (name == null)
@@ -463,7 +472,7 @@ public final class MultiFileSaveUtil {
 			String[] paths = new String[pathList.size()];
 			pathList.toArray(paths);
 			IStatus status = FileManager.getInstance().checkModify(paths,
-					PersistencePlugin.getDefault().getContext()/*MsgBox.getDefaultShell()*/);
+					MsgBox.getDefaultShell());
 			if (!status.isOK()) {
 				String msg = UmaUtil.getMessage(status);
 				if (msg == null) {
@@ -500,7 +509,7 @@ public final class MultiFileSaveUtil {
 				Resource[] resourceArray = new Resource[entry.getValue().size()];
 				entry.getValue().toArray(resourceArray);
 				try {
-					resourceSet.checkModify(resourceArray, PersistencePlugin.getDefault().getContext()/*MsgBox.getDefaultShell()*/);
+					resourceSet.checkModify(resourceArray, MsgBox.getDefaultShell());
 				} catch (LibraryResourceException e) {
 					throw new MultiFileIOException(e.getMessage());
 				}
@@ -608,9 +617,6 @@ public final class MultiFileSaveUtil {
 	private static ResourceManager addNewResourceManager(Resource resource) {
 		ResourceManager resMgr = getResourceManager(resource);
 		MethodElement e = PersistenceUtil.getMethodElement(resource);
-		if (e == null) {
-			return null;
-		}
 		EObject container = e.eContainer();
 		if (resMgr != null && container != null && resMgr.eContainer() == null) {
 			// new ResourceManager is added to the resource
@@ -669,7 +675,95 @@ public final class MultiFileSaveUtil {
 		// |_delivery_processes
 		// |_process_contributions
 		//
-		if (e instanceof ProcessComponent) {
+		
+		//**If instancia de ProcessLine**//
+		if (e instanceof ProcessLineComponent) {
+//			MethodPlugin plugin = UmaUtil.getMethodPlugin(e);
+			MethodPlugin plugin = UmaUtil.getMethodPluginForProcessLine(e);
+			if(plugin == null) {
+				return null;
+			}
+			Resource resource = plugin.eResource();
+			if (resource == null) {
+			}
+			String pluginDir = null;
+			if(resource != null) {
+				pluginDir = new File(getFinalURI(resource).toFileString()).getParent();
+			}
+			else {
+				MethodLibrary lib = (MethodLibrary) plugin.eContainer();
+				if (lib != null) {
+					String libDir = new File(((MultiFileXMIResourceImpl) lib
+							.eResource()).getFinalURI().toFileString()).getParent();
+					pluginDir = libDir + File.separator + plugin.getName();
+				}
+			}
+			if(pluginDir == null) {
+				// plugin is already deleted
+				//
+				return null;
+			}
+
+			String relativeDir;
+			org.eclipse.epf.uma.Process proc = ((ProcessLineComponent) e)
+					.getProcessLine();
+			if (proc instanceof LineProcess) {
+				relativeDir = LINE_PROCESS_PATH;
+			}  
+			else {
+				relativeDir = ""; //$NON-NLS-1$
+			}
+
+			String path = pluginDir + File.separator + relativeDir
+					+ File.separator + e.getName() + File.separator
+					+ DEFAULT_MODEL_FILENAME;
+			return URI.createFileURI(path);
+		}
+		//*If Instancia de TailoredProcessComponent*//
+		else if (e instanceof TailoredProcessComponent) {
+//			MethodPlugin plugin = UmaUtil.getMethodPlugin(e);//El methodPlugin va a ser la linea
+			MethodPlugin plugin = UmaUtil.getMethodPluginForTailoredProcess(e);
+			if(plugin == null) {
+				return null;
+			}
+			Resource resource = plugin.eResource();
+			if (resource == null) {
+			}
+			String pluginDir = null;
+			if(resource != null) {
+				pluginDir = new File(getFinalURI(resource).toFileString()).getParent();
+			}
+			else {
+				MethodLibrary lib = (MethodLibrary) plugin.eContainer();
+				if (lib != null) {
+					String libDir = new File(((MultiFileXMIResourceImpl) lib
+							.eResource()).getFinalURI().toFileString()).getParent();
+					pluginDir = libDir + File.separator + plugin.getName();
+				}
+			}
+			if(pluginDir == null) {
+				// plugin is already deleted
+				//
+				return null;
+			}
+
+			String relativeDir;
+			org.eclipse.epf.uma.Process proc = ((TailoredProcessComponent) e)
+					.getTailoredProcess();
+			if (proc instanceof LineProcess) {
+				relativeDir = TAILORED_PROCESS_PATH;
+			}  
+			else {
+				relativeDir = ""; //$NON-NLS-1$
+			}
+
+			String path = pluginDir + File.separator + relativeDir
+					+ File.separator + e.getName() + File.separator
+					+ DEFAULT_MODEL_FILENAME;
+			return URI.createFileURI(path);
+		}
+		//*If instancia de ProcessComponent*//
+		else if (e instanceof ProcessComponent) {
 			MethodPlugin plugin = UmaUtil.getMethodPlugin(e);
 			if(plugin == null) {
 				return null;
@@ -678,9 +772,6 @@ public final class MultiFileSaveUtil {
 			if (resource == null) {
 			}
 			String pluginDir = null;
-			if (! UmaUtil.hasDirectResource(plugin)) {
-				resource = null;
-			}
 			if(resource != null) {
 				pluginDir = new File(getFinalURI(resource).toFileString()).getParent();
 			}
@@ -1642,11 +1733,7 @@ public final class MultiFileSaveUtil {
 	 * @return
 	 */
 	public static Iterator listConfigFiles(File configDir) {
-		return listLibraryFiles(configDir);
-	}
-	
-	public static Iterator<File> listLibraryFiles(File dir) {
-		return new AbstractTreeIterator<File>(dir, false) {
+		return new AbstractTreeIterator(configDir, false) {
 			/**
 			 * Comment for <code>serialVersionUID</code>
 			 */
@@ -1663,7 +1750,7 @@ public final class MultiFileSaveUtil {
 
 			};
 
-			protected Iterator<File> getChildren(Object object) {
+			protected Iterator getChildren(Object object) {
 				File[] files = ((File) object).listFiles(filter);
 				if (files != null && files.length > 0) {
 					return Arrays.asList(files).iterator();
@@ -1673,4 +1760,5 @@ public final class MultiFileSaveUtil {
 
 		};
 	}
+	
 }

@@ -1,24 +1,17 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: UmaResourceImpl.java,v 1.1 2006/05/01 19:50:00 jthario Exp $
+ */
 package org.eclipse.epf.xml.uma.util;
 
 import java.io.IOException;
 import java.util.Map;
 
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.xmi.XMLHelper;
 import org.eclipse.emf.ecore.xmi.XMLSave;
-import org.eclipse.emf.ecore.xmi.impl.XMLHelperImpl;
 import org.eclipse.emf.ecore.xmi.impl.XMLResourceImpl;
-import org.eclipse.epf.xml.uma.UmaPackage;
 
 /**
  * <!-- begin-user-doc -->
@@ -54,17 +47,5 @@ public class UmaResourceImpl extends XMLResourceImpl {
 		// return super.createXMLSave();
 		return new UmaXMLSaveImpl(createXMLHelper());
 	}
-		
-	protected XMLHelper createXMLHelper() {
-		XMLHelperImpl helper = new XMLHelperImpl(this) {
-			public void addPrefix(String prefix, String uri) {
-				if (prefix.equals("uma")) {		//$NON-NLS-1$
-					uri = UmaPackage.eNS_URI;
-				}
-				super.addPrefix(prefix, uri);
-			}
-		};
-		return helper;
-	}
 	
-} // UmaResourceImpl
+} //UmaResourceImpl

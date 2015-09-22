@@ -40,7 +40,7 @@ public interface RoleDescription extends ContentDescription {
 	 * @return the value of the '<em>Skills</em>' attribute.
 	 * @see #setSkills(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getRoleDescription_Skills()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getSkills();
@@ -66,7 +66,7 @@ public interface RoleDescription extends ContentDescription {
 	 * @return the value of the '<em>Assignment Approaches</em>' attribute.
 	 * @see #setAssignmentApproaches(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getRoleDescription_AssignmentApproaches()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getAssignmentApproaches();
@@ -92,7 +92,7 @@ public interface RoleDescription extends ContentDescription {
 	 * @return the value of the '<em>Synonyms</em>' attribute.
 	 * @see #setSynonyms(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getRoleDescription_Synonyms()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getSynonyms();

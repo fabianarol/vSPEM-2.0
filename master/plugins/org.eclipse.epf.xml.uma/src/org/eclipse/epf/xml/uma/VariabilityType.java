@@ -1,20 +1,16 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: VariabilityType.java,v 1.5 2007/06/05 21:15:00 klow Exp $
+ */
 package org.eclipse.epf.xml.uma;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.emf.common.util.Enumerator;
+import org.eclipse.emf.common.util.AbstractEnumerator;
 
 /**
  * <!-- begin-user-doc -->
@@ -25,74 +21,10 @@ import org.eclipse.emf.common.util.Enumerator;
  * An Enumeration used for values for instances of Variability Element's attribute variabilityType.  It defines the nature of how a Variability Element extends another Variability Element. See enumeration literals for definitions for each type.
  * <!-- end-model-doc -->
  * @see org.eclipse.epf.xml.uma.UmaPackage#getVariabilityType()
- * @model extendedMetaData="name='VariabilityType'"
+ * @model
  * @generated
  */
-public enum VariabilityType implements Enumerator
-{
-	/**
-	 * The '<em><b>Na</b></em>' literal object.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #NA_VALUE
-	 * @generated
-	 * @ordered
-	 */
-	NA(0, "na", "na"),
-	/**
-	 * The '<em><b>Contributes</b></em>' literal object.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #CONTRIBUTES_VALUE
-	 * @generated
-	 * @ordered
-	 */
-	CONTRIBUTES(1, "contributes", "contributes"),
-	/**
-	 * The '<em><b>Extends</b></em>' literal object.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #EXTENDS_VALUE
-	 * @generated
-	 * @ordered
-	 */
-	EXTENDS(2, "extends", "extends"),
-	/**
-	 * The '<em><b>Replaces</b></em>' literal object.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #REPLACES_VALUE
-	 * @generated
-	 * @ordered
-	 */
-	REPLACES(3, "replaces", "replaces"),
-	/**
-	 * The '<em><b>Local Contribution</b></em>' literal object.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #LOCAL_CONTRIBUTION_VALUE
-	 * @generated
-	 * @ordered
-	 */
-	LOCAL_CONTRIBUTION(4, "localContribution", "localContribution"),
-	/**
-	 * The '<em><b>Local Replacement</b></em>' literal object.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #LOCAL_REPLACEMENT_VALUE
-	 * @generated
-	 * @ordered
-	 */
-	LOCAL_REPLACEMENT(5, "localReplacement", "localReplacement"),
-	/**
-	 * The '<em><b>Extends Replaces</b></em>' literal object.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #EXTENDS_REPLACES_VALUE
-	 * @generated
-	 * @ordered
-	 */
-	EXTENDS_REPLACES(6, "extendsReplaces", "extendsReplaces");
+public final class VariabilityType extends AbstractEnumerator {
 	/**
 	 * The '<em><b>Na</b></em>' literal value.
 	 * <!-- begin-user-doc -->
@@ -101,12 +33,12 @@ public enum VariabilityType implements Enumerator
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @see #NA
+	 * @see #NA_LITERAL
 	 * @model name="na"
 	 * @generated
 	 * @ordered
 	 */
-	public static final int NA_VALUE = 0;
+	public static final int NA = 0;
 
 	/**
 	 * The '<em><b>Contributes</b></em>' literal value.
@@ -116,12 +48,12 @@ public enum VariabilityType implements Enumerator
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @see #CONTRIBUTES
+	 * @see #CONTRIBUTES_LITERAL
 	 * @model name="contributes"
 	 * @generated
 	 * @ordered
 	 */
-	public static final int CONTRIBUTES_VALUE = 1;
+	public static final int CONTRIBUTES = 1;
 
 	/**
 	 * The '<em><b>Extends</b></em>' literal value.
@@ -131,12 +63,12 @@ public enum VariabilityType implements Enumerator
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @see #EXTENDS
+	 * @see #EXTENDS_LITERAL
 	 * @model name="extends"
 	 * @generated
 	 * @ordered
 	 */
-	public static final int EXTENDS_VALUE = 2;
+	public static final int EXTENDS = 2;
 
 	/**
 	 * The '<em><b>Replaces</b></em>' literal value.
@@ -146,12 +78,12 @@ public enum VariabilityType implements Enumerator
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @see #REPLACES
+	 * @see #REPLACES_LITERAL
 	 * @model name="replaces"
 	 * @generated
 	 * @ordered
 	 */
-	public static final int REPLACES_VALUE = 3;
+	public static final int REPLACES = 3;
 
 	/**
 	 * The '<em><b>Local Contribution</b></em>' literal value.
@@ -161,12 +93,12 @@ public enum VariabilityType implements Enumerator
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @see #LOCAL_CONTRIBUTION
+	 * @see #LOCAL_CONTRIBUTION_LITERAL
 	 * @model name="localContribution"
 	 * @generated
 	 * @ordered
 	 */
-	public static final int LOCAL_CONTRIBUTION_VALUE = 4;
+	public static final int LOCAL_CONTRIBUTION = 4;
 
 	/**
 	 * The '<em><b>Local Replacement</b></em>' literal value.
@@ -176,12 +108,12 @@ public enum VariabilityType implements Enumerator
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @see #LOCAL_REPLACEMENT
+	 * @see #LOCAL_REPLACEMENT_LITERAL
 	 * @model name="localReplacement"
 	 * @generated
 	 * @ordered
 	 */
-	public static final int LOCAL_REPLACEMENT_VALUE = 5;
+	public static final int LOCAL_REPLACEMENT = 5;
 
 	/**
 	 * The '<em><b>Extends Replaces</b></em>' literal value.
@@ -191,12 +123,82 @@ public enum VariabilityType implements Enumerator
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @see #EXTENDS_REPLACES
+	 * @see #EXTENDS_REPLACES_LITERAL
 	 * @model name="extendsReplaces"
 	 * @generated
 	 * @ordered
 	 */
-	public static final int EXTENDS_REPLACES_VALUE = 6;
+	public static final int EXTENDS_REPLACES = 6;
+
+	/**
+	 * The '<em><b>Na</b></em>' literal object.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #NA
+	 * @generated
+	 * @ordered
+	 */
+	public static final VariabilityType NA_LITERAL = new VariabilityType(NA, "na", "na");
+
+	/**
+	 * The '<em><b>Contributes</b></em>' literal object.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #CONTRIBUTES
+	 * @generated
+	 * @ordered
+	 */
+	public static final VariabilityType CONTRIBUTES_LITERAL = new VariabilityType(CONTRIBUTES, "contributes", "contributes");
+
+	/**
+	 * The '<em><b>Extends</b></em>' literal object.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #EXTENDS
+	 * @generated
+	 * @ordered
+	 */
+	public static final VariabilityType EXTENDS_LITERAL = new VariabilityType(EXTENDS, "extends", "extends");
+
+	/**
+	 * The '<em><b>Replaces</b></em>' literal object.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #REPLACES
+	 * @generated
+	 * @ordered
+	 */
+	public static final VariabilityType REPLACES_LITERAL = new VariabilityType(REPLACES, "replaces", "replaces");
+
+	/**
+	 * The '<em><b>Local Contribution</b></em>' literal object.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #LOCAL_CONTRIBUTION
+	 * @generated
+	 * @ordered
+	 */
+	public static final VariabilityType LOCAL_CONTRIBUTION_LITERAL = new VariabilityType(LOCAL_CONTRIBUTION, "localContribution", "localContribution");
+
+	/**
+	 * The '<em><b>Local Replacement</b></em>' literal object.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #LOCAL_REPLACEMENT
+	 * @generated
+	 * @ordered
+	 */
+	public static final VariabilityType LOCAL_REPLACEMENT_LITERAL = new VariabilityType(LOCAL_REPLACEMENT, "localReplacement", "localReplacement");
+
+	/**
+	 * The '<em><b>Extends Replaces</b></em>' literal object.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #EXTENDS_REPLACES
+	 * @generated
+	 * @ordered
+	 */
+	public static final VariabilityType EXTENDS_REPLACES_LITERAL = new VariabilityType(EXTENDS_REPLACES, "extendsReplaces", "extendsReplaces");
 
 	/**
 	 * An array of all the '<em><b>Variability Type</b></em>' enumerators.
@@ -206,13 +208,13 @@ public enum VariabilityType implements Enumerator
 	 */
 	private static final VariabilityType[] VALUES_ARRAY =
 		new VariabilityType[] {
-			NA,
-			CONTRIBUTES,
-			EXTENDS,
-			REPLACES,
-			LOCAL_CONTRIBUTION,
-			LOCAL_REPLACEMENT,
-			EXTENDS_REPLACES,
+			NA_LITERAL,
+			CONTRIBUTES_LITERAL,
+			EXTENDS_LITERAL,
+			REPLACES_LITERAL,
+			LOCAL_CONTRIBUTION_LITERAL,
+			LOCAL_REPLACEMENT_LITERAL,
+			EXTENDS_REPLACES_LITERAL,
 		};
 
 	/**
@@ -221,7 +223,7 @@ public enum VariabilityType implements Enumerator
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public static final List<VariabilityType> VALUES = Collections.unmodifiableList(Arrays.asList(VALUES_ARRAY));
+	public static final List VALUES = Collections.unmodifiableList(Arrays.asList(VALUES_ARRAY));
 
 	/**
 	 * Returns the '<em><b>Variability Type</b></em>' literal with the specified literal value.
@@ -263,37 +265,16 @@ public enum VariabilityType implements Enumerator
 	 */
 	public static VariabilityType get(int value) {
 		switch (value) {
-			case NA_VALUE: return NA;
-			case CONTRIBUTES_VALUE: return CONTRIBUTES;
-			case EXTENDS_VALUE: return EXTENDS;
-			case REPLACES_VALUE: return REPLACES;
-			case LOCAL_CONTRIBUTION_VALUE: return LOCAL_CONTRIBUTION;
-			case LOCAL_REPLACEMENT_VALUE: return LOCAL_REPLACEMENT;
-			case EXTENDS_REPLACES_VALUE: return EXTENDS_REPLACES;
+			case NA: return NA_LITERAL;
+			case CONTRIBUTES: return CONTRIBUTES_LITERAL;
+			case EXTENDS: return EXTENDS_LITERAL;
+			case REPLACES: return REPLACES_LITERAL;
+			case LOCAL_CONTRIBUTION: return LOCAL_CONTRIBUTION_LITERAL;
+			case LOCAL_REPLACEMENT: return LOCAL_REPLACEMENT_LITERAL;
+			case EXTENDS_REPLACES: return EXTENDS_REPLACES_LITERAL;
 		}
 		return null;
 	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	private final int value;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	private final String name;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	private final String literal;
 
 	/**
 	 * Only this class can construct instances.
@@ -302,46 +283,7 @@ public enum VariabilityType implements Enumerator
 	 * @generated
 	 */
 	private VariabilityType(int value, String name, String literal) {
-		this.value = value;
-		this.name = name;
-		this.literal = literal;
+		super(value, name, literal);
 	}
 
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public int getValue() {
-	  return value;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public String getName() {
-	  return name;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public String getLiteral() {
-	  return literal;
-	}
-
-	/**
-	 * Returns the literal value of the enumerator, which is its string representation.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public String toString() {
-		return literal;
-	}
-}
+} //VariabilityType

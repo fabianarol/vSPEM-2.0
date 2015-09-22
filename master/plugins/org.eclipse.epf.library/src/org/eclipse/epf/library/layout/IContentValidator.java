@@ -22,24 +22,20 @@ import org.eclipse.epf.uma.MethodElement;
  * @since 1.0
  *
  */
-public interface IContentValidator  {
+public interface IContentValidator {
 
-	final Object elementUrlFeature = new Object();
-	
 	/**
 	 * set publish dir
 	 * @param pubDir String
 	 */
 	public void setPublishDir(String pubDir);
-	
+
 	/**
 	 * show broken links if true
 	 * @return boolean
 	 */
 	public boolean showBrokenLinks();
 	
-	public void scanContent(IElementLayout layout, String content) throws Exception;
-
 	/**
 	 * validate the link attribute and linked text for the owning element within the configuration. 
 	 * Returns a LinkInfo object.
@@ -140,8 +136,6 @@ public interface IContentValidator  {
 	 * @param e MethodElement the element to be checked
 	 */
 	public boolean isDiscarded(MethodElement owner, Object feature, MethodElement e);
-	
-	public boolean isDiscarded(MethodElement owner, Object feature, MethodElement e, MethodConfiguration config);
 
 	/**
 	 * set an discarded element
@@ -180,10 +174,4 @@ public interface IContentValidator  {
 	 * @return String
 	 */
 	public String getDefaultActivityTab();
-	
-	/**
-	 * show lined element page for a descriptor if true
-	 */
-	public boolean showLinkedPageForDescriptor();
-	
 }

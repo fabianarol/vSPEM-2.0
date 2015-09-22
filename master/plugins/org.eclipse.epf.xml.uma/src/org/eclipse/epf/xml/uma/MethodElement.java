@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: MethodElement.java,v 1.4 2007/05/04 22:46:43 klow Exp $
+ */
 package org.eclipse.epf.xml.uma;
 
 import org.eclipse.emf.common.util.EList;
@@ -31,7 +27,6 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  *   <li>{@link org.eclipse.epf.xml.uma.MethodElement#getBriefDescription <em>Brief Description</em>}</li>
  *   <li>{@link org.eclipse.epf.xml.uma.MethodElement#getId <em>Id</em>}</li>
  *   <li>{@link org.eclipse.epf.xml.uma.MethodElement#getOrderingGuide <em>Ordering Guide</em>}</li>
- *   <li>{@link org.eclipse.epf.xml.uma.MethodElement#getPresentationName <em>Presentation Name</em>}</li>
  *   <li>{@link org.eclipse.epf.xml.uma.MethodElement#isSuppressed <em>Suppressed</em>}</li>
  * </ul>
  * </p>
@@ -68,11 +63,11 @@ public interface MethodElement extends PackageableElement {
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Owned Rule</em>' containment reference list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getMethodElement_OwnedRule()
-	 * @model containment="true" transient="true" volatile="true" derived="true"
+	 * @model type="org.eclipse.epf.xml.uma.Constraint" containment="true" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='OwnedRule' group='#group:1'"
 	 * @generated
 	 */
-	EList<Constraint> getOwnedRule();
+	EList getOwnedRule();
 
 	/**
 	 * Returns the value of the '<em><b>Method Element Property</b></em>' containment reference list.
@@ -85,11 +80,11 @@ public interface MethodElement extends PackageableElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Method Element Property</em>' containment reference list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getMethodElement_MethodElementProperty()
-	 * @model containment="true" transient="true" volatile="true" derived="true"
+	 * @model type="org.eclipse.epf.xml.uma.MethodElementProperty" containment="true" transient="true" volatile="true" derived="true"
 	 *        extendedMetaData="kind='element' name='MethodElementProperty' group='#group:1'"
 	 * @generated
 	 */
-	EList<MethodElementProperty> getMethodElementProperty();
+	EList getMethodElementProperty();
 
 	/**
 	 * Returns the value of the '<em><b>Brief Description</b></em>' attribute.
@@ -101,7 +96,7 @@ public interface MethodElement extends PackageableElement {
 	 * @return the value of the '<em>Brief Description</em>' attribute.
 	 * @see #setBriefDescription(String)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getMethodElement_BriefDescription()
-	 * @model dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="kind='attribute' name='briefDescription'"
 	 * @generated
 	 */
@@ -127,7 +122,7 @@ public interface MethodElement extends PackageableElement {
 	 * @return the value of the '<em>Id</em>' attribute.
 	 * @see #setId(String)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getMethodElement_Id()
-	 * @model dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="kind='attribute' name='id'"
 	 * @generated
 	 */
@@ -153,7 +148,7 @@ public interface MethodElement extends PackageableElement {
 	 * @return the value of the '<em>Ordering Guide</em>' attribute.
 	 * @see #setOrderingGuide(String)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getMethodElement_OrderingGuide()
-	 * @model dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="kind='attribute' name='orderingGuide'"
 	 * @generated
 	 */
@@ -170,32 +165,6 @@ public interface MethodElement extends PackageableElement {
 	void setOrderingGuide(String value);
 
 	/**
-	 * Returns the value of the '<em><b>Presentation Name</b></em>' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * <!-- begin-model-doc -->
-	 * Every Describable Element has a presentation name, which is used for external presentation of the element.  For example, name (the internal representation) might be set to "rup_architecture_document" to differentiate from a "j2ee_architcture_document" whereas the external presentation would always be "Architecture Document".
-	 * <!-- end-model-doc -->
-	 * @return the value of the '<em>Presentation Name</em>' attribute.
-	 * @see #setPresentationName(String)
-	 * @see org.eclipse.epf.xml.uma.UmaPackage#getMethodElement_PresentationName()
-	 * @model dataType="org.eclipse.emf.ecore.xml.type.String"
-	 *        extendedMetaData="kind='attribute' name='presentationName'"
-	 * @generated
-	 */
-	String getPresentationName();
-
-	/**
-	 * Sets the value of the '{@link org.eclipse.epf.xml.uma.MethodElement#getPresentationName <em>Presentation Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Presentation Name</em>' attribute.
-	 * @see #getPresentationName()
-	 * @generated
-	 */
-	void setPresentationName(String value);
-
-	/**
 	 * Returns the value of the '<em><b>Suppressed</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -207,7 +176,7 @@ public interface MethodElement extends PackageableElement {
 	 * @see #unsetSuppressed()
 	 * @see #setSuppressed(boolean)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getMethodElement_Suppressed()
-	 * @model unsettable="true" dataType="org.eclipse.emf.ecore.xml.type.Boolean"
+	 * @model unique="false" unsettable="true" dataType="org.eclipse.emf.ecore.xml.type.Boolean"
 	 *        extendedMetaData="kind='attribute' name='suppressed'"
 	 * @generated
 	 */

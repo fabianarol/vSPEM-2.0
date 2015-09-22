@@ -15,6 +15,7 @@ import java.util.Comparator;
 import org.eclipse.epf.library.edit.util.Comparators;
 import org.eclipse.epf.library.edit.util.Comparators.TypeComparator;
 import org.eclipse.epf.uma.Guidance;
+import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.ProcessComponent;
 import org.eclipse.epf.uma.ProcessPackage;
 import org.eclipse.epf.uma.UmaPackage;

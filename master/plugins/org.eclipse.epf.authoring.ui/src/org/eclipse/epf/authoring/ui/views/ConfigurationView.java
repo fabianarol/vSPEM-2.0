@@ -12,7 +12,6 @@ package org.eclipse.epf.authoring.ui.views;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 
 import org.eclipse.emf.common.command.BasicCommandStack;
 import org.eclipse.emf.common.command.Command;
@@ -24,36 +23,29 @@ import org.eclipse.emf.edit.provider.IDisposable;
 import org.eclipse.emf.edit.ui.action.CopyAction;
 import org.eclipse.emf.edit.ui.dnd.LocalTransfer;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryContentProvider;
-import org.eclipse.epf.authoring.ui.AuthoringPerspective;
-import org.eclipse.epf.authoring.ui.AuthoringUIExtensionManager;
 import org.eclipse.epf.authoring.ui.AuthoringUIHelpContexts;
 import org.eclipse.epf.authoring.ui.AuthoringUIPlugin;
 import org.eclipse.epf.authoring.ui.AuthoringUIResources;
-import org.eclipse.epf.authoring.ui.BrowsingPerspective;
 import org.eclipse.epf.authoring.ui.PerspectiveListUtil;
 import org.eclipse.epf.authoring.ui.UIActionDispatcher;
 import org.eclipse.epf.authoring.ui.actions.ConfigurationViewEditAction;
 import org.eclipse.epf.authoring.ui.actions.ILibraryActionBarContributor;
-import org.eclipse.epf.authoring.ui.actions.IMenuAction;
 import org.eclipse.epf.authoring.ui.actions.LibraryActionBarContributor;
 import org.eclipse.epf.authoring.ui.actions.LibraryViewCopyAction;
 import org.eclipse.epf.authoring.ui.actions.LibraryViewFindElementAction;
 import org.eclipse.epf.authoring.ui.dnd.LibraryViewerDragAdapter;
-import org.eclipse.epf.authoring.ui.providers.ConfigurationDecoratingLabelProvider;
-import org.eclipse.epf.authoring.ui.providers.IContentProviderFactory;
-import org.eclipse.epf.common.ui.util.ClipboardUtil;
+import org.eclipse.epf.authoring.ui.providers.ConfigurationLabelProvider;
+import org.eclipse.epf.common.utils.ClipboardUtil;
 import org.eclipse.epf.common.utils.StrUtil;
 import org.eclipse.epf.library.ILibraryManager;
 import org.eclipse.epf.library.LibraryService;
 import org.eclipse.epf.library.LibraryServiceUtil;
-import org.eclipse.epf.library.configuration.ConfigurationHelper;
+import org.eclipse.epf.library.configuration.ConfigurationFilter;
 import org.eclipse.epf.library.edit.IFilter;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
-import org.eclipse.epf.library.edit.util.ExtensionManager;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.events.ILibraryChangeListener;
 import org.eclipse.epf.library.ui.LibraryUIManager;
-import org.eclipse.epf.library.ui.actions.ConfigurationContributionItem;
 import org.eclipse.epf.library.util.ResourceHelper;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodElement;
@@ -62,7 +54,6 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
@@ -78,21 +69,16 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.HTMLTransfer;
-import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.IPerspectiveDescriptor;
-import org.eclipse.ui.IPerspectiveListener;
 import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
@@ -122,41 +108,10 @@ public class ConfigurationView extends AbstractBaseView implements
 
 	private IDoubleClickListener doubleClickListener;
 
-	private IFilter configFilter;
-
-	private List<Action> menuActionProviders;
-	
-	private String refreshedPersID;
-
 	/**
 	 * Creates a new instance.
 	 */
 	public ConfigurationView() {
-		extender = AuthoringUIExtensionManager.getInstance()
-				.createConfigurationViewExtender(this);
-		
-		IWorkbenchWindow window = AuthoringUIPlugin.getDefault().getWorkbench()
-				.getActiveWorkbenchWindow();
-		if (window != null) {
-			window.addPerspectiveListener(new IPerspectiveListener() {
-				public void perspectiveActivated(IWorkbenchPage page,
-						IPerspectiveDescriptor desc) {
-				}
-
-				public void perspectiveChanged(IWorkbenchPage page,
-						IPerspectiveDescriptor desc, String id) {
-					String newID = desc.getId();
-					if (AuthoringPerspective.PERSPECTIVE_ID.equals(newID)
-							|| BrowsingPerspective.PERSPECTIVE_ID.equals(newID)) {
-						if (! newID.equals(refreshedPersID)) {
-							refreshedPersID = newID;
-							refresh();
-						}
-					}
-
-				}
-			});
-		}
 	}
 
 	/**
@@ -168,26 +123,6 @@ public class ConfigurationView extends AbstractBaseView implements
 		LibraryUIManager.getInstance();
 	}
 
-	private IAction collapseViewAction;
-	public IAction getCollapseViewAction() {
-		if (collapseViewAction == null) {
-			collapseViewAction = new Action() {
-				public void run() {
-					PlatformUI.getWorkbench().getDisplay().syncExec(
-							new Runnable() {
-								public void run() {
-									if (getViewer() instanceof TreeViewer) {
-										((TreeViewer) getViewer())
-												.collapseAll();
-									}
-								}
-							});
-				}
-			};
-		}
-		return collapseViewAction;
-	}
-	
 	/**
 	 * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(Composite)
 	 */
@@ -197,48 +132,13 @@ public class ConfigurationView extends AbstractBaseView implements
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(parent,
 				AuthoringUIHelpContexts.CONFIGURATION_VIEW_CONTEXT);
 
-//		editingDomain = new AdapterFactoryEditingDomain(adapterFactory,
-//				new BasicCommandStack());				
-		editingDomain = newEditingDomain();
-		
+		editingDomain = new AdapterFactoryEditingDomain(adapterFactory,
+				new BasicCommandStack());
 		adapterFactory = (ComposedAdapterFactory) editingDomain
 				.getAdapterFactory();
 
 		// Open the current configuration.
 		setConfiguration(null);
-		
-		loadMenuActionProviders();
-		IToolBarManager mgr= getViewSite().getActionBars().getToolBarManager();
-
-		for (int i = 0; i < menuActionProviders.size(); i++) {
-			try {
-				Object actionProvider  = menuActionProviders.get(i);
-				if (actionProvider instanceof Action) {
-					mgr.add((Action)actionProvider);
-					if (actionProvider instanceof IMenuAction)
-						((IMenuAction) actionProvider).init(this);
-				}
-				
-			} catch (Exception e) {
-				AuthoringUIPlugin.getDefault().getLogger().logError(e);
-			}
-		}
-	}
-	
-	protected AdapterFactoryEditingDomain newEditingDomain() {
-		return new AdapterFactoryEditingDomain(adapterFactory,
-				new BasicCommandStack());
-	}
-	
-	/** 
-	 * Get all menu providers
-	 * @return
-	 */
-	private List<Action> loadMenuActionProviders() {
-		if (menuActionProviders == null) {
-			menuActionProviders = ExtensionManager.getExtensions(AuthoringUIPlugin.getDefault().getId(), "configurationViewMenuProvider", Action.class); //$NON-NLS-1$	
-		}
-		return menuActionProviders;
 	}
 
 	/**
@@ -246,6 +146,7 @@ public class ConfigurationView extends AbstractBaseView implements
 	 */
 	public void libraryCreated(MethodLibrary library) {
 	}
+
 	/**
 	 * @see org.eclipse.epf.library.ILibraryServiceListener#libraryOpened(MethodLibrary)
 	 */
@@ -266,10 +167,7 @@ public class ConfigurationView extends AbstractBaseView implements
 	 * @see org.eclipse.epf.library.ILibraryServiceListener#librarySet(MethodLibrary)
 	 */
 	public void librarySet(MethodLibrary library) {
-		MethodConfiguration config = LibraryService.getInstance().getCurrentMethodConfiguration();
-		if(config != null && config.eContainer() != library) {
-			setMethodConfiguration(null);
-		}
+		setMethodConfiguration(null);
 		// Add a library change listener.
 		ILibraryManager manager = LibraryService.getInstance()
 				.getCurrentLibraryManager();
@@ -321,10 +219,6 @@ public class ConfigurationView extends AbstractBaseView implements
 	 */
 	public void configurationSet(MethodConfiguration config) {
 		setMethodConfiguration(config);
-		ConfigurationContributionItem configCombo = LibraryUIManager.getInstance().getConfigCombo();
-		if (configCombo != null) {
-			configCombo.setCollapseConfigViewAction(getCollapseViewAction());
-		}
 	}
 
 	/**
@@ -353,15 +247,6 @@ public class ConfigurationView extends AbstractBaseView implements
 		}
 	}
 
-	private boolean firstButtonClicked = true;
-	public boolean isFirstButtonClicked() {
-		return firstButtonClicked;
-	}
-
-	private void setFirstButtonClicked(boolean firstButtonClicked) {
-		this.firstButtonClicked = firstButtonClicked;
-	}
-
 	/**
 	 * Creates the viewer.
 	 */
@@ -372,24 +257,12 @@ public class ConfigurationView extends AbstractBaseView implements
 		GridLayout layout = new GridLayout();
 		content.setLayout(layout);
 
-		treeViewer = new TreeViewer(content) {
-			protected void hookControl(Control control) {
-				super.hookControl(control);
-				getTree().addMouseListener(new MouseAdapter() {
-					public void mouseDown(MouseEvent e) {
-						boolean b = e != null && e.button == 1;
-						setFirstButtonClicked(b);
-					}
-				});
-			}
-		};
-		
-		treeViewer.setUseHashlookup(true);
+		treeViewer = new TreeViewer(content);
 		treeViewer.getTree().setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		// Add drag-and-drop support.
-		int dndOperations = DND.DROP_COPY | DND.DROP_MOVE ;
-		Transfer[] transfers = new Transfer[] { HTMLTransfer.getInstance(), TextTransfer.getInstance(),
+		int dndOperations = DND.DROP_COPY | DND.DROP_MOVE;
+		Transfer[] transfers = new Transfer[] { HTMLTransfer.getInstance(),
 				LocalTransfer.getInstance() };
 		treeViewer.addDragSupport(dndOperations, transfers,
 				new LibraryViewerDragAdapter(treeViewer));
@@ -440,16 +313,7 @@ public class ConfigurationView extends AbstractBaseView implements
 		actionDispatcher.setSelection(emptySelection);
 		UIActionDispatcher.getInstance().setSelection(emptySelection);
 	}
-	
-	private IFilter createFilter(MethodConfiguration config) {
-		IContentProviderFactory cpFactory = getContentProviderFactory();
-		IFilter filter = null;
-		if(cpFactory != null) {
-			filter = cpFactory.createFilter(config, treeViewer);
-		}
-		return filter != null ? filter : new ConfigurationViewFilter(config, treeViewer);
-	}
-	
+
 	/**
 	 * Sets the given Method Configuration as this viewer's input
 	 * 
@@ -467,19 +331,13 @@ public class ConfigurationView extends AbstractBaseView implements
 
 		if (config != null) {
 			this.configName = config.getName();
-			configFilter = createFilter(config);
+			IFilter configFilter = new ConfigurationFilter(config, treeViewer);
 			adapterFactory = TngAdapterFactory.INSTANCE
 					.getConfigurationView_AdapterFactory(configFilter);
 			editingDomain.setAdapterFactory(adapterFactory);
-			AdapterFactoryContentProvider contentProvider = (AdapterFactoryContentProvider) treeViewer.getContentProvider();			
-			if(contentProvider == null) {
-				contentProvider = createContentProvider();
-			}
-			else {
-				contentProvider.setAdapterFactory(adapterFactory);
-			}
-			treeViewer.setContentProvider(contentProvider);
-			treeViewer.setLabelProvider(new ConfigurationDecoratingLabelProvider(config,
+			treeViewer.setContentProvider(new AdapterFactoryContentProvider(
+					adapterFactory));
+			treeViewer.setLabelProvider(new ConfigurationLabelProvider(config,
 					adapterFactory));
 			title = config.getName();
 		} else {
@@ -575,11 +433,6 @@ public class ConfigurationView extends AbstractBaseView implements
 		return (ConfigurationView)ViewHelper.findView(VIEW_ID, show);
 	}
 
-	public static ConfigurationView getView(String viewId) {
-		boolean show = ViewHelper.isViewInCurrentPerspective(viewId);
-		return (ConfigurationView)ViewHelper.findView(viewId, show);
-	}
-	
 	/**
 	 * @see org.eclipse.epf.authoring.ui.views.AbstractBaseView#getViewer()
 	 */
@@ -693,11 +546,6 @@ public class ConfigurationView extends AbstractBaseView implements
 		 * @see LibraryActionBarContributor#menuAboutToShow(IMenuManager)
 		 */
 		public void menuAboutToShow(IMenuManager menuManager) {
-			menuAboutToShow_(menuManager);
-			getExtender().getActionBarExtender().menuAboutToShow(menuManager);
-		}
-		
-		private void menuAboutToShow_(IMenuManager menuManager) {
 			// Add our standard markers.
 			menuManager.add(new Separator("additions")); //$NON-NLS-1$
 			menuManager.add(new Separator("edit")); //$NON-NLS-1$
@@ -749,10 +597,6 @@ public class ConfigurationView extends AbstractBaseView implements
 			};
 		}
 
-		@Override
-		protected void refreshViewer(Viewer viewer) {
-			refresh();
-		}
 	}
 
 	/**
@@ -772,37 +616,9 @@ public class ConfigurationView extends AbstractBaseView implements
 			reset();
 		}
 	}
-	
-	public void refresh() {
-		ConfigurationHelper.getDelegate().configViewRefreshNotified();
-		
-		if(configFilter instanceof ConfigurationViewFilter) {
-			((ConfigurationViewFilter)configFilter).refreshViewer();
-		}
-		else {
-			getViewer().refresh();
-		}
-	}
 
 	@Override
 	public String getViewId() {
 		return VIEW_ID;
 	}
-	
-	private ConfigurationViewExtender extender;
-	protected ConfigurationViewExtender getExtender() {
-		return extender;
-	}
-	
-	@Override
-	public void setSelection(ISelection selection) {
-		getExtender().getActionBarExtender().updateSelection(selection);
-		super.setSelection(selection);
-	}
-	
-	//temp code
-	public void setDiffName(String name) {
-		setPartName(name);
-	}
-	
 }

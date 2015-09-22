@@ -45,8 +45,6 @@ public final class ExportXMLResources extends NLS {
 	public static String browseButton_text;
 
 	public static String overwriteText_msg;
-	
-	public static String overwriteText_msg1;
 
 	public static String exportingXML_text;
 
@@ -87,10 +85,6 @@ public final class ExportXMLResources extends NLS {
 	public static String xmlLibrary_new_id;
 
 	public static String xmlLibrary_id_not_unique;
-	
-	public static String export_config_to_temp_location;
-	
-	public static String open_lib_from_temp_exported_location;
 
 	static {
 		NLS.initializeMessages(BUNDLE_NAME, ExportXMLResources.class);

@@ -47,9 +47,7 @@ public final class PropertiesResources extends NLS {
 	public static String Descriptor_documentInformationDescription;
 	public static String Process_None;
 	public static String Process_name;
-	public static String Process_name_restore;
 	public static String Process_PresentationName;
-	public static String Process_PresentationName_restore;
 	public static String Process_briefDescription;
 	public static String Process_mainDescription;
 	public static String Process_purpose;
@@ -58,7 +56,6 @@ public final class PropertiesResources extends NLS {
 	public static String Process_Type_Task;
 	public static String Process_Type_Role;
 	public static String Process_Type_WorkProduct;
-	public static String Linked_Element;	
 	public static String WorkProduct_Type;
 	public static String Activity_ModelInfo;
 	public static String Activity_Type;
@@ -158,20 +155,12 @@ public final class PropertiesResources extends NLS {
 	public static String TeamProfile_Role_SectionTitle;
 	public static String TeamProfile_Role_SectionDescription;
 	public static String TeamProfile_Role_Table1;
-	public static String Milestone_WorkProducts_SectionDescription;
-	public static String Milestone_WorkProducts_Table1;
 	public static String Process_RichText_CollapseImage;
 	public static String Process_RichText_ExpandImage;
 	public static String Process_Add;
 	public static String Process_AddFromProcess;
 	public static String Process_Rename_Message;
 	public static String Process_Remove;
-	public static String Process_AssignState;
-	public static String Process_SelectStateDialog_Message;
-	public static String Process_SelectStateDialog_Title;
-	public static String Process_SelectStateDialog_Label_Description;
-	public static String Process_UnassignState_Body_Text;
-	public static String Process_UnassignState_Description;
 	public static String Process_Up;
 	public static String Process_Down;
 	public static String Process_MultipleSelection;
@@ -203,11 +192,6 @@ public final class PropertiesResources extends NLS {
 	public static String PredecessorDialog_PredecessorErrorMessage;
 	public static String ProcessEditorFormProperties_textEditCell_problem_msg;
 	public static String ProcessEditorFormProperties_cellEditor_invalidPredcessor_problem_msg;
-	
-	public static String true_text;
-	public static String false_text;
-	
-	public static String Process_SyncFree_FontStyle;
 
 	static {
 		NLS.initializeMessages(BUNDLE_NAME, PropertiesResources.class);

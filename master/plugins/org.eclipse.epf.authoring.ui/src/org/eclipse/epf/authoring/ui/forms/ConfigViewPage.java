@@ -21,14 +21,15 @@ import org.eclipse.emf.edit.ui.provider.AdapterFactoryContentProvider;
 import org.eclipse.epf.authoring.ui.AuthoringUIHelpContexts;
 import org.eclipse.epf.authoring.ui.AuthoringUIPlugin;
 import org.eclipse.epf.authoring.ui.AuthoringUIResources;
+import org.eclipse.epf.authoring.ui.AuthoringUIText;
 import org.eclipse.epf.authoring.ui.dialogs.ConfigurationAddViewsDialog;
 import org.eclipse.epf.authoring.ui.dialogs.ConfigurationOrderDialog;
 import org.eclipse.epf.authoring.ui.editors.ConfigurationEditor;
 import org.eclipse.epf.authoring.ui.editors.ConfigurationEditorInput;
 import org.eclipse.epf.authoring.ui.filters.ProcessViewFilter;
 import org.eclipse.epf.authoring.ui.providers.ConfigurationLabelProvider;
-import org.eclipse.epf.authoring.ui.views.ConfigurationViewFilter;
 import org.eclipse.epf.common.serviceability.Logger;
+import org.eclipse.epf.library.configuration.ConfigurationFilter;
 import org.eclipse.epf.library.edit.IFilter;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
 import org.eclipse.epf.library.edit.command.IActionManager;
@@ -60,6 +61,7 @@ import org.eclipse.ui.forms.editor.FormPage;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
+import org.eclipse.ui.forms.widgets.TableWrapData;
 
 
 /**
@@ -406,7 +408,7 @@ public class ConfigViewPage extends FormPage {
 		treeViewer.getTree().setLayout(new GridLayout());
 		treeViewer.getTree().setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		IFilter configFilter = new ConfigurationViewFilter(config, treeViewer);
+		IFilter configFilter = new ConfigurationFilter(config, treeViewer);
 		AdapterFactory adapterFactory = TngAdapterFactory.INSTANCE
 				.getConfigurationView_AdapterFactory(configFilter);
 

@@ -13,7 +13,6 @@ package org.eclipse.epf.uma.impl;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 import org.eclipse.emf.common.util.EList;
@@ -22,12 +21,9 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.ecore.util.EObjectContainmentEList;
-import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 import org.eclipse.emf.ecore.util.InternalEList;
 import org.eclipse.emf.ecore.xmi.XMLResource;
-import org.eclipse.epf.common.utils.ExtensionHelper;
 import org.eclipse.epf.uma.Constraint;
-import org.eclipse.epf.uma.Kind;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.MethodElementProperty;
 import org.eclipse.epf.uma.UmaPackage;
@@ -41,11 +37,9 @@ import org.eclipse.epf.uma.util.UmaUtil;
  * The following features are implemented:
  * <ul>
  *   <li>{@link org.eclipse.epf.uma.impl.MethodElementImpl#getGuid <em>Guid</em>}</li>
- *   <li>{@link org.eclipse.epf.uma.impl.MethodElementImpl#getPresentationName <em>Presentation Name</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.impl.MethodElementImpl#getBriefDescription <em>Brief Description</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.impl.MethodElementImpl#getOwnedRules <em>Owned Rules</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.impl.MethodElementImpl#getMethodElementProperty <em>Method Element Property</em>}</li>
- *   <li>{@link org.eclipse.epf.uma.impl.MethodElementImpl#getKind <em>Kind</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.impl.MethodElementImpl#getSuppressed <em>Suppressed</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.impl.MethodElementImpl#getOrderingGuide <em>Ordering Guide</em>}</li>
  * </ul>
@@ -55,6 +49,13 @@ import org.eclipse.epf.uma.util.UmaUtil;
  */
 public abstract class MethodElementImpl extends PackageableElementImpl
 		implements MethodElement {
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * The default value of the '{@link #getGuid() <em>Guid</em>}' attribute.
 	 * <!-- begin-user-doc -->
@@ -74,26 +75,6 @@ public abstract class MethodElementImpl extends PackageableElementImpl
 	 * @ordered
 	 */
 	protected String guid = GUID_EDEFAULT;
-
-	/**
-	 * The default value of the '{@link #getPresentationName() <em>Presentation Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getPresentationName()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String PRESENTATION_NAME_EDEFAULT = ""; //$NON-NLS-1$
-
-	/**
-	 * The cached value of the '{@link #getPresentationName() <em>Presentation Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getPresentationName()
-	 * @generated
-	 * @ordered
-	 */
-	protected String presentationName = PRESENTATION_NAME_EDEFAULT;
 
 	/**
 	 * The default value of the '{@link #getBriefDescription() <em>Brief Description</em>}' attribute.
@@ -123,7 +104,7 @@ public abstract class MethodElementImpl extends PackageableElementImpl
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Constraint> ownedRules;
+	protected EList ownedRules = null;
 
 	/**
 	 * The cached value of the '{@link #getMethodElementProperty() <em>Method Element Property</em>}' containment reference list.
@@ -133,17 +114,7 @@ public abstract class MethodElementImpl extends PackageableElementImpl
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<MethodElementProperty> methodElementProperty;
-
-	/**
-	 * The cached value of the '{@link #getKind() <em>Kind</em>}' reference list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getKind()
-	 * @generated
-	 * @ordered
-	 */
-	protected EList<Kind> kind;
+	protected EList methodElementProperty = null;
 
 	/**
 	 * The default value of the '{@link #getSuppressed() <em>Suppressed</em>}' attribute.
@@ -195,7 +166,7 @@ public abstract class MethodElementImpl extends PackageableElementImpl
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -203,7 +174,6 @@ public abstract class MethodElementImpl extends PackageableElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.METHOD_ELEMENT;
 	}
@@ -238,42 +208,6 @@ public abstract class MethodElementImpl extends PackageableElementImpl
 		}
 	}
 
-	public Object getAdapter(Class adapter) {
-		List<IAdaptable> extensions = ExtensionHelper
-				.getExtensions(
-						"org.eclipse.epf.uma.ecore", "methodElementIAdaptable", IAdaptable.class); //$NON-NLS-1$ //$NON-NLS-2$
-		for (IAdaptable adaptable : extensions) {
-			Object result = adaptable.getAdapter(adapter);
-			if (result != null) {
-				return result;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public String getPresentationName() {
-		return presentationName;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setPresentationName(String newPresentationName) {
-		String oldPresentationName = presentationName;
-		presentationName = newPresentationName;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					UmaPackage.METHOD_ELEMENT__PRESENTATION_NAME,
-					oldPresentationName, presentationName));
-	}
-
 	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -302,9 +236,9 @@ public abstract class MethodElementImpl extends PackageableElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<Constraint> getOwnedRules() {
+	public List getOwnedRules() {
 		if (ownedRules == null) {
-			ownedRules = new EObjectContainmentEList.Resolving<Constraint>(
+			ownedRules = new EObjectContainmentEList.Resolving(
 					Constraint.class, this,
 					UmaPackage.METHOD_ELEMENT__OWNED_RULES);
 		}
@@ -316,26 +250,13 @@ public abstract class MethodElementImpl extends PackageableElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<MethodElementProperty> getMethodElementProperty() {
+	public List getMethodElementProperty() {
 		if (methodElementProperty == null) {
-			methodElementProperty = new EObjectContainmentEList.Resolving<MethodElementProperty>(
+			methodElementProperty = new EObjectContainmentEList.Resolving(
 					MethodElementProperty.class, this,
 					UmaPackage.METHOD_ELEMENT__METHOD_ELEMENT_PROPERTY);
 		}
 		return methodElementProperty;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public List<Kind> getKind() {
-		if (kind == null) {
-			kind = new EObjectResolvingEList<Kind>(Kind.class, this,
-					UmaPackage.METHOD_ELEMENT__KIND);
-		}
-		return kind;
 	}
 
 	/**
@@ -389,15 +310,14 @@ public abstract class MethodElementImpl extends PackageableElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case UmaPackage.METHOD_ELEMENT__OWNED_RULES:
-			return ((InternalEList<?>) getOwnedRules()).basicRemove(otherEnd,
-					msgs);
+			return ((InternalEList) getOwnedRules())
+					.basicRemove(otherEnd, msgs);
 		case UmaPackage.METHOD_ELEMENT__METHOD_ELEMENT_PROPERTY:
-			return ((InternalEList<?>) getMethodElementProperty()).basicRemove(
+			return ((InternalEList) getMethodElementProperty()).basicRemove(
 					otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
@@ -408,21 +328,16 @@ public abstract class MethodElementImpl extends PackageableElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.METHOD_ELEMENT__GUID:
 			return getGuid();
-		case UmaPackage.METHOD_ELEMENT__PRESENTATION_NAME:
-			return getPresentationName();
 		case UmaPackage.METHOD_ELEMENT__BRIEF_DESCRIPTION:
 			return getBriefDescription();
 		case UmaPackage.METHOD_ELEMENT__OWNED_RULES:
 			return getOwnedRules();
 		case UmaPackage.METHOD_ELEMENT__METHOD_ELEMENT_PROPERTY:
 			return getMethodElementProperty();
-		case UmaPackage.METHOD_ELEMENT__KIND:
-			return getKind();
 		case UmaPackage.METHOD_ELEMENT__SUPPRESSED:
 			return getSuppressed();
 		case UmaPackage.METHOD_ELEMENT__ORDERING_GUIDE:
@@ -436,31 +351,21 @@ public abstract class MethodElementImpl extends PackageableElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.METHOD_ELEMENT__GUID:
 			setGuid((String) newValue);
-			return;
-		case UmaPackage.METHOD_ELEMENT__PRESENTATION_NAME:
-			setPresentationName((String) newValue);
 			return;
 		case UmaPackage.METHOD_ELEMENT__BRIEF_DESCRIPTION:
 			setBriefDescription((String) newValue);
 			return;
 		case UmaPackage.METHOD_ELEMENT__OWNED_RULES:
 			getOwnedRules().clear();
-			getOwnedRules().addAll((Collection<? extends Constraint>) newValue);
+			getOwnedRules().addAll((Collection) newValue);
 			return;
 		case UmaPackage.METHOD_ELEMENT__METHOD_ELEMENT_PROPERTY:
 			getMethodElementProperty().clear();
-			getMethodElementProperty().addAll(
-					(Collection<? extends MethodElementProperty>) newValue);
-			return;
-		case UmaPackage.METHOD_ELEMENT__KIND:
-			getKind().clear();
-			getKind().addAll((Collection<? extends Kind>) newValue);
+			getMethodElementProperty().addAll((Collection) newValue);
 			return;
 		case UmaPackage.METHOD_ELEMENT__SUPPRESSED:
 			setSuppressed((Boolean) newValue);
@@ -477,14 +382,10 @@ public abstract class MethodElementImpl extends PackageableElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.METHOD_ELEMENT__GUID:
 			setGuid(GUID_EDEFAULT);
-			return;
-		case UmaPackage.METHOD_ELEMENT__PRESENTATION_NAME:
-			setPresentationName(PRESENTATION_NAME_EDEFAULT);
 			return;
 		case UmaPackage.METHOD_ELEMENT__BRIEF_DESCRIPTION:
 			setBriefDescription(BRIEF_DESCRIPTION_EDEFAULT);
@@ -494,9 +395,6 @@ public abstract class MethodElementImpl extends PackageableElementImpl
 			return;
 		case UmaPackage.METHOD_ELEMENT__METHOD_ELEMENT_PROPERTY:
 			getMethodElementProperty().clear();
-			return;
-		case UmaPackage.METHOD_ELEMENT__KIND:
-			getKind().clear();
 			return;
 		case UmaPackage.METHOD_ELEMENT__SUPPRESSED:
 			setSuppressed(SUPPRESSED_EDEFAULT);
@@ -513,7 +411,6 @@ public abstract class MethodElementImpl extends PackageableElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);
@@ -525,9 +422,6 @@ public abstract class MethodElementImpl extends PackageableElementImpl
 		case UmaPackage.METHOD_ELEMENT__GUID:
 			return GUID_EDEFAULT == null ? guid != null : !GUID_EDEFAULT
 					.equals(guid);
-		case UmaPackage.METHOD_ELEMENT__PRESENTATION_NAME:
-			return PRESENTATION_NAME_EDEFAULT == null ? presentationName != null
-					: !PRESENTATION_NAME_EDEFAULT.equals(presentationName);
 		case UmaPackage.METHOD_ELEMENT__BRIEF_DESCRIPTION:
 			return BRIEF_DESCRIPTION_EDEFAULT == null ? briefDescription != null
 					: !BRIEF_DESCRIPTION_EDEFAULT.equals(briefDescription);
@@ -536,8 +430,6 @@ public abstract class MethodElementImpl extends PackageableElementImpl
 		case UmaPackage.METHOD_ELEMENT__METHOD_ELEMENT_PROPERTY:
 			return methodElementProperty != null
 					&& !methodElementProperty.isEmpty();
-		case UmaPackage.METHOD_ELEMENT__KIND:
-			return kind != null && !kind.isEmpty();
 		case UmaPackage.METHOD_ELEMENT__SUPPRESSED:
 			return SUPPRESSED_EDEFAULT == null ? suppressed != null
 					: !SUPPRESSED_EDEFAULT.equals(suppressed);
@@ -553,7 +445,6 @@ public abstract class MethodElementImpl extends PackageableElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy())
 			return super.toString();
@@ -561,8 +452,6 @@ public abstract class MethodElementImpl extends PackageableElementImpl
 		StringBuffer result = new StringBuffer(super.toString());
 		result.append(" (guid: "); //$NON-NLS-1$
 		result.append(guid);
-		result.append(", presentationName: "); //$NON-NLS-1$
-		result.append(presentationName);
 		result.append(", briefDescription: "); //$NON-NLS-1$
 		result.append(briefDescription);
 		result.append(", suppressed: "); //$NON-NLS-1$

@@ -1,13 +1,6 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+//------------------------------------------------------------------------------
+// Copyright (c) 2004, 2005 IBM Corporation.  All Rights Reserved.
+//------------------------------------------------------------------------------
 package org.eclipse.epf.library.configuration;
 
 import java.util.Collection;
@@ -22,6 +15,7 @@ import org.eclipse.epf.library.edit.VariabilityInfo;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodLibrary;
 import org.eclipse.epf.uma.VariabilityElement;
+import org.eclipse.jface.viewers.Viewer;
 
 
 /**
@@ -33,9 +27,9 @@ import org.eclipse.epf.uma.VariabilityElement;
  */
 public class ProcessAuthoringConfigurator extends ProcessConfigurator {
 	public static final ProcessAuthoringConfigurator INSTANCE = new ProcessAuthoringConfigurator();
-	
+
 	private ProcessAuthoringConfigurator() {
-		super(null);
+		super(null, null);
 		LibraryService.getInstance().addListener(new ILibraryServiceListener() {
 
 			public void configurationSet(MethodConfiguration config) {
@@ -64,8 +58,9 @@ public class ProcessAuthoringConfigurator extends ProcessConfigurator {
 	 * @param methodConfig
 	 * @param viewer
 	 */
-	public ProcessAuthoringConfigurator(MethodConfiguration methodConfig) {
-		super(methodConfig);
+	public ProcessAuthoringConfigurator(MethodConfiguration methodConfig,
+			Viewer viewer) {
+		super(methodConfig, viewer);
 	}
 	
 	/*
@@ -106,5 +101,4 @@ public class ProcessAuthoringConfigurator extends ProcessConfigurator {
 			}
 		};
 	}
-	
 }

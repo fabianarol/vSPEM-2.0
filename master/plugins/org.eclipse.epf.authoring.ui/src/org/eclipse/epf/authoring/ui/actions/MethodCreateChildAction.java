@@ -24,17 +24,10 @@ import org.eclipse.emf.edit.domain.AdapterFactoryEditingDomain;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.emf.edit.provider.IEditingDomainItemProvider;
 import org.eclipse.emf.edit.ui.action.StaticSelectionCommandAction;
-import org.eclipse.epf.authoring.ui.AuthoringUIPlugin;
 import org.eclipse.epf.library.edit.process.command.CreateProcessComponentCommand;
-import org.eclipse.epf.library.edit.util.PracticePropUtil;
-import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.ui.actions.LibraryLockingOperationRunner;
-import org.eclipse.epf.uma.Practice;
 import org.eclipse.epf.uma.ProcessComponent;
-import org.eclipse.epf.uma.provider.UmaEditPlugin;
-import org.eclipse.epf.uma.util.UserDefinedTypeMeta;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
 
 
@@ -96,29 +89,7 @@ public final class MethodCreateChildAction extends StaticSelectionCommandAction 
 						descriptor, collection);
 			}
 
-			if (isUserDefinedType()) {
-				return new CreateMethodElementCommand(cmd) {
-					public String getText() {
-						String name = getNameForUserDefinedType();
-						if (name != null) {
-							return name;
-						} else {
-							return super.getText();
-						}
-					}
-					
-					public Object getImage() {
-						Object img = getImageForUserDefinedType();
-						if (img != null) {
-							return img;
-						} else {
-							return super.getImage();
-						}
-					}
-				};
-			} else {
-				return new CreateMethodElementCommand(cmd);
-			}
+			return new CreateMethodElementCommand(cmd);
 		}
 		return UnexecutableCommand.INSTANCE;
 	}
@@ -140,48 +111,4 @@ public final class MethodCreateChildAction extends StaticSelectionCommandAction 
 			
 		});
 	}
-
-	private boolean isUserDefinedType() {
-		try {
-			if (descriptor instanceof CommandParameter
-					&& ((CommandParameter) descriptor).getValue() instanceof Practice) {
-				Practice prac = (Practice)((CommandParameter) descriptor).getValue();
-				UserDefinedTypeMeta udtMeta = PracticePropUtil.getPracticePropUtil().getUtdData(prac);
-				if (udtMeta != null) {
-					return true;
-				}
-			}
-		} catch (Exception e) {
-			AuthoringUIPlugin.getDefault().getLogger().logError(e);
-		}
-		
-		return false;
-	}
-	
-	private String getNameForUserDefinedType() {
-		try {
-			if (isUserDefinedType()) {
-				Practice prac = (Practice)((CommandParameter) descriptor).getValue();
-				UserDefinedTypeMeta udtMeta = PracticePropUtil.getPracticePropUtil().getUtdData(prac);
-				return udtMeta.getRteNameMap().get(UserDefinedTypeMeta._typeName);
-			}
-		} catch (Exception e) {
-			AuthoringUIPlugin.getDefault().getLogger().logError(e);
-		}
-		
-		return null;
-	}
-	
-	private Object getImageForUserDefinedType() {
-		if (isUserDefinedType()) {
-			Practice prac = (Practice) ((CommandParameter) descriptor).getValue();
-			Object image = TngUtil.getImageForUdt(prac);
-			if (image == null) {
-				return UmaEditPlugin.INSTANCE.getImage("full/obj16/UdtNode");
-			}
-			return image;
-		}
-		return null;
-	}
-	
 }

@@ -43,7 +43,7 @@ public interface PracticeDescription extends ContentDescription {
 	 * @return the value of the '<em>Additional Info</em>' attribute.
 	 * @see #setAdditionalInfo(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getPracticeDescription_AdditionalInfo()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getAdditionalInfo();
@@ -69,7 +69,7 @@ public interface PracticeDescription extends ContentDescription {
 	 * @return the value of the '<em>Problem</em>' attribute.
 	 * @see #setProblem(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getPracticeDescription_Problem()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getProblem();
@@ -95,7 +95,7 @@ public interface PracticeDescription extends ContentDescription {
 	 * @return the value of the '<em>Background</em>' attribute.
 	 * @see #setBackground(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getPracticeDescription_Background()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getBackground();
@@ -121,7 +121,7 @@ public interface PracticeDescription extends ContentDescription {
 	 * @return the value of the '<em>Goals</em>' attribute.
 	 * @see #setGoals(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getPracticeDescription_Goals()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getGoals();
@@ -147,7 +147,7 @@ public interface PracticeDescription extends ContentDescription {
 	 * @return the value of the '<em>Application</em>' attribute.
 	 * @see #setApplication(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getPracticeDescription_Application()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getApplication();
@@ -173,7 +173,7 @@ public interface PracticeDescription extends ContentDescription {
 	 * @return the value of the '<em>Levels Of Adoption</em>' attribute.
 	 * @see #setLevelsOfAdoption(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getPracticeDescription_LevelsOfAdoption()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getLevelsOfAdoption();

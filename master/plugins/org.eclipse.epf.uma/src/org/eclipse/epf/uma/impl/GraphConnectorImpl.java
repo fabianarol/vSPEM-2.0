@@ -36,8 +36,8 @@ import org.eclipse.epf.uma.UmaPackage;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link org.eclipse.epf.uma.impl.GraphConnectorImpl#getGraphEdge <em>Graph Edge</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.impl.GraphConnectorImpl#getGraphElement <em>Graph Element</em>}</li>
+ *   <li>{@link org.eclipse.epf.uma.impl.GraphConnectorImpl#getGraphEdge <em>Graph Edge</em>}</li>
  * </ul>
  * </p>
  *
@@ -46,6 +46,13 @@ import org.eclipse.epf.uma.UmaPackage;
 public class GraphConnectorImpl extends GraphElementImpl implements
 		GraphConnector {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The cached value of the '{@link #getGraphEdge() <em>Graph Edge</em>}' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -53,7 +60,7 @@ public class GraphConnectorImpl extends GraphElementImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<GraphEdge> graphEdge;
+	protected EList graphEdge = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -65,7 +72,7 @@ public class GraphConnectorImpl extends GraphElementImpl implements
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -73,7 +80,6 @@ public class GraphConnectorImpl extends GraphElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.GRAPH_CONNECTOR;
 	}
@@ -144,9 +150,9 @@ public class GraphConnectorImpl extends GraphElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<GraphEdge> getGraphEdge() {
+	public List getGraphEdge() {
 		if (graphEdge == null) {
-			graphEdge = new EObjectWithInverseResolvingEList.ManyInverse<GraphEdge>(
+			graphEdge = new EObjectWithInverseResolvingEList.ManyInverse(
 					GraphEdge.class, this,
 					UmaPackage.GRAPH_CONNECTOR__GRAPH_EDGE,
 					UmaPackage.GRAPH_EDGE__ANCHOR);
@@ -159,18 +165,15 @@ public class GraphConnectorImpl extends GraphElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-		case UmaPackage.GRAPH_CONNECTOR__GRAPH_EDGE:
-			return ((InternalEList<InternalEObject>) (InternalEList<?>) getGraphEdge())
-					.basicAdd(otherEnd, msgs);
 		case UmaPackage.GRAPH_CONNECTOR__GRAPH_ELEMENT:
 			if (eInternalContainer() != null)
 				msgs = eBasicRemoveFromContainer(msgs);
 			return basicSetGraphElement((GraphElement) otherEnd, msgs);
+		case UmaPackage.GRAPH_CONNECTOR__GRAPH_EDGE:
+			return ((InternalEList) getGraphEdge()).basicAdd(otherEnd, msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
@@ -180,15 +183,13 @@ public class GraphConnectorImpl extends GraphElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
-		case UmaPackage.GRAPH_CONNECTOR__GRAPH_EDGE:
-			return ((InternalEList<?>) getGraphEdge()).basicRemove(otherEnd,
-					msgs);
 		case UmaPackage.GRAPH_CONNECTOR__GRAPH_ELEMENT:
 			return basicSetGraphElement(null, msgs);
+		case UmaPackage.GRAPH_CONNECTOR__GRAPH_EDGE:
+			return ((InternalEList) getGraphEdge()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -198,7 +199,6 @@ public class GraphConnectorImpl extends GraphElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public NotificationChain eBasicRemoveFromContainerFeature(
 			NotificationChain msgs) {
 		switch (eContainerFeatureID) {
@@ -215,15 +215,14 @@ public class GraphConnectorImpl extends GraphElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-		case UmaPackage.GRAPH_CONNECTOR__GRAPH_EDGE:
-			return getGraphEdge();
 		case UmaPackage.GRAPH_CONNECTOR__GRAPH_ELEMENT:
 			if (resolve)
 				return getGraphElement();
 			return basicGetGraphElement();
+		case UmaPackage.GRAPH_CONNECTOR__GRAPH_EDGE:
+			return getGraphEdge();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -233,16 +232,14 @@ public class GraphConnectorImpl extends GraphElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-		case UmaPackage.GRAPH_CONNECTOR__GRAPH_EDGE:
-			getGraphEdge().clear();
-			getGraphEdge().addAll((Collection<? extends GraphEdge>) newValue);
-			return;
 		case UmaPackage.GRAPH_CONNECTOR__GRAPH_ELEMENT:
 			setGraphElement((GraphElement) newValue);
+			return;
+		case UmaPackage.GRAPH_CONNECTOR__GRAPH_EDGE:
+			getGraphEdge().clear();
+			getGraphEdge().addAll((Collection) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -253,14 +250,13 @@ public class GraphConnectorImpl extends GraphElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case UmaPackage.GRAPH_CONNECTOR__GRAPH_EDGE:
-			getGraphEdge().clear();
-			return;
 		case UmaPackage.GRAPH_CONNECTOR__GRAPH_ELEMENT:
 			setGraphElement((GraphElement) null);
+			return;
+		case UmaPackage.GRAPH_CONNECTOR__GRAPH_EDGE:
+			getGraphEdge().clear();
 			return;
 		}
 		super.eUnset(featureID);
@@ -271,7 +267,6 @@ public class GraphConnectorImpl extends GraphElementImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);
@@ -280,10 +275,10 @@ public class GraphConnectorImpl extends GraphElementImpl implements
 		}
 		//UMA<--		
 		switch (featureID) {
-		case UmaPackage.GRAPH_CONNECTOR__GRAPH_EDGE:
-			return graphEdge != null && !graphEdge.isEmpty();
 		case UmaPackage.GRAPH_CONNECTOR__GRAPH_ELEMENT:
 			return basicGetGraphElement() != null;
+		case UmaPackage.GRAPH_CONNECTOR__GRAPH_EDGE:
+			return graphEdge != null && !graphEdge.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}

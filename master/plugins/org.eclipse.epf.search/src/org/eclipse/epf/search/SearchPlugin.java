@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.search;
 
-import org.eclipse.epf.common.AbstractActivator;
+import org.eclipse.epf.common.plugin.AbstractPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -19,7 +19,7 @@ import org.osgi.framework.BundleContext;
  * @author Kelvin Low
  * @since 1.0
  */
-public final class SearchPlugin extends AbstractActivator {
+public final class SearchPlugin extends AbstractPlugin {
 
 	// The shared plug-in instance.
 	private static SearchPlugin plugin;

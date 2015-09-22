@@ -11,6 +11,7 @@
 package org.eclipse.epf.library.layout;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -18,7 +19,11 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.epf.library.CreateLibraryManagerException;
+import org.eclipse.epf.library.ILibraryManager;
 import org.eclipse.epf.library.LibraryPlugin;
+import org.eclipse.epf.library.internal.LibraryManagerElement;
+import org.eclipse.epf.services.Services;
 import org.osgi.framework.Bundle;
 
 /**

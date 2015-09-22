@@ -10,7 +10,6 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.authoring.gef.viewer;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -18,12 +17,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
-import javax.imageio.stream.FileImageOutputStream;
 
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.epf.diagram.model.util.GraphicalDataHelper;
@@ -45,12 +38,13 @@ import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.VariabilityElement;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.epf.diagram.ui.utils.ImageUtils;
 
 
 /**
@@ -372,26 +366,10 @@ public class ActivityDiagramService implements IActivityDiagramService {
 						if (!f.exists()) {
 							f.createNewFile();
 						}
-//						OutputStream os = new FileOutputStream(f);
-//						ImageLoader loader = new ImageLoader();
-//						loader.data = new ImageData[] { image.getImageData() };
-//						loader.save(os, SWT.IMAGE_JPEG);
-						
-//						/*
-						// Setting compression level to maximum quality
-						Iterator iter = ImageIO.getImageWritersByFormatName("jpeg"); //$NON-NLS-1$
-						ImageWriter writer = (ImageWriter)iter.next();
-						ImageWriteParam iwp = writer.getDefaultWriteParam();
-						iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-						iwp.setCompressionQuality(1);
-
-						FileImageOutputStream output = new FileImageOutputStream(f);
-						writer.setOutput(output);
-						BufferedImage bufferedImage = ImageUtils.convertToAWT(image.getImageData());
-						IIOImage iioImage = new IIOImage(bufferedImage, null, null);
-						writer.write(null, iioImage, iwp);
-						writer.dispose();
-//						 */
+						OutputStream os = new FileOutputStream(f);
+						ImageLoader loader = new ImageLoader();
+						loader.data = new ImageData[] { image.getImageData() };
+						loader.save(os, SWT.IMAGE_JPEG);
 
 						diagramInfo.setImageFilePath(imgPath);
 					} else {

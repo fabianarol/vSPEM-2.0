@@ -14,7 +14,6 @@ import java.util.Collection;
 
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.epf.library.edit.realization.IRealizationManager;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.VariabilityElement;
 
@@ -29,8 +28,6 @@ import org.eclipse.epf.uma.VariabilityElement;
 public interface IConfigurator extends IMethodConfigurationProvider, IFilter, Adapter {
 
 	void setMethodConfiguration(MethodConfiguration config);
-	
-	MethodConfiguration getMethodConfiguration();
 
 	/**
 	 * If this method return a non-NULL, the item provider will use the returned
@@ -111,16 +108,5 @@ public interface IConfigurator extends IMethodConfigurationProvider, IFilter, Ad
 	 */
 	public IFilter getRoleSetsFilter();
 
-	/**
-	 * @return an IRealizationManager instance
-	 */
-	public IRealizationManager getRealizationManager();
-		
-	/**
-	 * @param parentObject
-	 * @param children
-	 * @return
-	 */
-	public Collection<?> getModifiedChildren(Object parentObject, Collection children);
-	
+
 }

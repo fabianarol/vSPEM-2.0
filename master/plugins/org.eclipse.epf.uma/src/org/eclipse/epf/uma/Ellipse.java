@@ -18,12 +18,12 @@ package org.eclipse.epf.uma;
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link org.eclipse.epf.uma.Ellipse#getCenter <em>Center</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.Ellipse#getRadiusX <em>Radius X</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.Ellipse#getRadiusY <em>Radius Y</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.Ellipse#getRotation <em>Rotation</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.Ellipse#getStartAngle <em>Start Angle</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.Ellipse#getEndAngle <em>End Angle</em>}</li>
+ *   <li>{@link org.eclipse.epf.uma.Ellipse#getCenter <em>Center</em>}</li>
  * </ul>
  * </p>
  *
@@ -43,7 +43,7 @@ public interface Ellipse extends GraphicPrimitive {
 	 * @return the value of the '<em>Radius X</em>' attribute.
 	 * @see #setRadiusX(Double)
 	 * @see org.eclipse.epf.uma.UmaPackage#getEllipse_RadiusX()
-	 * @model dataType="org.eclipse.epf.uma.Double" required="true" ordered="false"
+	 * @model
 	 * @generated
 	 */
 	Double getRadiusX();
@@ -69,7 +69,7 @@ public interface Ellipse extends GraphicPrimitive {
 	 * @return the value of the '<em>Radius Y</em>' attribute.
 	 * @see #setRadiusY(Double)
 	 * @see org.eclipse.epf.uma.UmaPackage#getEllipse_RadiusY()
-	 * @model dataType="org.eclipse.epf.uma.Double" required="true" ordered="false"
+	 * @model
 	 * @generated
 	 */
 	Double getRadiusY();
@@ -95,7 +95,7 @@ public interface Ellipse extends GraphicPrimitive {
 	 * @return the value of the '<em>Rotation</em>' attribute.
 	 * @see #setRotation(Double)
 	 * @see org.eclipse.epf.uma.UmaPackage#getEllipse_Rotation()
-	 * @model dataType="org.eclipse.epf.uma.Double" required="true" ordered="false"
+	 * @model
 	 * @generated
 	 */
 	Double getRotation();
@@ -121,7 +121,7 @@ public interface Ellipse extends GraphicPrimitive {
 	 * @return the value of the '<em>Start Angle</em>' attribute.
 	 * @see #setStartAngle(Double)
 	 * @see org.eclipse.epf.uma.UmaPackage#getEllipse_StartAngle()
-	 * @model dataType="org.eclipse.epf.uma.Double" required="true" ordered="false"
+	 * @model
 	 * @generated
 	 */
 	Double getStartAngle();
@@ -147,7 +147,7 @@ public interface Ellipse extends GraphicPrimitive {
 	 * @return the value of the '<em>End Angle</em>' attribute.
 	 * @see #setEndAngle(Double)
 	 * @see org.eclipse.epf.uma.UmaPackage#getEllipse_EndAngle()
-	 * @model dataType="org.eclipse.epf.uma.Double" required="true" ordered="false"
+	 * @model
 	 * @generated
 	 */
 	Double getEndAngle();
@@ -163,26 +163,26 @@ public interface Ellipse extends GraphicPrimitive {
 	void setEndAngle(Double value);
 
 	/**
-	 * Returns the value of the '<em><b>Center</b></em>' reference.
+	 * Returns the value of the '<em><b>Center</b></em>' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <p>
 	 * If the meaning of the '<em>Center</em>' containment reference isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Center</em>' reference.
+	 * @return the value of the '<em>Center</em>' containment reference.
 	 * @see #setCenter(Point)
 	 * @see org.eclipse.epf.uma.UmaPackage#getEllipse_Center()
-	 * @model required="true" ordered="false"
+	 * @model containment="true" resolveProxies="true"
 	 * @generated
 	 */
 	Point getCenter();
 
 	/**
-	 * Sets the value of the '{@link org.eclipse.epf.uma.Ellipse#getCenter <em>Center</em>}' reference.
+	 * Sets the value of the '{@link org.eclipse.epf.uma.Ellipse#getCenter <em>Center</em>}' containment reference.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Center</em>' reference.
+	 * @param value the new value of the '<em>Center</em>' containment reference.
 	 * @see #getCenter()
 	 * @generated
 	 */

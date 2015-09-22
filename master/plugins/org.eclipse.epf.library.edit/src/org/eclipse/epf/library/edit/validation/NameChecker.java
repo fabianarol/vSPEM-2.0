@@ -159,7 +159,7 @@ public final class NameChecker {
 	private static INameProvider createNameProvider(
 			final EStructuralFeature nameFeature) {
 		if(nameFeature == UmaPackage.eINSTANCE
-								.getMethodElement_PresentationName()) {
+								.getDescribableElement_PresentationName()) {
 			return presentationNameProvider; 
 		}
 		
@@ -357,9 +357,9 @@ public final class NameChecker {
 	public static boolean canHaveEmptyPresentationName(DescribableElement e) {
 		if(e instanceof VariabilityElement) {
 			VariabilityType vType = ((VariabilityElement)e).getVariabilityType();
-			return vType == VariabilityType.EXTENDS
-				|| vType == VariabilityType.CONTRIBUTES
-				|| vType == VariabilityType.LOCAL_CONTRIBUTION;			
+			return vType == VariabilityType.EXTENDS_LITERAL
+				|| vType == VariabilityType.CONTRIBUTES_LITERAL
+				|| vType == VariabilityType.LOCAL_CONTRIBUTION_LITERAL;			
 		}
 		return false;	
 	}

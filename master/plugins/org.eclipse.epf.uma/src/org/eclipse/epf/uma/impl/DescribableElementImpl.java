@@ -21,11 +21,8 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-import org.eclipse.epf.uma.Classifier;
 import org.eclipse.epf.uma.ContentDescription;
 import org.eclipse.epf.uma.DescribableElement;
-import org.eclipse.epf.uma.Type;
-import org.eclipse.epf.uma.UmaFactory;
 import org.eclipse.epf.uma.UmaPackage;
 import org.eclipse.epf.uma.util.ContentDescriptionFactory;
 
@@ -36,7 +33,7 @@ import org.eclipse.epf.uma.util.ContentDescriptionFactory;
  * <p>
  * The following features are implemented:
  * <ul>
- *   <li>{@link org.eclipse.epf.uma.impl.DescribableElementImpl#getIsAbstract <em>Is Abstract</em>}</li>
+ *   <li>{@link org.eclipse.epf.uma.impl.DescribableElementImpl#getPresentationName <em>Presentation Name</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.impl.DescribableElementImpl#getPresentation <em>Presentation</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.impl.DescribableElementImpl#getShapeicon <em>Shapeicon</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.impl.DescribableElementImpl#getNodeicon <em>Nodeicon</em>}</li>
@@ -48,24 +45,31 @@ import org.eclipse.epf.uma.util.ContentDescriptionFactory;
 public abstract class DescribableElementImpl extends MethodElementImpl
 		implements DescribableElement {
 	/**
-	 * The default value of the '{@link #getIsAbstract() <em>Is Abstract</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getIsAbstract()
 	 * @generated
-	 * @ordered
 	 */
-	protected static final Boolean IS_ABSTRACT_EDEFAULT = Boolean.FALSE;
+	private static final long serialVersionUID = 1L;
 
 	/**
-	 * The cached value of the '{@link #getIsAbstract() <em>Is Abstract</em>}' attribute.
+	 * The default value of the '{@link #getPresentationName() <em>Presentation Name</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getIsAbstract()
+	 * @see #getPresentationName()
 	 * @generated
 	 * @ordered
 	 */
-	protected Boolean isAbstract = IS_ABSTRACT_EDEFAULT;
+	protected static final String PRESENTATION_NAME_EDEFAULT = ""; //$NON-NLS-1$
+
+	/**
+	 * The cached value of the '{@link #getPresentationName() <em>Presentation Name</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getPresentationName()
+	 * @generated
+	 * @ordered
+	 */
+	protected String presentationName = PRESENTATION_NAME_EDEFAULT;
 
 	/**
 	 * The cached value of the '{@link #getPresentation() <em>Presentation</em>}' containment reference.
@@ -75,7 +79,7 @@ public abstract class DescribableElementImpl extends MethodElementImpl
 	 * @generated
 	 * @ordered
 	 */
-	protected ContentDescription presentation;
+	protected ContentDescription presentation = null;
 
 	/**
 	 * The default value of the '{@link #getShapeicon() <em>Shapeicon</em>}' attribute.
@@ -127,7 +131,7 @@ public abstract class DescribableElementImpl extends MethodElementImpl
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -135,7 +139,6 @@ public abstract class DescribableElementImpl extends MethodElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.DESCRIBABLE_ELEMENT;
 	}
@@ -145,8 +148,8 @@ public abstract class DescribableElementImpl extends MethodElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public Boolean getIsAbstract() {
-		return isAbstract;
+	public String getPresentationName() {
+		return presentationName;
 	}
 
 	/**
@@ -154,13 +157,13 @@ public abstract class DescribableElementImpl extends MethodElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public void setIsAbstract(Boolean newIsAbstract) {
-		Boolean oldIsAbstract = isAbstract;
-		isAbstract = newIsAbstract;
+	public void setPresentationName(String newPresentationName) {
+		String oldPresentationName = presentationName;
+		presentationName = newPresentationName;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET,
-					UmaPackage.DESCRIBABLE_ELEMENT__IS_ABSTRACT, oldIsAbstract,
-					isAbstract));
+					UmaPackage.DESCRIBABLE_ELEMENT__PRESENTATION_NAME,
+					oldPresentationName, presentationName));
 	}
 
 	/**
@@ -236,7 +239,6 @@ public abstract class DescribableElementImpl extends MethodElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
@@ -251,11 +253,10 @@ public abstract class DescribableElementImpl extends MethodElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
-		case UmaPackage.DESCRIBABLE_ELEMENT__IS_ABSTRACT:
-			return getIsAbstract();
+		case UmaPackage.DESCRIBABLE_ELEMENT__PRESENTATION_NAME:
+			return getPresentationName();
 		case UmaPackage.DESCRIBABLE_ELEMENT__PRESENTATION:
 			if (resolve)
 				return getPresentation();
@@ -273,11 +274,10 @@ public abstract class DescribableElementImpl extends MethodElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
-		case UmaPackage.DESCRIBABLE_ELEMENT__IS_ABSTRACT:
-			setIsAbstract((Boolean) newValue);
+		case UmaPackage.DESCRIBABLE_ELEMENT__PRESENTATION_NAME:
+			setPresentationName((String) newValue);
 			return;
 		case UmaPackage.DESCRIBABLE_ELEMENT__PRESENTATION:
 			setPresentation((ContentDescription) newValue);
@@ -297,11 +297,10 @@ public abstract class DescribableElementImpl extends MethodElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
-		case UmaPackage.DESCRIBABLE_ELEMENT__IS_ABSTRACT:
-			setIsAbstract(IS_ABSTRACT_EDEFAULT);
+		case UmaPackage.DESCRIBABLE_ELEMENT__PRESENTATION_NAME:
+			setPresentationName(PRESENTATION_NAME_EDEFAULT);
 			return;
 		case UmaPackage.DESCRIBABLE_ELEMENT__PRESENTATION:
 			setPresentation((ContentDescription) null);
@@ -321,7 +320,6 @@ public abstract class DescribableElementImpl extends MethodElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);
@@ -330,9 +328,9 @@ public abstract class DescribableElementImpl extends MethodElementImpl
 		}
 		//UMA<--		
 		switch (featureID) {
-		case UmaPackage.DESCRIBABLE_ELEMENT__IS_ABSTRACT:
-			return IS_ABSTRACT_EDEFAULT == null ? isAbstract != null
-					: !IS_ABSTRACT_EDEFAULT.equals(isAbstract);
+		case UmaPackage.DESCRIBABLE_ELEMENT__PRESENTATION_NAME:
+			return PRESENTATION_NAME_EDEFAULT == null ? presentationName != null
+					: !PRESENTATION_NAME_EDEFAULT.equals(presentationName);
 		case UmaPackage.DESCRIBABLE_ELEMENT__PRESENTATION:
 			return presentation != null;
 		case UmaPackage.DESCRIBABLE_ELEMENT__SHAPEICON:
@@ -350,62 +348,13 @@ public abstract class DescribableElementImpl extends MethodElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	public int eBaseStructuralFeatureID(int derivedFeatureID, Class<?> baseClass) {
-		if (baseClass == Type.class) {
-			switch (derivedFeatureID) {
-			default:
-				return -1;
-			}
-		}
-		if (baseClass == Classifier.class) {
-			switch (derivedFeatureID) {
-			case UmaPackage.DESCRIBABLE_ELEMENT__IS_ABSTRACT:
-				return UmaPackage.CLASSIFIER__IS_ABSTRACT;
-			default:
-				return -1;
-			}
-		}
-		return super.eBaseStructuralFeatureID(derivedFeatureID, baseClass);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public int eDerivedStructuralFeatureID(int baseFeatureID, Class<?> baseClass) {
-		if (baseClass == Type.class) {
-			switch (baseFeatureID) {
-			default:
-				return -1;
-			}
-		}
-		if (baseClass == Classifier.class) {
-			switch (baseFeatureID) {
-			case UmaPackage.CLASSIFIER__IS_ABSTRACT:
-				return UmaPackage.DESCRIBABLE_ELEMENT__IS_ABSTRACT;
-			default:
-				return -1;
-			}
-		}
-		return super.eDerivedStructuralFeatureID(baseFeatureID, baseClass);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
 	public String toString() {
 		if (eIsProxy())
 			return super.toString();
 
 		StringBuffer result = new StringBuffer(super.toString());
-		result.append(" (isAbstract: "); //$NON-NLS-1$
-		result.append(isAbstract);
+		result.append(" (presentationName: "); //$NON-NLS-1$
+		result.append(presentationName);
 		result.append(", shapeicon: "); //$NON-NLS-1$
 		result.append(shapeicon);
 		result.append(", nodeicon: "); //$NON-NLS-1$

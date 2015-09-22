@@ -26,7 +26,6 @@ import org.eclipse.epf.common.utils.FileUtil;
 import org.eclipse.epf.common.utils.NetUtil;
 import org.eclipse.epf.library.edit.command.IActionManager;
 import org.eclipse.epf.library.edit.util.TngUtil;
-import org.eclipse.epf.library.ui.LibraryUIUtil;
 import org.eclipse.epf.library.util.ResourceHelper;
 import org.eclipse.epf.richtext.dialogs.AddLinkDialog;
 import org.eclipse.epf.uma.ContentDescription;
@@ -60,7 +59,7 @@ public class GuidanceWithAttachmentsDescriptionPage extends GuidanceDescriptionP
 
 	private List ctrl_attached_files;
 
-	public static final String GUIDANCE_ATTACHMENT_LAST_DIRECTORY_BROWSED_PREF = "guidance_attachment_last_dir_browsed"; //$NON-NLS-1$
+	private static final String GUIDANCE_ATTACHMENT_LAST_DIRECTORY_BROWSED_PREF = "guidance_attachment_last_dir_browsed"; //$NON-NLS-1$
 
 	/**
 	 * Creates a new instance.
@@ -136,7 +135,7 @@ public class GuidanceWithAttachmentsDescriptionPage extends GuidanceDescriptionP
 					try {
 						File fileToAttach = new File(dialog.getFilterPath(),
 								dialog.getFileName());
-						String fileUrl = LibraryUIUtil.getURLForAttachment(ctrl_attach.getShell(),
+						String fileUrl = ResourceHelper.getURLForAttachment(ctrl_attach.getShell(),
 								fileToAttach, guidance, true);
 						if (fileUrl == null) {
 							// user hit cancel on RenameFileConflictDialog

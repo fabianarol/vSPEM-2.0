@@ -42,6 +42,13 @@ import org.eclipse.epf.uma.UmaPackage;
 public class ProcessPackageImpl extends MethodPackageImpl implements
 		ProcessPackage {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The cached value of the '{@link #getProcessElements() <em>Process Elements</em>}' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -49,7 +56,7 @@ public class ProcessPackageImpl extends MethodPackageImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<ProcessElement> processElements;
+	protected EList processElements = null;
 
 	/**
 	 * The cached value of the '{@link #getDiagrams() <em>Diagrams</em>}' containment reference list.
@@ -59,7 +66,7 @@ public class ProcessPackageImpl extends MethodPackageImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Diagram> diagrams;
+	protected EList diagrams = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -71,7 +78,7 @@ public class ProcessPackageImpl extends MethodPackageImpl implements
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -79,7 +86,6 @@ public class ProcessPackageImpl extends MethodPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.PROCESS_PACKAGE;
 	}
@@ -89,9 +95,9 @@ public class ProcessPackageImpl extends MethodPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<ProcessElement> getProcessElements() {
+	public List getProcessElements() {
 		if (processElements == null) {
-			processElements = new EObjectContainmentEList.Resolving<ProcessElement>(
+			processElements = new EObjectContainmentEList.Resolving(
 					ProcessElement.class, this,
 					UmaPackage.PROCESS_PACKAGE__PROCESS_ELEMENTS);
 		}
@@ -103,10 +109,10 @@ public class ProcessPackageImpl extends MethodPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<Diagram> getDiagrams() {
+	public List getDiagrams() {
 		if (diagrams == null) {
-			diagrams = new EObjectContainmentEList.Resolving<Diagram>(
-					Diagram.class, this, UmaPackage.PROCESS_PACKAGE__DIAGRAMS);
+			diagrams = new EObjectContainmentEList.Resolving(Diagram.class,
+					this, UmaPackage.PROCESS_PACKAGE__DIAGRAMS);
 		}
 		return diagrams;
 	}
@@ -116,16 +122,14 @@ public class ProcessPackageImpl extends MethodPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case UmaPackage.PROCESS_PACKAGE__PROCESS_ELEMENTS:
-			return ((InternalEList<?>) getProcessElements()).basicRemove(
-					otherEnd, msgs);
-		case UmaPackage.PROCESS_PACKAGE__DIAGRAMS:
-			return ((InternalEList<?>) getDiagrams()).basicRemove(otherEnd,
+			return ((InternalEList) getProcessElements()).basicRemove(otherEnd,
 					msgs);
+		case UmaPackage.PROCESS_PACKAGE__DIAGRAMS:
+			return ((InternalEList) getDiagrams()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -135,7 +139,6 @@ public class ProcessPackageImpl extends MethodPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.PROCESS_PACKAGE__PROCESS_ELEMENTS:
@@ -151,18 +154,15 @@ public class ProcessPackageImpl extends MethodPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.PROCESS_PACKAGE__PROCESS_ELEMENTS:
 			getProcessElements().clear();
-			getProcessElements().addAll(
-					(Collection<? extends ProcessElement>) newValue);
+			getProcessElements().addAll((Collection) newValue);
 			return;
 		case UmaPackage.PROCESS_PACKAGE__DIAGRAMS:
 			getDiagrams().clear();
-			getDiagrams().addAll((Collection<? extends Diagram>) newValue);
+			getDiagrams().addAll((Collection) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -173,7 +173,6 @@ public class ProcessPackageImpl extends MethodPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.PROCESS_PACKAGE__PROCESS_ELEMENTS:
@@ -191,7 +190,6 @@ public class ProcessPackageImpl extends MethodPackageImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);

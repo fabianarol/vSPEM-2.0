@@ -19,14 +19,11 @@ import java.util.List;
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
 import org.eclipse.epf.library.edit.process.BSActivityItemProvider;
-import org.eclipse.epf.library.edit.util.DescriptorPropUtil;
+import org.eclipse.epf.library.edit.util.Comparators;
 import org.eclipse.epf.library.edit.util.ExposedAdapterFactory;
 import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
-import org.eclipse.epf.uma.Activity;
 import org.eclipse.epf.uma.Descriptor;
-import org.eclipse.epf.uma.MethodConfiguration;
-import org.eclipse.epf.uma.Milestone;
 import org.eclipse.epf.uma.RoleDescriptor;
 import org.eclipse.epf.uma.TaskDescriptor;
 import org.eclipse.epf.uma.WorkProductDescriptor;
@@ -81,8 +78,7 @@ public class ActivityItemProvider extends BSActivityItemProvider {
 	}
 	
 	protected Collection removeSubartifactsFromChildren(Collection children, boolean unwrap) {
-		MethodConfiguration config = getConfigurator() == null ? null : getConfigurator().getMethodConfiguration();
-		return ProcessUtil.removeSubartifactsFromChildren(config, children, unwrap);
+		return ProcessUtil.removeSubartifactsFromChildren(children, unwrap);
 	}
 
 	public Collection getChildren(Object obj) {
@@ -104,8 +100,6 @@ public class ActivityItemProvider extends BSActivityItemProvider {
 						AssociationHelper.getAssistedTaskDescriptors(roleDesc).isEmpty()) 
 				{
 					roleDescriptors.add(object);
-				} else if (ProcessUtil.isSynFree() && ! DescriptorPropUtil.getDesciptorPropUtil().isCreatedByReference(roleDesc)) {
-					roleDescriptors.add(object);	
 				}
 			}
 			// don't return wpdescriptor which are linked to either
@@ -119,8 +113,6 @@ public class ActivityItemProvider extends BSActivityItemProvider {
 						AssociationHelper.getResponsibleRoleDescriptors(wpDesc).isEmpty())
 				{
 					wpDescriptors.add(object);
-				} else if (ProcessUtil.isSynFree() && ! DescriptorPropUtil.getDesciptorPropUtil().isCreatedByReference(wpDesc)) {
-					wpDescriptors.add(object);	
 				}
 			} else {
 				newChildren.add(object);
@@ -148,18 +140,5 @@ public class ActivityItemProvider extends BSActivityItemProvider {
 	public boolean isRolledUp() {
 		return false;
 	}
-	
-	@Override
-	protected boolean acceptAsChild(Object parent, Object child) {	
-//		if (parent instanceof Activity) {
-//			child = TngUtil.unwrap(child);
-//			if(child instanceof Activity || child instanceof TaskDescriptor
-//					|| child instanceof Milestone) {
-//				return super.acceptAsChild(child);
-//			}
-//			return false;
-//		}			
-		return super.acceptAsChild(child);
-	}	
 
 }

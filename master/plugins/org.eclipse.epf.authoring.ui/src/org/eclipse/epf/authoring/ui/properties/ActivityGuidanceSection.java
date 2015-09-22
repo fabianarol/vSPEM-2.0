@@ -25,31 +25,23 @@ import org.eclipse.epf.diagram.model.util.DiagramInfo;
 import org.eclipse.epf.library.edit.IFilter;
 import org.eclipse.epf.library.edit.LibraryEditPlugin;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
-import org.eclipse.epf.library.edit.command.ChangeUdtCommand;
 import org.eclipse.epf.library.edit.command.IActionManager;
 import org.eclipse.epf.library.edit.configuration.GuidanceGroupingItemProvider;
 import org.eclipse.epf.library.edit.configuration.GuidanceItemProvider;
 import org.eclipse.epf.library.edit.itemsfilter.FilterConstants;
 import org.eclipse.epf.library.edit.itemsfilter.FilterInitializer;
 import org.eclipse.epf.library.edit.process.IBSItemProvider;
-import org.eclipse.epf.library.edit.process.command.AddGuidanceToBreakdownElementCommand;
-import org.eclipse.epf.library.edit.util.MethodElementPropUtil;
-import org.eclipse.epf.library.edit.util.PracticePropUtil;
+import org.eclipse.epf.library.edit.process.command.AddGuidanceToActivityCommand;
 import org.eclipse.epf.uma.Activity;
 import org.eclipse.epf.uma.Checklist;
 import org.eclipse.epf.uma.Concept;
 import org.eclipse.epf.uma.DeliveryProcess;
-import org.eclipse.epf.uma.EstimationConsiderations;
 import org.eclipse.epf.uma.Example;
 import org.eclipse.epf.uma.Guidance;
 import org.eclipse.epf.uma.Guideline;
-import org.eclipse.epf.uma.Practice;
-import org.eclipse.epf.uma.Report;
 import org.eclipse.epf.uma.ReusableAsset;
 import org.eclipse.epf.uma.Roadmap;
 import org.eclipse.epf.uma.SupportingMaterial;
-import org.eclipse.epf.uma.Template;
-import org.eclipse.epf.uma.ToolMentor;
 import org.eclipse.epf.uma.UmaPackage;
 import org.eclipse.epf.uma.util.UmaUtil;
 import org.eclipse.jface.viewers.ILabelProvider;
@@ -173,19 +165,8 @@ public class ActivityGuidanceSection extends AbstractSection {
 							|| (obj instanceof Example)
 							|| (obj instanceof Guideline)
 							|| (obj instanceof ReusableAsset)
-							|| (obj instanceof SupportingMaterial)
-					//		|| (obj instanceof Template)
-							|| (obj instanceof Report)
-					//		|| (obj instanceof ToolMentor)
-					//		|| (obj instanceof EstimationConsiderations)
-							)
+							|| (obj instanceof SupportingMaterial))
 						return true;
-					
-					if (obj instanceof Practice) {
-						if (PracticePropUtil.getPracticePropUtil().isUdtType((Practice) obj)) {
-							return true;
-						}
-					}
 
 					return false;
 
@@ -610,8 +591,6 @@ public class ActivityGuidanceSection extends AbstractSection {
 					fd.setTitle(FilterConstants.ROADMAP);
 					fd.setInput(UmaUtil.getMethodLibrary((EObject) element));
 					fd.setBlockOnOpen(true);
-					fd.setEnableProcessScope(true);
-					fd.setSection(getSection());
 					fd.open();
 					addGuidances(fd.getSelectedItems());
 					viewer_1.refresh();
@@ -669,8 +648,6 @@ public class ActivityGuidanceSection extends AbstractSection {
 					fd.setInput(UmaUtil.getMethodLibrary((EObject) element));
 					fd.setBlockOnOpen(true);
 					fd.setTypes(getFilterTypes());
-					fd.setEnableProcessScope(true);
-					fd.setSection(getSection());
 					fd.open();
 					addGuidances(fd.getSelectedItems());
 					viewer_2.refresh();
@@ -733,8 +710,6 @@ public class ActivityGuidanceSection extends AbstractSection {
 								.setInput(UmaUtil
 										.getMethodLibrary((EObject) element));
 						fd.setBlockOnOpen(true);
-						fd.setEnableProcessScope(true);
-						fd.setSection(getSection());
 						fd.open();
 
 						actionMgr
@@ -816,8 +791,6 @@ public class ActivityGuidanceSection extends AbstractSection {
 								.setInput(UmaUtil
 										.getMethodLibrary((EObject) element));
 						fd.setBlockOnOpen(true);
-						fd.setEnableProcessScope(true);
-						fd.setSection(getSection());
 						fd.open();
 
 						actionMgr
@@ -871,7 +844,8 @@ public class ActivityGuidanceSection extends AbstractSection {
 	 */
 	private void addGuidances(ArrayList addItems) {
 		// update the model
-		AddGuidanceToBreakdownElementCommand command = new AddGuidanceToBreakdownElementCommand(
+
+		AddGuidanceToActivityCommand command = new AddGuidanceToActivityCommand(
 				element, addItems);
 		actionMgr.execute(command);
 	}
@@ -883,7 +857,6 @@ public class ActivityGuidanceSection extends AbstractSection {
 	 */
 	private void removeGuidances(ArrayList rmItems) {
 		// update the model
-		List<Practice> utdItems = new ArrayList<Practice>();
 		if (!rmItems.isEmpty()) {
 			for (Iterator it = rmItems.iterator(); it.hasNext();) {
 				Guidance item = (Guidance) it.next();
@@ -891,62 +864,38 @@ public class ActivityGuidanceSection extends AbstractSection {
 				// guidances for activity
 				if (item instanceof Checklist) {
 					actionMgr.doAction(IActionManager.REMOVE, element,
-							UmaPackage.eINSTANCE.getBreakdownElement_Checklists(),
+							UmaPackage.eINSTANCE.getActivity_Checklists(),
 							item, -1);
 				} else if (item instanceof Concept) {
 					actionMgr.doAction(IActionManager.REMOVE, element,
-							UmaPackage.eINSTANCE.getBreakdownElement_Concepts(), item,
+							UmaPackage.eINSTANCE.getActivity_Concepts(), item,
 							-1);
 				} else if (item instanceof Example) {
 					actionMgr.doAction(IActionManager.REMOVE, element,
-							UmaPackage.eINSTANCE.getBreakdownElement_Examples(), item,
+							UmaPackage.eINSTANCE.getActivity_Examples(), item,
 							-1);
 				} else if (item instanceof SupportingMaterial) {
 					actionMgr.doAction(IActionManager.REMOVE, element,
 							UmaPackage.eINSTANCE
-									.getBreakdownElement_SupportingMaterials(), item,
+									.getActivity_SupportingMaterials(), item,
 							-1);
 				} else if (item instanceof Guideline) {
 					actionMgr.doAction(IActionManager.REMOVE, element,
-							UmaPackage.eINSTANCE.getBreakdownElement_Guidelines(),
+							UmaPackage.eINSTANCE.getActivity_Guidelines(),
 							item, -1);
 				} else if (item instanceof ReusableAsset) {
 					actionMgr.doAction(IActionManager.REMOVE, element,
-							UmaPackage.eINSTANCE.getBreakdownElement_ReusableAssets(),
+							UmaPackage.eINSTANCE.getActivity_ReusableAssets(),
 							item, -1);
 				} else if (item instanceof Roadmap) {
 					actionMgr.doAction(IActionManager.REMOVE, element,
 							UmaPackage.eINSTANCE.getActivity_Roadmaps(), item,
 							-1);
-				}else if (item instanceof Template) {
-					actionMgr.doAction(IActionManager.REMOVE, element,
-							UmaPackage.eINSTANCE.getBreakdownElement_Templates(),
-							item, -1);
-				}else if (item instanceof Report) {
-					actionMgr.doAction(IActionManager.REMOVE, element,
-							UmaPackage.eINSTANCE.getBreakdownElement_Reports(),
-							item, -1);
-				}else if (item instanceof ToolMentor) {
-					actionMgr.doAction(IActionManager.REMOVE, element,
-							UmaPackage.eINSTANCE.getBreakdownElement_Toolmentor(),
-							item, -1);
-				}else if (item instanceof EstimationConsiderations) {
-					actionMgr.doAction(IActionManager.REMOVE, element,
-							UmaPackage.eINSTANCE.getBreakdownElement_Estimationconsiderations(),
-							item, -1);
-				} else if (item instanceof Practice) {
-					if (PracticePropUtil.getPracticePropUtil().isUdtType((Practice) item)) {
-						utdItems.add((Practice) item);
-					}
 				} else {
 					logger
 							.logError("Can't remove Guidance: " + item.getType().getName() + ":" + item.getName()); //$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
-		}
-		
-		if (! utdItems.isEmpty()) {
-			actionMgr.execute(new ChangeUdtCommand(element, utdItems, true));
 		}
 	}
 
@@ -973,17 +922,7 @@ public class ActivityGuidanceSection extends AbstractSection {
 			itemList.add(info.getActivityDetailDiagram());
 		if (info.getWPDDiagram() != null)
 			itemList.add(info.getWPDDiagram());
-		
-		itemList.addAll(element.getTemplates());
-		itemList.addAll(element.getToolmentor());
-		itemList.addAll(element.getReports());
-		itemList.addAll(element.getEstimationconsiderations());
 
-		MethodElementPropUtil propUtil = MethodElementPropUtil.getMethodElementPropUtil();
-		if (propUtil.hasUdtList(element)) {
-			itemList.addAll(propUtil.getUdtList(element, false));
-		}
-		
 		return itemList;
 	}
 
@@ -1009,17 +948,7 @@ public class ActivityGuidanceSection extends AbstractSection {
 					itemList.add(obj);
 				}
 		}
-		
-		itemList.addAll(element.getTemplates());
-		itemList.addAll(element.getToolmentor());
-		itemList.addAll(element.getReports());
-		itemList.addAll(element.getEstimationconsiderations());
 
-		MethodElementPropUtil propUtil = MethodElementPropUtil.getMethodElementPropUtil();
-		if (propUtil.hasUdtList(element)) {
-			itemList.addAll(propUtil.getUdtList(element, false));
-		}
-		
 		return itemList;
 	}
 
@@ -1027,7 +956,7 @@ public class ActivityGuidanceSection extends AbstractSection {
 	 * Return list of filter types
 	 */
 	protected String[] getFilterTypes() {
-		String[] str = new String[12];
+		String[] str = new String[14];
 		int i = 0;
 		str[i++] = FilterConstants.GUIDANCE;
 		str[i++] = FilterConstants.space + FilterConstants.CHECKLISTS;
@@ -1036,12 +965,14 @@ public class ActivityGuidanceSection extends AbstractSection {
 				+ FilterConstants.ESTIMATE_CONSIDERATIONS;
 		str[i++] = FilterConstants.space + FilterConstants.EXAMPLES;
 		str[i++] = FilterConstants.space + FilterConstants.GUIDELINES;
+		str[i++] = FilterConstants.space + FilterConstants.PRACTICES;
 		str[i++] = FilterConstants.space + FilterConstants.REPORTS;
 		str[i++] = FilterConstants.space + FilterConstants.REUSABLE_ASSETS;
 		str[i++] = FilterConstants.space + FilterConstants.SUPPORTING_MATERIALS;
 		str[i++] = FilterConstants.space + FilterConstants.TEMPLATES;
 		str[i++] = FilterConstants.space + FilterConstants.TOOL_MENTORS;
 		str[i++] = FilterConstants.space + FilterConstants.WHITE_PAPERS;
+		str[i++] = FilterConstants.space + FilterConstants.TERM_DEFINITIONS;
 		return str;
 	}
 }

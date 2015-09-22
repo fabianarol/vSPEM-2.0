@@ -1,0 +1,15 @@
+/ActivityDetailDiagramEditPart.java/1.16/Tue Jul 31 01:50:19 2007//
+/DiagramEditPartFactory.java/1.4/Fri May 18 20:17:45 2007//
+/DiagramExtNodeLabelEditPart.java/1.2/Tue Mar 13 00:23:05 2007//
+/LinkEditPart.java/1.8/Mon Aug  6 20:37:58 2007//
+/LinkNameEditPart.java/1.4/Wed Oct 10 00:14:14 2007//
+/RoleNodeEditPart.java/1.8/Wed Jul 11 23:37:53 2007//
+/RoleNodeNameEditPart.java/1.10/Wed Oct 10 00:14:14 2007//
+/RoleTaskCompositeEditPart.java/1.12/Tue Jun 26 19:22:44 2007//
+/RoleTaskCompositeRoleTaskCompartmentEditPart.java/1.5/Fri May 18 20:17:45 2007//
+/TaskNodeEditPart.java/1.10/Wed Jul 11 23:37:53 2007//
+/TaskNodeNameEditPart.java/1.12/Wed Oct 10 00:14:14 2007//
+/WorkProductCompositeEditPart.java/1.8/Tue Jun 26 19:22:44 2007//
+/WorkProductCompositeWorkProductCompartmentEditPart.java/1.5/Fri May 18 20:17:45 2007//
+/WorkProductDescriptorNodeEditPart.java/1.10/Wed Jul 11 23:37:53 2007//
+/WorkProductDescriptorNodeNameEditPart.java/1.12/Wed Oct 10 00:14:14 2007//

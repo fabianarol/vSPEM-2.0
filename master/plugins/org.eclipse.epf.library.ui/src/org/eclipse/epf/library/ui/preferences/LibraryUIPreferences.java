@@ -14,11 +14,8 @@ import java.util.List;
 
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.epf.common.ui.util.PreferenceUtil;
 import org.eclipse.epf.common.utils.FileUtil;
-import org.eclipse.epf.library.configuration.SupportingElementData;
-import org.eclipse.epf.library.edit.util.LibraryEditUtil;
-import org.eclipse.epf.library.edit.validation.IValidationManager;
+import org.eclipse.epf.common.utils.PreferenceUtil;
 import org.eclipse.epf.library.ui.LibraryUIPlugin;
 import org.eclipse.epf.persistence.MultiFileSaveUtil;
 import org.eclipse.epf.uma.UmaPackage;
@@ -76,14 +73,6 @@ public class LibraryUIPreferences {
 
 	private static final String DESCRIPTOR_ONGOING = "descriptor_multiple_ongoing"; //$NON-NLS-1$
 
-	private static final String INCLUDE_DESCRIPTORS = "include descriptors"; //$NON-NLS-1$
-	
-	private static final String NAME_VALIDATION = "name validation"; //$NON-NLS-1$
-	
-	private static final String CIRCULAR_VALIDATION = "circular validation"; //$NON-NLS-1$
-
-	private static final String UNDECLARED_VALIDATION = "undeclared validation"; //$NON-NLS-1$
-
 	private static final String DESCRIPTOR_REPEATABLE = "descriptor_repeatable"; //$NON-NLS-1$
 
 	private static final String DEFAULT_LIBRARY_FOLDER_NAME = "Method Libraries"; //$NON-NLS-1$
@@ -118,15 +107,7 @@ public class LibraryUIPreferences {
 		prefStore.setDefault(DESCRIPTOR_PLANNED, false);
 		prefStore.setDefault(DESCRIPTOR_EVENT_DRIVEN, false);
 		prefStore.setDefault(DESCRIPTOR_ONGOING, false);
-		prefStore.setDefault(INCLUDE_DESCRIPTORS, !SupportingElementData.isDescriptorExclusiveOption());
 		prefStore.setDefault(DESCRIPTOR_REPEATABLE, false);
-		
-		prefStore.setDefault(NAME_VALIDATION, false);
-		prefStore.setDefault(CIRCULAR_VALIDATION, false);
-		prefStore.setDefault(UNDECLARED_VALIDATION, true);
-		prefStore.setDefault(PUBLISH_AD_FOR_ACTIVITY_EXTENSION, true);
-		
-		SupportingElementData.setDescriptorExclusiveOption(! LibraryUIPreferences.getIncludeDescriptors());
 	}
 
 	/**
@@ -579,27 +560,6 @@ public class LibraryUIPreferences {
 	}
 
 	/**
-	 * Returns "include descriptors" feature value in preference store
-	 * 
-	 * @return value - boolean
-	 */
-	public static boolean getIncludeDescriptors() {
-		return prefStore.getBoolean(INCLUDE_DESCRIPTORS);
-	}
-
-	/**
-	 * Saves value for "include descriptors"  feature in preference store
-	 * 
-	 * @param value -
-	 *            boolean true/false
-	 * 
-	 */
-	public static void setIncludeDescriptors(boolean value) {
-		prefStore.setValue(INCLUDE_DESCRIPTORS, value);
-		SupportingElementData.setDescriptorExclusiveOption(!value);
-	}
-	
-	/**
 	 * Returns Repeatable feature value of descriptor in preference store
 	 * 
 	 * @return value - boolean
@@ -708,75 +668,4 @@ public class LibraryUIPreferences {
 			}
 		}
 	}
-
-
-	/**
-	 * Returns "name validation" feature value in preference store
-	 * 
-	 * @return value - boolean
-	 */
-	public static boolean getNameValidation() {
-		return prefStore.getBoolean(NAME_VALIDATION);
-	}
-
-	/**
-	 * Saves value for "name validation"  feature in preference store
-	 * 
-	 * @param value -
-	 *            boolean true/false
-	 * 
-	 */
-	public static void setNameValidation(boolean value) {
-		prefStore.setValue(NAME_VALIDATION, value);
-	}
-	
-	/**
-	 * Returns "circular validation" feature value in preference store
-	 * 
-	 * @return value - boolean
-	 */
-	public static boolean getCircularValidation() {
-		return prefStore.getBoolean(CIRCULAR_VALIDATION);
-	}
-
-	/**
-	 * Saves value for "circular validation"  feature in preference store
-	 * 
-	 * @param value -
-	 *            boolean true/false
-	 * 
-	 */
-	public static void setCircularValidation(boolean value) {
-		prefStore.setValue(CIRCULAR_VALIDATION, value);
-
-	}
-	
-	/**
-	 * Returns "Undeclared validation" feature value in preference store
-	 * 
-	 * @return value - boolean
-	 */
-	public static boolean getUndeclaredValidation() {
-		return prefStore.getBoolean(UNDECLARED_VALIDATION);
-	}
-
-	/**
-	 * Saves value for "Undeclared validation"  feature in preference store
-	 * 
-	 * @param value -
-	 *            boolean true/false
-	 * 
-	 */
-	public static void setUndeclaredValidation(boolean value) {
-		prefStore.setValue(UNDECLARED_VALIDATION, value);
-	}
-	
-	public static void update(IValidationManager mgr) {
-		if (mgr != null) {
-			mgr.setNameCheck(getNameValidation());
-			mgr.setCircularDependancyCheck(getCircularValidation());
-			mgr.setUndeclaredDependancyCheck(getUndeclaredValidation());
-		}
-	}
-	
 }

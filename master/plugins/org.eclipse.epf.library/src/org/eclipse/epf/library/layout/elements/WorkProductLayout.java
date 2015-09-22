@@ -10,22 +10,13 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.library.layout.elements;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.epf.library.LibraryResources;
 import org.eclipse.epf.library.configuration.ConfigurationHelper;
-import org.eclipse.epf.library.configuration.ElementRealizer;
-import org.eclipse.epf.library.edit.util.WorkProductPropUtil;
 import org.eclipse.epf.library.layout.ElementLayoutManager;
 import org.eclipse.epf.library.layout.util.XmlElement;
-import org.eclipse.epf.uma.Constraint;
-import org.eclipse.epf.uma.FulfillableElement;
 import org.eclipse.epf.uma.MethodElement;
-import org.eclipse.epf.uma.UmaPackage;
 import org.eclipse.epf.uma.WorkProduct;
-import org.eclipse.epf.uma.ecore.util.OppositeFeature;
 import org.eclipse.epf.uma.util.AssociationHelper;
 
 
@@ -46,69 +37,11 @@ public class WorkProductLayout extends AbstractElementLayout {
 		super.__init(layoutManager, element);
 	}
 
-	@Override
-	protected XmlElement getXmlElement() {
-		XmlElement elementXml = super.getXmlElement();
-		
-		WorkProduct wp = (WorkProduct) getElement();
-		WorkProductPropUtil propUtil = WorkProductPropUtil.getWorkProductPropUtil();
-		List<Constraint> states = propUtil.getWorkProductStates(wp);
-		addStatesAttValue(elementXml, states);
-		addReferences(stateFeauteObj, elementXml, "States", states); //$NON-NLS-1$
-		return elementXml;
-	}
-
-	private static Object stateFeauteObj = new Object();
-	protected void processChild(Object feature, XmlElement parent, List items,
-			boolean includeReferences) {
-		if (feature == stateFeauteObj) {
-			if (items == null || items.isEmpty()) {
-				return;
-			}
-			
-			for (Constraint state : (List<Constraint>) items) {
-				XmlElement childXmlElement = new XmlElement("Element");//$NON-NLS-1$
-				childXmlElement.setAttribute("Name", state.getBody());//$NON-NLS-1$
-				childXmlElement.setAttribute("Description", state.getBriefDescription());//$NON-NLS-1$
-				childXmlElement.setAttribute("Type", "State"); //$NON-NLS-1$ //$NON-NLS-2$
-				parent.addChild(childXmlElement);
-			}
-			
-			return;
-		}
-		super.processChild(feature, parent, items, includeReferences);
-	}
-	
-	private void addStatesAttValue(XmlElement elementXml, List<Constraint> states) {
-		if (states == null || states.isEmpty()) {
-			return;
-		}
-		String str = ""; //$NON-NLS-1$
-		for (Constraint state : states) {
-			if (str.length() > 0) {
-				str += ", ";
-			}
-			str += state.getBody();
-		}
-		elementXml.setAttribute("States", str); //$NON-NLS-1$
-	}
-	
 	/**
 	 * @see org.eclipse.epf.library.layout.IElementLayout#getXmlElement(boolean)
 	 */
 	public XmlElement getXmlElement(boolean includeReferences) {
 		XmlElement elementXml = super.getXmlElement(includeReferences);
-		
-		boolean isSlot = false;
-		if (getElement() instanceof WorkProduct) {
-			WorkProduct wp = (WorkProduct) getElement();
-			isSlot = wp.getIsAbstract();
-		}
-		if (isSlot) {			
-			elementXml.setAttribute("Type", getType()); //$NON-NLS-1$
-			elementXml.setAttribute("TypeName", LibraryResources.WorkProductSlot_text); //$NON-NLS-1$
-		}
-		
 		if (includeReferences) {
 
 			// no this will lose the contributor
@@ -200,8 +133,6 @@ public class WorkProductLayout extends AbstractElementLayout {
 			addReferences(AssociationHelper.WorkProduct_OutputFrom_Tasks, 
 					elementXml, "outputFromTasks", outputFromTasks); //$NON-NLS-1$
 			
-			includeSlotReferences(elementXml);
-			
 			// add the descriptors referencing this element
 			super.processDescriptors(elementXml);
 
@@ -210,60 +141,6 @@ public class WorkProductLayout extends AbstractElementLayout {
 		
 		return elementXml;
 	}
-	
-	private void includeSlotReferences(XmlElement elementXml) {
-		ElementRealizer realizer = layoutManager.getElementRealizer();		
-		FulfillableElement fElement = (FulfillableElement) getElement();
-		if (fElement.getIsAbstract()) {
-			return;
-		}
-		List slots = ConfigurationHelper.calcFulfillableElement_Fulfills(
-				fElement, realizer);
-				
-		addSlotReferences(elementXml,
-				AssociationHelper.WorkProduct_MandatoryInputTo_Tasks,
-				"mandatoryInputToTasks_fromSlots", slots, realizer);	//$NON-NLS-1$
 
-		addSlotReferences(elementXml,
-				AssociationHelper.WorkProduct_OptionalInputTo_Tasks,
-				"optionalInputToTasks_fromSlots", slots, realizer);	//$NON-NLS-1$
-
-		addSlotReferences(elementXml,
-				AssociationHelper.WorkProduct_OutputFrom_Tasks,
-				"outputFromTasks_fromSlots", slots, realizer);	//$NON-NLS-1$	
-	}
-	
-	private void addSlotReferences(XmlElement elementXml, OppositeFeature ofeature, String referenceName, List<FulfillableElement> slots, ElementRealizer realizer) {
-		List references = new ArrayList();
-		
-		for (FulfillableElement fElement: slots) {
-			List list = ConfigurationHelper.calc0nFeatureValue(fElement, ofeature, realizer);
-			list = getTagQualifiedList(realizer.getConfiguration(), list);
-			references.addAll(list);
-		}
-
-		addReferences(ofeature, elementXml, referenceName, references); 
-	}
-		
-	protected List calc0nFeatureValue(MethodElement element,
-			MethodElement ownerElement, EStructuralFeature feature,
-			ElementRealizer realizer) {
-		if (feature == UmaPackage.eINSTANCE.getFulfillableElement_Fulfills()) {
-			return ConfigurationHelper.calcFulfillableElement_Fulfills(
-					(FulfillableElement) element, realizer);
-		}
-		return super.calc0nFeatureValue(element, ownerElement, feature,
-				layoutManager.getElementRealizer());
-	}	
-
-	protected List calc0nFeatureValue(MethodElement element,
-			OppositeFeature feature, ElementRealizer realizer) {
-		if (feature == AssociationHelper.FulFills_FullFillableElements) {
-			return ConfigurationHelper.calcFulfills_FulfillableElement(
-					(FulfillableElement) element, realizer.getConfiguration());
-		}
-		return super.calc0nFeatureValue(element, feature, layoutManager
-				.getElementRealizer());
-	}
 
 }

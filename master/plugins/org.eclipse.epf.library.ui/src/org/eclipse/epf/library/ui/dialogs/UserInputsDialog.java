@@ -17,7 +17,6 @@ import java.util.List;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.epf.library.edit.command.UserInput;
 import org.eclipse.epf.library.edit.validation.IValidator;
-import org.eclipse.epf.library.ui.providers.DelegateLabelProvider;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -237,7 +236,7 @@ public class UserInputsDialog extends Dialog {
 				new GridData(SWT.FILL, SWT.FILL, true, true));
 		viewer.setContentProvider(new ArrayContentProvider());
 		if (userInput.getLabelProvider() != null) {
-			viewer.setLabelProvider(new DelegateLabelProvider(userInput.getLabelProvider()));
+			viewer.setLabelProvider(userInput.getLabelProvider());
 		}
 		List choices = userInput.getChoices();
 		viewer.setInput(choices);

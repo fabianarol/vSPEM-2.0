@@ -36,7 +36,7 @@ public interface UmaFactory extends EFactory {
 	 * @return a new object of class '<em>Package</em>'.
 	 * @generated
 	 */
-	Package createPackage();
+	org.eclipse.epf.uma.Package createPackage();
 
 	/**
 	 * Returns a new object of class '<em>Constraint</em>'.
@@ -55,15 +55,6 @@ public interface UmaFactory extends EFactory {
 	 * @generated
 	 */
 	MethodElementProperty createMethodElementProperty();
-
-	/**
-	 * Returns a new object of class '<em>Kind</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Kind</em>'.
-	 * @generated
-	 */
-	Kind createKind();
 
 	/**
 	 * Returns a new object of class '<em>Content Description</em>'.
@@ -118,24 +109,6 @@ public interface UmaFactory extends EFactory {
 	 * @generated
 	 */
 	Artifact createArtifact();
-
-	/**
-	 * Returns a new object of class '<em>Work Product</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Work Product</em>'.
-	 * @generated
-	 */
-	WorkProduct createWorkProduct();
-
-	/**
-	 * Returns a new object of class '<em>Fulfillable Element</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Fulfillable Element</em>'.
-	 * @generated
-	 */
-	FulfillableElement createFulfillableElement();
 
 	/**
 	 * Returns a new object of class '<em>Deliverable</em>'.
@@ -226,6 +199,150 @@ public interface UmaFactory extends EFactory {
 	 * @generated
 	 */
 	PracticeDescription createPracticeDescription();
+
+	/**
+	 * Returns a new object of class '<em>Point</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Point</em>'.
+	 * @generated
+	 */
+	Point createPoint();
+
+	/**
+	 * Returns a new object of class '<em>Diagram Link</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Diagram Link</em>'.
+	 * @generated
+	 */
+	DiagramLink createDiagramLink();
+
+	/**
+	 * Returns a new object of class '<em>Graph Connector</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Graph Connector</em>'.
+	 * @generated
+	 */
+	GraphConnector createGraphConnector();
+
+	/**
+	 * Returns a new object of class '<em>Dimension</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Dimension</em>'.
+	 * @generated
+	 */
+	Dimension createDimension();
+
+	/**
+	 * Returns a new object of class '<em>Reference</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Reference</em>'.
+	 * @generated
+	 */
+	Reference createReference();
+
+	/**
+	 * Returns a new object of class '<em>Property</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Property</em>'.
+	 * @generated
+	 */
+	Property createProperty();
+
+	/**
+	 * Returns a new object of class '<em>Graph Edge</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Graph Edge</em>'.
+	 * @generated
+	 */
+	GraphEdge createGraphEdge();
+
+	/**
+	 * Returns a new object of class '<em>Diagram</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Diagram</em>'.
+	 * @generated
+	 */
+	Diagram createDiagram();
+
+	/**
+	 * Returns a new object of class '<em>Graph Node</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Graph Node</em>'.
+	 * @generated
+	 */
+	GraphNode createGraphNode();
+
+	/**
+	 * Returns a new object of class '<em>Simple Semantic Model Element</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Simple Semantic Model Element</em>'.
+	 * @generated
+	 */
+	SimpleSemanticModelElement createSimpleSemanticModelElement();
+
+	/**
+	 * Returns a new object of class '<em>UMA Semantic Model Bridge</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>UMA Semantic Model Bridge</em>'.
+	 * @generated
+	 */
+	UMASemanticModelBridge createUMASemanticModelBridge();
+
+	/**
+	 * Returns a new object of class '<em>Core Semantic Model Bridge</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Core Semantic Model Bridge</em>'.
+	 * @generated
+	 */
+	CoreSemanticModelBridge createCoreSemanticModelBridge();
+
+	/**
+	 * Returns a new object of class '<em>Text Element</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Text Element</em>'.
+	 * @generated
+	 */
+	TextElement createTextElement();
+
+	/**
+	 * Returns a new object of class '<em>Image</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Image</em>'.
+	 * @generated
+	 */
+	Image createImage();
+
+	/**
+	 * Returns a new object of class '<em>Polyline</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Polyline</em>'.
+	 * @generated
+	 */
+	Polyline createPolyline();
+
+	/**
+	 * Returns a new object of class '<em>Ellipse</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Ellipse</em>'.
+	 * @generated
+	 */
+	Ellipse createEllipse();
 
 	/**
 	 * Returns a new object of class '<em>Activity</em>'.
@@ -471,15 +588,6 @@ public interface UmaFactory extends EFactory {
 	TermDefinition createTermDefinition();
 
 	/**
-	 * Returns a new object of class '<em>Applicable Meta Class Info</em>'.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Applicable Meta Class Info</em>'.
-	 * @generated
-	 */
-	ApplicableMetaClassInfo createApplicableMetaClassInfo();
-
-	/**
 	 * Returns a new object of class '<em>Practice</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -496,6 +604,60 @@ public interface UmaFactory extends EFactory {
 	 * @generated
 	 */
 	ReusableAsset createReusableAsset();
+
+	/**
+	 * Returns a new object of class '<em>State</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>State</em>'.
+	 * @generated
+	 */
+	State createState();
+
+	/**
+	 * Returns a new object of class '<em>Vertex</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Vertex</em>'.
+	 * @generated
+	 */
+	Vertex createVertex();
+
+	/**
+	 * Returns a new object of class '<em>Region</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Region</em>'.
+	 * @generated
+	 */
+	Region createRegion();
+
+	/**
+	 * Returns a new object of class '<em>State Machine</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>State Machine</em>'.
+	 * @generated
+	 */
+	StateMachine createStateMachine();
+
+	/**
+	 * Returns a new object of class '<em>Transition</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Transition</em>'.
+	 * @generated
+	 */
+	Transition createTransition();
+
+	/**
+	 * Returns a new object of class '<em>Pseudo State</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Pseudo State</em>'.
+	 * @generated
+	 */
+	PseudoState createPseudoState();
 
 	/**
 	 * Returns a new object of class '<em>Discipline</em>'.
@@ -523,6 +685,15 @@ public interface UmaFactory extends EFactory {
 	 * @generated
 	 */
 	Domain createDomain();
+
+	/**
+	 * Returns a new object of class '<em>Pruebas Lineas</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Pruebas Lineas</em>'.
+	 * @generated
+	 */
+	PruebasLineas createPruebasLineas();
 
 	/**
 	 * Returns a new object of class '<em>Work Product Type</em>'.
@@ -651,6 +822,132 @@ public interface UmaFactory extends EFactory {
 	MethodPlugin createMethodPlugin();
 
 	/**
+	 * Returns a new object of class '<em>Process Lines Package</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Process Lines Package</em>'.
+	 * @generated
+	 */
+	ProcessLinesPackage createProcessLinesPackage();
+
+	/**
+	 * Returns a new object of class '<em>Process Line Element</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Process Line Element</em>'.
+	 * @generated
+	 */
+	ProcessLineElement createProcessLineElement();
+
+	/**
+	 * Returns a new object of class '<em>Process Line Component</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Process Line Component</em>'.
+	 * @generated
+	 */
+	ProcessLineComponent createProcessLineComponent();
+
+	/**
+	 * Returns a new object of class '<em>Process Line Component Package</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Process Line Component Package</em>'.
+	 * @generated
+	 */
+	ProcessLineComponentPackage createProcessLineComponentPackage();
+
+	/**
+	 * Returns a new object of class '<em>Process Line Component Interface</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Process Line Component Interface</em>'.
+	 * @generated
+	 */
+	ProcessLineComponentInterface createProcessLineComponentInterface();
+
+	/**
+	 * Returns a new object of class '<em>Core Process Package</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Core Process Package</em>'.
+	 * @generated
+	 */
+	CoreProcessPackage createCoreProcessPackage();
+
+	/**
+	 * Returns a new object of class '<em>Tailored Process</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Tailored Process</em>'.
+	 * @generated
+	 */
+	TailoredProcess createTailoredProcess();
+
+	/**
+	 * Returns a new object of class '<em>Tailored Processes Package</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Tailored Processes Package</em>'.
+	 * @generated
+	 */
+	TailoredProcessesPackage createTailoredProcessesPackage();
+
+	/**
+	 * Returns a new object of class '<em>Tailored Process Component</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Tailored Process Component</em>'.
+	 * @generated
+	 */
+	TailoredProcessComponent createTailoredProcessComponent();
+
+	/**
+	 * Returns a new object of class '<em>Tailored Core Process Package</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Tailored Core Process Package</em>'.
+	 * @generated
+	 */
+	TailoredCoreProcessPackage createTailoredCoreProcessPackage();
+
+	/**
+	 * Returns a new object of class '<em>Variations Package</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Variations Package</em>'.
+	 * @generated
+	 */
+	VariationsPackage createVariationsPackage();
+
+	/**
+	 * Returns a new object of class '<em>Variants Package</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Variants Package</em>'.
+	 * @generated
+	 */
+	VariantsPackage createVariantsPackage();
+
+	/**
+	 * Returns a new object of class '<em>Var Points Package</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Var Points Package</em>'.
+	 * @generated
+	 */
+	VarPointsPackage createVarPointsPackage();
+
+	/**
+	 * Returns a new object of class '<em>Line Process</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Line Process</em>'.
+	 * @generated
+	 */
+	LineProcess createLineProcess();
+
+	/**
 	 * Returns a new object of class '<em>Method Configuration</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -678,148 +975,337 @@ public interface UmaFactory extends EFactory {
 	MethodLibrary createMethodLibrary();
 
 	/**
-	 * Returns a new object of class '<em>Point</em>'.
+	 * Returns a new object of class '<em>Var Point</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Point</em>'.
+	 * @return a new object of class '<em>Var Point</em>'.
 	 * @generated
 	 */
-	Point createPoint();
+	VarPoint createVarPoint();
 
 	/**
-	 * Returns a new object of class '<em>Diagram Link</em>'.
+	 * Returns a new object of class '<em>Variant</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Diagram Link</em>'.
+	 * @return a new object of class '<em>Variant</em>'.
 	 * @generated
 	 */
-	DiagramLink createDiagramLink();
+	Variant createVariant();
 
 	/**
-	 * Returns a new object of class '<em>Graph Connector</em>'.
+	 * Returns a new object of class '<em>Var Activity</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Graph Connector</em>'.
+	 * @return a new object of class '<em>Var Activity</em>'.
 	 * @generated
 	 */
-	GraphConnector createGraphConnector();
+	VarActivity createVarActivity();
 
 	/**
-	 * Returns a new object of class '<em>Dimension</em>'.
+	 * Returns a new object of class '<em>Var Phase</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Dimension</em>'.
+	 * @return a new object of class '<em>Var Phase</em>'.
 	 * @generated
 	 */
-	Dimension createDimension();
+	VarPhase createVarPhase();
 
 	/**
-	 * Returns a new object of class '<em>Reference</em>'.
+	 * Returns a new object of class '<em>Var Iteration</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Reference</em>'.
+	 * @return a new object of class '<em>Var Iteration</em>'.
 	 * @generated
 	 */
-	Reference createReference();
+	VarIteration createVarIteration();
 
 	/**
-	 * Returns a new object of class '<em>Property</em>'.
+	 * Returns a new object of class '<em>Var Role Descriptor</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Property</em>'.
+	 * @return a new object of class '<em>Var Role Descriptor</em>'.
 	 * @generated
 	 */
-	Property createProperty();
+	VarRoleDescriptor createVarRoleDescriptor();
 
 	/**
-	 * Returns a new object of class '<em>Graph Edge</em>'.
+	 * Returns a new object of class '<em>Var Task Descriptor</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Graph Edge</em>'.
+	 * @return a new object of class '<em>Var Task Descriptor</em>'.
 	 * @generated
 	 */
-	GraphEdge createGraphEdge();
+	VarTaskDescriptor createVarTaskDescriptor();
 
 	/**
-	 * Returns a new object of class '<em>Diagram</em>'.
+	 * Returns a new object of class '<em>Var Milestone</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Diagram</em>'.
+	 * @return a new object of class '<em>Var Milestone</em>'.
 	 * @generated
 	 */
-	Diagram createDiagram();
+	VarMilestone createVarMilestone();
 
 	/**
-	 * Returns a new object of class '<em>Graph Node</em>'.
+	 * Returns a new object of class '<em>Var Team Profile</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Graph Node</em>'.
+	 * @return a new object of class '<em>Var Team Profile</em>'.
 	 * @generated
 	 */
-	GraphNode createGraphNode();
+	VarTeamProfile createVarTeamProfile();
 
 	/**
-	 * Returns a new object of class '<em>Simple Semantic Model Element</em>'.
+	 * Returns a new object of class '<em>Var Work Product Descriptor</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Simple Semantic Model Element</em>'.
+	 * @return a new object of class '<em>Var Work Product Descriptor</em>'.
 	 * @generated
 	 */
-	SimpleSemanticModelElement createSimpleSemanticModelElement();
+	VarWorkProductDescriptor createVarWorkProductDescriptor();
 
 	/**
-	 * Returns a new object of class '<em>UMA Semantic Model Bridge</em>'.
+	 * Returns a new object of class '<em>Proc Aspect</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>UMA Semantic Model Bridge</em>'.
+	 * @return a new object of class '<em>Proc Aspect</em>'.
 	 * @generated
 	 */
-	UMASemanticModelBridge createUMASemanticModelBridge();
+	ProcAspect createProcAspect();
 
 	/**
-	 * Returns a new object of class '<em>Core Semantic Model Bridge</em>'.
+	 * Returns a new object of class '<em>Variants List Package</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Core Semantic Model Bridge</em>'.
+	 * @return a new object of class '<em>Variants List Package</em>'.
 	 * @generated
 	 */
-	CoreSemanticModelBridge createCoreSemanticModelBridge();
+	VariantsListPackage createVariantsListPackage();
 
 	/**
-	 * Returns a new object of class '<em>Text Element</em>'.
+	 * Returns a new object of class '<em>Variation</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Text Element</em>'.
+	 * @return a new object of class '<em>Variation</em>'.
 	 * @generated
 	 */
-	TextElement createTextElement();
+	Variation createVariation();
 
 	/**
-	 * Returns a new object of class '<em>Image</em>'.
+	 * Returns a new object of class '<em>Occupation</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Image</em>'.
+	 * @return a new object of class '<em>Occupation</em>'.
 	 * @generated
 	 */
-	Image createImage();
+	Occupation createOccupation();
 
 	/**
-	 * Returns a new object of class '<em>Polyline</em>'.
+	 * Returns a new object of class '<em>Proc Advice</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Polyline</em>'.
+	 * @return a new object of class '<em>Proc Advice</em>'.
 	 * @generated
 	 */
-	Polyline createPolyline();
+	ProcAdvice createProcAdvice();
 
 	/**
-	 * Returns a new object of class '<em>Ellipse</em>'.
+	 * Returns a new object of class '<em>Proc Pointcut</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return a new object of class '<em>Ellipse</em>'.
+	 * @return a new object of class '<em>Proc Pointcut</em>'.
 	 * @generated
 	 */
-	Ellipse createEllipse();
+	ProcPointcut createProcPointcut();
+
+	/**
+	 * Returns a new object of class '<em>Dependences</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Dependences</em>'.
+	 * @generated
+	 */
+	Dependences createDependences();
+
+	/**
+	 * Returns a new object of class '<em>variant2var P</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>variant2var P</em>'.
+	 * @generated
+	 */
+	variant2varP createvariant2varP();
+
+	/**
+	 * Returns a new object of class '<em>variant2variant</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>variant2variant</em>'.
+	 * @generated
+	 */
+	variant2variant createvariant2variant();
+
+	/**
+	 * Returns a new object of class '<em>varp2variant</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>varp2variant</em>'.
+	 * @generated
+	 */
+	varp2variant createvarp2variant();
+
+	/**
+	 * Returns a new object of class '<em>var P2var P</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>var P2var P</em>'.
+	 * @generated
+	 */
+	varP2varP createvarP2varP();
+
+	/**
+	 * Returns a new object of class '<em>Process Line</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Process Line</em>'.
+	 * @generated
+	 */
+	ProcessLine createProcessLine();
+
+	/**
+	 * Returns a new object of class '<em>Variation Type</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Variation Type</em>'.
+	 * @generated
+	 */
+	VariationType createVariationType();
+
+	/**
+	 * Returns a new object of class '<em>Optative</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Optative</em>'.
+	 * @generated
+	 */
+	Optative createOptative();
+
+	/**
+	 * Returns a new object of class '<em>Mandatory</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Mandatory</em>'.
+	 * @generated
+	 */
+	Mandatory createMandatory();
+
+	/**
+	 * Returns a new object of class '<em>Optional</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Optional</em>'.
+	 * @generated
+	 */
+	Optional createOptional();
+
+	/**
+	 * Returns a new object of class '<em>vp Iteration</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>vp Iteration</em>'.
+	 * @generated
+	 */
+	vpIteration createvpIteration();
+
+	/**
+	 * Returns a new object of class '<em>vp Role Descriptor</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>vp Role Descriptor</em>'.
+	 * @generated
+	 */
+	vpRoleDescriptor createvpRoleDescriptor();
+
+	/**
+	 * Returns a new object of class '<em>vp Task Descriptor</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>vp Task Descriptor</em>'.
+	 * @generated
+	 */
+	vpTaskDescriptor createvpTaskDescriptor();
+
+	/**
+	 * Returns a new object of class '<em>vp Milestone</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>vp Milestone</em>'.
+	 * @generated
+	 */
+	vpMilestone createvpMilestone();
+
+	/**
+	 * Returns a new object of class '<em>vp Team Profile</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>vp Team Profile</em>'.
+	 * @generated
+	 */
+	vpTeamProfile createvpTeamProfile();
+
+	/**
+	 * Returns a new object of class '<em>vp Work Product Descriptor</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>vp Work Product Descriptor</em>'.
+	 * @generated
+	 */
+	vpWorkProductDescriptor createvpWorkProductDescriptor();
+
+	/**
+	 * Returns a new object of class '<em>vIteration</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>vIteration</em>'.
+	 * @generated
+	 */
+	vIteration createvIteration();
+
+	/**
+	 * Returns a new object of class '<em>vPhase</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>vPhase</em>'.
+	 * @generated
+	 */
+	vPhase createvPhase();
+
+	/**
+	 * Returns a new object of class '<em>vp Phase</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>vp Phase</em>'.
+	 * @generated
+	 */
+	vpPhase createvpPhase();
+
+	/**
+	 * Returns a new object of class '<em>vActivity</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>vActivity</em>'.
+	 * @generated
+	 */
+	vActivity createvActivity();
+
+	/**
+	 * Returns a new object of class '<em>vp Activity</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>vp Activity</em>'.
+	 * @generated
+	 */
+	vpActivity createvpActivity();
 
 	/**
 	 * Returns the package supported by this factory.

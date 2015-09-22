@@ -28,9 +28,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.common.util.Diagnostic;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.edit.provider.ItemProviderAdapter;
-import org.eclipse.emf.edit.ui.EMFEditUIPlugin;
 import org.eclipse.emf.edit.ui.action.ValidateAction.EclipseResourcesUtil;
 import org.eclipse.epf.library.LibraryService;
 import org.eclipse.epf.library.LibraryServiceListener;
@@ -42,7 +40,6 @@ import org.eclipse.epf.library.edit.navigator.MethodPackagesItemProvider;
 import org.eclipse.epf.library.edit.navigator.ProcessesItemProvider;
 import org.eclipse.epf.library.edit.util.ModelStructure;
 import org.eclipse.epf.library.edit.util.TngUtil;
-import org.eclipse.epf.library.validation.ValidationManager;
 import org.eclipse.epf.persistence.FileManager;
 import org.eclipse.epf.persistence.util.PersistenceUtil;
 import org.eclipse.epf.uma.ContentCategory;
@@ -65,21 +62,6 @@ public class LibraryValidationMarkerHelper extends EclipseResourcesUtil {
 	public static final LibraryValidationMarkerHelper INSTANCE = new LibraryValidationMarkerHelper();
 	public static final String GUID = "guid"; //$NON-NLS-1$
 	
-    @Override
-    protected String getMarkerID()
-    {
-      return ValidationManager.MARKER_ID;
-    }
-	
-    @Override
-    public void createMarkers(Resource resource, Diagnostic diagnostic)
-    {
-    	if (diagnostic.getSeverity() == Diagnostic.WARNING) {
-    		return;
-    	}
-    	super.createMarkers(resource, diagnostic);
-    }
-    
 	private static interface IParentProvider {
 		final IParentProvider containerProvider = new IParentProvider() {
 
@@ -419,9 +401,6 @@ public class LibraryValidationMarkerHelper extends EclipseResourcesUtil {
 				for (int i = 0; i < markers.length; i++) {
 					IMarker marker = markers[i];
 					String guid = (String) marker.getAttribute(GUID);
-					if (guid == null) {
-						continue;
-					}
 					MethodElement e = LibraryService.getInstance().getCurrentLibraryManager().getMethodElement(guid);
 					if(e != null) {
 						errorCalculator.removeError(e);

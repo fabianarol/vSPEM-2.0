@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: GuidanceDescriptionImpl.java,v 1.3 2006/09/07 00:05:59 klow Exp $
+ */
 package org.eclipse.epf.xml.uma.impl;
 
 import org.eclipse.emf.common.notify.Notification;
@@ -64,7 +60,6 @@ public class GuidanceDescriptionImpl extends ContentDescriptionImpl implements G
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.GUIDANCE_DESCRIPTION;
 	}
@@ -95,7 +90,6 @@ public class GuidanceDescriptionImpl extends ContentDescriptionImpl implements G
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 			case UmaPackage.GUIDANCE_DESCRIPTION__ATTACHMENT:
@@ -109,7 +103,6 @@ public class GuidanceDescriptionImpl extends ContentDescriptionImpl implements G
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 			case UmaPackage.GUIDANCE_DESCRIPTION__ATTACHMENT:
@@ -124,7 +117,6 @@ public class GuidanceDescriptionImpl extends ContentDescriptionImpl implements G
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 			case UmaPackage.GUIDANCE_DESCRIPTION__ATTACHMENT:
@@ -139,7 +131,6 @@ public class GuidanceDescriptionImpl extends ContentDescriptionImpl implements G
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 			case UmaPackage.GUIDANCE_DESCRIPTION__ATTACHMENT:
@@ -153,7 +144,6 @@ public class GuidanceDescriptionImpl extends ContentDescriptionImpl implements G
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 

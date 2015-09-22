@@ -16,7 +16,6 @@ import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.epf.library.edit.IFilter;
 import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.uma.Descriptor;
-import org.eclipse.epf.uma.MethodConfiguration;
 
 /**
  * The item provider adapter for activities in the Work Breakdown Structure
@@ -39,8 +38,7 @@ public class PBSActivityItemProvider extends BSActivityItemProvider {
 		Collection col = super.getChildren(object);
 		// This call to PBSActiivityItemProvider(process package) is done
 		// - in order remove duplicate subartifact.
-		MethodConfiguration config = getConfigurator() == null ? null : getConfigurator().getMethodConfiguration();
-		col = ProcessUtil.removeSubartifactsFromChildren(config, col, false);
+		col = ProcessUtil.removeSubartifactsFromChildren(col, false);
 		return col;
 	}
 
@@ -55,5 +53,5 @@ public class PBSActivityItemProvider extends BSActivityItemProvider {
 	public Collection getEClasses() {
 		return ProcessUtil.getPBSEclasses();
 	}
-	
+
 }

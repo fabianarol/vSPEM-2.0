@@ -51,8 +51,6 @@ public class SelectXMLFilePage extends BaseWizardPage {
 
 	private boolean mergeOption = true;
 	
-	private int mergeLevel = 0;	//0: undetermined, 1: default merge, 2: fine grade merge
-	
 	private boolean checkBasePlugins = true;
 
 	/**
@@ -109,7 +107,7 @@ public class SelectXMLFilePage extends BaseWizardPage {
 				setPageComplete(ok);
 			}
 		});
-		
+
 		Group optionGroup = new Group(composite, SWT.NONE);
 		optionGroup.setLayout(new GridLayout(1, false));
 		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
@@ -118,45 +116,24 @@ public class SelectXMLFilePage extends BaseWizardPage {
 		optionGroup.setText(ImportXMLResources.optionGroup_text);
 
 		mergeOption = ImportXMLPreferences.getMergeOption();
-		mergeLevel = ImportXMLPreferences.getMergeLevel();
-		
-		final Button overwriteRadioButton = createRadioButton(optionGroup,
+			
+		Button overwriteRadioButton = createRadioButton(optionGroup,
 				ImportXMLResources.overwriteRadioButton_text, 1, !mergeOption);
 		overwriteRadioButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				if (!overwriteRadioButton.getSelection()) {
-					return;
-				}
-				mergeLevel = 0;
 				mergeOption = false;
 			}
 		});
 		
-		final Button mergeRadioButton = createRadioButton(optionGroup,
-				ImportXMLResources.mergeRadioButton_text, 1, mergeOption && mergeLevel != 2);
+		Button mergeRadioButton = createRadioButton(optionGroup,
+				ImportXMLResources.mergeRadioButton_text, 1, mergeOption);
 		mergeRadioButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
-				if (!mergeRadioButton.getSelection()) {
-					return;
-				}
-				mergeLevel = 1;
 				mergeOption = true;
 			}
 		});
 		
-		final Button mergeRadioButton2 = createRadioButton(optionGroup,
-				ImportXMLResources.mergeRadioButton2_text, 1, mergeOption
-						&& mergeLevel == 2);
-		mergeRadioButton2.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				if (!mergeRadioButton2.getSelection()) {
-					return;
-				}
-				mergeOption = true;
-				mergeLevel = 2;
-			}
-		});
-					
+		
 		Group optionGroup1 = new Group(composite, SWT.NONE);
 		optionGroup1.setLayout(new GridLayout(1, false));
 		GridData gridData1 = new GridData(GridData.FILL_HORIZONTAL);
@@ -184,18 +161,8 @@ public class SelectXMLFilePage extends BaseWizardPage {
 		setControl(composite);
 
 		setPageComplete(isValidPath(pathText.getText().trim()));
-		
-		createAdditionalControls(composite);
 	}
 
-	/**
-	 * Adds additional controls to this wizard page.
-	 * 
-	 * @param composite the parent composite
-	 */
-	protected void createAdditionalControls(Composite composite) {
-	}
-	
 	/**
 	 * Checks whether the user specific path is valid.
 	 * 
@@ -251,10 +218,6 @@ public class SelectXMLFilePage extends BaseWizardPage {
 	 */
 	public boolean getCheckBasePlugins() {
 		return checkBasePlugins;
-	}
-
-	public int getMergerLevel() {
-		return mergeLevel;
 	}
 	
 }

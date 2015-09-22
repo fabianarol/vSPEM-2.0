@@ -11,18 +11,30 @@
  */
 package org.eclipse.epf.diagram.ad.edit.policies;
 
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.epf.diagram.ad.edit.commands.ControlFlowCreateCommand;
-import org.eclipse.epf.diagram.core.util.DiagramCoreValidation;
+import java.util.List;
+
 import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.commands.CompoundCommand;
-import org.eclipse.gef.commands.UnexecutableCommand;
 import org.eclipse.gmf.runtime.emf.type.core.commands.DestroyElementCommand;
 import org.eclipse.gmf.runtime.emf.type.core.requests.CreateRelationshipRequest;
 import org.eclipse.gmf.runtime.emf.type.core.requests.DestroyElementRequest;
 import org.eclipse.gmf.runtime.emf.type.core.requests.ReorientRelationshipRequest;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.epf.diagram.ad.edit.commands.ControlFlowCreateCommand;
+import org.eclipse.epf.diagram.ad.edit.commands.ControlFlowReorientCommand;
+import org.eclipse.epf.diagram.ad.edit.parts.ControlFlowEditPart;
+import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.gmf.runtime.notation.View;
+import org.eclipse.emf.ecore.EClass;
+
+import org.eclipse.epf.diagram.ad.providers.UMLElementTypes;
+
+import org.eclipse.gef.commands.UnexecutableCommand;
+
+import org.eclipse.gmf.runtime.emf.type.core.commands.CreateRelationshipCommand;
+
 import org.eclipse.uml2.uml.ActivityNode;
+import org.eclipse.uml2.uml.ControlFlow;
 import org.eclipse.uml2.uml.MergeNode;
 import org.eclipse.uml2.uml.StructuredActivityNode;
 import org.eclipse.uml2.uml.UMLPackage;
@@ -133,10 +145,12 @@ public class MergeNodeItemSemanticEditPolicy extends
 	 * @modified
 	 */
 	protected Command getCreateOutgoing(CreateRelationshipRequest req) {
+
 		// Validation merge node should allow only one outgoing connection.
 		if (req.getSource() instanceof MergeNode) {
-			MergeNode merge = (MergeNode) req.getSource();
-			if(DiagramCoreValidation.hasVisibleTarget(merge)) {
+			MergeNode join = (MergeNode) req.getSource();
+			List list = join.getOutgoings();
+			if (list != null && list.size() >= 1) {
 				return UnexecutableCommand.INSTANCE;
 			}
 		}

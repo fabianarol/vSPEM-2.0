@@ -17,13 +17,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import org.eclipse.epf.library.edit.LibraryEditPlugin;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.uma.Activity;
 import org.eclipse.epf.uma.CustomCategory;
 import org.eclipse.epf.uma.Deliverable;
 import org.eclipse.epf.uma.MethodElement;
-import org.eclipse.epf.uma.Practice;
 import org.eclipse.epf.uma.VariabilityElement;
 import org.eclipse.epf.uma.VariabilityType;
 import org.eclipse.epf.uma.util.AssociationHelper;
@@ -185,7 +183,7 @@ public class UpwardReachableInfo implements IDependencyInfo {
 		collectParentList(element, list);
 		VariabilityElement ve = (VariabilityElement) element;
 		collectParentListByVariantPaths(ve, list);
-		if (ve.getVariabilityType() == VariabilityType.REPLACES ) {
+		if (ve.getVariabilityType() == VariabilityType.REPLACES_LITERAL ) {
 			mgr.addToReplacerMap(this);
 		}
 		return list;
@@ -196,8 +194,8 @@ public class UpwardReachableInfo implements IDependencyInfo {
 		
 		int sz = parentList == null ? 0 : parentList.size();
 		if (mgr.isMoveElement(elem)) {
-			if (sz > 1 && !(elem instanceof CustomCategory || elem instanceof Practice)) {
-				LibraryEditPlugin.getDefault().getLogger().logError("Error in collectParentList"); //$NON-NLS-1$
+			if (sz > 1 && !(elem instanceof CustomCategory)) {
+				throw new UnsupportedOperationException();	
 			}
 		} else if (sz > 0) {
 			list.addAll(parentList);
@@ -210,8 +208,6 @@ public class UpwardReachableInfo implements IDependencyInfo {
 		
 		if (elem instanceof CustomCategory) {
 			parentList = AssociationHelper.getCustomCategories((CustomCategory) elem);
-			parentList = combine(parentList, AssociationHelper.getPractices((CustomCategory) elem));
-						
 		} else if (elem instanceof Deliverable) {
 			parentList = AssociationHelper.getDeliverables((Deliverable) elem);			
 		} else {	
@@ -220,30 +216,15 @@ public class UpwardReachableInfo implements IDependencyInfo {
 				parentList = new ArrayList();
 				parentList.add(parent);
 			}
-			if (elem instanceof Practice) {
-				parentList = combine(parentList, AssociationHelper.getCustomCategories((Practice) elem));
-				parentList = combine(parentList, AssociationHelper.getPractices((Practice) elem));
-			}
 		}
 		return parentList;
-	}
-	
-	private static List combine(List list1, List list2) {
-		List ret = new ArrayList();		
-		if (list1 != null) {
-			ret.addAll(list1);
-		} 
-		if (list2 != null) {
-			ret.addAll(list2);
-		}		
-		return ret;
 	}
 	
 	private void collectParentListByVariantPaths(VariabilityElement ve, List list) {
 		if (! mgr.isFilterElement(ve)) {
 			VariabilityElement parentVe = ve.getVariabilityBasedOnElement();
 			VariabilityType type = parentVe == null ? null : ve.getVariabilityType();
-			if (type == VariabilityType.CONTRIBUTES || type == VariabilityType.REPLACES) {
+			if (type == VariabilityType.CONTRIBUTES_LITERAL || type == VariabilityType.REPLACES_LITERAL) {
 				list.add(parentVe);
 			}
 		}
@@ -252,7 +233,7 @@ public class UpwardReachableInfo implements IDependencyInfo {
 			return;
 		}
 				
-		for (Iterator it = TngUtil.getImmediateVarieties(ve, VariabilityType.EXTENDS) ; it.hasNext();) {
+		for (Iterator it = TngUtil.getImmediateVarieties(ve, VariabilityType.EXTENDS_LITERAL) ; it.hasNext();) {
 			VariabilityElement extender = (VariabilityElement) it.next();
 			if (! mgr.isFilterElement(extender)) {
 				list.add(extender);

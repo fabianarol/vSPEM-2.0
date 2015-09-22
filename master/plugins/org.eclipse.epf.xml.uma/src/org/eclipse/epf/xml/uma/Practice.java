@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: Practice.java,v 1.4 2007/05/04 22:46:43 klow Exp $
+ */
 package org.eclipse.epf.xml.uma;
 
 import org.eclipse.emf.common.util.EList;
@@ -49,7 +45,7 @@ public interface Practice extends Guidance {
 	 * @return the value of the '<em>Group2</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getPractice_Group2()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
-	 *        extendedMetaData="kind='group' name='group:24'"
+	 *        extendedMetaData="kind='group' name='group:22'"
 	 * @generated
 	 */
 	FeatureMap getGroup2();
@@ -65,11 +61,11 @@ public interface Practice extends Guidance {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Activity Reference</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getPractice_ActivityReference()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='ActivityReference' group='#group:24'"
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='ActivityReference' group='#group:22'"
 	 * @generated
 	 */
-	EList<String> getActivityReference();
+	EList getActivityReference();
 
 	/**
 	 * Returns the value of the '<em><b>Content Reference</b></em>' attribute list.
@@ -82,11 +78,11 @@ public interface Practice extends Guidance {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Content Reference</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getPractice_ContentReference()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='ContentReference' group='#group:24'"
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='ContentReference' group='#group:22'"
 	 * @generated
 	 */
-	EList<String> getContentReference();
+	EList getContentReference();
 
 	/**
 	 * Returns the value of the '<em><b>Sub Practice</b></em>' containment reference list.
@@ -99,10 +95,10 @@ public interface Practice extends Guidance {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Sub Practice</em>' containment reference list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getPractice_SubPractice()
-	 * @model containment="true" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='SubPractice' group='#group:24'"
+	 * @model type="org.eclipse.epf.xml.uma.Practice" containment="true" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='SubPractice' group='#group:22'"
 	 * @generated
 	 */
-	EList<Practice> getSubPractice();
+	EList getSubPractice();
 
 } // Practice

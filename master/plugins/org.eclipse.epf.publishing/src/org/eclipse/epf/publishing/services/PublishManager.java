@@ -21,23 +21,17 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.epf.common.serviceability.DebugTrace;
 import org.eclipse.epf.common.utils.FileUtil;
 import org.eclipse.epf.diagram.core.services.DiagramManager;
-import org.eclipse.epf.library.LibraryService;
-import org.eclipse.epf.library.configuration.ConfigurationHelper;
 import org.eclipse.epf.library.configuration.ElementRealizer;
-import org.eclipse.epf.library.edit.realization.IRealizationManager;
 import org.eclipse.epf.library.layout.Bookmark;
 import org.eclipse.epf.library.layout.ElementLayoutManager;
 import org.eclipse.epf.library.layout.HtmlBuilder;
 import org.eclipse.epf.library.layout.util.XmlElement;
-import org.eclipse.epf.library.util.ResourceHelper;
-import org.eclipse.epf.persistence.refresh.RefreshJob;
 import org.eclipse.epf.publishing.PublishingPlugin;
 import org.eclipse.epf.publishing.PublishingResources;
 import org.eclipse.epf.publishing.services.index.DefinitionObject;
 import org.eclipse.epf.publishing.services.index.KeyWordIndexHelper;
 import org.eclipse.epf.publishing.util.PublishingUtil;
 import org.eclipse.epf.search.SearchService;
-import org.eclipse.epf.uma.MethodLibrary;
 
 /**
  * Manages the publishing of a method configuration.
@@ -67,11 +61,11 @@ public class PublishManager extends AbstractPublishManager {
 		ElementRealizer realizer = null;
 		if ((options != null) && options.publishProcess) {
 			validator = new ProcessPublishingContentValidator(pubDir, options);
-			realizer = ProcessPublishingElementRealizer.newProcessPublishingElementRealizer(config,
+			realizer = new ProcessPublishingElementRealizer(config,
 					(ProcessPublishingContentValidator) validator);
 		} else {
 			validator = new PublishingContentValidator(pubDir, options);
-			realizer = PublishingElementRealizer.newPublishingElementRealizer(config, validator);
+			realizer = new PublishingElementRealizer(config, validator);
 		}
 
 		// validator.setShowBrokenLinks(options.convertBrokenLinks == false);
@@ -114,35 +108,10 @@ public class PublishManager extends AbstractPublishManager {
 	}
 
 	protected void doPublish(IProgressMonitor monitor) throws Exception {
-		boolean suspendRefresh = RefreshJob.getInstance().isSuspendRefresh();
-		if(! suspendRefresh) {
-			RefreshJob.getInstance().setSuspendRefresh(true);
-		}
-		try {
-			ResourceHelper.birt_publishing = false;
-			ConfigurationHelper.getDelegate().buildDynamicCustomCategoriesMap(config);
-			doPublish_(monitor);
-			MethodLibrary lib = LibraryService.getInstance().getCurrentMethodLibrary();			
-		} finally {
-			ResourceHelper.birt_publishing = true;
-			ConfigurationHelper.getDelegate().clearDynamicCustomCategoriesMap();
-			if (! suspendRefresh) {
-				RefreshJob.getInstance().setSuspendRefresh(false);
-				RefreshJob.getInstance().resumeRefresh();
-			}
-		}
-	}
-	
-	private void doPublish_(IProgressMonitor monitor) throws Exception {
+		
 		// before doing publishing, load the whole library and remember the resouces loaded
 		// so we can unload those resources later to free memory
 		Collection<Resource> changedResources = loadLibrary(monitor);
-		
-		IRealizationManager mgr = ConfigurationHelper.getDelegate().getRealizationManager(config);
-		if (mgr != null) {
-			mgr.updateAllProcesseModels();
-		}
-		
 		Collection<DiagramManager> existingMgrs = DiagramManager.getDiagramManagers();
 
 		// don't copy all the content resources

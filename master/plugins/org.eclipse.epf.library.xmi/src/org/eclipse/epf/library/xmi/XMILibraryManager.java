@@ -12,13 +12,8 @@ package org.eclipse.epf.library.xmi;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
@@ -27,21 +22,17 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.epf.common.service.versioning.VersionUtil;
 import org.eclipse.epf.common.serviceability.DebugTrace;
+import org.eclipse.epf.common.serviceability.VersionUtil;
 import org.eclipse.epf.library.AbstractLibraryManager;
 import org.eclipse.epf.library.ILibraryResourceManager;
 import org.eclipse.epf.library.LibraryAlreadyExistsException;
 import org.eclipse.epf.library.LibraryNotFoundException;
 import org.eclipse.epf.library.LibraryResources;
 import org.eclipse.epf.library.LibraryServiceException;
-import org.eclipse.epf.library.edit.meta.TypeDefUtil;
-import org.eclipse.epf.library.edit.util.DebugUtil;
-import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.library.layout.LayoutResources;
 import org.eclipse.epf.library.persistence.ILibraryResourceSet;
 import org.eclipse.epf.library.persistence.PersistenceService;
@@ -53,10 +44,6 @@ import org.eclipse.epf.persistence.migration.MappingUtil;
 import org.eclipse.epf.persistence.util.PersistenceUtil;
 import org.eclipse.epf.services.Services;
 import org.eclipse.epf.uma.MethodLibrary;
-import org.eclipse.epf.uma.util.ExtendedOpposite;
-import org.eclipse.epf.uma.util.ExtendedReference;
-import org.eclipse.epf.uma.util.ModifiedTypeMeta;
-import org.eclipse.epf.uma.util.UserDefinedTypeMeta;
 import org.eclipse.osgi.util.NLS;
 
 import com.ibm.icu.util.Calendar;
@@ -104,9 +91,6 @@ public class XMILibraryManager extends AbstractLibraryManager {
 		super();
 		resourceMgr = new XMILibraryResourceManager();
 	}
-	
-	protected boolean isReopeningLib = false;
-	protected boolean isReopeningSynLib = false;
 
 	/**
 	 * Creates a new method library.
@@ -208,7 +192,6 @@ public class XMILibraryManager extends AbstractLibraryManager {
 
 			return library;
 		} catch (Exception e) {
-			XMILibraryPlugin.getDefault().getLogger().logError(e);
 			throw new LibraryServiceException(e);
 		} finally {
 			skipEventProcessing = false;
@@ -265,51 +248,8 @@ public class XMILibraryManager extends AbstractLibraryManager {
 	 * @throw <code>LibraryServiceException</code> if an error occurred while
 	 *        performing the operation.
 	 */
-	protected MethodLibrary openMethodLibrary(final File path)
+	protected MethodLibrary openMethodLibrary(File path)
 			throws LibraryServiceException {
-		final MethodLibrary[] libHolder = new MethodLibrary[1];
-		final LibraryServiceException[] exceptionHolder = new LibraryServiceException[1];
-		if (ResourcesPlugin.getWorkspace().isTreeLocked()) {
-			// if user opens a project from Navigator view, the
-			// workspace-runable cannot be run successfully because the
-			// workspace is locked at that time and an exception will be
-			// thrown.
-			// TODO: this work-around however will not defer the notification
-			// of resource change events until after the library is opened.
-			// This might cause concurrent modification exception.
-			//
-			try {
-				libHolder[0] = doOpenMethodLibrary(path);
-			} catch (LibraryServiceException e) {
-				exceptionHolder[0] = e;
-			}
-		} else {
-			IWorkspaceRunnable workspaceRunnable = new IWorkspaceRunnable() {
-
-				public void run(IProgressMonitor monitor) throws CoreException {
-					try {
-						libHolder[0] = doOpenMethodLibrary(path);
-					} catch (LibraryServiceException e) {
-						exceptionHolder[0] = e;
-					}
-				}
-				
-			};
-			try {
-				ResourcesPlugin.getWorkspace().run(workspaceRunnable,
-						ResourcesPlugin.getWorkspace().getRoot(),
-						IWorkspace.AVOID_UPDATE, new NullProgressMonitor());
-			} catch (CoreException e) {
-				throw new LibraryServiceException(e);
-			}
-		}
-		if(exceptionHolder[0] != null) {
-			throw exceptionHolder[0];
-		}
-		return libHolder[0];
-	}
-	
-	protected MethodLibrary doOpenMethodLibrary(File path) throws LibraryServiceException {
 		File libraryXMIFile = new File(path, LIBRARY_XMI);
 		if (!libraryXMIFile.exists()) {
 			throw new LibraryNotFoundException();
@@ -401,16 +341,7 @@ public class XMILibraryManager extends AbstractLibraryManager {
 			DebugTrace.print(this, "reopenMethodLibrary"); //$NON-NLS-1$
 		}
 
-		try {
-			isReopeningLib = true;
-			if (library != null && ProcessUtil.isSynFree()) {
-				isReopeningSynLib = true;
-			}
-			library = openMethodLibrary(new File(getMethodLibraryLocation()));
-		} finally {
-			isReopeningLib = false;
-			isReopeningSynLib = false;
-		}
+		library = openMethodLibrary(new File(getMethodLibraryLocation()));
 
 		if (debug) {
 			DebugTrace.print(this, "reopenMethodLibrary", "library=" + library); //$NON-NLS-1$ //$NON-NLS-2$
@@ -558,118 +489,6 @@ public class XMILibraryManager extends AbstractLibraryManager {
 		}
 		//Minimum implementation for defaul register type, to minimize caller code change
 		this.library = null;
-	}
-	
-	private Map<String, UserDefinedTypeMeta> userDefinedTypeMap;
-	public Collection<UserDefinedTypeMeta> getUserDefinedTypes() {
-		return userDefinedTypeMap == null ? null : userDefinedTypeMap.values();
-	}
-	
-	public void addUserDefineType(UserDefinedTypeMeta meta) {
-		if (userDefinedTypeMap == null) {
-			userDefinedTypeMap = new HashMap<String, UserDefinedTypeMeta>();
-		}
-		userDefinedTypeMap.put(meta.getId(), meta);
-	}
-		
-	public UserDefinedTypeMeta getUserDefineType(String id) {
-		return userDefinedTypeMap == null ? null : userDefinedTypeMap.get(id);
-	}
-	
-	private boolean userDefinedTypeLoaded = false;
-	public boolean isUserDefinedTypeLoaded() {
-		return userDefinedTypeLoaded;
-	}
-	
-	public void setUserDefinedTypeLoaded(boolean b) {
-		if (DebugUtil.udtDebug && !userDefinedTypeLoaded && b) {
-			String str = TypeDefUtil.getMTypesDebugString(getModifiedTypes(), "User defined types loaded");//$NON-NLS-1$
-			DebugUtil.print(str);
-		}
-		userDefinedTypeLoaded = b;
-	}
-	
-	public void prepareToLoadUserDefinedTypes() {
-		userDefinedTypeMap = null;
-		modifiedTypeMap = null;
-	}
-	
-	private Map<String, ModifiedTypeMeta> modifiedTypeMap;
-	public Collection<ModifiedTypeMeta> getModifiedTypes() {
-		return modifiedTypeMap == null ? null : modifiedTypeMap.values();		
-	}
-	
-	public void addModifiedType(ModifiedTypeMeta meta) {
-		if (modifiedTypeMap == null) {
-			modifiedTypeMap = new HashMap<String, ModifiedTypeMeta>();
-		}
-		modifiedTypeMap.put(meta.getId(), meta);
-	}
-		
-	private ModifiedTypeMeta noneValue = (ModifiedTypeMeta) TypeDefUtil
-			.getInstance().createMetaDef(ModifiedTypeMeta.class);
-
-	public ModifiedTypeMeta getModifiedType(String id) {
-		if (modifiedTypeMap == null) {
-			return null;
-		}		
-		
-		ModifiedTypeMeta meta = modifiedTypeMap.get(id);
-		if (meta == noneValue) {
-			return null;
-		} else if (meta != null) {
-			return meta;
-		}
-		
-		try {
-			Class cls = Class.forName(id);
-			if (cls == null) {
-				modifiedTypeMap.put(id, noneValue);
-				return null;
-			}
-			List<Class> list = new ArrayList<Class>();
-			list.add(cls);
-			cls = TypeDefUtil.getSuperClass(cls);
-			while (cls != null) {
-				meta = modifiedTypeMap.get(cls.getName());
-				if (meta != null) {
-					break;
-				}
-				list.add(cls);
-				cls = TypeDefUtil.getSuperClass(cls);
-			}
-			if (meta == null) {
-				meta = noneValue;
-			}
-			for (Class c : list) {
-				modifiedTypeMap.put(c.getName(), meta);
-			}
-			
-		} catch (Exception e) {
-//			e.printStackTrace();
-		}
-		return meta == noneValue ? null : meta;
-	}
-	
-	private List<ExtendedOpposite> opposites;
-	public List<ExtendedOpposite> getLoadedOpposites() {
-		if (! isUserDefinedTypeLoaded() || modifiedTypeMap == null) {
-			return Collections.EMPTY_LIST;
-		}
-		if (opposites == null) {
-			opposites = new ArrayList<ExtendedOpposite>();
-			Set<ExtendedOpposite> set = new HashSet<ExtendedOpposite>();
-			for (ModifiedTypeMeta meta : modifiedTypeMap.values()) {
-				for (ExtendedReference ref : meta.getReferences()) {
-					ExtendedOpposite o = ref.getOpposite();
-					if (o != null && set.add(o)) {
-						opposites.add(o);
-					}
-				}
-			}
-			Collections.sort(opposites);
-		}
-		return opposites;
 	}
 	
 }

@@ -21,10 +21,8 @@ import org.eclipse.epf.authoring.ui.editors.MethodElementEditorInput;
 import org.eclipse.epf.authoring.ui.richtext.IMethodRichText;
 import org.eclipse.epf.authoring.ui.richtext.IMethodRichTextEditor;
 import org.eclipse.epf.library.util.ResourceHelper;
-import org.eclipse.epf.uma.ContentDescription;
 import org.eclipse.epf.uma.ContentElement;
 import org.eclipse.epf.uma.MethodElement;
-import org.eclipse.epf.uma.MethodUnit;
 import org.eclipse.epf.uma.ProcessComponent;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
@@ -83,11 +81,11 @@ public class BaseFormPage extends FormPage {
 
 	protected static final int CLEAR_BUTTON = 6;
 
-	public static final int ATTACH_BUTTON = 7;
+	protected static final int ATTACH_BUTTON = 7;
 
-	public static final int DETACH_BUTTON = 8;
+	protected static final int DETACH_BUTTON = 8;
 	
-	public static final int ATTACH_URL_BUTTON = 9;
+	protected static final int ATTACH_URL_BUTTON = 9;
 	
 	/**
 	 * Table types.
@@ -110,8 +108,6 @@ public class BaseFormPage extends FormPage {
 
 	protected String editorName;
 
-	protected MethodUnit methodUnit;
-	
 	protected MethodElement methodElement;
 
 	protected ContentElement contentElement = null;
@@ -150,14 +146,8 @@ public class BaseFormPage extends FormPage {
 		MethodElement elementOfPath =  methodElement instanceof ProcessComponent ?
 				((ProcessComponent) methodElement).getProcess() : methodElement;
 		contentElementPath = ResourceHelper.getFolderAbsolutePath(elementOfPath);
-		if (methodElement instanceof MethodUnit) {
-			methodUnit = (MethodUnit)methodElement;
-		}
-		if (methodElement instanceof ContentElement) {
+		if(methodElement instanceof ContentElement) {
 			contentElement = (ContentElement) methodElement;
-			ContentDescription contentDescription = contentElement
-					.getPresentation();
-			methodUnit = contentDescription;
 		}
 	}
 
@@ -229,11 +219,11 @@ public class BaseFormPage extends FormPage {
 	 *            The section description.
 	 * @return A new <code>Section</code>.
 	 */
-	public Section createSection(FormToolkit toolkit, Composite parent,
+	protected Section createSection(FormToolkit toolkit, Composite parent,
 			String title, String description) {
 		Section section = toolkit.createSection(parent, Section.DESCRIPTION
 				| Section.TWISTIE | Section.EXPANDED | Section.TITLE_BAR);
-		GridData td = new GridData(SWT.FILL, SWT.FILL, true, false);
+		TableWrapData td = new TableWrapData(TableWrapData.FILL_GRAB);
 		section.setLayoutData(td);
 		section.setText(title);
 //		String text = MessageFormat.format(description,
@@ -261,7 +251,8 @@ public class BaseFormPage extends FormPage {
 	 */
 	protected static Label createLabel(FormToolkit toolkit, Composite parent,
 			String text, int gridDataStyle, int horizontalSpan) {
-		Label label = toolkit.createLabel(parent, text, SWT.WRAP);
+		Label label = toolkit.createLabel(parent, text, SWT.WRAP
+				| SWT.LEFT_TO_RIGHT);
 		GridData gridData = new GridData(gridDataStyle);
 		gridData.horizontalSpan = horizontalSpan;
 		gridData.verticalAlignment = SWT.TOP;
@@ -287,7 +278,7 @@ public class BaseFormPage extends FormPage {
 	 */
 	public static Label createLabelWithNoWrap(FormToolkit toolkit, Composite parent,
 			String text, int gridDataStyle, int horizontalSpan) {
-		Label label = toolkit.createLabel(parent, text);
+		Label label = toolkit.createLabel(parent, text, SWT.LEFT_TO_RIGHT);
 		GridData gridData = new GridData(gridDataStyle);
 		gridData.horizontalSpan = horizontalSpan;
 		gridData.verticalAlignment = SWT.TOP;
@@ -307,7 +298,7 @@ public class BaseFormPage extends FormPage {
 	 *            The text for the label.
 	 * @return A new <code>Label</code>.
 	 */
-	public static Label createLabel(FormToolkit toolkit, Composite parent,
+	protected static Label createLabel(FormToolkit toolkit, Composite parent,
 			String text) {
 		return createLabel(toolkit, parent, text, GridData.BEGINNING, 1);
 	}
@@ -325,7 +316,7 @@ public class BaseFormPage extends FormPage {
 	 *            The number of column cells taken up by the Label.
 	 * @return A new <code>Label</code>.
 	 */
-	public static Label createLabel(FormToolkit toolkit, Composite parent,
+	protected static Label createLabel(FormToolkit toolkit, Composite parent,
 			String text, int horizontalSpan) {
 		return createLabel(toolkit, parent, text, GridData.BEGINNING,
 				horizontalSpan);
@@ -438,7 +429,7 @@ public class BaseFormPage extends FormPage {
 		createLabel(toolkit, parent, labelText, 2);
 		return createTextEdit(toolkit, parent);
 	}
-	
+
 	/**
 	 * Creates a double-line text control with a label on a form page.
 	 * 
@@ -450,7 +441,7 @@ public class BaseFormPage extends FormPage {
 	 *            the text for the label.
 	 * @return A new <code>Text</code> control.
 	 */
-	public static Text createTextEditWithLabel2(FormToolkit toolkit,
+	protected static Text createTextEditWithLabel2(FormToolkit toolkit,
 			Composite parent, String labelText) {
 		createLabel(toolkit, parent, labelText, 2);
 		return createTextEdit(toolkit, parent, SWT.MULTI | SWT.WRAP
@@ -458,15 +449,6 @@ public class BaseFormPage extends FormPage {
 				| GridData.GRAB_HORIZONTAL, 40, 300, 1);
 	}
 
-	public static Text createTextEditWithLabel2a(FormToolkit toolkit,
-			Composite parent, String labelText) {
-		Label label = createLabel(toolkit, parent, labelText);
-		((GridData) label.getLayoutData()).widthHint = SWT.DEFAULT;
-		return createTextEdit(toolkit, parent, SWT.MULTI | SWT.WRAP
-				| SWT.V_SCROLL, GridData.FILL_HORIZONTAL
-				| GridData.GRAB_HORIZONTAL, 40, 300, 1);
-	}
-	
 	/**
 	 * Creates a single or multi-line text control with a label on a form page.
 	 * 
@@ -478,7 +460,7 @@ public class BaseFormPage extends FormPage {
 	 *            the text for the label.
 	 * @return A new <code>Text</code> control.
 	 */
-	public static Text createTextEditWithLabel3(FormToolkit toolkit,
+	protected static Text createTextEditWithLabel3(FormToolkit toolkit,
 			Composite parent, String labelText, int height, int singleOrMulti) {
 		createLabel(toolkit, parent, labelText, 2);
 		return createTextEdit(toolkit, parent, singleOrMulti | SWT.WRAP
@@ -555,7 +537,7 @@ public class BaseFormPage extends FormPage {
 	 *            The text for the Label.
 	 * @return A new <code>Combobox</code>.
 	 */
-	public static Combo createComboWithLabel3(FormToolkit toolkit, Composite parent,
+	protected Combo createComboWithLabel3(FormToolkit toolkit, Composite parent,
 			String labelText) {
 		createLabel(toolkit, parent, labelText, 2);
 		return createCombo(parent, SWT.SINGLE | SWT.FLAT | SWT.READ_ONLY |SWT.TRAVERSE_TAB_NEXT,
@@ -589,7 +571,7 @@ public class BaseFormPage extends FormPage {
 	 *            the text for the label.
 	 * @return A new <code>Text</code> control.
 	 */
-	public static Text createTextEditWithLabelLarge(FormToolkit toolkit,
+	protected static Text createTextEditWithLabelLarge(FormToolkit toolkit,
 			Composite parent, String labelText) {
 		Label label = createLabel(toolkit, parent, labelText);
 		((GridData) label.getLayoutData()).widthHint = SWT.DEFAULT;
@@ -760,7 +742,7 @@ public class BaseFormPage extends FormPage {
 	 *            The section ID.
 	 * @return A new <code>IRichMethodText</code>.
 	 */
-	public IMethodRichText createRichTextEditWithLinkForSection(
+	protected IMethodRichText createRichTextEditWithLinkForSection(
 			FormToolkit toolkit, Composite parent, String labelText,
 			int height, int width, int sectionID) {
 		final int SECTION_ID = sectionID;
@@ -827,7 +809,7 @@ public class BaseFormPage extends FormPage {
 	 *            The GridData style.
 	 * @return A new <code>Combobox</code>.
 	 */
-	protected static Combo createCombo(Composite parent, int style, int gridDataStyle) {
+	protected Combo createCombo(Composite parent, int style, int gridDataStyle) {
 		Combo control = new Combo(parent, style);
 		return control;
 	}
@@ -893,7 +875,7 @@ public class BaseFormPage extends FormPage {
 	 * @return A new <code>Composite</code>.
 	 */
 
-	public Composite createComposite(FormToolkit toolkit, Section section) {
+	protected Composite createComposite(FormToolkit toolkit, Section section) {
 		Composite composite = toolkit.createComposite(section);
 		composite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		composite.setLayout(new GridLayout(3, false));
@@ -918,7 +900,7 @@ public class BaseFormPage extends FormPage {
 	 *            The number of columns in the grid.
 	 * @return A new <code>Composite</code>.
 	 */
-	public static Composite createComposite(FormToolkit toolkit,
+	protected static Composite createComposite(FormToolkit toolkit,
 			Composite parent, int gridDataStyle, int verticalSpan,
 			int horizontalSpan, int numColumns) {
 		Composite composite = toolkit.createComposite(parent, SWT.NONE);
@@ -941,7 +923,7 @@ public class BaseFormPage extends FormPage {
 	 *            The number of row cells taken up by the Composite.
 	 * @return A new <code>Composite</code>.
 	 */
-	public static Composite createComposite(FormToolkit toolkit,
+	protected static Composite createComposite(FormToolkit toolkit,
 			Composite parent, int verticalSpan) {
 		return createComposite(toolkit, parent, GridData.FILL_BOTH,
 				verticalSpan, 1, 1);
@@ -958,7 +940,7 @@ public class BaseFormPage extends FormPage {
 	 *            The Composite type.
 	 * @return A new <code>Composite</code>.
 	 */
-	public static Composite createCompositeForButtons(FormToolkit toolkit,
+	protected static Composite createCompositeForButtons(FormToolkit toolkit,
 			Composite parent) {
 		return createComposite(toolkit, parent, GridData.VERTICAL_ALIGN_CENTER
 				| GridData.HORIZONTAL_ALIGN_CENTER, SWT.DEFAULT, SWT.DEFAULT, 1);
@@ -1029,7 +1011,7 @@ public class BaseFormPage extends FormPage {
 	 *            The table table.
 	 * @return A new <code>Table</code>.
 	 */
-	public static Table createTable(FormToolkit toolkit, Composite parent,
+	protected static Table createTable(FormToolkit toolkit, Composite parent,
 			int type) {
 		switch (type) {
 		case SMALL_SIZE:
@@ -1060,7 +1042,7 @@ public class BaseFormPage extends FormPage {
 	 *            The button type.
 	 * @return A new <code>Button</code>.
 	 */
-	public static Button createButton(FormToolkit toolkit, Composite parent,
+	protected static Button createButton(FormToolkit toolkit, Composite parent,
 			int type) {
 		Button button;
 		switch (type) {
@@ -1128,10 +1110,6 @@ public class BaseFormPage extends FormPage {
 	 */
 	public int getRichTextEditorWidth() {
 		return form.getBounds().width - 2 * 32;
-	}
-
-	public MethodElement getMethodElement() {
-		return methodElement;
 	}
 
 

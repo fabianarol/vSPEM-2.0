@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: ProcessPlanningTemplate.java,v 1.5 2007/05/04 22:46:43 klow Exp $
+ */
 package org.eclipse.epf.xml.uma;
 
 import org.eclipse.emf.common.util.EList;
@@ -26,7 +22,7 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link org.eclipse.epf.xml.uma.ProcessPlanningTemplate#getGroup4 <em>Group4</em>}</li>
+ *   <li>{@link org.eclipse.epf.xml.uma.ProcessPlanningTemplate#getGroup3 <em>Group3</em>}</li>
  *   <li>{@link org.eclipse.epf.xml.uma.ProcessPlanningTemplate#getBaseProcess <em>Base Process</em>}</li>
  * </ul>
  * </p>
@@ -37,21 +33,21 @@ import org.eclipse.emf.ecore.util.FeatureMap;
  */
 public interface ProcessPlanningTemplate extends org.eclipse.epf.xml.uma.Process {
 	/**
-	 * Returns the value of the '<em><b>Group4</b></em>' attribute list.
+	 * Returns the value of the '<em><b>Group3</b></em>' attribute list.
 	 * The list contents are of type {@link org.eclipse.emf.ecore.util.FeatureMap.Entry}.
 	 * <!-- begin-user-doc -->
 	 * <p>
-	 * If the meaning of the '<em>Group4</em>' attribute list isn't clear,
+	 * If the meaning of the '<em>Group3</em>' attribute list isn't clear,
 	 * there really should be more of a description here...
 	 * </p>
 	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Group4</em>' attribute list.
-	 * @see org.eclipse.epf.xml.uma.UmaPackage#getProcessPlanningTemplate_Group4()
+	 * @return the value of the '<em>Group3</em>' attribute list.
+	 * @see org.eclipse.epf.xml.uma.UmaPackage#getProcessPlanningTemplate_Group3()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
-	 *        extendedMetaData="kind='group' name='group:47'"
+	 *        extendedMetaData="kind='group' name='group:44'"
 	 * @generated
 	 */
-	FeatureMap getGroup4();
+	FeatureMap getGroup3();
 
 	/**
 	 * Returns the value of the '<em><b>Base Process</b></em>' attribute list.
@@ -64,10 +60,10 @@ public interface ProcessPlanningTemplate extends org.eclipse.epf.xml.uma.Process
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Base Process</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getProcessPlanningTemplate_BaseProcess()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='BaseProcess' group='#group:47'"
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='BaseProcess' group='#group:44'"
 	 * @generated
 	 */
-	EList<String> getBaseProcess();
+	EList getBaseProcess();
 
 } // ProcessPlanningTemplate

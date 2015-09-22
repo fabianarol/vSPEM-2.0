@@ -10,8 +10,6 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.persistence;
 
-import org.eclipse.emf.common.util.URI;
-
 /**
  * Exception for URI that cannot be normalized.
  * 
@@ -20,18 +18,11 @@ import org.eclipse.emf.common.util.URI;
  */
 public class UnnormalizedURIException extends MultiFileIOException {
 
-	private URI uri;
-
 	/**
 	 * @param msg
 	 */
-	public UnnormalizedURIException(URI uri, String msg) {
+	public UnnormalizedURIException(String msg) {
 		super(msg);
-		this.uri = uri;
-	}
-	
-	public URI getURI() {
-		return uri;
 	}
 
 	/**

@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.emf.common.util.BasicEList;
-import org.eclipse.emf.common.util.UniqueEList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.epf.uma.Activity;
@@ -35,7 +34,6 @@ import org.eclipse.epf.uma.CustomCategory;
 import org.eclipse.epf.uma.DescribableElement;
 import org.eclipse.epf.uma.Discipline;
 import org.eclipse.epf.uma.Example;
-import org.eclipse.epf.uma.FulfillableElement;
 import org.eclipse.epf.uma.Guideline;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodElement;
@@ -202,33 +200,33 @@ public final class AssociationHelper {
 	 * An opposite feature used for retrieving the activities which a checklist is
 	 * associated with.
 	 */
-	public static final OppositeFeature Checklist_BreakdownElements = new OppositeFeature(
+	public static final OppositeFeature Checklist_Activities = new OppositeFeature(
 			Checklist.class,
-			"Checklist_BreakdownElements", UmaPackage.eINSTANCE.getBreakdownElement_Checklists(), true); //$NON-NLS-1$
+			"Checklist_Activities", UmaPackage.eINSTANCE.getActivity_Checklists(), true); //$NON-NLS-1$
 
 	/**
 	 * An opposite feature used for retrieving the activities which a concept is
 	 * associated with.
 	 */
-	public static final OppositeFeature Concept_BreakdownElements = new OppositeFeature(
+	public static final OppositeFeature Concept_Activities = new OppositeFeature(
 			Concept.class,
-			"Concept_BreakdownElements", UmaPackage.eINSTANCE.getBreakdownElement_Concepts(), true, false); //$NON-NLS-1$
+			"Concept_Activities", UmaPackage.eINSTANCE.getActivity_Concepts(), true, false); //$NON-NLS-1$
 
 	/**
 	 * An opposite feature used for retrieving the activities which an example is
 	 * associated with.
 	 */
-	public static final OppositeFeature Example_BreakdownElements = new OppositeFeature(
+	public static final OppositeFeature Example_Activities = new OppositeFeature(
 			Concept.class,
-			"Example_BreakdownElements", UmaPackage.eINSTANCE.getBreakdownElement_Examples(), true, false); //$NON-NLS-1$
+			"Example_Activities", UmaPackage.eINSTANCE.getActivity_Examples(), true, false); //$NON-NLS-1$
 
 	/**
 	 * An opposite feature used for retrieving the activities which a ReusableAsset is
 	 * associated with.
 	 */
-	public static final OppositeFeature ReusableAsset_BreakdownElements = new OppositeFeature(
+	public static final OppositeFeature ReusableAsset_Activities = new OppositeFeature(
 			Concept.class,
-			"ReusableAsset_BreakdownElements", UmaPackage.eINSTANCE.getBreakdownElement_ReusableAssets(), true, false); //$NON-NLS-1$
+			"ReusableAsset_Activities", UmaPackage.eINSTANCE.getActivity_ReusableAssets(), true, false); //$NON-NLS-1$
 
 
 	/**
@@ -287,22 +285,13 @@ public final class AssociationHelper {
 			Roadmap.class,
 			"Roadmap_Activites", UmaPackage.eINSTANCE.getActivity_Roadmaps(), true); //$NON-NLS-1$
 
-	
-	/**
-	 * An opposite feature used for retrieving the fulfills elements which a workproduct is
-	 * associated with.
-	 */
-	public static final OppositeFeature FulFills_FullFillableElements = new OppositeFeature(
-			FulfillableElement.class,
-			"FulFills_FullFillableElements", UmaPackage.eINSTANCE.getFulfillableElement_Fulfills(), true); //$NON-NLS-1$
-
 	/**
 	 * An opposite feature used for retrieving the activities which a supporting
 	 * material is associated with.
 	 */
-	public static final OppositeFeature SupportingMaterial_BreakdownElements = new OppositeFeature(
+	public static final OppositeFeature SupportingMaterial_Activities = new OppositeFeature(
 			SupportingMaterial.class,
-			"SupportingMaterial_BreakdownElements", UmaPackage.eINSTANCE.getBreakdownElement_SupportingMaterials(), true, false); //$NON-NLS-1$
+			"SupportingMaterial_Activities", UmaPackage.eINSTANCE.getActivity_SupportingMaterials(), true, false); //$NON-NLS-1$
 
 	/**
 	 * An opposite feature used for retrieving the content elements which a
@@ -348,9 +337,9 @@ public final class AssociationHelper {
 	 * An opposite feature used for retrieving the activities which a guideline
 	 * is associated with.
 	 */
-	public static final OppositeFeature Guideline_BreakdownElements = new OppositeFeature(
+	public static final OppositeFeature Guideline_Activities = new OppositeFeature(
 			Guideline.class,
-			"Guideline_BreakdownElements", UmaPackage.eINSTANCE.getBreakdownElement_Guidelines(), true, false); //$NON-NLS-1$
+			"Guideline_Activities", UmaPackage.eINSTANCE.getActivity_Guidelines(), true, false); //$NON-NLS-1$
 
 	/**
 	 * An opposite feature used for retrieving the work products which a
@@ -364,9 +353,9 @@ public final class AssociationHelper {
 	 * An opposite feature used for retrieving the tool which a tool mentor is
 	 * categorized under.
 	 */
-	public static final OppositeFeature ToolMentor_Tools = new OppositeFeature(
+	public static final OppositeFeature ToolMentor_Tool = new OppositeFeature(
 			ToolMentor.class,
-			"ToolMentor_Tools", UmaPackage.eINSTANCE.getTool_ToolMentors(), true); //$NON-NLS-1$
+			"ToolMentor_Tool", UmaPackage.eINSTANCE.getTool_ToolMentors(), false); //$NON-NLS-1$
 
 	/**
 	 * An opposite feature used for retrieving the tasks which a tool mentor is
@@ -469,7 +458,7 @@ public final class AssociationHelper {
 	 */
 	public static final OppositeFeature WorkOrder_Successor = new OppositeFeature(
 			WorkOrder.class,
-			"WorkOrder_Successor", UmaPackage.eINSTANCE.getWorkBreakdownElement_LinkToPredecessor(), true); //$NON-NLS-1$
+			"WorkOrder_Successor", UmaPackage.eINSTANCE.getWorkBreakdownElement_LinkToPredecessor(), false); //$NON-NLS-1$
 
 	/**
 	 * An opposite feature used for retrieving the successor link of a work
@@ -836,9 +825,9 @@ public final class AssociationHelper {
 	 *            a tool mentor
 	 * @return a tool
 	 */
-	public static List<? extends ToolMentor> getTools(ToolMentor toolMentor) {
-		return (List<? extends ToolMentor>) ((MultiResourceEObject) toolMentor)
-				.getOppositeFeatureValue(ToolMentor_Tools);
+	public static Tool getTool(ToolMentor toolMentor) {
+		return (Tool) ((MultiResourceEObject) toolMentor)
+				.getOppositeFeatureValue(ToolMentor_Tool);
 	}
 
 	/**
@@ -947,17 +936,6 @@ public final class AssociationHelper {
 	public static List getResponsibleRoles(WorkProduct wp) {
 		return (List) wp.getOppositeFeatureValue(WorkProduct_ResponsibleRoles);
 	}
-	
-	/**
-	 * Gets list of work products for which given work product fulfills.
-	 * 
-	 * @param wp
-	 *            a work product
-	 * @return a list of work products
-	 */
-	public static List getFullFills(WorkProduct wp) {
-		return (List) wp.getOppositeFeatureValue(FulFills_FullFillableElements);
-	}
 
 	/**
 	 * Gets the work products modified by a role.
@@ -999,13 +977,18 @@ public final class AssociationHelper {
 	 * @return a list of roles
 	 */
 	public static List getModifiedBy(WorkProduct wp) {
-		List outputFrom = AssociationHelper.getOutputtingTasks(wp);
-		UniqueEList<Role> modifies = new UniqueEList<Role>();
+		List outputFrom = AssociationHelper.getOutputtingTasks(wp); // this.getOutputFrom();
+		java.util.ArrayList modifies = new java.util.ArrayList();
 		if (outputFrom != null && outputFrom.size() > 0) {
 			for (Iterator it = outputFrom.iterator(); it.hasNext();) {
-				//	for each task get, get primary performer role
+				// for each task get, get primary performer role
 				Task task = (Task) it.next();
-				modifies.addAll(task.getPerformedBy());
+				Role modifiedByRole = task.getPerformedBy();
+				if (modifiedByRole != null) {
+					if (!modifies.contains(modifiedByRole)) {
+						modifies.add(modifiedByRole);
+					}
+				}
 			}
 		}
 		return modifies;
@@ -1184,8 +1167,8 @@ public final class AssociationHelper {
 	 *            a method plug-in
 	 * @return a list of method plug-ins
 	 */
-	public static List<MethodPlugin> getPluginDirectExtensions(MethodPlugin plugin) {
-		return (List<MethodPlugin>) ((MultiResourceEObject) plugin)
+	public static List getPluginDirectExtensions(MethodPlugin plugin) {
+		return (List) ((MultiResourceEObject) plugin)
 				.getOppositeFeatureValue(MethodPlugin_DirectExtensions);
 	}
 

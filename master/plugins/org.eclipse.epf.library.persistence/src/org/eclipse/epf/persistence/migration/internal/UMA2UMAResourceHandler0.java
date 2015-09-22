@@ -83,7 +83,7 @@ public class UMA2UMAResourceHandler0 extends UMA2UMAResourceHandler {
 	protected EStructuralFeature getNewFeature(EObject owner, String featureName) {
 		if ("presentationName".equals(featureName) && owner instanceof ContentDescription) { //$NON-NLS-1$
 			return UmaPackage.eINSTANCE
-					.getMethodElement_PresentationName();
+					.getDescribableElement_PresentationName();
 		}
 		if (procMovedFeatureNames.contains(featureName)) {
 			if (owner instanceof ProcessElement) {
@@ -147,7 +147,7 @@ public class UMA2UMAResourceHandler0 extends UMA2UMAResourceHandler {
 			WorkBreakdownElement pred = (WorkBreakdownElement) resourceSet
 					.getEObject(predGuid);
 			workOrder.setPred(pred);
-			workOrder.setLinkType(WorkOrderType.FINISH_TO_FINISH);
+			workOrder.setLinkType(WorkOrderType.FINISH_TO_FINISH_LITERAL);
 			return workOrder;
 		}
 		return getText(value);

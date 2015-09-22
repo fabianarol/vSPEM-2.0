@@ -69,11 +69,4 @@ public interface IConfigurationError {
 	 * @return String
 	 */
 	public String getCategory();
-	
-	/**
-	 * get the error message id
-	 * @return
-	 */
-	public String getMessageId();
-	
 }

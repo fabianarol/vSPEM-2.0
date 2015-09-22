@@ -35,6 +35,13 @@ import org.eclipse.epf.uma.WorkProductDescription;
 public class WorkProductDescriptionImpl extends ContentDescriptionImpl
 		implements WorkProductDescription {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The default value of the '{@link #getPurpose() <em>Purpose</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -104,7 +111,7 @@ public class WorkProductDescriptionImpl extends ContentDescriptionImpl
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -112,7 +119,6 @@ public class WorkProductDescriptionImpl extends ContentDescriptionImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.WORK_PRODUCT_DESCRIPTION;
 	}
@@ -193,7 +199,6 @@ public class WorkProductDescriptionImpl extends ContentDescriptionImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.WORK_PRODUCT_DESCRIPTION__PURPOSE:
@@ -211,7 +216,6 @@ public class WorkProductDescriptionImpl extends ContentDescriptionImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.WORK_PRODUCT_DESCRIPTION__PURPOSE:
@@ -232,7 +236,6 @@ public class WorkProductDescriptionImpl extends ContentDescriptionImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.WORK_PRODUCT_DESCRIPTION__PURPOSE:
@@ -253,7 +256,6 @@ public class WorkProductDescriptionImpl extends ContentDescriptionImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);
@@ -281,7 +283,6 @@ public class WorkProductDescriptionImpl extends ContentDescriptionImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy())
 			return super.toString();

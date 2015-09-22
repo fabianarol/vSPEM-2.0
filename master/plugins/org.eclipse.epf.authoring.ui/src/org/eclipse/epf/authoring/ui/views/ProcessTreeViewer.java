@@ -16,7 +16,6 @@ import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryContentProvider;
 import org.eclipse.epf.authoring.ui.AuthoringUIResources;
 import org.eclipse.epf.authoring.ui.editors.ColumnDescriptor;
-import org.eclipse.epf.library.configuration.ActivityDeepCopyConfigurator;
 import org.eclipse.epf.library.edit.command.IActionManager;
 import org.eclipse.epf.library.edit.command.IResourceAwareCommand;
 import org.eclipse.epf.library.edit.process.IBSItemProvider;
@@ -273,11 +272,6 @@ public class ProcessTreeViewer extends TreeViewer implements
 					ActivityDropCommand cmd = ((ActivityDropCommand) command);
 					cmd.setType(ProcessTreeViewer.this.actionType);
 					cmd.setLabel(text);
-					
-					if (ProcessTreeViewer.this.actionType == DEEP_COPY ) {
-						cmd.setActivityDeepCopyConfigurator(new ActivityDeepCopyConfigurator());
-					}
-					
 				}
 
 				if (actionManager != null

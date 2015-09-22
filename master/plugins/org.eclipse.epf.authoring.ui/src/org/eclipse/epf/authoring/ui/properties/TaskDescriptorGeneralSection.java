@@ -21,8 +21,6 @@ import org.eclipse.epf.library.edit.IFilter;
 import org.eclipse.epf.library.edit.command.IActionManager;
 import org.eclipse.epf.library.edit.itemsfilter.FilterConstants;
 import org.eclipse.epf.library.edit.process.command.LinkMethodElementCommand;
-import org.eclipse.epf.library.edit.util.ProcessUtil;
-import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.ui.LibraryUIText;
 import org.eclipse.epf.uma.Task;
 import org.eclipse.epf.uma.TaskDescriptor;
@@ -150,8 +148,7 @@ public class TaskDescriptorGeneralSection extends
 	private String getMethodElementName(TaskDescriptor element) {
 		String str = PropertiesResources.Process_None; 
 		if (element.getTask() != null) {
-//			str = element.getTask().getName();
-			str = TngUtil.getLabelWithPath(element.getTask());
+			str = element.getTask().getName();
 		}
 
 		return str;
@@ -191,16 +188,11 @@ public class TaskDescriptorGeneralSection extends
 				fd.setBlockOnOpen(true);
 				fd.setViewerSelectionSingle(true);
 				fd.setTitle(FilterConstants.TASKS);
-				fd.setEnableProcessScope(true);
-				fd.setSection(getSection());
 				fd.open();
 				setMethodElement(fd.getSelectedItems());
 
 				// update method element control
 				ctrl_method_element.setText(getMethodElementName(element));
-				if (isSyncFree()) {
-					getEditor().updateOnLinkedElementChange(element);
-				}
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e1) {
@@ -231,15 +223,8 @@ public class TaskDescriptorGeneralSection extends
 		synchronizedButton.setEnabled(editable);
 		linkButton.setEnabled(editable);
 		clearButton.setEnabled(editable);
-		if (isSyncFree()) {
-			if (element.getTask() != null) {
-				linkButton.setEnabled(false);
-			}
-			clearButton.setEnabled(false);
-			synchronizedButton.setVisible(false);
-			synchronizedButton.setEnabled(false);
-		}	
 	}
+
 	
 	/**
 	 * @see org.eclipse.epf.authoring.ui.properties.WorkBreakdownElementGeneralSection#refresh()
@@ -267,9 +252,4 @@ public class TaskDescriptorGeneralSection extends
 	public String getNamePrefix() {
 		return LibraryUIText.TEXT_TASK_DESCRIPTOR + ": "; //$NON-NLS-1$
 	}
-	
-	protected boolean isSyncFree() {
-		return ProcessUtil.isSynFree();
-	}
-	
 }

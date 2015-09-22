@@ -18,31 +18,23 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EClassifier;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.edit.provider.ComposedAdapterFactory;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
 import org.eclipse.epf.common.utils.StrUtil;
 import org.eclipse.epf.common.utils.Timer;
 import org.eclipse.epf.common.utils.XMLUtil;
-import org.eclipse.epf.library.ILibraryManager;
 import org.eclipse.epf.library.LibraryPlugin;
 import org.eclipse.epf.library.LibraryResources;
 import org.eclipse.epf.library.LibraryService;
 import org.eclipse.epf.library.configuration.ConfigurationHelper;
 import org.eclipse.epf.library.edit.IFilter;
-import org.eclipse.epf.library.edit.meta.TypeDefUtil;
-import org.eclipse.epf.library.edit.process.BreakdownElementWrapperItemProvider;
-import org.eclipse.epf.library.edit.process.ComposedWPDescriptorWrapperItemProvider;
 import org.eclipse.epf.library.edit.process.IBSItemProvider;
 import org.eclipse.epf.library.edit.util.Comparators;
-import org.eclipse.epf.library.edit.util.DescriptorPropUtil;
 import org.eclipse.epf.library.edit.util.PredecessorList;
 import org.eclipse.epf.library.edit.util.ProcessUtil;
-import org.eclipse.epf.library.edit.util.PropUtil;
 import org.eclipse.epf.library.edit.util.Suppression;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.layout.ElementLayoutManager;
@@ -54,15 +46,12 @@ import org.eclipse.epf.library.layout.util.XmlElement;
 import org.eclipse.epf.library.prefs.BSColumn;
 import org.eclipse.epf.library.prefs.PreferenceUtil;
 import org.eclipse.epf.library.util.LibraryUtil;
-import org.eclipse.epf.library.util.ModelInfoKeyMap;
 import org.eclipse.epf.library.util.ResourceHelper;
 import org.eclipse.epf.uma.Activity;
-import org.eclipse.epf.uma.Artifact;
 import org.eclipse.epf.uma.BreakdownElement;
 import org.eclipse.epf.uma.CompositeRole;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.MethodPlugin;
-import org.eclipse.epf.uma.Milestone;
 import org.eclipse.epf.uma.Process;
 import org.eclipse.epf.uma.Role;
 import org.eclipse.epf.uma.RoleDescriptor;
@@ -71,14 +60,10 @@ import org.eclipse.epf.uma.Task;
 import org.eclipse.epf.uma.TaskDescriptor;
 import org.eclipse.epf.uma.TeamProfile;
 import org.eclipse.epf.uma.UmaPackage;
-import org.eclipse.epf.uma.VariabilityElement;
-import org.eclipse.epf.uma.VariabilityType;
 import org.eclipse.epf.uma.WorkBreakdownElement;
 import org.eclipse.epf.uma.WorkProductDescriptor;
 import org.eclipse.epf.uma.ecore.util.OppositeFeature;
 import org.eclipse.epf.uma.util.AssociationHelper;
-import org.eclipse.epf.uma.util.ExtendedReference;
-import org.eclipse.epf.uma.util.ModifiedTypeMeta;
 import org.eclipse.osgi.util.NLS;
 
 
@@ -284,12 +269,6 @@ public class ActivityLayout extends AbstractProcessElementLayout {
 		if (!includeReferences) {
 			return elementXml;
 		}
-		
-		loadExtendedAttributes(elementXml);
-		
-		// Load the udt info
-		loadUdtReferences(elementXml);
-		loadExtendedReferences(elementXml);
 		
 		elementXml.setAttribute("ShowFullMethodContent", (layoutManager.getValidator().showExtraInfoForDescriptors()) ? "true" : "false"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
@@ -584,7 +563,7 @@ public class ActivityLayout extends AbstractProcessElementLayout {
 	{
 		Timer timer = null;
 		if (debug ){
-			System.out.println("START: generating diagram " + imgFile);//$NON-NLS-1$
+			System.out.println("START: generating diagram " + imgFile);
 			timer = new Timer();			
 		}
 		// generate diagram
@@ -602,17 +581,9 @@ public class ActivityLayout extends AbstractProcessElementLayout {
 			boolean publishingmode = LibraryUtil.PUBLISH_MODE;
 			LibraryUtil.PUBLISH_MODE = true;
 
-			boolean oldValue = DescriptorPropUtil.useLinkedElementInDiagram;
-			try {
-				DescriptorPropUtil.useLinkedElementInDiagram = layoutManager.getValidator().showLinkedPageForDescriptor();				
-				diagram = diagramService.saveDiagram(wrapper,
+			diagram = diagramService.saveDiagram(wrapper,
 					imgFile,
 					diagramType, filter, sup);
-			} finally {
-				if (DescriptorPropUtil.useLinkedElementInDiagram != oldValue) {
-					DescriptorPropUtil.useLinkedElementInDiagram = oldValue;
-				}
-			}
 			
 			// set back to 
 			LibraryUtil.PUBLISH_MODE = publishingmode;
@@ -622,7 +593,7 @@ public class ActivityLayout extends AbstractProcessElementLayout {
 			timer.stop();	
 			String msg = timer.getTime() + " mini seconds generating " + diagramType + " diagram"  ; //$NON-NLS-1$ //$NON-NLS-2$ 			
 			System.out.println(msg);
-			System.out.println("END: generating diagram " + imgFile);//$NON-NLS-1$
+			System.out.println("END: generating diagram " + imgFile);
 		}
 		
 		return diagram;
@@ -775,28 +746,10 @@ public class ActivityLayout extends AbstractProcessElementLayout {
 
 				MethodElement item = (MethodElement) LibraryUtil
 						.unwrap(rawitem);
-				
-				//Filter out WPDs and RDs from WBS page 
-				if (setting.adapterFactory == layoutManager.getCBSAdapterFactory()) {
-					if (item instanceof WorkProductDescriptor || item instanceof RoleDescriptor) {
-						continue;
-					}
-				} 
-				
-				if (item instanceof WorkProductDescriptor) {
-					if (! ConfigurationHelper.inConfig(item, getLayoutMgr().getConfiguration())) {
-						continue;
-					}
-				}
 
-				boolean aSkipIterCond = false;
 				if ( setting.showTaskOnly && (actLevel > ACTIVITY_SHOW_LEVEL)
 						&& !(item instanceof Activity || item instanceof TaskDescriptor) ) {
-					if (item instanceof Milestone) {
-						aSkipIterCond = true;
-					} else {
-						continue;
-					}
+					continue;
 				}
 
 				if ( item == null ) {
@@ -834,10 +787,6 @@ public class ActivityLayout extends AbstractProcessElementLayout {
 					continue;
 				}
 				
-				if (aSkipIterCond) {
-					continue;
-				}
-				
 				// ineterate children, not just activity, any child in the
 				// rawitem should be iterated,
 				// such as the sub-artifacts
@@ -872,15 +821,6 @@ public class ActivityLayout extends AbstractProcessElementLayout {
 		boolean isSupressed = setting.sup.isSuppressed(elementItem.rawItem);
 		if ( isSupressed ) {
 			itemDetail.addSuppressed(elementItem.element);
-			
-		} else if (elementItem.rawItem instanceof BreakdownElementWrapperItemProvider &&
-				item instanceof BreakdownElement) {
-			try {
-				isSupressed = isSuppressedDueToContribution((BreakdownElementWrapperItemProvider) elementItem.rawItem, setting.sup.getProcess(), 
-					(BreakdownElement) item);
-			} catch (Exception e) {
-				isSupressed = false;
-			}
 		}
 		
 		XmlElement child = l.getXmlElement(false);
@@ -907,17 +847,8 @@ public class ActivityLayout extends AbstractProcessElementLayout {
 		// get the index and predecessor indeces
 		if (elementItem.element instanceof BreakdownElement) {
 			String index = getIndex(adapter);
-			
-			String modelInfo = null;			
-			if (adapter instanceof ComposedWPDescriptorWrapperItemProvider) {
-				ComposedWPDescriptorWrapperItemProvider provider = (ComposedWPDescriptorWrapperItemProvider) adapter;
-				modelInfo = provider.getAttribute(item, IBSItemProvider.COL_MODEL_INFO);
-			} else {
-				modelInfo = ProcessUtil.getAttribute(item,
-						IBSItemProvider.COL_MODEL_INFO, adapter);
-			}			
-			String modelInfoKey = ModelInfoKeyMap.getInstance().getModelInfoKey(modelInfo);
-			
+			String modelInfo = ProcessUtil.getAttribute(item,
+					IBSItemProvider.COL_MODEL_INFO, adapter);
 			String team = ProcessUtil.getAttribute(item,
 					IBSItemProvider.COL_TEAMS, adapter);
 			String prefix = ProcessUtil.getAttribute(item,
@@ -938,10 +869,8 @@ public class ActivityLayout extends AbstractProcessElementLayout {
 							IBSItemProvider.COL_HAS_MULTIPLE_OCCURRENCES,
 							adapter);
 			
-//			String displayName = ProcessUtil.getAttribute(item,
-//					IBSItemProvider.COL_PRESENTATION_NAME, adapter);
-			
-			String displayName = ConfigurationHelper.getPresentationName(item, this.getLayoutMgr().getConfiguration());
+			String displayName = ProcessUtil.getAttribute(item,
+					IBSItemProvider.COL_PRESENTATION_NAME, adapter);
 			
 			String mName = ProcessUtil.getAttribute(item,
 					IBSItemProvider.COL_NAME, adapter);
@@ -963,9 +892,8 @@ public class ActivityLayout extends AbstractProcessElementLayout {
 			
 			child.setAttribute("Index", index) //$NON-NLS-1$
 					.setAttribute("ModelInfo", modelInfo) //$NON-NLS-1$
-					.setAttribute("ModelInfoKey", modelInfoKey) //$NON-NLS-1$
 					.setAttribute("Team", team); //$NON-NLS-1$
-					
+
 			child.newChild("attribute").setAttribute("name", "prefix").setValue(prefix); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			
 			child
@@ -1052,55 +980,6 @@ public class ActivityLayout extends AbstractProcessElementLayout {
 		
 		return child;
 	}
-
-	private boolean isSuppressedDueToContribution(BreakdownElementWrapperItemProvider provider,
-			Process process, BreakdownElement breakdownElement) {
-		
-		Process ownerProcess = ProcessUtil.getProcessForBreakdownElement(breakdownElement);
-		if (ownerProcess == null || ownerProcess == process) {
-			return false;
-		}
-		
-		boolean isSupressed = false;
-		String path = Suppression.getPathWithoutViewType(provider).toString();
-		String viewType = Suppression.getViewType(provider);
-
-		String[] guids = path.substring(1).split("/"); 	//$NON-NLS-1$ /
-		int sz = guids.length;
-		ILibraryManager libMgr = LibraryService.getInstance()
-				.getCurrentLibraryManager();
-
-		for (int i = 1; i < sz - 1; i++) {
-			MethodElement iThElement = libMgr.getMethodElement(guids[i]);
-			if (!(iThElement instanceof Activity)) {
-				break;
-			}
-			Activity act = (Activity) iThElement;
-			Process proc = ProcessUtil.getProcess(act);
-			if (proc == null) {
-				break;
-			}
-
-			VariabilityElement base = proc.getVariabilityBasedOnElement();
-			if (base != null
-					&& proc.getVariabilityType() == VariabilityType.CONTRIBUTES) {
-				String path1 = viewType + "://" + proc.getGuid();	//$NON-NLS-1$ /
-				for (int j = i; j < sz; j++) {
-					path1 += "/" + guids[j];  						//$NON-NLS-1$ /
-				}
-				if (getSuppression(proc).getSuppressedExternalElementPaths()
-						.contains(path1)) {
-					isSupressed = true;
-					break;
-				}
-				if (proc == ownerProcess) {
-					break;
-				}				
-			}
-		}
-
-		return isSupressed;
-	}
 	
 	
 	private void buildRoleRollup(RoleDescriptor roleItem, XmlElement parentXml,
@@ -1118,7 +997,6 @@ public class ActivityLayout extends AbstractProcessElementLayout {
 		List modifies = new ArrayList();
 		List primaryTasks = new ArrayList();
 		List additionalTasks = new ArrayList();	
-		List assistTasks = new ArrayList();
 		List items;
 		
 		for ( Iterator it = descriptors.iterator(); it.hasNext(); ) {
@@ -1143,67 +1021,28 @@ public class ActivityLayout extends AbstractProcessElementLayout {
 					AssociationHelper.RoleDescriptor_AdditionalTaskDescriptors, 
 					getLayoutMgr().getElementRealizer());
 			additionalTasks.addAll(items);
-			
-			items = ConfigurationHelper.calc0nFeatureValue(roleItem,
-					AssociationHelper.RoleDescriptor_AssistsIn_TaskDescriptors,
-					getLayoutMgr().getElementRealizer());
-			assistTasks.addAll(items);
 		}
 		
 		Collections.sort(responsibleFor, Comparators.PRESENTATION_NAME_COMPARATOR);
 		createRoleRollupNodes(parentXml, responsibleFor, TngUtil
-				.getFeatureText(UmaPackage.eINSTANCE.getRoleDescriptor_ResponsibleFor()), setting);
+				.getFeatureText(UmaPackage.eINSTANCE.getRoleDescriptor_ResponsibleFor()));
 
 		Collections.sort(modifies, Comparators.PRESENTATION_NAME_COMPARATOR);
 		createRoleRollupNodes(parentXml, modifies, TngUtil
-				.getFeatureText(UmaPackage.eINSTANCE.getRoleDescriptor_Modifies()), setting);
+				.getFeatureText(UmaPackage.eINSTANCE.getRoleDescriptor_Modifies()));
 
 		Collections.sort(primaryTasks, Comparators.PRESENTATION_NAME_COMPARATOR);
 		createRoleRollupNodes(parentXml, primaryTasks, 
-				LibraryResources.ActivityLayout_primaryTasks_text, setting); 
+				LibraryResources.ActivityLayout_primaryTasks_text); 
 
 		Collections.sort(additionalTasks, Comparators.PRESENTATION_NAME_COMPARATOR);
 		createRoleRollupNodes(parentXml, additionalTasks, 
-				LibraryResources.ActivityLayout_additionalTasks_text, setting); 
-		
-		Collections.sort(assistTasks, Comparators.PRESENTATION_NAME_COMPARATOR);
-		createRoleRollupNodes(parentXml, assistTasks, 
-				LibraryResources.ActivityLayout_assistTasks_text, setting);
+				LibraryResources.ActivityLayout_additionalTasks_text); 
 
-		ModifiedTypeMeta meta = TypeDefUtil.getMdtMeta(UmaPackage.eINSTANCE.getRole());
-		if (meta != null) {
-			for ( Iterator it = descriptors.iterator(); it.hasNext(); ) {			
-				roleItem = (RoleDescriptor) it.next();				
-				for (ExtendedReference eRef : meta.getReferences()) {
-					if (ExtendedReference.WorkProducts.equals(eRef.getContributeTo())) {
-						items = PropUtil.getPropUtil().getExtendedReferenceList(roleItem, eRef, false);
-						createRoleRollupNodes(parentXml, items, 
-								eRef.getName(), setting);
-					}
-				}
-				
-			}
-		}
-		
-		meta = TypeDefUtil.getMdtMeta(UmaPackage.eINSTANCE.getTask());
-		if (meta != null) {
-			for ( Iterator it = descriptors.iterator(); it.hasNext(); ) {			
-				roleItem = (RoleDescriptor) it.next();				
-				for (ExtendedReference eRef : meta.getReferences()) {
-					if (ExtendedReference.Roles.equals(eRef.getContributeTo())) {
-						items = PropUtil.getPropUtil().getReferencingList(roleItem, eRef);
-						String info = LibraryResources.bind(LibraryResources.ActivityLayout_performAs_text, (new String[] {eRef.getName()}));
-						createRoleRollupNodes(parentXml, items, 
-								info, setting);
-					}
-				}
-				
-			}
-		}
 	}
 	
 	private void createRoleRollupNodes(XmlElement parentXml, List items,
-			String info, ActivityLayoutSetting setting) {
+			String info) {
 		
 		// 160188 - Published Team Allocation tab shows redundant information
 		// only show one descriptor if more than one are linked to the same task or wp.
@@ -1231,29 +1070,9 @@ public class ActivityLayout extends AbstractProcessElementLayout {
 			IElementLayout l = layoutManager.getLayout(e, true);
 			XmlElement child = l.getXmlElement(false);
 			child.setAttribute("ModelInfo", info); //$NON-NLS-1$
-			String modelInfoKey = ModelInfoKeyMap.getInstance().getModelInfoKey(info);
-			child.setAttribute("ModelInfoKey", modelInfoKey); //$NON-NLS-1$
 			parentXml.addChild(child);
-			
-			if ( setting.escapeString )
-			{
-				String displayName = ConfigurationHelper.getPresentationName(e, this.getLayoutMgr().getConfiguration());
-				displayName = XMLUtil.escape(displayName);
-				child.setAttribute("DisplayName", displayName); //$NON-NLS-1$
-			}
-			
-//			lookup the list to see if the item is a suppressed one - for RATLC00264374
-//			if ( !getLayoutMgr().isPublishingMode() )
-//			{
-				for ( Object objItem : itemDetail.suppressedItems) {
-					MethodElement item = (MethodElement)objItem;
-					if ( item.getGuid().equals(l.getId())) {
-						child.setAttribute("isSupressed", "true"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-						break;
-					}
-				}
-			}
-//		}
+		}
+
 	}
 
 
@@ -1773,22 +1592,9 @@ public class ActivityLayout extends AbstractProcessElementLayout {
 			} else if ( item instanceof WorkProductDescriptor ) {
 				e = ((WorkProductDescriptor)item).getWorkProduct();
 			} 
-			MethodElement er = ConfigurationHelper.getCalculatedElement(e,  getLayoutMgr().getElementRealizer());
-			if (er != null) {
-				e = er;
-			}
 			
-			if (e != null) {
+			if ( e != null ) {
 				getLayoutMgr().getValidator().addReferencedElement(item, e);
-				if (e instanceof Artifact) {
-					for (TreeIterator<EObject> ti = e.eAllContents(); ti.hasNext();) {
-						EObject obj = ti.next();
-						if (obj instanceof Artifact) {
-							getLayoutMgr().getValidator().addReferencedElement(
-									item, (Artifact) obj);
-						}
-					}
-				}
 			} 
 				
 			MethodElement parent = (MethodElement) LibraryUtil.unwrap(rawitem);

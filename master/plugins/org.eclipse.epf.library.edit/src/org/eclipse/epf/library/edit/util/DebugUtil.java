@@ -14,10 +14,7 @@ import java.io.PrintStream;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.eclipse.epf.library.edit.LibraryEditPlugin;
 import org.eclipse.epf.uma.MethodElement;
-import org.eclipse.epf.uma.Practice;
-import org.eclipse.epf.uma.util.UserDefinedTypeMeta;
 
 /**
  * Utility class for debug purpose
@@ -26,9 +23,6 @@ import org.eclipse.epf.uma.util.UserDefinedTypeMeta;
  * @since 1.2
  */
 public final class DebugUtil {
-
-	public static final boolean uiDebug = LibraryEditPlugin.getDefault().debug("UiDebug");			//$NON-NLS-1$
-	public static final boolean udtDebug = LibraryEditPlugin.getDefault().debug("UdtDebug");		//$NON-NLS-1$
 
 	private static PrintStream output;
 	private static String prompt = "LD> "; 					//$NON-NLS-1$
@@ -46,25 +40,6 @@ public final class DebugUtil {
 			return output;
 		}
 		return System.out;
-	}
-	
-	public static void print(String msg) {
-		out().println(prompt + msg);
-	}
-	
-	public static void print() {
-		out().println("");	//$NON-NLS-1$ 
-	}
-	
-	public static void print(Collection<? extends MethodElement> elements) {
-		out().println(prompt + "elements: " + (elements == null ? "null" : elements.size()));//$NON-NLS-1$ //$NON-NLS-2$
-		if (elements == null || elements.isEmpty()) {
-			return;
-		}
-		for (MethodElement element : elements) {
-			out().println(prompt + element);
-		}
-		out().println("");//$NON-NLS-1$
 	}
 	
 	public static void print(String beginTitle, String endTitle, Collection<? extends MethodElement> elements, int ix) {
@@ -93,21 +68,11 @@ public final class DebugUtil {
 	}
 	
 	public static String toString(MethodElement element, int ix) {
-		if (element == null) {
-			return "null";//$NON-NLS-1$
-		}
 		if (ix == 1) {
 			return TngUtil.getLabelWithPath(element);
 		} 
 		if (ix == 2) {
-			String typeName = element.eClass().getName();
-			if (element instanceof Practice) {
-				UserDefinedTypeMeta meta = PracticePropUtil.getPracticePropUtil().getUdtMeta((Practice) element);
-				if (meta != null) {
-					typeName = meta.getRteNameMap().get(UserDefinedTypeMeta._typeName);
-				}
-			}			
-			return typeName + ", " +  //$NON-NLS-1$
+			return element.eClass().getName() + ", " +  //$NON-NLS-1$
 					element.getGuid() + ", " + TngUtil.getLabelWithPath(element);//$NON-NLS-1$ 
 		}
 		return element.toString();

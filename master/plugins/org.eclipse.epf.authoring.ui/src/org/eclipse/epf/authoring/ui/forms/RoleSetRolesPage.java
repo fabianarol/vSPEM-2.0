@@ -21,10 +21,12 @@ import org.eclipse.epf.authoring.ui.filters.ContentFilter;
 import org.eclipse.epf.library.edit.IFilter;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
 import org.eclipse.epf.library.edit.command.IActionManager;
+import org.eclipse.epf.library.edit.command.MoveInCategoryCommand;
 import org.eclipse.epf.library.edit.itemsfilter.FilterConstants;
 import org.eclipse.epf.library.edit.util.CategorySortHelper;
 import org.eclipse.epf.library.edit.util.ContentElementOrderList;
 import org.eclipse.epf.library.edit.util.ModelStructure;
+import org.eclipse.epf.uma.ContentCategory;
 import org.eclipse.epf.uma.ContentElement;
 import org.eclipse.epf.uma.Role;
 import org.eclipse.epf.uma.RoleSet;
@@ -78,13 +80,10 @@ public class RoleSetRolesPage extends AssociationFormPage {
 			public Object[] getElements(Object object) {
 				//return ((RoleSet) object).getRoles().toArray();
 				if (allSteps == null) {
-//					allSteps = new ContentElementOrderList(
-//							contentElement,
-//							ContentElementOrderList.CONTENT_ELEMENTS__FOR_ELEMENT_ONLY,
-//							getOrderFeature());
-					allSteps = getProviderExtender().newContentElementOrderList(contentElement, 
+					allSteps = new ContentElementOrderList(
+							contentElement,
 							ContentElementOrderList.CONTENT_ELEMENTS__FOR_ELEMENT_ONLY,
-							getOrderFeature(), 1);					
+							getContentCategoryOrderFeature());
 				}
 				List returnList = CategorySortHelper.sortCategoryElements(contentElement, 
 						allSteps.toArray());
@@ -190,7 +189,7 @@ public class RoleSetRolesPage extends AssociationFormPage {
 	}
 	
 	@Override
-	protected EStructuralFeature getOrderFeature() {
+	protected EStructuralFeature getContentCategoryOrderFeature() {
 		return UmaPackage.eINSTANCE.getRoleSet_Roles();
 	}
 
@@ -200,7 +199,7 @@ public class RoleSetRolesPage extends AssociationFormPage {
 	}
 	
 	@Override
-	public ContentElementOrderList getContentElementOrderList() {
+	protected ContentElementOrderList getContentElementOrderList() {
 		return allSteps;
 	}
 

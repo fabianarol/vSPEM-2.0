@@ -24,14 +24,10 @@ import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.epf.common.utils.XMLUtil;
 import org.eclipse.epf.export.ExportPlugin;
-import org.eclipse.epf.library.edit.util.MethodLibraryPropUtil;
 import org.eclipse.epf.persistence.MultiFileSaveUtil;
-import org.eclipse.epf.uma.MethodElementProperty;
 import org.eclipse.epf.uma.MethodPlugin;
-import org.eclipse.epf.uma.UmaPackage;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -71,8 +67,6 @@ public class LibraryDocument {
 
 	public static final String libraryFile = "library.xmi"; //$NON-NLS-1$
 
-	public static final String ATTR_name = "name"; //$NON-NLS-1$
-	
 	protected File libFile;
 
 	protected Document document;
@@ -84,8 +78,6 @@ public class LibraryDocument {
 	private HashMap guidToUriMap = null;
 	
 	private Map<String, String> guidToPlugNameMap;
-	
-	private int synFreeLibIx = -1; //-1: unset, 0: false, 1: true;
 
 	/**
 	 * Creates a new instance.
@@ -577,53 +569,7 @@ public class LibraryDocument {
 				spec.viewIds.add(guid);
 			}
 		}
-		
-		// get added CCs
-		nodes = configNode.getElementsByTagName("addedCategory"); //$NON-NLS-1$
-		if (nodes != null) {
-			for (int i = 0; i < nodes.getLength(); i++) {
-				Element node = (Element) nodes.item(i);
-				String guid = getGuidFromHref(node.getAttribute(ATTR_href));
-				spec.addedCCIds.add(guid);
-			}
-		}
-		
-		// get substract CCs
-		nodes = configNode.getElementsByTagName("subtractedCategory"); //$NON-NLS-1$
-		if (nodes != null) {
-			for (int i = 0; i < nodes.getLength(); i++) {
-				Element node = (Element) nodes.item(i);
-				String guid = getGuidFromHref(node.getAttribute(ATTR_href));
-				spec.substractCCIds.add(guid);
-			}
-		}
-		
-		// get default view
-		nodes = configNode.getElementsByTagName("defaultView"); //$NON-NLS-1$
-		if (nodes != null) {
-			for (int i = 0; i < nodes.getLength(); i++) {
-				Element node = (Element) nodes.item(i);
-				String guid = getGuidFromHref(node.getAttribute(ATTR_href));
-				spec.defaultView = guid;
-				break;
-			}
-		}
 
-		// get meps
-		nodes = configNode.getElementsByTagName(TAG_methodElementProperty); //$NON-NLS-1$
-		if (nodes != null) {
-			for (int i = 0; i < nodes.getLength(); i++) {
-				Element node = (Element) nodes.item(i);
-				String name = node.getAttribute(ATTR_name);
-				String value = node.getAttribute(ATTR_value);
-				MethodElementProperty mep = (MethodElementProperty) EcoreUtil
-						.create(UmaPackage.eINSTANCE.getMethodElementProperty());
-				mep.setName(name);
-				mep.setValue(value);
-				spec.mepList.add(mep);
-			}
-		}
-		
 		return spec;
 	}
 	
@@ -741,25 +687,12 @@ public class LibraryDocument {
 			if (nodes == null || nodes.getLength() == 0) {
 				return;
 			}
-			int ix = -1;
-			for (int i = 0; i < nodes.getLength(); i++) {
-				Element node = (Element) nodes.item(i);
-				String name = node.getAttribute(ATTR_name);
-				if (name ==null || name.trim().length() == 0) {
-					ix = i;
-					break;
-				}
-			}
-			if (ix == -1) {
-				return;
-			}
-			
-			Element versionNode = (Element) nodes.item(ix);
+			Element versionNode = (Element) nodes.item(0);
 			String versionStr = versionNode.getAttribute(ATTR_value);
 			
 			if (versionStr.equals("0")) { //$NON-NLS-1$ 
 				guidToPlugNameMap = new HashMap<String, String>();
-				for (int i = ix + 1; i < nodes.getLength();) {
+				for (int i = 1; i < nodes.getLength();) {
 					Element node = (Element) nodes.item(i);
 					String guid = node.getAttribute(ATTR_value);
 					node = (Element) nodes.item(i + 1);
@@ -795,26 +728,5 @@ public class LibraryDocument {
 	private NodeList getMethodElementProperties() {
 		return libTag.getElementsByTagName(TAG_methodElementProperty);
 	}
-	
-	public boolean isSynFreeLib() {
-		if (synFreeLibIx == -1) {
-			synFreeLibIx = 0;
-			
-			NodeList nodes = getMethodElementProperties();
-			if (nodes != null) {
-				for (int i = 0; i < nodes.getLength(); i++) {
-					Element node = (Element) nodes.item(i);
-					String name = node.getAttribute(ATTR_name);
-					if (name != null && name.equals(MethodLibraryPropUtil.Library_SynFree)) {
-						String value = node.getAttribute(ATTR_value);
-						synFreeLibIx = Boolean.parseBoolean(value) ? 1 : 0;
-						break;
-					}
-				}
-			}
-		}
-		return synFreeLibIx > 0;
-	}
-
 	
 }

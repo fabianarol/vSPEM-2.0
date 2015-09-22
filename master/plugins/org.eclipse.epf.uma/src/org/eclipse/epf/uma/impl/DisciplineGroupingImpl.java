@@ -37,6 +37,13 @@ import org.eclipse.epf.uma.UmaPackage;
 public class DisciplineGroupingImpl extends ContentCategoryImpl implements
 		DisciplineGrouping {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The cached value of the '{@link #getDisciplines() <em>Disciplines</em>}' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -44,7 +51,7 @@ public class DisciplineGroupingImpl extends ContentCategoryImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Discipline> disciplines;
+	protected EList disciplines = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -56,7 +63,7 @@ public class DisciplineGroupingImpl extends ContentCategoryImpl implements
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -64,7 +71,6 @@ public class DisciplineGroupingImpl extends ContentCategoryImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.DISCIPLINE_GROUPING;
 	}
@@ -74,10 +80,9 @@ public class DisciplineGroupingImpl extends ContentCategoryImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<Discipline> getDisciplines() {
+	public List getDisciplines() {
 		if (disciplines == null) {
-			disciplines = new EObjectResolvingEList<Discipline>(
-					Discipline.class, this,
+			disciplines = new EObjectResolvingEList(Discipline.class, this,
 					UmaPackage.DISCIPLINE_GROUPING__DISCIPLINES);
 		}
 		return disciplines;
@@ -88,7 +93,6 @@ public class DisciplineGroupingImpl extends ContentCategoryImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.DISCIPLINE_GROUPING__DISCIPLINES:
@@ -102,14 +106,11 @@ public class DisciplineGroupingImpl extends ContentCategoryImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.DISCIPLINE_GROUPING__DISCIPLINES:
 			getDisciplines().clear();
-			getDisciplines()
-					.addAll((Collection<? extends Discipline>) newValue);
+			getDisciplines().addAll((Collection) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -120,7 +121,6 @@ public class DisciplineGroupingImpl extends ContentCategoryImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.DISCIPLINE_GROUPING__DISCIPLINES:
@@ -135,7 +135,6 @@ public class DisciplineGroupingImpl extends ContentCategoryImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);

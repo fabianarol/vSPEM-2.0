@@ -21,7 +21,6 @@ import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.emf.edit.provider.IDisposable;
-import org.eclipse.epf.library.edit.ContextIFilter;
 import org.eclipse.epf.library.edit.IConfigurable;
 import org.eclipse.epf.library.edit.IConfigurator;
 import org.eclipse.epf.library.edit.IFilter;
@@ -30,14 +29,11 @@ import org.eclipse.epf.library.edit.IStatefulItemProvider;
 import org.eclipse.epf.library.edit.LibraryEditPlugin;
 import org.eclipse.epf.library.edit.category.DisciplineCategoriesItemProvider;
 import org.eclipse.epf.library.edit.category.RoleSetsItemProvider;
-import org.eclipse.epf.library.edit.util.LibraryEditUtil;
 import org.eclipse.epf.library.edit.util.ModelStructure;
-import org.eclipse.epf.library.edit.util.PracticePropUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.uma.ContentCategory;
 import org.eclipse.epf.uma.Domain;
 import org.eclipse.epf.uma.MethodConfiguration;
-import org.eclipse.epf.uma.Practice;
 import org.eclipse.epf.uma.Role;
 import org.eclipse.epf.uma.Task;
 import org.eclipse.epf.uma.Tool;
@@ -45,9 +41,7 @@ import org.eclipse.epf.uma.ToolMentor;
 import org.eclipse.epf.uma.UmaPackage;
 import org.eclipse.epf.uma.WorkProduct;
 import org.eclipse.epf.uma.WorkProductType;
-import org.eclipse.epf.uma.provider.UmaEditPlugin;
 import org.eclipse.epf.uma.util.AssociationHelper;
-import org.eclipse.epf.uma.util.UserDefinedTypeMeta;
 
 /**
  * The item provider adapter for a method configuration in the Configuration
@@ -67,16 +61,6 @@ public class MethodConfigurationItemProvider extends
 
 	// changed to protected, extended class can play with children variable.
 	protected ArrayList children;
-
-	private static boolean finalOnGetChildrenCall = false; 
-	
-	public static boolean isFinalOnGetChildrenCall() {
-		return finalOnGetChildrenCall;
-	}
-
-	public static void setFinalOnGetChildrenCall(boolean b) {
-		finalOnGetChildrenCall = b;
-	}
 
 	private IFilter disciplinesFilter = new IFilter() {
 
@@ -147,13 +131,13 @@ public class MethodConfigurationItemProvider extends
 
 	};
 
-	private static final ContextIFilter customCategoriesFilter = new ContextIFilter() {
+	private static final IFilter customCategoriesFilter = new IFilter() {
 
 		public boolean accept(Object obj) {
 			// Browsing: With categories, replace generalization
 			// causes both replacement and base to become invisible to browsing
 			return org.eclipse.epf.library.edit.category.CustomCategoriesItemProvider
-					.accept(obj, getMethodConfiguration()) /*
+					.accept(obj) /*
 									 * &&
 									 * ((VariabilityElement)obj).getVariabilityBasedOnElement() ==
 									 * null
@@ -203,7 +187,7 @@ public class MethodConfigurationItemProvider extends
 	private IFilter uncategorizedToolMentorFilter = new IFilter() {
 		public boolean accept(Object obj) {
 			return obj instanceof ToolMentor
-					&& AssociationHelper.getTools((ToolMentor) obj).isEmpty();
+					&& AssociationHelper.getTool((ToolMentor) obj) == null;
 		}
 
 	};
@@ -348,41 +332,16 @@ public class MethodConfigurationItemProvider extends
 							.getImage("full/obj16/MethodPackages"), //$NON-NLS-1$
 					ModelStructure.DEFAULT.customCategoryPath);
 			child.setParent(conf);
-			customCategoriesFilter.setContext(conf);
 			child.setCategorizedFilter(customCategoriesFilter);
 			children.add(child);
 			groupItemProviderMap.put(name, child);
 
-			Collection<UserDefinedTypeMeta> udtTypes = LibraryEditUtil.getInstance().getUserDefinedTypes();		
-			if (udtTypes != null && !udtTypes.isEmpty()) {
-				name = LibraryEditPlugin.INSTANCE.getString("_UI_UdtElements_group"); //$NON-NLS-1$
-	//			GuidanceItemProvider child2 = new GuidanceItemProvider(
-	//					adapterFactory, conf, name, LibraryEditPlugin.INSTANCE.getImage("full/obj16/Practices"));
-				Object image = overlayImage(object,  UmaEditPlugin.INSTANCE.getImage(
-				"full/obj16/UdtNode")); //$NON-NLS-1$
-				GuidanceItemProvider child2 = new GuidanceItemProvider(
-				adapterFactory, conf, name, image);
-				
-				IFilter udtFilter = new IFilter() {
-					public boolean accept(Object obj) {
-						if (! (obj instanceof Practice)) {
-							return false;
-						}
-						return PracticePropUtil.getPracticePropUtil().isUdtType((Practice) obj);
-					}
-				};
-				child2.setGuidanceFilter(udtFilter);
-				children.add(child2);
-				groupItemProviderMap.put(name, child2);
-			}
-			
 			name = LibraryEditPlugin.INSTANCE.getString("_UI_Guidances_group"); //$NON-NLS-1$
 			GuidanceGroupingItemProvider child1 = new GuidanceGroupingItemProvider(
 					adapterFactory, conf);
 			child1.setFilter(filter);
 			children.add(child1);
 			groupItemProviderMap.put(name, child1);
-						
 		}
 
 		return children;

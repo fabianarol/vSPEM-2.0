@@ -39,7 +39,7 @@ public interface ProcessDescription extends ActivityDescription {
 	 * @return the value of the '<em>Scope</em>' attribute.
 	 * @see #setScope(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getProcessDescription_Scope()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getScope();
@@ -65,7 +65,7 @@ public interface ProcessDescription extends ActivityDescription {
 	 * @return the value of the '<em>Usage Notes</em>' attribute.
 	 * @see #setUsageNotes(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getProcessDescription_UsageNotes()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getUsageNotes();

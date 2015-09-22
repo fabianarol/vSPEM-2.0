@@ -35,7 +35,7 @@ public class ProcessAdapterFactoryFilter extends ProcessConfigurator implements
 	 * @param factory
 	 */
 	public ProcessAdapterFactoryFilter(MethodConfiguration methodConfig, ElementLayoutManager.LayoutAdapterFactory factory) {
-		super(methodConfig);
+		super(methodConfig, null);
 		this.factory = factory;
 	}
 
@@ -43,28 +43,28 @@ public class ProcessAdapterFactoryFilter extends ProcessConfigurator implements
 	 * @return AdapterFactory
 	 */
 	public AdapterFactory getWBSAdapterFactory() {
-		return factory != null ? factory.wbsAdapterFactory : null;
+		return factory.wbsAdapterFactory;
 	}
 
 	/**
 	 * @return AdapterFactory
 	 */
 	public AdapterFactory getTBSAdapterFactory() {
-		return factory != null ? factory.tbsAdapterFactory : null;
+		return factory.tbsAdapterFactory;
 	}
 
 	/**
 	 * @return AdapterFactory
 	 */
 	public AdapterFactory getWPBSAdapterFactory() {
-		return factory != null ? factory.wpbsAdapterFactory : null;
+		return factory.wpbsAdapterFactory;
 	}
 
 	/**
 	 * @return AdapterFactory
 	 */
 	public AdapterFactory getCBSAdapterFactory() {
-		return factory != null ? factory.cbsAdapterFactory : null;
+		return factory.cbsAdapterFactory;
 	}
 
 	/**

@@ -30,6 +30,8 @@ import org.eclipse.epf.library.edit.util.model.ModelFactory;
 import org.eclipse.epf.library.edit.util.model.OrderInfo;
 import org.eclipse.epf.library.edit.util.model.OrderInfoCollection;
 import org.eclipse.epf.library.edit.util.model.util.StringResource;
+import org.eclipse.epf.uma.ContentCategory;
+import org.eclipse.epf.uma.ContentElement;
 import org.eclipse.epf.uma.DescribableElement;
 import org.eclipse.epf.uma.VariabilityElement;
 import org.eclipse.epf.uma.VariabilityType;
@@ -41,8 +43,6 @@ import org.eclipse.epf.uma.util.UmaUtil;
  * This class encapsulates all the logics used to retrieve the list of all
  * contributed/inherited sections of the given element as well as allows
  * manipulate this list.
- * 
- * 1.5: Refactored to work on any VariabilityElement
  * 
  * @author Lokanath Jagga
  * @author Phong Nguyen Le
@@ -67,7 +67,7 @@ public class ContentElementOrderList extends BasicEList {
 		DEFAULT_SAVE_OPTIONS.put(XMLResource.OPTION_ENCODING, "ASCII"); //$NON-NLS-1$
 	}
 
-	private VariabilityElement editElement;
+	private ContentElement editElement;
 
 	private boolean mixed = true;
 
@@ -79,7 +79,7 @@ public class ContentElementOrderList extends BasicEList {
 		return TngUtil.isContributor(e);
 	}
 
-	public ContentElementOrderList(VariabilityElement e, int scope, EStructuralFeature feature) {
+	public ContentElementOrderList(ContentElement e, int scope, EStructuralFeature feature) {
 		this.feature = feature;
 		editElement = e;
 		if (scope == CONTENT_ELEMENTS__FOR_ELEMENT_ONLY) {
@@ -91,13 +91,13 @@ public class ContentElementOrderList extends BasicEList {
 		}
 	}
 
-	private void calculateParentsOnly(VariabilityElement e) {
+	private void calculateParentsOnly(ContentElement e) {
 		Iterator iter = null;
 		if (isContributor(e) || isExtended(e)) {
 			List supers = new ArrayList();
 			UmaUtil.getAllSupersBoth(supers, e,
-					VariabilityType.CONTRIBUTES,
-					VariabilityType.EXTENDS);
+					VariabilityType.CONTRIBUTES_LITERAL,
+					VariabilityType.EXTENDS_LITERAL);
 			supers.add(e);
 			iter = supers.iterator();
 		} else {
@@ -111,19 +111,21 @@ public class ContentElementOrderList extends BasicEList {
 			Map guidMap = new HashMap();
 			Set elements = new LinkedHashSet();
 			while (iter.hasNext()) {
-				VariabilityElement element = (VariabilityElement) iter.next();
-				List contentElements = new ArrayList();
-				Object eGet = ((VariabilityElement) element).eGet(feature);
-				if (eGet instanceof List) {
-					contentElements.addAll((List) eGet);
-				}
-				for (Iterator iterator = contentElements.iterator(); iterator
-						.hasNext();) {
-					DescribableElement categorizedElement = (DescribableElement) iterator
-							.next();
-					guidMap.put(categorizedElement.getGuid(),
-							categorizedElement);
-					elements.add(categorizedElement);
+				ContentElement element = (ContentElement) iter.next();
+				if (element instanceof ContentElement) {
+					List contentElements = new ArrayList();
+					Object eGet = ((ContentElement) element).eGet(feature);
+					if (eGet instanceof List) {
+						contentElements.addAll((List) eGet);
+					}
+					for (Iterator iterator = contentElements.iterator(); iterator
+							.hasNext();) {
+						DescribableElement categorizedElement = (DescribableElement) iterator
+								.next();
+						guidMap.put(categorizedElement.getGuid(),
+								categorizedElement);
+						elements.add(categorizedElement);
+					}
 				}
 
 				OrderInfo orderInfo = TngUtil.getOrderInfo(element,
@@ -154,7 +156,7 @@ public class ContentElementOrderList extends BasicEList {
 	}
 
 	// deprecate the following constructor
-	public ContentElementOrderList(VariabilityElement e) {
+	public ContentElementOrderList(ContentElement e) {
 		editElement = e;
 		Iterator iter = null;
 		if (isContributor(e) || TngUtil.hasContributor(e)) {
@@ -168,7 +170,7 @@ public class ContentElementOrderList extends BasicEList {
 							.iterator(); iterator.hasNext();) {
 						VariabilityElement element = (VariabilityElement) iterator
 								.next();
-						if (element.getVariabilityType() == VariabilityType.CONTRIBUTES) {
+						if (element.getVariabilityType() == VariabilityType.CONTRIBUTES_LITERAL) {
 							children.add(element);
 						}
 					}
@@ -180,7 +182,7 @@ public class ContentElementOrderList extends BasicEList {
 			System.out
 					.println("$$$ for " + e.getName() + " = extended is true"); //$NON-NLS-1$ //$NON-NLS-2$
 			List supers = new ArrayList();
-			UmaUtil.getAllSupers(supers, e, VariabilityType.EXTENDS);
+			UmaUtil.getAllSupers(supers, e, VariabilityType.EXTENDS_LITERAL);
 			supers.add(e);
 			iter = supers.iterator();
 		} else {
@@ -193,7 +195,7 @@ public class ContentElementOrderList extends BasicEList {
 			Map guidMap = new HashMap();
 			List elements = new LinkedList();
 			while (iter.hasNext()) {
-				VariabilityElement element = (VariabilityElement) iter.next();
+				ContentElement element = (ContentElement) iter.next();
 				guidMap.put(element.getGuid(), element);
 				elements.add(element);
 
@@ -229,9 +231,9 @@ public class ContentElementOrderList extends BasicEList {
 		// }
 	}
 
-	private static boolean isExtended(VariabilityElement e) {
+	private static boolean isExtended(ContentElement e) {
 		return e.getVariabilityBasedOnElement() != null
-				&& e.getVariabilityType() == VariabilityType.EXTENDS;
+				&& e.getVariabilityType() == VariabilityType.EXTENDS_LITERAL;
 	}
 
 	/**
@@ -309,7 +311,7 @@ public class ContentElementOrderList extends BasicEList {
 		}
 	}
 
-	public boolean canRemove(VariabilityElement contentElement) {
+	public boolean canRemove(ContentElement contentElement) {
 		if (eGet().contains(contentElement)) {
 			return true;
 		}
@@ -318,7 +320,7 @@ public class ContentElementOrderList extends BasicEList {
 
 	public Object remove(int index) {
 		if (mixed) {
-			if (!canRemove((VariabilityElement) get(index)))
+			if (!canRemove((ContentElement) get(index)))
 				return null;
 			Object removed = super.remove(index);
 			eGet().remove(removed);
@@ -329,7 +331,7 @@ public class ContentElementOrderList extends BasicEList {
 	}
 
 	public boolean remove(Object o) {
-		if (!canRemove((VariabilityElement) o))
+		if (!canRemove((ContentElement) o))
 			return false;
 		if (mixed) {
 			if (super.remove(o)) {
@@ -347,7 +349,7 @@ public class ContentElementOrderList extends BasicEList {
 			Iterator e = iterator();
 			while (e.hasNext()) {
 				Object o = e.next();
-				if (c.contains(o) && canRemove((VariabilityElement) o)) {
+				if (c.contains(o) && canRemove((ContentElement) o)) {
 					e.remove();
 					eGet().remove(o);
 					modified = true;
@@ -500,7 +502,7 @@ public class ContentElementOrderList extends BasicEList {
 
 	private EList eGet() {
 		EList list = null;
-		Object object = editElement.eGet(feature);
+		Object object = ((ContentCategory) editElement).eGet(feature);
 		if (object instanceof EList) {
 			list = (EList) object;
 		}

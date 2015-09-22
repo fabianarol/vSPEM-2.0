@@ -10,18 +10,12 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.authoring.ui.forms;
 
-import java.util.Map;
-
-import org.eclipse.epf.authoring.ui.AuthoringUIPlugin;
-import org.eclipse.epf.authoring.ui.AuthoringUIResources;
 import org.eclipse.epf.authoring.ui.AuthoringUIText;
 import org.eclipse.epf.authoring.ui.editors.MethodElementEditor;
 import org.eclipse.epf.authoring.ui.richtext.IMethodRichText;
 import org.eclipse.epf.library.edit.command.IActionManager;
-import org.eclipse.epf.library.edit.util.PracticePropUtil;
 import org.eclipse.epf.uma.Practice;
 import org.eclipse.epf.uma.UmaPackage;
-import org.eclipse.epf.uma.util.UserDefinedTypeMeta;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Event;
@@ -61,15 +55,7 @@ public class PracticeDescriptionPage extends GuidanceDescriptionPage {
 	public void init(IEditorSite site, IEditorInput input) {
 		super.init(site, input);
 		guidance = (Practice) contentElement;
-		
-		publishPracticeOn = true;
-		if (PracticePropUtil.getPracticePropUtil().isUdtType(guidance)) {
-			publishPracticeOnForUDT = true;
-		} 
-		
 		setContentFieldHeight(200);
-		setFullDescOn(true);
-		contentOn = false;
 	}
 
 	/**
@@ -77,45 +63,27 @@ public class PracticeDescriptionPage extends GuidanceDescriptionPage {
 	 */
 	protected void createEditorContent(FormToolkit toolkit) {
 		super.createEditorContent(toolkit);
-		label_base.setText(AuthoringUIText.BASE_ELEMENT_TEXT);
-	}
-	
-	@Override
-	protected void createDetailSectionContent() {
-		PracticeRTELabelProvider provider = new PracticeRTELabelProvider(guidance);
-		
-		// Problem is named "Purpose" in the UI
-		ctrl_problem = createRichTextEditWithLinkForSection(toolkit,
-				detailComposite, provider.getProblemLabel(), 40, 400,
+
+		ctrl_additional_info = createRichTextEditWithLinkForSection(toolkit,
+				detailComposite, AuthoringUIText.ADDITIONAL_INFO_TEXT, 40, 400,
 				DETAIL_SECTION_ID);
 		ctrl_goals = createRichTextEditWithLinkForSection(toolkit,
-				detailComposite, provider.getGoalsLabel(), 40, 400,
+				detailComposite, AuthoringUIText.GOALS_TEXT, 40, 400,
+				DETAIL_SECTION_ID);
+		ctrl_application = createRichTextEditWithLinkForSection(toolkit,
+				detailComposite, AuthoringUIText.APPLICATION_TEXT, 40, 400,
+				DETAIL_SECTION_ID);
+		ctrl_problem = createRichTextEditWithLinkForSection(toolkit,
+				detailComposite, AuthoringUIText.PROBLEM_TEXT, 40, 400,
 				DETAIL_SECTION_ID);
 		ctrl_background = createRichTextEditWithLinkForSection(toolkit,
-				detailComposite, provider.getBackgroundLabel(), 40, 400,
-				DETAIL_SECTION_ID);
-
-		if (fullDescOn) {
-			int width = 40;
-			if (!PracticePropUtil.getPracticePropUtil().isUdtType(guidance)) {
-				width = 100;
-			}
-			
-			ctrl_full_desc = createRichTextEditWithLinkForSection(toolkit,
-					detailComposite, provider.getMainDescriptionLabel(),
-					width, 400, DETAIL_SECTION_ID);
-		}
-		
-		// Application field is called "How to read this practice" in the UI
-		ctrl_application = createRichTextEditWithLinkForSection(toolkit,
-				detailComposite, provider.getApplicationLabel(), 40, 400,
+				detailComposite, AuthoringUIText.BACKGROUND_TEXT, 40, 400,
 				DETAIL_SECTION_ID);
 		ctrl_levels_adoption = createRichTextEditWithLinkForSection(toolkit,
-				detailComposite, provider.getLevelsOfAdoptionLabel(), 40,
+				detailComposite, AuthoringUIText.LEVEL_OF_ADOPTION_TEXT, 40,
 				400, DETAIL_SECTION_ID);
-		ctrl_additional_info = createRichTextEditWithLinkForSection(toolkit,
-				detailComposite, provider.getAdditionalInfoLabel(), 40, 400,
-				DETAIL_SECTION_ID);
+
+		label_base.setText(AuthoringUIText.BASE_ELEMENT_TEXT);
 	}
 
 	/**
@@ -340,7 +308,7 @@ public class PracticeDescriptionPage extends GuidanceDescriptionPage {
 		ctrl_additional_info.setEditable(editable);
 		ctrl_application.setEditable(editable);
 		ctrl_goals.setEditable(editable);
-//		ctrl_problem.setEditable(editable);
+		ctrl_problem.setEditable(editable);
 		ctrl_levels_adoption.setEditable(editable);
 		ctrl_background.setEditable(editable);
 	}
@@ -368,20 +336,6 @@ public class PracticeDescriptionPage extends GuidanceDescriptionPage {
 			ctrl_levels_adoption
 					.setText(guidanceDescription.getLevelsOfAdoption() == null ? "" : guidanceDescription.getLevelsOfAdoption()); //$NON-NLS-1$
 		}
-		
-		//For user defined type
-		if (elementTypeOn) {
-			if (PracticePropUtil.getPracticePropUtil().isUdtType(guidance)) {
-				try {
-					String typeName = PracticePropUtil.getPracticePropUtil()
-							.getUtdData(guidance)
-							.getRteNameMap().get(UserDefinedTypeMeta._typeName);
-					ctrl_type_label.setText(typeName);
-				} catch (Exception e) {
-					AuthoringUIPlugin.getDefault().getLogger().logError(e);
-				}
-			}
-		}
 	}
 
 	/**
@@ -389,74 +343,6 @@ public class PracticeDescriptionPage extends GuidanceDescriptionPage {
 	 */
 	protected Object getContentElement() {
 		return guidance;
-	}
-
-	private class PracticeRTELabelProvider {
-		private String problemLabel;
-		private String goalsLabel;
-		private String backgroundLabel;
-		private String mainDescriptionLabel;
-		private String applicationLabel;
-		private String levelsOfAdoptionLabel;
-		private String additionalInfoLabel;
-		
-		public PracticeRTELabelProvider(Practice prac) {
-			buildLables(prac);
-		}
-		
-		private void buildLables(Practice prac) {
-			try {
-				UserDefinedTypeMeta udtMeta = PracticePropUtil.getPracticePropUtil().getUtdData(prac);				
-				if (udtMeta != null) {
-					Map<String, String> rteNameMap = udtMeta.getRteNameMap();					
-					problemLabel = rteNameMap.get(UserDefinedTypeMeta._problems) + ":"; //$NON-NLS-1$
-					goalsLabel = rteNameMap.get(UserDefinedTypeMeta._goals) + ":"; //$NON-NLS-1$
-					backgroundLabel = rteNameMap.get(UserDefinedTypeMeta._background) + ":"; //$NON-NLS-1$
-					mainDescriptionLabel = rteNameMap.get(UserDefinedTypeMeta._mainDescription) + ":"; //$NON-NLS-1$
-					applicationLabel = rteNameMap.get(UserDefinedTypeMeta._application) + ":"; //$NON-NLS-1$
-					levelsOfAdoptionLabel = rteNameMap.get(UserDefinedTypeMeta._levelsOfAdoption) + ":"; //$NON-NLS-1$
-					additionalInfoLabel = rteNameMap.get(UserDefinedTypeMeta._additionalInfo) + ":"; //$NON-NLS-1$
-				} else {
-					problemLabel = AuthoringUIText.PURPOSE_TEXT;
-					goalsLabel = AuthoringUIText.GOALS_TEXT;
-					backgroundLabel = AuthoringUIText.BACKGROUND_TEXT;
-					mainDescriptionLabel = AuthoringUIText.MAIN_DESCRIPTION_TEXT;
-					applicationLabel = AuthoringUIResources.practice_application_text;
-					levelsOfAdoptionLabel = AuthoringUIText.LEVEL_OF_ADOPTION_TEXT;
-					additionalInfoLabel = AuthoringUIText.ADDITIONAL_INFO_TEXT;
-				}				
-			} catch (Exception e) {
-				AuthoringUIPlugin.getDefault().getLogger().logError(e);
-			}
-		}
-		
-		public String getProblemLabel() {
-			return problemLabel;
-		}
-
-		public String getGoalsLabel() {
-			return goalsLabel;
-		}
-
-		public String getBackgroundLabel() {
-			return backgroundLabel;
-		}
-
-		public String getMainDescriptionLabel() {
-			return mainDescriptionLabel;
-		}
-
-		public String getApplicationLabel() {
-			return applicationLabel;
-		}
-
-		public String getLevelsOfAdoptionLabel() {
-			return levelsOfAdoptionLabel;
-		}
-
-		public String getAdditionalInfoLabel() {
-			return additionalInfoLabel;
-		}
 	}
 
 }

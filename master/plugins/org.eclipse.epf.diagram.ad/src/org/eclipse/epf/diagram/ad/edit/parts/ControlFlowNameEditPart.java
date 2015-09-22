@@ -596,7 +596,7 @@ public class ControlFlowNameEditPart extends LabelEditPart implements
 		 */
 		public ControlFlowLabelFigure() {
 
-			this.setText("");		//$NON-NLS-1$
+			this.setText("");
 			createContents();
 		}
 

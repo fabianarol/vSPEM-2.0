@@ -53,6 +53,7 @@ import org.eclipse.emf.ecore.xmi.XMLResource;
 import org.eclipse.emf.ecore.xmi.impl.XMLInfoImpl;
 import org.eclipse.emf.ecore.xmi.impl.XMLMapImpl;
 import org.eclipse.emf.ecore.xmi.impl.XMLResourceImpl;
+import org.eclipse.epf.common.serviceability.MsgBox;
 import org.eclipse.epf.common.utils.FileUtil;
 import org.eclipse.epf.library.persistence.ILibraryResourceSet;
 import org.eclipse.epf.library.persistence.LibraryResourceException;
@@ -78,6 +79,7 @@ import org.eclipse.epf.uma.MethodPlugin;
 import org.eclipse.epf.uma.Process;
 import org.eclipse.epf.uma.ProcessComponent;
 import org.eclipse.epf.uma.ProcessElement;
+import org.eclipse.epf.uma.ProcessLineComponent;
 import org.eclipse.epf.uma.ProcessPackage;
 import org.eclipse.epf.uma.RoleDescriptor;
 import org.eclipse.epf.uma.SemanticModelBridge;
@@ -108,7 +110,6 @@ import com.ibm.icu.util.Calendar;
  */
 public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 		IProxyResolutionListener, IUmaResourceSet, ILibraryResourceSet {
-	public static final String SKIP_RETRY_PROXY_RESOLUTION = "SKIP_RETRY_PROXY_RESOLUTION"; //$NON-NLS-1$
 
 	private static final String[] DEFAULT_DELIVERY_PROCESS_PATH = { "DeliveryProcesses" }; //$NON-NLS-1$
 
@@ -123,7 +124,7 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 
 	public static boolean REPORT_ERROR = true;
 
-	static final Map<Object, Object> DEFAULT_SAVE_OPTIONS = new HashMap<Object, Object>();
+	static final Map DEFAULT_SAVE_OPTIONS = new HashMap();
 
 	static final Set DEFAULT_SAVE_SEPARATELY_CLASS_SET = new HashSet();
 
@@ -163,9 +164,9 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 
 	public static final String RESMGR_XMI = "resmgr.xmi"; //$NON-NLS-1$
 
-	private HashMap<Object, Object> defaultSaveOptions;
+	private HashMap defaultSaveOptions;
 
-	private HashMap<String, EObject> guidToMethodElementMap;
+	private HashMap guidToMethodElementMap;
 
 	private boolean loading;
 
@@ -261,7 +262,6 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 
 	public MultiFileResourceSetImpl() {
 		super();
-		setURIResourceMap(new HashMap<URI, Resource>());
 		markerMananger = new UnresolvedProxyMarkerManager(this);
 	}
 
@@ -274,7 +274,7 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 		return markerMananger;		
 	}
 	
-	public IURIProvider getURIProvider() {
+	protected IURIProvider getURIProvider() {
 		if(uriProvider == null) {
 			uriProvider = new FilePathProvider();
 		}
@@ -308,16 +308,16 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 
 	}
 
-	public Map<Object, Object> getLoadOptions() {
-		Map<Object, Object> options = super.getLoadOptions();
+	public Map getLoadOptions() {
+		Map options = super.getLoadOptions();
 		options.put(XMLResource.OPTION_ENCODING, "UTF-8"); //$NON-NLS-1$
 		options.put(XMLResource.OPTION_XML_MAP, createLoadXMLMap());
 		return options;
 	}
 
-	public Map<Object, Object> getDefaultSaveOptions() {
+	public Map getDefaultSaveOptions() {
 		if (defaultSaveOptions == null) {
-			defaultSaveOptions = new HashMap<Object, Object>();
+			defaultSaveOptions = new HashMap();
 			defaultSaveOptions.putAll(DEFAULT_SAVE_OPTIONS);
 		}
 
@@ -449,30 +449,6 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 			}			
 		}
 	}
-	
-	private Set<URI> errorUriSet;
-	private void handleLoadResourceException(URI uri, RuntimeException e) {
-		if (errorUriSet == null) {
-			errorUriSet = new HashSet<URI>();
-		}
-		if (errorUriSet.contains(uri)) {
-			return;
-		}
-		errorUriSet.add(uri);
-		String msg = null;
-		if (e.getMessage() != null) {
-			msg = NLS.bind(
-					PersistenceResources.loadResourceErrorWithReason_msg,
-					(new Object[] { uri, e.getMessage() }));
-		}
-		else {
-			msg = NLS.bind(PersistenceResources.loadResourceError_msg, uri);
-			PersistencePlugin.getDefault().getLogger().logError(e);
-		}
-		handleException(msg);
-		throw e;
-
-	}
 
 	/**
 	 * @see org.eclipse.emf.ecore.resource.impl.ResourceSetImpl#getResource(org.eclipse.emf.common.util.URI,
@@ -485,29 +461,15 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 		try {
 			res = super.getResource(uri, loadOnDemand);
 		} catch (RuntimeException e) {
-			// Somehow the resource list of the resource set has null value that
-			// will cause NullPointerException in the following call. Remove the null resource and retry here.
-			// TODO: need to find out the cause of this and fix it.
-			if(e instanceof NullPointerException) {
-				boolean hasNull = false;
-				for (Iterator<Resource> iterator = getResources().iterator(); iterator
-						.hasNext();) {
-					Resource resource = iterator.next();
-					if(resource == null) {
-						iterator.remove();
-						hasNull = true;
-					}
-				}
-				if(hasNull) {
-					try {
-						return super.getResource(uri, loadOnDemand);
-					} catch(RuntimeException re) {
-						handleLoadResourceException(uri, re);
-					}
-				}
-			}
-			
-			handleLoadResourceException(uri, e);
+			String msg = null;
+			if (e.getMessage() != null)
+				msg = NLS.bind(
+						PersistenceResources.loadResourceErrorWithReason_msg,
+						(new Object[] { uri, e.getMessage() }));
+			else
+				msg = NLS.bind(PersistenceResources.loadResourceError_msg, uri);
+			handleException(msg);
+			throw e;
 		}
 		return res;
 	}
@@ -822,7 +784,7 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 								NLS.bind(PersistenceResources.loadConfiguration_couldNotLoad_logMsg, configFile));
 					}
 					else {
-						lib.getPredefinedConfigurations().add((MethodConfiguration) e);
+						lib.getPredefinedConfigurations().add(e);
 						return resource;
 					}
 				} else {
@@ -861,13 +823,10 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 		if (uriConverter instanceof MultiFileURIConverter) {
 			((MultiFileURIConverter) uriConverter).dispose();
 		}
-		errorUriSet = null;
 		uriConverter = null;
 		boolean notify = eDeliver();
 		boolean reportError = REPORT_ERROR;
 		boolean refresh = RefreshJob.getInstance().isEnabled();
-		boolean oldMarkerManagerEnabled = markerMananger.isEnabled();
-
 		try {
 			if(RefreshJob.getInstance().getResourceSet() == this) {
 				RefreshJob.getInstance().setEnabled(false);
@@ -894,7 +853,7 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 		} finally {
 			eSetDeliver(notify);
 			REPORT_ERROR = reportError;
-			markerMananger.setEnabled(oldMarkerManagerEnabled);
+			markerMananger.setEnabled(true);
 			if(RefreshJob.getInstance().getResourceSet() == this) {
 				RefreshJob.getInstance().setEnabled(refresh);
 			}
@@ -908,11 +867,6 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 
 		if (URIToTempURIMap != null) {
 			URIToTempURIMap.clear();
-		}
-		
-		Map<URI, Resource> map = getURIResourceMap();
-		if (map != null) {
-			map.clear();
 		}
 
 		MultiFileXMIResourceImpl.clearDetachedEObjectToIDMap();
@@ -962,7 +916,7 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 		if (!res.getErrors().isEmpty()) {
 			StringBuffer strBuf = new StringBuffer();
 			strBuf.append(PersistenceResources.loadLibraryError_msg);
-			for (Iterator<?> iter = res.getErrors().iterator(); iter.hasNext();) {
+			for (Iterator iter = res.getErrors().iterator(); iter.hasNext();) {
 				Resource.Diagnostic error = (Resource.Diagnostic) iter
 						.next();
 				strBuf.append(NLS.bind(
@@ -1057,7 +1011,6 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 		// disable logging unresolved proxies during loading resource manager
 		// tree
 		//
-		boolean oldMarkerManagerEnabled = markerMananger.isEnabled();
 		markerMananger.setEnabled(false);
 
 		MultiFileURIConverter uriConverter = (MultiFileURIConverter) getURIConverter();
@@ -1068,14 +1021,14 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 			uriConverter.setResolveProxy(false);
 
 			ResourceManager resMgr = getRootResourceManager();
-			Iterator<?> iterator = new AbstractTreeIterator<Object>(resMgr, false) {
+			Iterator iterator = new AbstractTreeIterator(resMgr, false) {
 
 				/**
 				 * Comment for <code>serialVersionUID</code>
 				 */
 				private static final long serialVersionUID = 2172691017987702506L;
 
-				protected Iterator<?> getChildren(Object object) {
+				protected Iterator getChildren(Object object) {
 					ResourceManager resMgr = (ResourceManager) object;
 					return resMgr.getSubManagers().iterator();
 				}
@@ -1085,7 +1038,7 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 			for (; iterator.hasNext(); iterator.next())
 				;
 		} finally {
-			markerMananger.setEnabled(oldMarkerManagerEnabled);
+			markerMananger.setEnabled(true);
 			uriConverter.setResolveProxy(true);
 			loadingResourceManagerTree = false;
 
@@ -1095,7 +1048,7 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 			// unnormalized URIs and report them
 			//
 			try {
-				for (Iterator<?> iter = new ArrayList<Object>(getGuidToMethodElementMap().values())
+				for (Iterator iter = new ArrayList(getGuidToMethodElementMap().values())
 						.iterator(); iter.hasNext();) {
 					InternalEObject o = (InternalEObject) iter.next();
 					if (o.eIsProxy() && o.eContainer() != null) {
@@ -1124,23 +1077,15 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 		return ((MultiFileURIConverter) getURIConverter()).getResourceManager();
 	}
 
-	protected EObject findEObjectInUnloadedResources(String id, boolean skipContent) {
-		return findEObjectInUnloadedResources(getResourceManager(), id, skipContent);
+	protected EObject findEObjectInUnloadedResources(String id) {
+		return findEObjectInUnloadedResources(getResourceManager(), id);
 	}
 
 	private EObject findEObjectInUnloadedResources(ResourceManager resMgr,
-			String id, boolean skipContent) {
-		boolean isLibraryResMgr = getResourceManager() == resMgr;
+			String id) {
 		for (Iterator iter = resMgr.getResourceDescriptors().iterator(); iter
 				.hasNext();) {
 			ResourceDescriptor desc = (ResourceDescriptor) iter.next();
-			if (! isLibraryResMgr && skipContent) {
-				if (! (desc.getUri().endsWith(MultiFileSaveUtil.DEFAULT_PLUGIN_MODEL_FILENAME) ||
-						desc.getUri().endsWith(MultiFileSaveUtil.DEFAULT_MODEL_FILENAME))	) {
-					continue;				
-				}
-			}	
-			
 			Resource resource = super.getResource(desc.getResolvedURI(), false);
 			if (resource == null || !resource.isLoaded()) {
 				try {
@@ -1158,7 +1103,7 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 		}
 		for (Iterator iter = resMgr.getSubManagers().iterator(); iter.hasNext();) {
 			EObject eObject = findEObjectInUnloadedResources(
-					(ResourceManager) iter.next(), id, skipContent);
+					(ResourceManager) iter.next(), id);
 			if (eObject != null)
 				return eObject;
 		}
@@ -1169,13 +1114,6 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 	 * Gets object with the given id
 	 */
 	public EObject getEObject(String id) {
-		return getEObject(id, false);
-	}
-	
-	/**
-	 * Gets object with the given id
-	 */
-	public EObject getEObject(String id, boolean skipContent) {
 		// first, try to get the object from the cache guidToMethodElement
 		//
 		EObject eObject = (EObject) getGuidToMethodElementMap().get(id);
@@ -1191,7 +1129,7 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 			// go thru all unloaded resources, load them, and try to find the
 			// object with the given id.
 			//
-			eObject = findEObjectInUnloadedResources(id, skipContent);
+			eObject = findEObjectInUnloadedResources(id);
 			if (eObject == null && REPORT_ERROR) {
 				handleException(NLS.bind(
 						PersistenceResources.objNotFoundError_msg, id));
@@ -1226,13 +1164,6 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 		result.setTrackingModification(true);
 		getResources().add(result);
 		return result;
-	}
-	
-	/*
-	 * Javadoc copied from interface.
-	 */
-	public Resource createResource(URI uri, String contentType) {
-		return createResource(uri);
 	}
 	
 	protected Resource doCreateResource(URI uri) {
@@ -1472,6 +1403,9 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 						}
 					}
 					else if (eObj instanceof MethodPlugin) {
+						MultiFileSaveUtil.addResourceManager(res);
+					}
+					else if (eObj instanceof ProcessLineComponent){
 						MultiFileSaveUtil.addResourceManager(res);
 					}
 				}
@@ -2090,14 +2024,16 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 		for (Iterator iter = elements.iterator(); iter.hasNext();) {
 			EObject element = (EObject) iter.next();
 			if (!(element instanceof Activity) && element.eContainer() == null) {
-				parentPkg.getProcessElements().add((ProcessElement) element);
+				parentPkg.getProcessElements().add(element);
 			}
 		}
 
 		// add new WorkOrder objects or remove unused WorkOrder objects of this
 		// activity
 		//
-		for (WorkOrder workOrder : activity.getLinkToPredecessor()) {
+		for (Iterator iter = activity.getLinkToPredecessor().iterator(); iter
+				.hasNext();) {
+			WorkOrder workOrder = (WorkOrder) iter.next();
 			if (workOrder.eContainer() == null) {
 				if (workOrder.getPred() != null
 						&& getParent(workOrder.getPred()) != null) {
@@ -2236,9 +2172,9 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 		}
 	}
 
-	public Map<String, EObject> getGuidToMethodElementMap() {
+	public Map getGuidToMethodElementMap() {
 		if (guidToMethodElementMap == null) {
-			guidToMethodElementMap = new HashMap<String, EObject>();
+			guidToMethodElementMap = new HashMap();
 		}
 		return guidToMethodElementMap;
 	}
@@ -2306,13 +2242,13 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 		if(resolved instanceof MethodElement) {
 			String guid = MultiFileSaveUtil.getGuid(resolved);
 			if (guid != null) {
-				getGuidToMethodElementMap().put(guid, (EObject) resolved);
+				getGuidToMethodElementMap().put(guid, resolved);
 			}
 		}
 		markerMananger.proxyResolved(proxy, resolved);
 	}
 
-	protected EObject getEObjectByGUID(String guid) {
+	private EObject getEObjectByGUID(String guid) {
 		return (EObject) getGuidToMethodElementMap().get(guid);
 	}
 
@@ -2342,7 +2278,7 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 
 			String msg = NLS.bind(PersistenceResources.normalizeURIError_msg,
 					uri);
-			throw new UnnormalizedURIException(uri, msg);
+			throw new UnnormalizedURIException(msg);
 		}
 		Resource resource = getResource(normalized.trimFragment(), loadOnDemand);
 		if (resource != null) {
@@ -2366,25 +2302,6 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 		//			
 		// }
 	}
-	
-	private ArrayList copyCollectionToList(Collection c) {
-		int max = 5;
-		for (int i = 0; i < max; i++) {	//Try up to max times for any concurrent exception
-			try {
-				return new ArrayList(c);				
-			} catch (Exception e) {
-				if (i == max - 1) {
-					CommonPlugin.INSTANCE.log(e);
-				} else {
-					try {
-						Thread.sleep(1000);
-					} catch (Exception ee) {						
-					}
-				}
-			}
-		}
-		return new ArrayList();
-	}
 
 	// /**
 	// * @return Returns the exceptions.
@@ -2398,7 +2315,7 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 		if (max < 0) {
 			return;
 		}
-		ArrayList elements = copyCollectionToList(getGuidToMethodElementMap().values());
+		ArrayList elements = new ArrayList(getGuidToMethodElementMap().values());
 		HashSet loadedElements = new HashSet();
 		while (!elements.isEmpty()) {
 			for (Iterator iter = elements.iterator(); iter.hasNext();) {
@@ -2429,7 +2346,7 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 			// gets the newly loaded elements to load their opposite features
 			//
 			loadedElements.addAll(elements);
-			elements = copyCollectionToList(getGuidToMethodElementMap().values());
+			elements = new ArrayList(getGuidToMethodElementMap().values());
 			elements.removeAll(loadedElements);
 		}
 	}
@@ -2439,7 +2356,7 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 		if (max < 0) {
 			return;
 		}
-		ArrayList elements = copyCollectionToList(getGuidToMethodElementMap().values());
+		ArrayList elements = new ArrayList(getGuidToMethodElementMap().values());
 		HashSet loadedElements = new HashSet();
 		while (!elements.isEmpty()) {
 			for (Iterator iter = elements.iterator(); iter.hasNext();) {
@@ -2515,7 +2432,7 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 			// gets the newly loaded elements to load their opposite features
 			//
 			loadedElements.addAll(elements);
-			elements = copyCollectionToList(getGuidToMethodElementMap().values());
+			elements = new ArrayList(getGuidToMethodElementMap().values());
 			elements.removeAll(loadedElements);
 		}
 	}
@@ -2540,7 +2457,7 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 		if(!resources.isEmpty()) {
 			Resource[] resourceArray = new Resource[resources.size()];
 			resources.toArray(resourceArray);
-			checkModify(resourceArray, PersistencePlugin.getDefault().getContext()/*MsgBox.getDefaultShell()*/);
+			checkModify(resourceArray, MsgBox.getDefaultShell());
 		}
 	}
 
@@ -2677,12 +2594,8 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 		
 		// clear cached resolved URI in all ResourceDescriptors
 		//
-		clearCachedResolvedURIs();
-	}
-	
-	protected void clearCachedResolvedURIs() {
 		ResourceManager resMgr = getRootResourceManager();
-		Iterator iterator = new AbstractTreeIterator(resMgr, true) {
+		Iterator iterator = new AbstractTreeIterator(resMgr, false) {
 			private static final long serialVersionUID = 1L;
 
 			protected Iterator getChildren(Object object) {
@@ -2698,9 +2611,4 @@ public class MultiFileResourceSetImpl extends ResourceSetImpl implements
 			}
 		}
 	}
-	
-	public boolean hasOwnFolder(Object e) {
-		return MultiFileSaveUtil.hasOwnFolder(e);
-	}	
-	
 }

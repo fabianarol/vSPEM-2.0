@@ -11,24 +11,13 @@
 package org.eclipse.epf.library.configuration.closure;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryContentProvider;
 import org.eclipse.epf.library.IConfigurationClosure;
@@ -36,20 +25,9 @@ import org.eclipse.epf.library.IConfigurationManager;
 import org.eclipse.epf.library.LibraryPlugin;
 import org.eclipse.epf.library.LibraryResources;
 import org.eclipse.epf.library.LibraryService;
-import org.eclipse.epf.library.configuration.ConfigDataBase;
-import org.eclipse.epf.library.configuration.ConfigurationData;
 import org.eclipse.epf.library.configuration.ConfigurationHelper;
-import org.eclipse.epf.library.configuration.ConfigurationProperties;
-import org.eclipse.epf.library.configuration.SupportingElementData;
 import org.eclipse.epf.library.edit.command.IActionManager;
-import org.eclipse.epf.library.edit.util.ConfigurationUtil;
-import org.eclipse.epf.library.edit.util.MethodElementPropertyHelper;
-import org.eclipse.epf.library.edit.util.MethodElementPropertyMgr;
-import org.eclipse.epf.library.edit.util.MethodElementPropertyMgr.ChangeEvent;
-import org.eclipse.epf.library.persistence.ILibraryResourceSet;
-import org.eclipse.epf.library.util.LibraryProblemMonitor;
 import org.eclipse.epf.library.util.LibraryUtil;
-import org.eclipse.epf.persistence.MultiFileResourceSetImpl;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.MethodLibrary;
@@ -87,15 +65,6 @@ public class ConfigurationClosure implements IConfigurationClosure {
 	
 	private List<ElementError> errors = new ArrayList<ElementError>();
 	
-	private boolean abortCheckError = false;
-	
-	public static ProcessNodeLock processNodeLock = new ProcessNodeLock();
-	
-	// marker ID 
-	public static final String multipleReplacersMARKER_ID = "org.eclipse.epf.library.multipleReplacers"; //$NON-NLS-1$
-	
-	public static final String replacerGuids = "replacerGuids"; //$NON-NLS-1$
-	
 	// A map of invalid nodes to ElementDependencyError objects.
 	protected Map<Object, ElementDependencyError> invalidNodesMap =
 		new HashMap<Object, ElementDependencyError>();
@@ -104,9 +73,6 @@ public class ConfigurationClosure implements IConfigurationClosure {
 	
 	private List<ClosureListener> listeners;
 
-	private MethodElementPropertyMgr.ChangeEventListener configPropListener;
-	
-	private Map<MethodElement, IMarker> replacerElementMarkerMap;
 	/**
 	 * Creates a new instance.
 	 * 
@@ -123,24 +89,7 @@ public class ConfigurationClosure implements IConfigurationClosure {
 				config);
 		if (configManager != null) {
 			library = configManager.getMethodLibrary();
-			//dependencyManager = configManager.getDependencyManager();
-			
-			ConfigurationProperties props = configManager.getConfigurationProperties();
-			configPropListener = new MethodElementPropertyMgr.ChangeEventListener() {
-				public void notifyChange(ChangeEvent event) {
-					if (event.propElement != null) {
-						String name = event.propElement.getName();
-						if (MethodElementPropertyHelper.CONFIG_UPDATE_ON_CLICK
-								.equals(name)
-								|| MethodElementPropertyHelper.CONFIG_NO_UPDATE_ON_CLICK
-										.equals(name)) {
-							return;
-						}
-					}
-					refreshErrormarks();
-				}
-			};			
-			props.addListener(configPropListener);
+			dependencyManager = configManager.getDependencyManager();
 		}
 
 		// configuration changed, re-build the analyze the configuration for errors
@@ -199,62 +148,6 @@ public class ConfigurationClosure implements IConfigurationClosure {
 	 * 
 	 */
 	public void checkError() {
-		if (isRunningCheckError()) {
-			if (ConfigDataBase.localDebug) {
-				System.out.println("LD> checkError skipped");//$NON-NLS-1$
-			}
-			return;
-		}
-		ILibraryResourceSet libResourceSet = null;
-		Resource resource = config.eResource();
-		if(resource != null && resource.getResourceSet() instanceof ILibraryResourceSet) {
-			libResourceSet = (ILibraryResourceSet) resource.getResourceSet();
-		}
-		Object oldValue = null;
-		Map<Object, Object> loadOptions = null;
-		if(libResourceSet != null) {
-			loadOptions = libResourceSet.getLoadOptions();;
-			oldValue = loadOptions.get(MultiFileResourceSetImpl.SKIP_RETRY_PROXY_RESOLUTION);
-			loadOptions.put(MultiFileResourceSetImpl.SKIP_RETRY_PROXY_RESOLUTION, Boolean.TRUE);
-		}
-		try {
-			if (ConfigDataBase.localDebug) {
-				System.out.println("LD> checkError_ ->");//$NON-NLS-1$
-			}
-			checkError_();
-		} catch (Exception e) {
-			LibraryPlugin.getDefault().getLogger().logError(e);
-		} finally {
-			if (ConfigDataBase.localDebug) {
-				System.out.println("LD> checkError_ <-");//$NON-NLS-1$
-			}
-			setRunningCheckError(false);
-			if(loadOptions != null) {
-				if(oldValue == null) {
-					loadOptions.remove(MultiFileResourceSetImpl.SKIP_RETRY_PROXY_RESOLUTION);
-				} else {
-					loadOptions.put(MultiFileResourceSetImpl.SKIP_RETRY_PROXY_RESOLUTION, oldValue);
-				}
-			}
-		}	
-	}
-	
-	private boolean runningCheckError = false;
-	
-	//Be aware of side effect of the call
-	private synchronized boolean isRunningCheckError()  {
-		boolean ret = runningCheckError;
-		if (! ret) {	//make sure no 2 threads can be runningCheckError at the same time
-			runningCheckError = true;
-		}
-		return ret;
-	}
-	private synchronized void setRunningCheckError(boolean b)  {
-		runningCheckError = b;
-	}
-	
-	private void checkError_() {
-		dependencyManager = new DependencyManager(library, getConfiguration());
 		
 		// Bug 206724 - SCM: Always prompt check out elements for a opened configuration when refresh source control status
 		// don't need to validate the configuration, rely on the caller to validate it before call this method.
@@ -272,132 +165,16 @@ public class ConfigurationClosure implements IConfigurationClosure {
 		// Cleanup the old status and rebuild the list.
 		invalidNodesMap.clear();
 
-		synchronized (processNodeLock) {
-			processNodeLock.setLockingThread(Thread.currentThread());
-			try {
-				processChangedNodes(getSelection());
-			} finally {
-				processNodeLock.setLockingThread(null);
-			}
-		}
+		processChangedNodes(getSelection());
 
-		processReplacers();
-		
-	}
-
-	private void processReplacers() {
-		clearReplacerElementMarkerMap();
-		
-		Set<VariabilityElement> replacerSet = dependencyManager.getReplacerSet();
-		if (replacerSet == null || replacerSet.isEmpty()) {
-			return;
-		}			
-
-		Map<VariabilityElement, List> baseReplacersMap = new HashMap<VariabilityElement, List>();
-		for (VariabilityElement ve: replacerSet) {
-			if (! ConfigurationHelper.inConfig(ve, config, true, false)) {
-				continue;
-			}
-			VariabilityElement base = ve.getVariabilityBasedOnElement();
-			if (! ConfigurationHelper.inConfig(base, config, true, false)) {
-				continue;
-			}
-			List<MethodElement> replacers = baseReplacersMap.get(base);
-			if (replacers == null) {
-				replacers = new ArrayList<MethodElement>();
-				baseReplacersMap.put(base, replacers);
-			}
-			replacers.add(ve);
-		}
-		
-		//clearReplacerElementMarkerMap();	
-		replacerElementMarkerMap = new HashMap<MethodElement, IMarker>();
-		for (Map.Entry<VariabilityElement, List> entry: baseReplacersMap.entrySet()) {
-			VariabilityElement base = entry.getKey();
-			List replacers = entry.getValue();
-			processReplacerError(replacerElementMarkerMap, base, replacers);
-		}
-	}
-	
-	private static void processReplacerError(Map<MethodElement, IMarker> elementMarkerMap, 
-			MethodElement base, Collection<MethodElement> replacers) {
-		if (replacers == null || replacers.isEmpty() || replacers.size() < 2) {
-			return;
-		}
-		IMarker marker = elementMarkerMap.get(base);
-		if (marker == null) {
-			Resource res = base.eResource();
-			if (res == null) {
-				return;
-			}
-		
-			URI containerURI = res.getURI();
-			IWorkspace workspace = ResourcesPlugin.getWorkspace();
-			IPath path = new Path(containerURI.toFileString());
-			IFile file = workspace.getRoot().getFileForLocation(path);
-			if (file == null) {
-				return;
-			}
-			String location = containerURI != null ? containerURI
-					.toFileString() : ""; //$NON-NLS-1$	
-
-			try {
-				marker = file.createMarker(multipleReplacersMARKER_ID);
-				marker.setAttribute(IMarker.LOCATION, location);				
-				marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
-				marker.setAttribute(LibraryProblemMonitor.Guid, base.getGuid());
-				elementMarkerMap.put(base, marker);
-					
-			} catch (Exception e) {
-				LibraryPlugin.getDefault().getLogger().logError(e);
-			}
-		}
-		
-		
-		String replacerGuidsValue = "";		//$NON-NLS-1$
-		for (MethodElement replacer: replacers) {
-			if (replacerGuidsValue.length() != 0) {
-				replacerGuidsValue += ", "; //$NON-NLS-1$	
-			}
-			replacerGuidsValue += replacer.getGuid();
-		}
-		String errMsg = LibraryResources.bind(LibraryResources.ElementError_having_multiple_replacers, 
-				(new String[] {LibraryUtil.getTypePath(base), 
-						replacerGuidsValue }));
-		
-		try {
-			marker.setAttribute(replacerGuids, replacerGuidsValue);
-			marker.setAttribute(IMarker.MESSAGE, errMsg);
-		} catch (Exception e) {
-			LibraryPlugin.getDefault().getLogger().logError(e);
-		}
-				
 	}
 
 	private void clearErrorMarks() {
-		clearErrorMarks(true);
-	}
-
-	private void clearErrorMarks(boolean checkAbort) {
 		// Re-build the selections to auto add the process packages.
 
 		for (Iterator<ElementError> it = errors.iterator(); it.hasNext(); ) {
-			if (checkAbort && isAbortCheckError()) {
-				return;
-			}
 			ElementError error = it.next();
 			notifyError(error, ClosureListener.ERROR_REMOVED);
-		}	
-	}
-	
-	public void refreshErrormarks() {
-		clearErrorMarks();
-		for (Iterator<ElementError> it = errors.iterator(); it.hasNext(); ) {
-			if (isAbortCheckError()) {
-				return;
-			}
-			ElementError error = it.next();
-			notifyError(error, ClosureListener.ERROR_ADDED);
 		}	
 	}
 	
@@ -536,18 +313,15 @@ public class ConfigurationClosure implements IConfigurationClosure {
 	/**
 	 * Returns all the errors.
 	 * 
+	 * @return A a list of <code>PackageError</code>.
 	 */
-	public List<ElementError> getAllErrors() {
-		return errors;
-	}
-	
-	private List<PackageError> getAllPackageErrors() {
-		List<PackageError> perrors = new ArrayList<PackageError>();
+	public List<PackageError> getAllErrors() {
+		List<PackageError> errors = new ArrayList<PackageError>();
 		for (Iterator it = invalidNodesMap.values().iterator(); it.hasNext();) {
 			ElementDependencyError error = (ElementDependencyError) it.next();
-			perrors.addAll(error.getAll());
+			errors.addAll(error.getAll());
 		}
-		return perrors;
+		return errors;
 	}
 
 	/**
@@ -564,8 +338,8 @@ public class ConfigurationClosure implements IConfigurationClosure {
 	 * 
 	 * @return A list of invalid elements.
 	 */
-	public List<Object> getInvalidElements() {
-		return new ArrayList<Object>(invalidNodesMap.keySet());
+	public List getInvalidElements() {
+		return new ArrayList(invalidNodesMap.keySet());
 	}
 
 	private void removeError(Object element) {
@@ -605,71 +379,16 @@ public class ConfigurationClosure implements IConfigurationClosure {
 		return selectedNotes.toArray();
 	}
 
-	private void processChangedNodes(Object[] changedNodes) {		
-		if (getConfigurationManager().getSupportingElementData() != null) {
-			getConfigurationManager().getSupportingElementData().beginUpdateSupportingElements();
-		}
+	private void processChangedNodes(Object[] changedNodes) {
 		
-		replacerMap.clear();
-		processChangedNodes_(changedNodes);
-		replacerMap.clear();
-		
-/*		if (isAbortCheckError()) {
-			return;
-		}*/
-		Map<String, ElementReference> refMap = new HashMap<String, ElementReference>();			
-		getConfigurationManager().getSupportingElementData().endUpdateSupportingElements(refMap);
-		if (isAbortCheckError()) {
-			return;
-		}
-		for (ElementReference ref : refMap.values()) {
-			ElementError error = ConfigurationErrorMatrix.getError(config, ref);
-			if (error != null) {
-				errors.add(error);
-/*				notifyError(error, ClosureListener.ERROR_ADDED);
-				processPackageError(LibraryUtil.getSelectable(ref.element),
-						LibraryUtil.getSelectable(ref.refElement), error
-								.getErrorLevel());*/
-			}
-		}
-		
-		List<ElementError> updatedErrors = new ArrayList<ElementError>();
-		for (ElementError error: errors) {
-			if (error.causeElement instanceof MethodElement) {
-				MethodElement referenced = (MethodElement) error.causeElement;
-				if (! ConfigurationHelper.inConfig(referenced, getConfiguration())) {				
-					notifyError(error, ClosureListener.ERROR_ADDED);
-					updatedErrors.add(error);
-					if (error.ownerElement instanceof MethodElement) {
-						MethodElement referencing = (MethodElement) error.ownerElement;
-						processPackageError(LibraryUtil.getSelectable(referencing),
-								LibraryUtil.getSelectable(referenced), error
-										.getErrorLevel());
-					}
-				}
-			}
-		}
-		errors = updatedErrors;
-	}
-	
-	private void processChangedNodes_(Object[] changedNodes) {	
-		SupportingElementData seData = getConfigurationManager().getSupportingElementData();	
-
 		// for all the changed notes,
 		// all all contained elements and check if the elements are in config or not
 		// if the elements are in config, the referenced elements should also be in config
 		
 		for (int i = 0; i <changedNodes.length; i++) {
-			if (isAbortCheckError()) {
-				return;
-			}
 			
 			// the elements are either plugin or package
 			Object changedElement = changedNodes[i];
-			if (seData != null && seData.isSupportingSelectable((MethodElement) changedElement)) {
-				continue;
-			}
-			
 			PackageDependency dependency = dependencyManager
 					.getDependency((MethodElement) changedElement);
 			if (dependency == null) {
@@ -688,9 +407,8 @@ public class ConfigurationClosure implements IConfigurationClosure {
 		}
 		
 		// for all the elements in the added category, check their references as well
-		List<MethodElement> list = new ArrayList<MethodElement>();
-		list.addAll(configManager.getConfigurationData().getAddedElements());
-		for ( Iterator<MethodElement> it = list.iterator(); it.hasNext(); ) {
+		for ( Iterator<MethodElement> it = configManager.getConfigurationData()
+				.getAddedElements().iterator(); it.hasNext(); ) {
 			MethodElement e = it.next();
 			
 			PackageDependency dependency = 
@@ -715,33 +433,10 @@ public class ConfigurationClosure implements IConfigurationClosure {
 		
 	}
 	
-	private Map<VariabilityElement, VariabilityElement> replacerMap = new HashMap<VariabilityElement, VariabilityElement>();
-	private VariabilityElement getReplacer(VariabilityElement e) {
-		VariabilityElement r = replacerMap.get(e);
-		if (r == e) {
-			return null;
-		}
-		if (r == null) {
-			r = ConfigurationHelper.getReplacer((VariabilityElement)e, config);
-			if (r == null) {
-				replacerMap.put(e, e);
-			} else {
-				replacerMap.put(e, r);
-			}
-		}
-		return r;
-	}
-	
 	private void checkReference(ElementReference ref) {
 		MethodElement e = ref.getElement();
 		MethodElement e_ref = ref.getRefElement();
-		SupportingElementData seData = getConfigurationManager().getSupportingElementData();
-		ConfigurationData configData = getConfigurationManager().getConfigurationData();
-
 		
-		//System.out.println("LD> e: " + e);
-		//System.out.println("LD> e_ref: " + e_ref);
-				
 		if ( e instanceof MethodPackage || e instanceof MethodConfiguration ) {
 			return;
 		}
@@ -749,26 +444,19 @@ public class ConfigurationClosure implements IConfigurationClosure {
 		// Bug 207609 - Replaced elements are not considered for configuration error "missing mandatory input"
 		// if the element is replaced, ignore the reference
 		if ( e instanceof VariabilityElement ) {
-			VariabilityElement replacer = getReplacer((VariabilityElement)e);
+			VariabilityElement replacer = ConfigurationHelper.getReplacer((VariabilityElement)e, config);
 			if ( replacer != null ) {
 				return;
 			}
 		}
 		
 		// the element might be subtracted, so ignore it
-/*		if ( !ConfigurationHelper.inConfig(e, config, true, false)) {
-			return;
-		}*/
-		if ( configData.isSubstracted(e)) {
+		if ( !ConfigurationHelper.inConfig(e, config, true, false)) {
 			return;
 		}
 				
 		// if the referenced element is not in  config, log error
-		if ( !ConfigurationHelper.inConfig(e_ref, config)
-				&& (seData == null || !seData.isSupportingElementCallDuringUpdating(ref))) {
-			if (!ConfigurationHelper.inConfig(e, config)) {
-				return;
-			}
+		if ( !ConfigurationHelper.inConfig(e_ref, config)) {
 			
 			/*
 			String message = LibraryResources.bind(LibraryResources.ElementError_missing_element, 
@@ -785,10 +473,10 @@ public class ConfigurationClosure implements IConfigurationClosure {
 			}
 			
 			errors.add(error);
-			//notifyError(error, ClosureListener.ERROR_ADDED);
+			notifyError(error, ClosureListener.ERROR_ADDED);
 			
 			// process package error
-			//processPackageError(LibraryUtil.getSelectable(e), LibraryUtil.getSelectable(e_ref), error.getErrorLevel() );
+			processPackageError(LibraryUtil.getSelectable(e), LibraryUtil.getSelectable(e_ref), error.getErrorLevel() );
 		}	
 	}
 	
@@ -1100,7 +788,7 @@ public class ConfigurationClosure implements IConfigurationClosure {
 		boolean changed = forceCheck;
 
 		// list of errorInfo objects
-		List errors = getAllPackageErrors();
+		List errors = getAllErrors();
 		if (errors.size() > 0) {			
 			invalidNodesMap.clear();
 			PackageError error;
@@ -1135,33 +823,16 @@ public class ConfigurationClosure implements IConfigurationClosure {
 		
 		return changed;
 	}
-	
+
 	private boolean selectErrorElement(EObject element) {
-		boolean ret = false;		
-		boolean oldNotify = config.eDeliver();
-		config.eSetDeliver(false);
-		try {
-			ret = selectErrorElement_(element);
-		} finally {
-			config.eSetDeliver(oldNotify);
-		}
-		return ret;
-	}
-	
-	private boolean selectErrorElement_(EObject element) {
-		
+
 		boolean selected = true;
-		List toAdd = Collections.singletonList(element);
 		if (element instanceof MethodPlugin 
 				&& !config.getMethodPluginSelection().contains(element)) {
-			//config.getMethodPluginSelection().add((MethodPlugin) element);
-			ConfigurationUtil.addCollToMethodPluginList(actionMgr, config, toAdd);
-			config.eResource().setModified(true);
+			config.getMethodPluginSelection().add(element);
 		} else if ( element instanceof MethodPackage 
 				&& !config.getMethodPackageSelection().contains(element)){
-			//config.getMethodPackageSelection().add((MethodPackage) element);
-			ConfigurationUtil.addCollToMethodPackageList(actionMgr, config, toAdd);
-			config.eResource().setModified(true);
+			config.getMethodPackageSelection().add(element);
 		} else {
 			selected = false;
 		}
@@ -1306,23 +977,12 @@ public class ConfigurationClosure implements IConfigurationClosure {
 	 * Disposes resources allocated by this closure.
 	 */
 	public void dispose() {
-		replacerMap = null;
 		
-		clearErrorMarks(false);
+		clearErrorMarks();
 		
-		if (configManager != null) {
-			ConfigurationProperties props = configManager.getConfigurationProperties();
-			if (props != null) {
-				props.removeListener(configPropListener);
-			}
-		}
-				
 		configManager = null;
 		config = null;
 		library = null;
-		if (dependencyManager != null) {
-			dependencyManager.dispose();
-		}
 		dependencyManager = null;
 		actionMgr = null;
 		//selectedNotes.clear();
@@ -1333,22 +993,8 @@ public class ConfigurationClosure implements IConfigurationClosure {
 		if (listeners != null) {
 			listeners.clear();
 		}
-		clearReplacerElementMarkerMap();
 	}
 
-	private void clearReplacerElementMarkerMap() {
-		if (replacerElementMarkerMap != null) {
-			for (IMarker marker: replacerElementMarkerMap.values()) {
-				try {
-					marker.delete();
-				} catch (Exception e) {
-					LibraryPlugin.getDefault().getLogger().logError(e);
-				}
-			}
-		}		
-		replacerElementMarkerMap = null;
-	}
-	
 //	private boolean canIgnore(PackageReference pkgRef) {
 //		return pkgRef.canIgnore();
 //	}
@@ -1387,17 +1033,6 @@ public class ConfigurationClosure implements IConfigurationClosure {
 			listener.fireEvent(ClosureListener.ERROR_ADDED, config, error);
 		}
 	}
-
-	public synchronized boolean isAbortCheckError() {
-		return abortCheckError;
-	}
-
-	public synchronized void setAbortCheckError(boolean abortCheckError) {
-		this.abortCheckError = abortCheckError;
-		if (ConfigDataBase.localDebug) {
-			System.out.println("LD> setAbortCheckError: " + abortCheckError);//$NON-NLS-1$
-		}
-	}
 	
 //	/**
 //	 * add this element into the configuration
@@ -1426,20 +1061,4 @@ public class ConfigurationClosure implements IConfigurationClosure {
 //		
 //		return Status.OK_STATUS;
 //	}
-	
-	public static class ProcessNodeLock {
-		private Thread lockingThread;
-
-		public synchronized Thread getLockingThread() {
-			return lockingThread;
-		}
-
-		public synchronized void setLockingThread(Thread lockingThread) {
-			this.lockingThread = lockingThread;
-		}
-		
-		
-		
-	}
-	
 }

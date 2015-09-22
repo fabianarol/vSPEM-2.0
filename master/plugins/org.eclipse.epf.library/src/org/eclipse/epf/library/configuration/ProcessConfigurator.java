@@ -10,10 +10,9 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.library.configuration;
 
-import org.eclipse.epf.library.LibraryService;
 import org.eclipse.epf.library.edit.IFilter;
-import org.eclipse.epf.library.edit.realization.IRealizationManager;
 import org.eclipse.epf.library.edit.util.ProcessUtil;
+import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.uma.Activity;
 import org.eclipse.epf.uma.BreakdownElement;
 import org.eclipse.epf.uma.Descriptor;
@@ -21,6 +20,8 @@ import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.Milestone;
 import org.eclipse.epf.uma.TeamProfile;
+import org.eclipse.epf.uma.VariabilityType;
+import org.eclipse.jface.viewers.Viewer;
 
 
 /**
@@ -38,8 +39,8 @@ public class ProcessConfigurator extends ConfigurationFilter {
 	 * @param methodConfig
 	 * @param viewer
 	 */
-	public ProcessConfigurator(MethodConfiguration methodConfig) {
-		super(methodConfig);
+	public ProcessConfigurator(MethodConfiguration methodConfig, Viewer viewer) {
+		super(methodConfig, viewer);
 	}
 	
 	/**
@@ -48,8 +49,8 @@ public class ProcessConfigurator extends ConfigurationFilter {
 	 * @param checkOwningProcess if true will check on owning process of activities whether it is in the configuration.
 	 *          This check is not required in process editor and skipping it helps the performance.
 	 */
-	public ProcessConfigurator(MethodConfiguration methodConfig, boolean checkOwningProcess) {
-		this(methodConfig);
+	public ProcessConfigurator(MethodConfiguration methodConfig, Viewer viewer, boolean checkOwningProcess) {
+		this(methodConfig, viewer);
 		this.checkOwningProcess = checkOwningProcess;
 	}
 
@@ -62,13 +63,13 @@ public class ProcessConfigurator extends ConfigurationFilter {
 			return true;
 
 		if (obj instanceof BreakdownElement) {
-			ElementRealizer realizer = getRealizer();
+			DefaultElementRealizer realizer = new DefaultElementRealizer(super.methodConfig);
 			return accept((BreakdownElement)obj, realizer);
 		}
 		
 		return super.accept(obj);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see org.eclipse.epf.library.configuration.ProcessConfigurator#accept(org.eclipse.epf.uma.Descriptor)
 	 */
@@ -109,13 +110,4 @@ public class ProcessConfigurator extends ConfigurationFilter {
 		
 		return super.accept(e);
 	}
-	
-	/**
-	 * @return an IRealizationManager instance
-	 */
-	public IRealizationManager getRealizationManager() {
-		MethodConfiguration c = LibraryService.getInstance().getCurrentMethodConfiguration();
-		return ConfigurationHelper.getDelegate().getRealizationManager(c);
-	}
-	
 }

@@ -29,9 +29,9 @@ public class UniqueNamePNameHandler {
 	/**
 	 * Empty constructor
 	 */
-	public UniqueNamePNameHandler(Collection<? extends MethodElement> elements) {
-		nameHandler.registerNames(elements);
-		pnameHandler.registerPresentationNames(elements);		
+	public UniqueNamePNameHandler(Collection<MethodElement> nameElements, Collection<DescribableElement> pnameElements) {
+		nameHandler.registerNames(nameElements);
+		pnameHandler.registerPresentationNames(pnameElements);		
 	}
 	
 	/**

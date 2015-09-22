@@ -44,7 +44,6 @@ import org.eclipse.epf.richtext.RichTextListener;
 import org.eclipse.epf.uma.Checklist;
 import org.eclipse.epf.uma.UmaFactory;
 import org.eclipse.epf.uma.UmaPackage;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -309,12 +308,12 @@ public class ChecklistItemsPage extends BaseFormPage {
 				if (form != null && !form.isDisposed()) {
 					UIHelper.setFormText(form, contentElement);
 				}
-//				loadData();
+				loadData();
 				if (TngUtil.isLocked(contentElement)) {
 					enableControls(false);
 				} else {
 					ctrl_add.setEnabled(true);
-//					checkSelection();
+					checkSelection();
 				}
 			}
 		});
@@ -496,11 +495,7 @@ public class ChecklistItemsPage extends BaseFormPage {
 						AuthoringUIResources.ChecklistOrder_title, 
 						AuthoringUIResources.ChecklistOrder_description, 
 						AuthoringUIResources.ChecklistOrder_checklistitems_text); 
-				boolean isDirty = getEditor().isDirty();
-				int rtnValue = dlg.open();
-				if(!isDirty && rtnValue == Dialog.CANCEL && getEditor().isDirty()){
-					getEditor().doSave(null);
-				}
+				dlg.open();
 			}
 		});
 	}
@@ -640,7 +635,6 @@ public class ChecklistItemsPage extends BaseFormPage {
 		}
 
 		if (descExpandFlag) {
-			ctrl_expanded.collapse();
 			sectionComposite.setVisible(true);
 			expandedComposite.setVisible(false);
 			formSection.setClient(sectionComposite);

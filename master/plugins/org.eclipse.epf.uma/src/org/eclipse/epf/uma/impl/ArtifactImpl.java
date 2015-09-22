@@ -43,6 +43,13 @@ import org.eclipse.epf.uma.UmaPackage;
  */
 public class ArtifactImpl extends WorkProductImpl implements Artifact {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The cached value of the '{@link #getContainedArtifacts() <em>Contained Artifacts</em>}' containment reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -50,7 +57,7 @@ public class ArtifactImpl extends WorkProductImpl implements Artifact {
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Artifact> containedArtifacts;
+	protected EList containedArtifacts = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -62,7 +69,7 @@ public class ArtifactImpl extends WorkProductImpl implements Artifact {
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -70,7 +77,6 @@ public class ArtifactImpl extends WorkProductImpl implements Artifact {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.ARTIFACT;
 	}
@@ -141,9 +147,9 @@ public class ArtifactImpl extends WorkProductImpl implements Artifact {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<Artifact> getContainedArtifacts() {
+	public List getContainedArtifacts() {
 		if (containedArtifacts == null) {
-			containedArtifacts = new EObjectContainmentWithInverseEList.Resolving<Artifact>(
+			containedArtifacts = new EObjectContainmentWithInverseEList.Resolving(
 					Artifact.class, this,
 					UmaPackage.ARTIFACT__CONTAINED_ARTIFACTS,
 					UmaPackage.ARTIFACT__CONTAINER_ARTIFACT);
@@ -156,8 +162,6 @@ public class ArtifactImpl extends WorkProductImpl implements Artifact {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
 	public NotificationChain eInverseAdd(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
@@ -166,8 +170,8 @@ public class ArtifactImpl extends WorkProductImpl implements Artifact {
 				msgs = eBasicRemoveFromContainer(msgs);
 			return basicSetContainerArtifact((Artifact) otherEnd, msgs);
 		case UmaPackage.ARTIFACT__CONTAINED_ARTIFACTS:
-			return ((InternalEList<InternalEObject>) (InternalEList<?>) getContainedArtifacts())
-					.basicAdd(otherEnd, msgs);
+			return ((InternalEList) getContainedArtifacts()).basicAdd(otherEnd,
+					msgs);
 		}
 		return super.eInverseAdd(otherEnd, featureID, msgs);
 	}
@@ -177,14 +181,13 @@ public class ArtifactImpl extends WorkProductImpl implements Artifact {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case UmaPackage.ARTIFACT__CONTAINER_ARTIFACT:
 			return basicSetContainerArtifact(null, msgs);
 		case UmaPackage.ARTIFACT__CONTAINED_ARTIFACTS:
-			return ((InternalEList<?>) getContainedArtifacts()).basicRemove(
+			return ((InternalEList) getContainedArtifacts()).basicRemove(
 					otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
@@ -195,7 +198,6 @@ public class ArtifactImpl extends WorkProductImpl implements Artifact {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public NotificationChain eBasicRemoveFromContainerFeature(
 			NotificationChain msgs) {
 		switch (eContainerFeatureID) {
@@ -212,7 +214,6 @@ public class ArtifactImpl extends WorkProductImpl implements Artifact {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.ARTIFACT__CONTAINER_ARTIFACT:
@@ -230,8 +231,6 @@ public class ArtifactImpl extends WorkProductImpl implements Artifact {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.ARTIFACT__CONTAINER_ARTIFACT:
@@ -239,8 +238,7 @@ public class ArtifactImpl extends WorkProductImpl implements Artifact {
 			return;
 		case UmaPackage.ARTIFACT__CONTAINED_ARTIFACTS:
 			getContainedArtifacts().clear();
-			getContainedArtifacts().addAll(
-					(Collection<? extends Artifact>) newValue);
+			getContainedArtifacts().addAll((Collection) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -251,7 +249,6 @@ public class ArtifactImpl extends WorkProductImpl implements Artifact {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.ARTIFACT__CONTAINER_ARTIFACT:
@@ -269,7 +266,6 @@ public class ArtifactImpl extends WorkProductImpl implements Artifact {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);

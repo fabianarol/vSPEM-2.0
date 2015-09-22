@@ -11,10 +11,8 @@
 package org.eclipse.epf.library.edit.process;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -32,6 +30,7 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.edit.command.AddCommand;
 import org.eclipse.emf.edit.command.MoveCommand;
+import org.eclipse.emf.edit.command.CopyCommand.Helper;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.emf.edit.provider.Disposable;
 import org.eclipse.emf.edit.provider.ITableItemLabelProvider;
@@ -49,20 +48,16 @@ import org.eclipse.epf.library.edit.VariabilityInfo;
 import org.eclipse.epf.library.edit.command.IActionManager;
 import org.eclipse.epf.library.edit.command.IResourceAwareCommand;
 import org.eclipse.epf.library.edit.process.command.ActivityAddCommand;
-import org.eclipse.epf.library.edit.ui.UserInteractionHelper;
-import org.eclipse.epf.library.edit.util.DescriptorPropUtil;
 import org.eclipse.epf.library.edit.util.GraphicalData;
 import org.eclipse.epf.library.edit.util.PredecessorList;
 import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
-import org.eclipse.epf.library.edit.util.WbePropUtil;
 import org.eclipse.epf.uma.Activity;
 import org.eclipse.epf.uma.BreakdownElement;
 import org.eclipse.epf.uma.Descriptor;
 import org.eclipse.epf.uma.Iteration;
 import org.eclipse.epf.uma.Process;
 import org.eclipse.epf.uma.ProcessComponent;
-import org.eclipse.epf.uma.ProcessElement;
 import org.eclipse.epf.uma.ProcessPackage;
 import org.eclipse.epf.uma.TeamProfile;
 import org.eclipse.epf.uma.UmaFactory;
@@ -71,8 +66,11 @@ import org.eclipse.epf.uma.VariabilityElement;
 import org.eclipse.epf.uma.VariabilityType;
 import org.eclipse.epf.uma.WorkBreakdownElement;
 import org.eclipse.epf.uma.WorkOrder;
+import org.eclipse.epf.uma.edit.command.MethodElementCreateCopyCommand;
+import org.eclipse.epf.uma.edit.command.MethodElementInitializeCopyCommand;
 import org.eclipse.epf.uma.provider.ActivityItemProvider;
 import org.eclipse.epf.uma.util.AssociationHelper;
+import org.eclipse.swt.widgets.Display;
 
 
 /**
@@ -84,10 +82,6 @@ import org.eclipse.epf.uma.util.AssociationHelper;
 public abstract class BSActivityItemProvider extends ActivityItemProvider
 		implements IProcessItemProvider, IBSItemProvider,
 		ITableItemLabelProvider, IConfigurable, ICachedChildrenItemProvider {
-	private static final Set<VariabilityType> localVariabilityTypes = new HashSet<VariabilityType>(Arrays.asList(new VariabilityType[] {
-			VariabilityType.LOCAL_CONTRIBUTION,
-			VariabilityType.LOCAL_REPLACEMENT
-	}));
 
 	private Object parent;
 
@@ -193,10 +187,6 @@ public abstract class BSActivityItemProvider extends ActivityItemProvider
 			return filter.accept(child);
 		}
 		return true;
-	}
-	
-	protected boolean acceptAsChild(Object parent, Object child) {
-		return acceptAsChild(child);
 	}
 
 	/**
@@ -431,25 +421,10 @@ public abstract class BSActivityItemProvider extends ActivityItemProvider
 //	}
 	
 	private Collection getImmediateChildren(Object object) {
-		DescriptorPropUtil propUtil = DescriptorPropUtil.getDesciptorPropUtil();
-		boolean isSynFree = ProcessUtil.isSynFree();
-		
 		Collection children = new ArrayList();
 		for (Iterator iter = super.getChildren(object).iterator(); iter.hasNext();) {
 			Object child = (Object) iter.next();
-			if(acceptAsChild(object, child)) {
-
-				if (isSynFree) {
-					Object unwrapped = TngUtil.unwrap(child);
-					if (unwrapped instanceof Descriptor) {
-						Descriptor des = (Descriptor) unwrapped;
-						Descriptor greenParent = propUtil.getGreenParentDescriptor(des);
-						if (greenParent != null) {
-							continue;
-						}
-					}
-				}
-				
+			if(acceptAsChild(child)) {
 				if(configurator != null) {
 					child = configurator.resolve(child);
 				}
@@ -578,161 +553,6 @@ public abstract class BSActivityItemProvider extends ActivityItemProvider
 	 * @see org.eclipse.emf.edit.provider.ItemProviderAdapter#getChildren(java.lang.Object)
 	 */
 	public Collection getChildren(Object object) {
-		Collection children = getChildren_(object);
-		if (!(children instanceof List)) {
-			return children;
-		}
-
-		Activity activity = (Activity) object;
-		VariabilityType extendType = activity.getVariabilityType();
-		if (extendType != VariabilityType.LOCAL_CONTRIBUTION
-				&& extendType != VariabilityType.EXTENDS) {
-			return children;
-		}
-		
-		List childList = handleGlobalOrdering(activity, (List) children);
-//		System.out.println("");
-		
-		return childList;
-	}
-
-	private List handleGlobalOrdering(Activity activity, List childList) {
-
-		WbePropUtil propUtil = WbePropUtil.getWbePropUtil();
-//		Set localSet = new HashSet(activity.getBreakdownElements());
-//		System.out.println("LD> orignail: ");
-//		for (int i = 0; i < childList.size(); i++) {
-//			Object item = TngUtil.unwrap(childList.get(i));
-//			System.out.println("LD> " + i + ": " + item);
-//			if (localSet.contains(item)) {
-//				System.out.println("LD> globalPrev: " + propUtil.getGlobalPresentedAfter((WorkBreakdownElement) item));
-//			}
-//			System.out.println("");
-//		}
-		
-		WorkBreakdownElement globalPresentedAfter = null;
-		LinkedChildList linkedChildList = null;
-		Map<WorkBreakdownElement, LinkedChildListNode> map = null;
-		
-		List<LinkedChildListNode> toMoveList = new ArrayList<LinkedChildListNode>();
-		for (int i = 0; i < childList.size(); i++) {
-			Object item = childList.get(i);
-			if (item instanceof WorkBreakdownElement) {
-				WorkBreakdownElement wbe = (WorkBreakdownElement) item;
-				globalPresentedAfter = propUtil.getGlobalPresentedAfter(wbe);
-				if (globalPresentedAfter != null) {
-					if (linkedChildList == null) {
-						map = new HashMap<WorkBreakdownElement, LinkedChildListNode>();
-						linkedChildList = getLinkedChildList(activity, childList, i, map);
-					}
-				}
-			}
-			if (linkedChildList != null) {
-				addItemToLinkedChildList(map, linkedChildList, item, globalPresentedAfter);
-				if (globalPresentedAfter != null) {
-					toMoveList.add(linkedChildList.last);
-				}
-			}
-		}
-		boolean orderModified = false;
-		for (LinkedChildListNode node : toMoveList) {
-			WorkBreakdownElement key = node.globalPresentedAfter;
-			LinkedChildListNode newPrevNode = key == activity ? linkedChildList.head
-					: map.get(key);
-			if (newPrevNode == null || node.prevNode == newPrevNode) {
-				continue;
-			}
-			node.prevNode.nextNode = node.nextNode;
-			if (node.nextNode != null) {
-				node.nextNode.prevNode = node.prevNode;
-			}
-
-			node.prevNode = newPrevNode;
-			node.nextNode = newPrevNode.nextNode;
-
-			if (newPrevNode.nextNode != null) {
-				newPrevNode.nextNode.prevNode = node;
-			}
-			newPrevNode.nextNode = node;
-			orderModified = true;
-		}
-		
-		if (orderModified) {
-			List oldChildList = childList;
-			childList = new ArrayList();			
-			LinkedChildListNode node = linkedChildList.head.nextNode;
-			while (node != null) {
-				childList.add(node.thisItem);
-				node = node.nextNode;
-			}
-			if (oldChildList.size() != childList.size()) {		//Should never happen, but in case
-				childList = oldChildList;
-			}
-		}
-	
-//		System.out.println("LD> result: ");
-//		for (int i = 0; i < childList.size(); i++) {
-//			Object item = TngUtil.unwrap(childList.get(i));
-//			System.out.println("LD> " + i + ": " + item);
-//			if (localSet.contains(item)) {
-//				System.out.println("LD> globalPrev: " + propUtil.getGlobalPresentedAfter((WorkBreakdownElement) item));
-//			}
-//			System.out.println("");
-//		}
-		
-		return childList;
-	}
-
-	private LinkedChildList getLinkedChildList(Activity activity,
-			List childList, int index,
-			Map<WorkBreakdownElement, LinkedChildListNode> map) {
-		
-		LinkedChildList linkedChildList;
-		linkedChildList = new LinkedChildList(activity);
-
-		for (int i = 0; i < index; i++) {
-			Object item = childList.get(i);
-			addItemToLinkedChildList(map, linkedChildList, item, null);
-		}
-
-		return linkedChildList;
-	}
-
-	private void addItemToLinkedChildList(Map<WorkBreakdownElement, LinkedChildListNode> map,
-			LinkedChildList linkedChildList, Object item, WorkBreakdownElement globalPresentedAfter) {
-		LinkedChildListNode node = new LinkedChildListNode(item, globalPresentedAfter);
-		node.prevNode = linkedChildList.last;
-		linkedChildList.last.nextNode = node;
-		linkedChildList.last = node;
-		if (! (item instanceof WorkBreakdownElement)) {
-			item = TngUtil.unwrap(item);
-		}
-		if (item instanceof WorkBreakdownElement) {
-			map.put((WorkBreakdownElement) item, node);
-		}
-	}
-	
-	static class LinkedChildList {
-		LinkedChildListNode head;
-		LinkedChildListNode last;
-		public LinkedChildList(Activity act) {
-			head = new LinkedChildListNode(act, null);
-			last = head;
-		}
-	}
-	
-	static class LinkedChildListNode {
-		LinkedChildListNode prevNode;
-		LinkedChildListNode nextNode;
-		Object thisItem;
-		WorkBreakdownElement globalPresentedAfter;
-		LinkedChildListNode(Object item, WorkBreakdownElement globalPresentedAfter) {
-			thisItem = item;
-			this.globalPresentedAfter = globalPresentedAfter;
-		}
-	}
-	
-	private Collection getChildren_(Object object) {
 		Activity activity = (Activity) object;
 		if(configurator != null) {
 			
@@ -891,15 +711,15 @@ public abstract class BSActivityItemProvider extends ActivityItemProvider
 		return factory;
 	}
 	
-	private List<?> wrap(Activity owner, Collection<?> breakdownElements, boolean inherited, boolean contributed, Disposable wrappers) {
-		ArrayList<Object> wrapperList = new ArrayList<Object>();
+	private List wrap(Activity owner, Collection breakdownElements, boolean inherited, boolean contributed, Disposable wrappers) {
+		ArrayList wrapperList = new ArrayList();
 		IWrapperItemProviderFactory wrapperFactory = getWrapperItemProviderFactory();
-		for (Iterator<?> iter = breakdownElements.iterator(); iter.hasNext();) {
+		for (Iterator iter = breakdownElements.iterator(); iter.hasNext();) {
 			Object object = iter.next();
 			Object unWrapped = TngUtil.unwrap(object);
 			if (unWrapped instanceof BreakdownElement) {
 				BreakdownElement e = (BreakdownElement) unWrapped;
-				if (!TngUtil.isBase(owner.getBreakdownElements(), e, localVariabilityTypes)) {
+				if (!TngUtil.isBase(owner.getBreakdownElements(), e)) {
 					Object child = getWrapper(owner, e, wrappers);
 					if(child == null) {
 						child = wrapperFactory.createWrapper(e, owner, adapterFactory);
@@ -1055,10 +875,10 @@ public abstract class BSActivityItemProvider extends ActivityItemProvider
 			Activity baseAct = listenToBaseActivity();
 			if (baseAct != null) {
 				VariabilityType extendType = act.getVariabilityType();
-				if (extendType == VariabilityType.LOCAL_REPLACEMENT) {
+				if (extendType == VariabilityType.LOCAL_REPLACEMENT_LITERAL) {
 					return myChildren;
-				} else if (extendType == VariabilityType.LOCAL_CONTRIBUTION
-						|| extendType == VariabilityType.EXTENDS) {
+				} else if (extendType == VariabilityType.LOCAL_CONTRIBUTION_LITERAL
+						|| extendType == VariabilityType.EXTENDS_LITERAL) {
 					BSActivityItemProvider adapter = (BSActivityItemProvider) getRootAdapterFactory()
 						.adapt(baseAct, ITreeItemContentProvider.class);
 					List allChildren;					
@@ -1068,8 +888,6 @@ public abstract class BSActivityItemProvider extends ActivityItemProvider
 							adapter.basicSetRolledUp(false);
 						}
 						allChildren = wrapInherited(act, adapter.getChildren(baseAct));
-						
-						handleCustomizingGreenDescriptors(act, allChildren);
 					}
 					finally {
 						if(oldRolledUp) {
@@ -1096,51 +914,6 @@ public abstract class BSActivityItemProvider extends ActivityItemProvider
 			}
 		}
 		return myChildren;
-	}
-
-	private void handleCustomizingGreenDescriptors(Activity act,
-			List allChildren) {
-		if (allChildren == null || allChildren.isEmpty()
-				|| !ProcessUtil.isSynFree()) {
-			return;
-		}
-		
-		DescriptorPropUtil propUtil = DescriptorPropUtil.getDesciptorPropUtil();
-		Map<String, Descriptor> map = new HashMap<String, Descriptor>();
-		
-		List<BreakdownElement> beList = act.getBreakdownElements();
-		for (int i = 0; i < beList.size(); i++) {
-			BreakdownElement be = beList.get(i);
-			if (be instanceof Descriptor) {
-				Descriptor des = (Descriptor) be;
-				String greenParent = propUtil.getGreenParent(des);
-				if (greenParent != null) {
-					map.put(greenParent, des);
-				}
-			}
-		}
-		
-		int sz = map.size();
-		
-		if (sz == 0) {
-			return;
-		}
-		
-		for (int i = 0; i < allChildren.size(); i++) {
-			Object child = TngUtil.unwrap(allChildren.get(i));
-			if (child instanceof Descriptor) {
-				Descriptor greenDes = (Descriptor) child;
-				Descriptor des = map.get(greenDes.getGuid());
-				if (des != null) {
-					allChildren.set(i, des);
-					sz--;
-					if (sz == 0) {
-						return;
-					}
-				}
-			}
-		}
-		
 	}
 
 	/**
@@ -1247,6 +1020,13 @@ public abstract class BSActivityItemProvider extends ActivityItemProvider
 	protected void refreshChildren(final Notification notification,
 			final List newOrOldChildren) {
 		if (!newOrOldChildren.isEmpty()) {
+
+			Display display = null;
+			try {
+				display = Display.getCurrent();
+			} catch (Exception e) {
+				//
+			}
 			Runnable runnable = new Runnable() {
 
 				public void run() {
@@ -1254,11 +1034,29 @@ public abstract class BSActivityItemProvider extends ActivityItemProvider
 				}
 
 			};
-			UserInteractionHelper.getUIHelper().runSafely(runnable, false);
+			if (display != null) {
+				display.asyncExec(runnable);
+			} else {
+				runnable.run();
+			}
 		}
 	}
 
 	protected void refreshAffectedViewers() {
+		Display display = null;
+		try {
+			display = Display.getCurrent();
+		} catch (Exception e) {
+			//
+		}
+		if(display == null) {
+			try {
+				display = Display.getDefault();
+			}
+			catch(Exception e) {
+
+			}
+		}
 		Runnable runnable = new Runnable() {
 
 			public void run() {
@@ -1266,7 +1064,11 @@ public abstract class BSActivityItemProvider extends ActivityItemProvider
 			}
 
 		};
-		UserInteractionHelper.getUIHelper().runSafely(runnable, false);
+		if (display != null) {
+			display.asyncExec(runnable);
+		} else {
+			runnable.run();
+		}
 	}
 
 	protected void doRefreshAffectedViewers() {
@@ -1365,7 +1167,7 @@ public abstract class BSActivityItemProvider extends ActivityItemProvider
 							.createProcessPackage();
 					newPkg.setName(act.getName());
 					pkg.getChildPackages().add(newPkg);
-					newPkg.getProcessElements().add(act);
+					newPkg.getProcessElements().add(element);
 				} else {
 					// Check if the activity's ProcessPackage is at the right
 					// place.
@@ -1376,8 +1178,8 @@ public abstract class BSActivityItemProvider extends ActivityItemProvider
 						pkg.getChildPackages().add(oldPkg);
 					}
 				}
-			} else if(element instanceof ProcessElement) {
-				pkg.getProcessElements().add((ProcessElement) element);
+			} else {
+				pkg.getProcessElements().add(element);
 			}
 		}
 	}
@@ -1642,6 +1444,16 @@ public abstract class BSActivityItemProvider extends ActivityItemProvider
 		}
 	}
 
+	protected Command createInitializeCopyCommand(EditingDomain domain,
+			EObject owner, Helper helper) {
+		return new MethodElementInitializeCopyCommand(domain, owner, helper);
+	}
+
+	protected Command createCreateCopyCommand(EditingDomain domain,
+			EObject owner, Helper helper) {
+		return new MethodElementCreateCopyCommand(domain, owner, helper);
+	}
+
 	protected Command createAddCommand(EditingDomain domain, EObject owner,
 			EStructuralFeature feature, Collection collection, int index) {
 		return new ActivityAddCommand((AddCommand) super.createAddCommand(
@@ -1766,9 +1578,4 @@ public abstract class BSActivityItemProvider extends ActivityItemProvider
 	protected Command createMoveCommand(EditingDomain domain, EObject owner, EStructuralFeature feature, Object value, int index) {
 		return new MoveCommandEx(domain, owner, feature, value, index);
 	}
-	
-	protected IConfigurator getConfigurator() {
-		return configurator;
-	}
-	
 }

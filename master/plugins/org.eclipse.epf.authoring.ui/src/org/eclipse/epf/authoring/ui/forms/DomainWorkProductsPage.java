@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.authoring.ui.forms;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -21,12 +22,17 @@ import org.eclipse.epf.authoring.ui.AuthoringUIText;
 import org.eclipse.epf.authoring.ui.editors.MethodElementEditor;
 import org.eclipse.epf.authoring.ui.filters.WorkProductFilter;
 import org.eclipse.epf.library.edit.IFilter;
+import org.eclipse.epf.library.edit.LibraryEditResources;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
 import org.eclipse.epf.library.edit.command.IActionManager;
+import org.eclipse.epf.library.edit.command.MoveInCategoryCommand;
 import org.eclipse.epf.library.edit.itemsfilter.FilterConstants;
 import org.eclipse.epf.library.edit.util.CategorySortHelper;
 import org.eclipse.epf.library.edit.util.ContentElementOrderList;
+import org.eclipse.epf.library.edit.util.Messenger;
 import org.eclipse.epf.library.edit.util.ModelStructure;
+import org.eclipse.epf.library.edit.util.TngUtil;
+import org.eclipse.epf.uma.ContentCategory;
 import org.eclipse.epf.uma.ContentElement;
 import org.eclipse.epf.uma.Domain;
 import org.eclipse.epf.uma.MethodElement;
@@ -86,16 +92,10 @@ public class DomainWorkProductsPage extends AssociationFormPage {
 			public Object[] getElements(Object object) {
 				//return ((Domain) object).getWorkProducts().toArray();
 				if (allSteps == null) {
-//					allSteps = new ContentElementOrderList(
-//							contentElement,
-//							ContentElementOrderList.CONTENT_ELEMENTS__FOR_ELEMENT_ONLY,
-//							getOrderFeature());
-					allSteps = getProviderExtender().newContentElementOrderList(contentElement, 
+					allSteps = new ContentElementOrderList(
+							contentElement,
 							ContentElementOrderList.CONTENT_ELEMENTS__FOR_ELEMENT_ONLY,
-							getOrderFeature(), 1);					
-				}
-				if (getProviderExtender().useContentProviderAPIs()) {
-					return getProviderExtender().getElements(object, 1);
+							getContentCategoryOrderFeature());
 				}
 				List returnList = CategorySortHelper.sortCategoryElements(
 						contentElement, allSteps.toArray());
@@ -228,7 +228,7 @@ public class DomainWorkProductsPage extends AssociationFormPage {
 	}
 	
 	@Override
-	protected EStructuralFeature getOrderFeature() {
+	protected EStructuralFeature getContentCategoryOrderFeature() {
 		return UmaPackage.eINSTANCE.getDomain_WorkProducts();
 	}
 	
@@ -238,7 +238,7 @@ public class DomainWorkProductsPage extends AssociationFormPage {
 	}
 	
 	@Override
-	public ContentElementOrderList getContentElementOrderList() {
+	protected ContentElementOrderList getContentElementOrderList() {
 		return allSteps;
 	}
 

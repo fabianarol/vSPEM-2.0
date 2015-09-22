@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.uma;
 
+import org.eclipse.emf.common.util.EList;
 import java.util.List;
 
 /**
@@ -27,7 +28,6 @@ import java.util.List;
  *   <li>{@link org.eclipse.epf.uma.RoleDescriptor#getRole <em>Role</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.RoleDescriptor#getModifies <em>Modifies</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.RoleDescriptor#getResponsibleFor <em>Responsible For</em>}</li>
- *   <li>{@link org.eclipse.epf.uma.RoleDescriptor#getResponsibleForExclude <em>Responsible For Exclude</em>}</li>
  * </ul>
  * </p>
  *
@@ -47,7 +47,7 @@ public interface RoleDescriptor extends Descriptor {
 	 * @return the value of the '<em>Role</em>' reference.
 	 * @see #setRole(Role)
 	 * @see org.eclipse.epf.uma.UmaPackage#getRoleDescriptor_Role()
-	 * @model ordered="false"
+	 * @model
 	 * @generated
 	 */
 	Role getRole();
@@ -73,10 +73,10 @@ public interface RoleDescriptor extends Descriptor {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Modifies</em>' reference list.
 	 * @see org.eclipse.epf.uma.UmaPackage#getRoleDescriptor_Modifies()
-	 * @model volatile="true" derived="true" ordered="false"
+	 * @model type="org.eclipse.epf.uma.WorkProductDescriptor" transient="true" changeable="false" volatile="true" derived="true" ordered="false"
 	 * @generated
 	 */
-	List<WorkProductDescriptor> getModifies();
+	List getModifies();
 
 	/**
 	 * Returns the value of the '<em><b>Responsible For</b></em>' reference list.
@@ -89,25 +89,9 @@ public interface RoleDescriptor extends Descriptor {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Responsible For</em>' reference list.
 	 * @see org.eclipse.epf.uma.UmaPackage#getRoleDescriptor_ResponsibleFor()
-	 * @model ordered="false"
+	 * @model type="org.eclipse.epf.uma.WorkProductDescriptor" ordered="false"
 	 * @generated
 	 */
-	List<WorkProductDescriptor> getResponsibleFor();
-
-	/**
-	 * Returns the value of the '<em><b>Responsible For Exclude</b></em>' reference list.
-	 * The list contents are of type {@link org.eclipse.epf.uma.WorkProduct}.
-	 * <!-- begin-user-doc -->
-	 * <p>
-	 * If the meaning of the '<em>Responsible For Exclude</em>' reference list isn't clear,
-	 * there really should be more of a description here...
-	 * </p>
-	 * <!-- end-user-doc -->
-	 * @return the value of the '<em>Responsible For Exclude</em>' reference list.
-	 * @see org.eclipse.epf.uma.UmaPackage#getRoleDescriptor_ResponsibleForExclude()
-	 * @model ordered="false"
-	 * @generated
-	 */
-	List<WorkProduct> getResponsibleForExclude();
+	List getResponsibleFor();
 
 } // RoleDescriptor

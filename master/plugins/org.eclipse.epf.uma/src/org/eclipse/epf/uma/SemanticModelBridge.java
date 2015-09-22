@@ -19,8 +19,8 @@ package org.eclipse.epf.uma;
  * The following features are supported:
  * <ul>
  *   <li>{@link org.eclipse.epf.uma.SemanticModelBridge#getPresentation <em>Presentation</em>}</li>
- *   <li>{@link org.eclipse.epf.uma.SemanticModelBridge#getDiagram <em>Diagram</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.SemanticModelBridge#getGraphElement <em>Graph Element</em>}</li>
+ *   <li>{@link org.eclipse.epf.uma.SemanticModelBridge#getDiagram <em>Diagram</em>}</li>
  * </ul>
  * </p>
  *
@@ -41,7 +41,7 @@ public interface SemanticModelBridge extends DiagramElement {
 	 * @return the value of the '<em>Presentation</em>' attribute.
 	 * @see #setPresentation(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getSemanticModelBridge_Presentation()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getPresentation();
@@ -69,7 +69,7 @@ public interface SemanticModelBridge extends DiagramElement {
 	 * @see #setGraphElement(GraphElement)
 	 * @see org.eclipse.epf.uma.UmaPackage#getSemanticModelBridge_GraphElement()
 	 * @see org.eclipse.epf.uma.GraphElement#getSemanticModel
-	 * @model opposite="semanticModel" transient="false" ordered="false"
+	 * @model opposite="semanticModel"
 	 * @generated
 	 */
 	GraphElement getGraphElement();
@@ -97,7 +97,7 @@ public interface SemanticModelBridge extends DiagramElement {
 	 * @see #setDiagram(Diagram)
 	 * @see org.eclipse.epf.uma.UmaPackage#getSemanticModelBridge_Diagram()
 	 * @see org.eclipse.epf.uma.Diagram#getNamespace
-	 * @model opposite="namespace" transient="false" ordered="false"
+	 * @model opposite="namespace"
 	 * @generated
 	 */
 	Diagram getDiagram();

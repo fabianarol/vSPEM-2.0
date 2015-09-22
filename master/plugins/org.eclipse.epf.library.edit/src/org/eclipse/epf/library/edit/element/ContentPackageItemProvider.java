@@ -21,8 +21,10 @@ import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.edit.command.AddCommand;
 import org.eclipse.emf.edit.command.CommandParameter;
+import org.eclipse.emf.edit.command.CopyCommand.Helper;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
 import org.eclipse.epf.library.edit.IFilter;
@@ -36,6 +38,8 @@ import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.MethodPackage;
 import org.eclipse.epf.uma.UmaFactory;
 import org.eclipse.epf.uma.UmaPackage;
+import org.eclipse.epf.uma.edit.command.MethodElementCreateCopyCommand;
+import org.eclipse.epf.uma.edit.command.MethodElementInitializeCopyCommand;
 
 /**
  * The item provider adapter for the "Content Packages" folder in the Library
@@ -58,8 +62,6 @@ public class ContentPackageItemProvider extends
 	protected WorkProductsItemProvider workProducts;
 
 	protected GuidancesItemProvider guidances;
-
-	protected UdtElementsItemProvider udtElements;
 
 	protected String label;
 
@@ -124,7 +126,6 @@ public class ContentPackageItemProvider extends
 				EStructuralFeature feature = (EStructuralFeature) i.next();
 				if (feature.isMany()) {
 					List children = (List) eObject.eGet(feature);
-					children = new ArrayList(children);		
 					List contentPkgs = new ArrayList();
 					int index = 0;
 					for (Iterator ci = children.iterator(); ci.hasNext(); index++) {
@@ -203,20 +204,10 @@ public class ContentPackageItemProvider extends
 			guidances = new GuidancesItemProvider(adapterFactory, contentPkg);
 		}
 
-		if (udtElements == null) {
-			udtElements = new UdtElementsItemProvider(adapterFactory, contentPkg);
-		}
-		
 		allChildren.add(roles);
 		allChildren.add(tasks);
 		allChildren.add(workProducts);
 		allChildren.add(guidances);
-		allChildren.add(udtElements);
-		
-		if(udtElements.getChildren(null).isEmpty()) {
-			allChildren.remove(udtElements);
-			udtElements = null;
-		}
 		return allChildren;
 	}
 
@@ -226,7 +217,7 @@ public class ContentPackageItemProvider extends
 	 * @see org.eclipse.emf.edit.provider.ItemProviderAdapter#collectNewChildDescriptors(java.util.Collection,
 	 *      java.lang.Object)
 	 */
-	protected void collectNewChildDescriptors(Collection<Object> newChildDescriptors,
+	protected void collectNewChildDescriptors(Collection newChildDescriptors,
 			Object object) {
 		newChildDescriptors.add(createChildParameter(UmaPackage.eINSTANCE
 				.getMethodPackage_ChildPackages(), UmaFactory.eINSTANCE
@@ -263,6 +254,14 @@ public class ContentPackageItemProvider extends
 		} else {
 			txt = TngUtil
 					.getLabel(object, getString("_UI_ContentPackage_type")); //$NON-NLS-1$
+		}
+		// check if the object has its own resource and it is modified to add
+		// the dirty flag
+		//
+		Resource res = ((EObject) object).eResource();
+		if (res != null && res.getContents().get(0) == object
+				&& res.isModified()) {
+			txt = txt + "*"; //$NON-NLS-1$
 		}
 		return txt;
 	}
@@ -312,10 +311,6 @@ public class ContentPackageItemProvider extends
 	public GuidancesItemProvider getGuidances() {
 		return guidances;
 	}
-	
-	public UdtElementsItemProvider getUdtElements() {
-		return udtElements;
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -357,6 +352,16 @@ public class ContentPackageItemProvider extends
 	// public Object getImage(Object object) {
 	// return TngEditPlugin.INSTANCE.getImage("full/obj16/MethodPackages");
 	// }
+
+	protected Command createInitializeCopyCommand(EditingDomain domain,
+			EObject owner, Helper helper) {
+		return new MethodElementInitializeCopyCommand(domain, owner, helper);
+	}
+
+	protected Command createCreateCopyCommand(EditingDomain domain,
+			EObject owner, Helper helper) {
+		return new MethodElementCreateCopyCommand(domain, owner, helper);
+	}
 
 	protected Command createAddCommand(EditingDomain domain, EObject owner,
 			EStructuralFeature feature, Collection collection, int index) {
@@ -400,10 +405,6 @@ public class ContentPackageItemProvider extends
 		if (workProducts != null) {
 			workProducts.dispose();
 			workProducts = null;
-		}
-		if (udtElements != null) {
-			udtElements.dispose();
-			udtElements = null;
 		}
 		super.dispose();
 	}

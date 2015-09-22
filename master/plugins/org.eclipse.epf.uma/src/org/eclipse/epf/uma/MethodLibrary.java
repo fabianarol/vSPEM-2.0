@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.uma;
 
+import org.eclipse.emf.common.util.EList;
 import java.util.List;
 
 /**
@@ -45,10 +46,10 @@ public interface MethodLibrary extends MethodUnit, org.eclipse.epf.uma.Package {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Method Plugins</em>' containment reference list.
 	 * @see org.eclipse.epf.uma.UmaPackage#getMethodLibrary_MethodPlugins()
-	 * @model containment="true" resolveProxies="true" ordered="false"
+	 * @model type="org.eclipse.epf.uma.MethodPlugin" containment="true" resolveProxies="true" ordered="false"
 	 * @generated
 	 */
-	List<MethodPlugin> getMethodPlugins();
+	List getMethodPlugins();
 
 	/**
 	 * Returns the value of the '<em><b>Predefined Configurations</b></em>' containment reference list.
@@ -61,9 +62,9 @@ public interface MethodLibrary extends MethodUnit, org.eclipse.epf.uma.Package {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Predefined Configurations</em>' containment reference list.
 	 * @see org.eclipse.epf.uma.UmaPackage#getMethodLibrary_PredefinedConfigurations()
-	 * @model containment="true" resolveProxies="true" ordered="false"
+	 * @model type="org.eclipse.epf.uma.MethodConfiguration" containment="true" resolveProxies="true" ordered="false"
 	 * @generated
 	 */
-	List<MethodConfiguration> getPredefinedConfigurations();
+	List getPredefinedConfigurations();
 
 } // MethodLibrary

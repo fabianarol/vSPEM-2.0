@@ -28,7 +28,6 @@ import org.eclipse.swt.widgets.Composite;
  * Displays the searchable method elements, organized by types, in a tree view.
  * 
  * @author Kelvin Low
- * @author Phong Nguyen Le
  * @since 1.0
  */
 public class MethodSearchScopeViewer {
@@ -45,8 +44,6 @@ public class MethodSearchScopeViewer {
 
 	private static final String GUIDANCE = MethodSearchScope.GUIDANCE;
 
-	private static final String UDT = MethodSearchScope.UDT;
-	
 	private static final String CHECKLIST = MethodSearchScope.CHECKLIST;
 
 	private static final String CONCEPT = MethodSearchScope.CONCEPT;
@@ -97,7 +94,6 @@ public class MethodSearchScopeViewer {
 		methodContentList.add(TASK);
 		methodContentList.add(WORK_PRODUCT);
 		methodContentList.add(GUIDANCE);
-		methodContentList.add(UDT);
 		methodContentList.add(STANDARD_CATEGORY);
 		methodContentList.add(CUSTOM_CATEGORY);
 	}
@@ -134,7 +130,7 @@ public class MethodSearchScopeViewer {
 		hasChildrenList.add(PROCESS);
 	}
 
-	protected CheckboxTreeViewer viewer;
+	private CheckboxTreeViewer viewer;
 
 	/**
 	 * The content provider for the viewer.
@@ -202,59 +198,6 @@ public class MethodSearchScopeViewer {
 			return null;
 		}
 	}
-	
-	private boolean shouldParentGrayed(Object selectedElement) {
-		ITreeContentProvider cp = (ITreeContentProvider) viewer.getContentProvider();
-		Object parent = cp.getParent(selectedElement);
-		if (parent != null && parent != ROOT) {
-			Object[] children = cp.getChildren(parent);
-			boolean grayed = false;
-			boolean checked = false;
-			for (Object child : children) {
-				if(!checked) {
-					checked = viewer.getChecked(child);
-					if(checked && grayed) {
-						return true;
-					}
-				}
-				if (!viewer.getChecked(child) || viewer.getGrayed(child)) {
-					if(checked) {
-						return true;
-					}
-					grayed = true;
-				}
-			}
-		}
-		return false;
-	}
-	
-	private void checkParent(Object selectedElement) {
-		ITreeContentProvider cp = (ITreeContentProvider) viewer.getContentProvider();
-		Object parent = cp.getParent(selectedElement);
-		if (parent != null && parent != ROOT) {
-			Object[] children = cp.getChildren(parent);
-			boolean grayed = false;
-			for (Object child : children) {
-				if (!viewer.getChecked(child) || viewer.getGrayed(child)) {
-					grayed = true;
-					break;
-				}
-			}
-			if (grayed) {
-				viewer.setGrayChecked(parent, true);
-				
-				// check all other parents grayed as well
-				//
-				for(parent = cp.getParent(parent); parent != null && parent != ROOT; parent = cp.getParent(parent)) {
-					viewer.setGrayChecked(parent, true);
-				}
-			} else {
-				viewer.setChecked(parent, true);
-				viewer.setParentsGrayed(selectedElement, false);
-				checkParent(parent);
-			}
-		}
-	}
 
 	/**
 	 * Creates a new instance.
@@ -274,25 +217,10 @@ public class MethodSearchScopeViewer {
 				Object selectedElement = event.getElement();
 				viewer.setSubtreeChecked(selectedElement, event.getChecked());
 				if (!event.getChecked()) {
-					if(shouldParentGrayed(selectedElement)) {
-						viewer.setParentsGrayed(selectedElement, true);
-					} else {
-						ITreeContentProvider cp = (ITreeContentProvider) viewer.getContentProvider();
-						Object parent = cp.getParent(selectedElement);
-						if(parent != null) {
-							viewer.setGrayChecked(parent, false);
-						}
-					}
+					viewer.setParentsGrayed(selectedElement, true);
 					viewer.setGrayChecked(selectedElement, false);
-					// set gray to false for items that are unchecked
-					//
-					for (Object element : viewer.getGrayedElements()) {
-						if(!viewer.getChecked(element)) {
-							viewer.setGrayed(element, false);
-						}
-					}
-				} else {		
-					checkParent(selectedElement);
+				} else {
+					viewer.setParentsGrayed(selectedElement, false);
 				}
 			}
 		});
@@ -306,4 +234,5 @@ public class MethodSearchScopeViewer {
 	public MethodSearchScope getSearchScope() {
 		return new MethodSearchScope(viewer.getCheckedElements());
 	}
+
 }

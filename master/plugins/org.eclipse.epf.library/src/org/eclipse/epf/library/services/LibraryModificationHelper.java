@@ -83,32 +83,26 @@ public class LibraryModificationHelper {
 			actionMgr = null;
 		}
 	}
-	
+
 	/**
 	 * check if update is allowed
 	 * @param object
 	 * @return boolean
 	 */
 	public static boolean canUpdate(EObject object) {
-		return canUpdate(object, null);
-	}
-	
-	public static boolean canUpdate(EObject object, Object context) {
-		IStatus status = TngUtil.checkEdit(object, context);
+		IStatus status = TngUtil.checkEdit(object, null);
 		if (status.isOK()) {
 			return true;
 		} else {
 			String msg = NLS.bind(LibraryResources.LibraryModificationHelper_cannotUpdate, TngUtil.getTypeText(object), object
 			.eGet(UmaPackage.eINSTANCE.getNamedElement_Name()));
-			LibraryPlugin.getDefault().getMsgCallback().displayWarning(LibraryPlugin.getDefault(),
+			LibraryPlugin.getDefault().getMsgDialog().displayWarning(
 					LibraryResources.warningDlg_title
 					, msg, TngUtil.getMessage(status));
 
 			return false;
 		}
 	}
-
-	
 
 	/**
 	 * check if save is needed
@@ -137,7 +131,7 @@ public class LibraryModificationHelper {
 				} catch (Exception e) {
 					String msg = NLS.bind(LibraryResources.errorDlg_saveError
 							, resource.getURI().isFile() ? resource.getURI().toFileString() : resource.getURI().toString()); 
-					LibraryPlugin.getDefault().getMsgCallback().displayError(LibraryPlugin.getDefault(),
+					LibraryPlugin.getDefault().getMsgDialog().displayError(
 							LibraryResources.errorDlg_title
 							, msg, e);
 				}
@@ -179,22 +173,4 @@ public class LibraryModificationHelper {
 		return null;
 	}
 
-	public static class CheckActionManager extends ActionManager {
-		
-		private Object context;
-
-		public CheckActionManager(Object context) {
-			this.context = context;
-		}
-		
-		public boolean doAction(int actionType, EObject object,
-				EStructuralFeature feature, Object value, int index) {
-			if (canUpdate(object, context)) {
-				return super.doAction(actionType, object, feature, value,
-						index);
-			}
-			return false;
-		}
-
-	}
 }

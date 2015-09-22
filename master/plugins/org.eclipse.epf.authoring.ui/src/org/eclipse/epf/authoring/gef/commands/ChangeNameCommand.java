@@ -13,7 +13,7 @@ package org.eclipse.epf.authoring.gef.commands;
 import org.eclipse.epf.authoring.gef.edit.NamedNodeEditPart;
 import org.eclipse.epf.authoring.ui.AuthoringUIPlugin;
 import org.eclipse.epf.authoring.ui.AuthoringUIResources;
-import org.eclipse.epf.common.ui.util.MsgDialog;
+import org.eclipse.epf.common.serviceability.MsgDialog;
 import org.eclipse.epf.common.utils.StrUtil;
 import org.eclipse.epf.diagram.model.NamedNode;
 import org.eclipse.gef.commands.Command;

@@ -11,7 +11,6 @@
 package org.eclipse.epf.export.services;
 
 import java.io.File;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +20,6 @@ import org.apache.tools.ant.taskdefs.Copy;
 import org.apache.tools.ant.types.FileSet;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.epf.common.utils.ExtensionHelper;
 import org.eclipse.epf.common.utils.FileUtil;
 import org.eclipse.epf.export.ExportResources;
 import org.eclipse.epf.library.LibraryService;
@@ -43,7 +41,6 @@ import org.eclipse.epf.uma.MethodPlugin;
 public class PluginExportService extends BaseExportService {
 
 	PluginExportData data;
-	protected File exportLibFolder;
 
 	/**
 	 * Creates a new instance.
@@ -52,21 +49,13 @@ public class PluginExportService extends BaseExportService {
 		this.data = data;
 	}
 
-	public static PluginExportService newInstance(PluginExportData data) {
-		Object obj = ExtensionHelper.create(PluginExportService.class, data);
-		if (obj instanceof PluginExportService) {
-			return (PluginExportService) obj;
-		}		
-		return new PluginExportService(data);
-	}
-	
 	/**
 	 * Run to export plugins
 	 */
 	public void run(IProgressMonitor monitor) {
 		monitor.setTaskName(ExportResources.PluginExportService_MSG0); 
 
-		Collection<MethodPlugin> plugins = data.selectedPlugins;
+		List plugins = data.selectedPlugins;
 		if (plugins == null || plugins.size() == 0) {
 			return;
 		}
@@ -75,7 +64,7 @@ public class PluginExportService extends BaseExportService {
 
 		// Create the library folder in the target directory.
 		String exportLibPath = (new File(data.llData.getParentFolder())).getAbsolutePath();
-		exportLibFolder = new File(exportLibPath);
+		File exportLibFolder = new File(exportLibPath);
 		if (!exportLibFolder.exists()) {
 			exportLibFolder.mkdir();
 		}
@@ -143,11 +132,6 @@ public class PluginExportService extends BaseExportService {
 				String uri = document.getResourceUri(guid);
 				File src = null;
 				if (uri == null) {
-					//if a process refers to a config that does not exist
-					//then there would be no resource for the config
-					if (config.eResource() == null) {
-						continue;
-					}
 					URI resUri = config.eResource().getURI();
 					uri = MultiFileSaveUtil.METHOD_CONFIGURATION_FOLDER_NAME + File.separator + resUri.lastSegment();
 					uri = document.decodeUri(uri);
@@ -181,7 +165,7 @@ public class PluginExportService extends BaseExportService {
 		cp.execute();
 	}
 
-	private void getSelectedIds(Collection<MethodPlugin> plugins, Map configsMap) {
+	private void getSelectedIds(List plugins, Map configsMap) {
 		selectedIds.clear();
 		selectedPluginNames.clear();
 

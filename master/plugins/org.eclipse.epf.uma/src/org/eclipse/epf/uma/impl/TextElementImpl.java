@@ -32,6 +32,13 @@ import org.eclipse.epf.uma.UmaPackage;
  */
 public class TextElementImpl extends LeafElementImpl implements TextElement {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The default value of the '{@link #getText() <em>Text</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -61,7 +68,7 @@ public class TextElementImpl extends LeafElementImpl implements TextElement {
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -69,7 +76,6 @@ public class TextElementImpl extends LeafElementImpl implements TextElement {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.TEXT_ELEMENT;
 	}
@@ -101,7 +107,6 @@ public class TextElementImpl extends LeafElementImpl implements TextElement {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.TEXT_ELEMENT__TEXT:
@@ -115,7 +120,6 @@ public class TextElementImpl extends LeafElementImpl implements TextElement {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.TEXT_ELEMENT__TEXT:
@@ -130,7 +134,6 @@ public class TextElementImpl extends LeafElementImpl implements TextElement {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.TEXT_ELEMENT__TEXT:
@@ -145,7 +148,6 @@ public class TextElementImpl extends LeafElementImpl implements TextElement {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);
@@ -166,7 +168,6 @@ public class TextElementImpl extends LeafElementImpl implements TextElement {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy())
 			return super.toString();

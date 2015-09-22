@@ -27,7 +27,6 @@ import org.eclipse.epf.common.xml.XSLTProcessor;
 import org.eclipse.epf.library.ILibraryManager;
 import org.eclipse.epf.library.LibraryService;
 import org.eclipse.epf.library.configuration.ConfigurationFilter;
-import org.eclipse.epf.library.configuration.SupportingElementData;
 import org.eclipse.epf.library.edit.IFilter;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
 import org.eclipse.epf.library.edit.configuration.GuidanceGroupingItemProvider;
@@ -88,28 +87,6 @@ public class GlossaryBuilder {
 	 */
 	public void execute(MethodConfiguration config, String pubDir,
 			String title, IProgressMonitor monitor) {
-		
-		SupportingElementData sdata = LibraryService.getInstance()
-				.getConfigurationManager(config).getSupportingElementData();
-		
-		boolean oldValue = false;
-		if (sdata != null) {
-			oldValue = sdata.isEnabled();
-			sdata.setEnabled(false);
-		}
-		
-		try {
-			execute_(config, pubDir, title, monitor);
-		} finally {
-			if (sdata != null) {
-				sdata.setEnabled(oldValue);
-			}
-		}
-		
-	}
-	
-	private void execute_(MethodConfiguration config, String pubDir,
-			String title, IProgressMonitor monitor) {
 		if (monitor.isCanceled()) {
 			return;
 		}
@@ -117,7 +94,7 @@ public class GlossaryBuilder {
 		glossaryItems = new GlossaryList(pubDir);
 		
 		glossaryItems.clear();
-		IFilter configFilter = new ConfigurationFilter(config);
+		IFilter configFilter = new ConfigurationFilter(config, null);
 		adapterFactory = TngAdapterFactory.INSTANCE
 				.getConfigurationView_AdapterFactory(configFilter);
 		// iterate thru configuration to get all glossary items
@@ -274,7 +251,7 @@ public class GlossaryBuilder {
 			// update the url text
 			String text = "<a " + urltext + ">" + linkedText + "</a>"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-			m.appendReplacement(sb, ResourceHelper.regExpEscape(text));
+			m.appendReplacement(sb, text);
 		}
 
 		m.appendTail(sb);
@@ -282,16 +259,6 @@ public class GlossaryBuilder {
 	}
 
 	private String fixUrlText(String urltext) {
-		try {
-			return fixUrlText_(urltext);
-		} catch (Throwable e) {			
-			PublishingPlugin.getDefault().getLogger().logError(e);
-		}
-		
-		return urltext;
-	}
-	
-	private String fixUrlText_(String urltext) {
 		String guid = ResourceHelper.getGuidFromUrl(urltext);
 		if (guid == null) {
 			return urltext;

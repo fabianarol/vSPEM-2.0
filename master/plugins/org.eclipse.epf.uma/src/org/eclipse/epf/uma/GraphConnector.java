@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.uma;
 
+import org.eclipse.emf.common.util.EList;
 import java.util.List;
 
 /**
@@ -20,8 +21,8 @@ import java.util.List;
  * <p>
  * The following features are supported:
  * <ul>
- *   <li>{@link org.eclipse.epf.uma.GraphConnector#getGraphEdge <em>Graph Edge</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.GraphConnector#getGraphElement <em>Graph Element</em>}</li>
+ *   <li>{@link org.eclipse.epf.uma.GraphConnector#getGraphEdge <em>Graph Edge</em>}</li>
  * </ul>
  * </p>
  *
@@ -43,7 +44,7 @@ public interface GraphConnector extends GraphElement {
 	 * @see #setGraphElement(GraphElement)
 	 * @see org.eclipse.epf.uma.UmaPackage#getGraphConnector_GraphElement()
 	 * @see org.eclipse.epf.uma.GraphElement#getAnchorage
-	 * @model opposite="anchorage" required="true" transient="false" ordered="false"
+	 * @model opposite="anchorage" required="true"
 	 * @generated
 	 */
 	GraphElement getGraphElement();
@@ -71,9 +72,9 @@ public interface GraphConnector extends GraphElement {
 	 * @return the value of the '<em>Graph Edge</em>' reference list.
 	 * @see org.eclipse.epf.uma.UmaPackage#getGraphConnector_GraphEdge()
 	 * @see org.eclipse.epf.uma.GraphEdge#getAnchor
-	 * @model opposite="anchor" ordered="false"
+	 * @model type="org.eclipse.epf.uma.GraphEdge" opposite="anchor" ordered="false"
 	 * @generated
 	 */
-	List<GraphEdge> getGraphEdge();
+	List getGraphEdge();
 
 } // GraphConnector

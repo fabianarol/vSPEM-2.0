@@ -1,15 +1,6 @@
-/*******************************************************************************
- * Copyright (c) 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
- *******************************************************************************/
 package org.eclipse.epf.richtext.actions;
 
+import org.eclipse.epf.common.utils.StrUtil;
 import org.eclipse.epf.richtext.IRichText;
 import org.eclipse.epf.richtext.RichTextCommand;
 import org.eclipse.epf.richtext.RichTextEditor;
@@ -21,6 +12,7 @@ import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.widgets.Display;
 
 public class PastePlainTextAction extends RichTextAction {
+	
 	/**
 	 * Creates a new instance.
 	 */
@@ -47,7 +39,7 @@ public class PastePlainTextAction extends RichTextAction {
 			String text = (String) clipboard.getContents(TextTransfer
 					.getInstance());
 			if (text != null && text.length() > 0) {
-				//text = StrUtil.convertNewlinesToHTML(text);
+				text = StrUtil.convertNewlinesToHTML(text);
 				if (richText instanceof RichTextEditor) {
 					((RichTextEditor)richText).addHTML(text);
 				} else {

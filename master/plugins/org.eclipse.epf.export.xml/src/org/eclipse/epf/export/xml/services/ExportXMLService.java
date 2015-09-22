@@ -14,20 +14,16 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.epf.common.utils.ExtensionHelper;
+import org.eclipse.emf.ecore.sdo.EDataObject;
 import org.eclipse.epf.dataexchange.util.ContentProcessor;
 import org.eclipse.epf.dataexchange.util.IResourceHandler;
 import org.eclipse.epf.diagram.ui.service.DiagramImageService;
@@ -37,11 +33,7 @@ import org.eclipse.epf.export.xml.ExportXMLResources;
 import org.eclipse.epf.library.IConfigurationManager;
 import org.eclipse.epf.library.LibraryService;
 import org.eclipse.epf.library.edit.IFilter;
-import org.eclipse.epf.library.edit.util.DescriptorPropUtil;
-import org.eclipse.epf.library.edit.util.LibraryEditUtil;
-import org.eclipse.epf.library.edit.util.MethodElementPropertyHelper;
 import org.eclipse.epf.library.edit.util.ModelStructure;
-import org.eclipse.epf.library.edit.util.ProcessScopeUtil;
 import org.eclipse.epf.library.edit.util.Suppression;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.layout.ElementLayoutManager;
@@ -50,21 +42,15 @@ import org.eclipse.epf.library.util.LibraryUtil;
 import org.eclipse.epf.library.util.MigrationUtil;
 import org.eclipse.epf.library.util.ResourceHelper;
 import org.eclipse.epf.uma.Activity;
-import org.eclipse.epf.uma.Descriptor;
 import org.eclipse.epf.uma.Diagram;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodElement;
-import org.eclipse.epf.uma.MethodElementProperty;
 import org.eclipse.epf.uma.MethodLibrary;
 import org.eclipse.epf.uma.MethodPackage;
 import org.eclipse.epf.uma.MethodPlugin;
-import org.eclipse.epf.uma.Process;
 import org.eclipse.epf.uma.TaskDescriptor;
-import org.eclipse.epf.uma.WorkBreakdownElement;
 import org.eclipse.epf.uma.WorkOrder;
 import org.eclipse.epf.uma.WorkOrderType;
-import org.eclipse.epf.uma.ecore.IModelObject;
-import org.eclipse.epf.uma.util.Scope;
 import org.eclipse.epf.uma.util.UmaUtil;
 import org.eclipse.osgi.util.NLS;
 
@@ -77,7 +63,7 @@ import org.eclipse.osgi.util.NLS;
 public class ExportXMLService {
 
 	// String xmlPath;
-	protected ExportXMLData data;
+	private ExportXMLData data;
 	
 	private boolean debug = ExportXMLPlugin.getDefault().isDebugging();
 
@@ -95,8 +81,6 @@ public class ExportXMLService {
 	
 	//tds with steps
 	private Map<String, TaskDescriptor> tdMap;
-	
-	private Set<WorkOrder> successors;
 
 	/**
 	 * Creates a new instance.
@@ -106,15 +90,6 @@ public class ExportXMLService {
 		logger = new ExportXMLLogger(new File(this.data.xmlFile)
 				.getParentFile());
 	}
-	
-	public static ExportXMLService newInstance(ExportXMLData data) {
-		Object obj = ExtensionHelper.create(ExportXMLService.class, data);
-		if (obj instanceof ExportXMLService) {
-			return (ExportXMLService) obj;
-		}		
-		return new ExportXMLService(data);
-	}
-	
 	/**
 	 * Gets the logger file.
 	 */
@@ -160,7 +135,7 @@ public class ExportXMLService {
 						if (value.targetFile == null) {
 							continue;
 						} else if (value.sourceFile != null) {
-							IModelObject xmlObj = getXmlObject(value.element);
+							EDataObject xmlObj = getXmlObject(value.element);
 							if (xmlObj instanceof org.eclipse.epf.xml.uma.Process) {
 								org.eclipse.epf.xml.uma.Process proc = 
 													(org.eclipse.epf.xml.uma.Process) xmlObj;
@@ -198,10 +173,7 @@ public class ExportXMLService {
 							org.eclipse.epf.uma.Process proc = (org.eclipse.epf.uma.Process) value.element;
 							MethodConfiguration config = proc.getDefaultContext();
 							if (config == null) {
-								config = ProcessScopeUtil.getInstance().loadScope(proc);
-								if (config == null) {
-									continue;
-								}
+								continue;
 							}
 							diagramService.setConfig(config);
 							IConfigurationManager mgr = LibraryService.getInstance().getConfigurationManager(config);
@@ -262,11 +234,10 @@ public class ExportXMLService {
 					.getXMLFile());
 
 			this.xmlLib.createLibrary(src.getGuid(), src.getName());
-			IModelObject target = this.xmlLib.getRoot();
+			EDataObject target = this.xmlLib.getRoot();
 
 			creatEDataObjectTree(src, target);
 			iteratEDataObject(src);
-			handleSuccessors();
 
 			this.xmlLib.fixLibraryForExport();
 			this.xmlLib.fixTaskDescriptorsForExport(tdMap);
@@ -291,8 +262,7 @@ public class ExportXMLService {
 			return (data.selectedPlugins != null)
 					&& data.selectedPlugins.contains(plugin);
 		} else if (data.exportType == ExportXMLData.EXPORT_METHOD_CONFIGS) {
-			//return false;
-			return true;	//hot fix
+			return false;
 		} else {
 			return true;
 		}
@@ -307,7 +277,7 @@ public class ExportXMLService {
 	}
 	
 	private void creatEDataObjectTree(MethodElement srcObj,
-			IModelObject targetObj) {
+			EDataObject targetObj) {
 
 		// if it's a plugin, skip all the system packages
 		// and find the top most user packages
@@ -358,14 +328,6 @@ public class ExportXMLService {
 				// so delay the creation if the owner is a package
 				if (child instanceof WorkOrder
 						&& srcObj instanceof MethodPackage) {
-					WorkOrder workOrder = (WorkOrder) child;
-					MethodElementProperty prop = MethodElementPropertyHelper
-					.getProperty(
-							workOrder,
-							MethodElementPropertyHelper.WORK_ORDER__SUCCESSOR);
-					if (prop != null) {
-						getSuccessors().add(workOrder);
-					}					
 					continue;
 				}
 
@@ -406,7 +368,7 @@ public class ExportXMLService {
 		return discardedElements.contains(o);
 	}
 
-	private IModelObject getXmlObject(MethodElement srcObj) {
+	private EDataObject getXmlObject(MethodElement srcObj) {
 		String id = srcObj.getGuid();
 		if (umaIdToXmlIdMap.containsKey(id)) {
 			id = (String) umaIdToXmlIdMap.get(id);
@@ -421,7 +383,7 @@ public class ExportXMLService {
 	 * @param targetContainer
 	 */
 	private void createXmlObject(MethodElement umaElement,
-			IModelObject targetContainer) {
+			EDataObject targetContainer) {
 		EStructuralFeature feature = umaElement.eContainmentFeature();
 		createXmlObject(umaElement, targetContainer, feature.getName());
 	}
@@ -433,7 +395,7 @@ public class ExportXMLService {
 	 * @param targetContainer
 	 */
 	private void createXmlObject(MethodElement umaElement,
-			IModelObject targetContainer, String containmentFeature) {
+			EDataObject targetContainer, String containmentFeature) {
 
 		try {
 			if (umaElement == null) {
@@ -443,7 +405,7 @@ public class ExportXMLService {
 			// get the containment feature so we can create the object of the
 			// same type
 			String elementType = umaElement.getType().getName();
-			IModelObject xmlElement = xmlLib.createElement(targetContainer,
+			EDataObject xmlElement = xmlLib.createElement(targetContainer,
 					containmentFeature, umaElement.eClass().getName(),
 					elementType, umaElement.getGuid());
 			
@@ -461,13 +423,7 @@ public class ExportXMLService {
 			}
 			
 			if (xmlElement != null) {
-				if (umaElement instanceof WorkOrder
-						&& xmlElement instanceof org.eclipse.epf.xml.uma.WorkOrder) {
-					xmlLib.getSuccessOrWorkOrderMap().put(
-							(org.eclipse.epf.xml.uma.WorkOrder) xmlElement,
-							(WorkOrder) umaElement);
-				}
-				
+
 				// recursive
 				creatEDataObjectTree(umaElement, xmlElement);
 			}
@@ -479,39 +435,6 @@ public class ExportXMLService {
 	}
 
 	private void iteratEDataObject(MethodElement srcObj) {
-		Scope scope = null;	
-		Process proc = null;
-		try {
-			if (srcObj instanceof Process) {
-				proc = (Process) srcObj;
-				scope = ProcessScopeUtil.getInstance().getScope(proc);
-				if (scope != null) {
-					setScope(proc, null);
-				}
-			}
-			iteratEDataObject_(srcObj);
-		} finally {
-			if (scope != null && proc != null) {
-				setScope(proc, scope);
-			}
-		}
-	}
-	
-	private void setScope(Process proc, Scope scope) {
-		boolean oldDeliver = proc.eDeliver();
-		try {
-			proc.eSetDeliver(false);
-			proc.setDefaultContext(scope);
-			proc.getValidContext().clear();
-			if (scope != null) {
-				proc.getValidContext().add(scope);
-			}
-		} finally {
-			proc.eSetDeliver(oldDeliver);
-		}
-	}
-	
-	private void iteratEDataObject_(MethodElement srcObj) {
 		diagramHandler.registerElement(srcObj, true);
 		
 		if (srcObj instanceof MethodPlugin) {
@@ -526,7 +449,7 @@ public class ExportXMLService {
 		}
 		setProcessed(srcObj.getGuid());
 
-		IModelObject targetObj = getXmlObject(srcObj);
+		EDataObject targetObj = getXmlObject(srcObj);
 
 		// if object is not created,
 		// which means it's either a system package or something wrong
@@ -548,8 +471,6 @@ public class ExportXMLService {
 
 			return;
 		}
-		
-		handleDescriptorExtraReferences(srcObj, targetObj);		
 
 		EClass eClass = srcObj.eClass();
 
@@ -574,7 +495,7 @@ public class ExportXMLService {
 						// WorkBreakdownElement
 						if (src_value instanceof WorkOrder) {
 							// get the owner of the WorkOrder
-							IModelObject workOrder = getXmlObject(src_value);
+							EDataObject workOrder = getXmlObject(src_value);
 							if (workOrder == null) {
 								createXmlObject(src_value, targetObj, feature
 										.getName());
@@ -728,113 +649,19 @@ public class ExportXMLService {
 		// pkgs.addAll(TngUtil.getContentCategoryPackages(plugin));
 
 	}
-	public ExportXMLLogger getLogger() {
-		return logger;
-	}
-	
-	private Set<WorkOrder> getSuccessors() {
-		if (successors == null) {
-			successors = new HashSet<WorkOrder>();
-		}
-		return successors;
-	}
-	
-	private void  handleSuccessors() {
-		if (getSuccessors() == null) {
-			return;
-		}
-		
-		String fname = "linkToPredecessor";	//$NON-NLS-1$
-		for (WorkOrder srcWorkOrder : getSuccessors()) {
-			WorkBreakdownElement wbe = srcWorkOrder.getPred();
-			if (wbe == null) {
-				continue;
-			}			
-			IModelObject targetObj = getXmlObject(wbe);
-			if (targetObj == null) {
-				continue;
-			}			
-			IModelObject tgtWorkOrder = getXmlObject(srcWorkOrder);
-			if (tgtWorkOrder == null) {
-				createXmlObject(srcWorkOrder, targetObj, fname);
-			}			
-			String xmlId = getXmlId(srcWorkOrder.getGuid());
-			if (xmlId == null) {
-				continue;
-			}
-			try {
-				xmlLib.setReferenceValue(targetObj, fname, xmlId, srcWorkOrder
-						.getType());
-			} catch (Exception e) {
-				String msg = NLS.bind(
-						ExportXMLResources.exportXMLService_feature_error,
-						LibraryUtil.getTypeName(wbe), fname);
-				logger.logError(msg, e);
-			}
-		}
-	}
-	
-	private void handleDescriptorExtraReferences(MethodElement srcObj,
-			IModelObject targetObj) {
-		try {
-			handleDescriptorExtraReferences_(srcObj, targetObj);
-		} catch (Exception e) {
-			logger.logError(e.getMessage(), e);
-		}
-	}
-	
-	private void handleDescriptorExtraReferences_(MethodElement srcObj,
-			IModelObject targetObj) {
-		if (!(srcObj instanceof Descriptor)) {
-			return;
-		}
 
-		boolean ok = targetObj instanceof org.eclipse.epf.xml.uma.RoleDescriptor
-				|| targetObj instanceof org.eclipse.epf.xml.uma.WorkProductDescriptor
-				|| targetObj instanceof org.eclipse.epf.xml.uma.TaskDescriptor;
-
-		if (!ok) {
-			return;
-		}
-
-		Descriptor srcDes = (Descriptor) srcObj;
-		org.eclipse.epf.xml.uma.BreakdownElement tgtDes = (org.eclipse.epf.xml.uma.BreakdownElement) targetObj;
-		List<EReference> refList = LibraryEditUtil.getInstance()
-				.getExcludeRefList(srcDes);
-		
-		for (EReference ref : refList) {
-			handleExtraRef(srcDes, tgtDes, ref);		
-		}		
-		handleExtraRef(srcDes, tgtDes, org.eclipse.epf.uma.UmaPackage.eINSTANCE.getDescriptor_GuidanceExclude());	
-		handleExtraRef(srcDes, tgtDes, org.eclipse.epf.uma.UmaPackage.eINSTANCE.getDescriptor_GuidanceAdditional());	
-	}
-	
-	private void handleExtraRef(Descriptor srcDes,
-			org.eclipse.epf.xml.uma.BreakdownElement tgtDes, EReference ref) {
-		org.eclipse.epf.xml.uma.UmaPackage xmlUp = org.eclipse.epf.xml.uma.UmaPackage.eINSTANCE;
-		EClass mepClass = xmlUp.getMethodElementProperty();
-		
-		List<MethodElement> refValueList = (List<MethodElement>) srcDes
-				.eGet(ref);
-		if (refValueList != null && !refValueList.isEmpty()) {
-			List<org.eclipse.epf.xml.uma.MethodElementProperty> xmlMepList = tgtDes
-					.getMethodElementProperty();
-			org.eclipse.epf.xml.uma.MethodElementProperty xmlMep = (org.eclipse.epf.xml.uma.MethodElementProperty) EcoreUtil
-					.create(mepClass);
-			xmlMep.setName("XML_" + ref.getName()); //$NON-NLS-1$
-			String value = ""; //$NON-NLS-1$
-
-			for (int i = 0; i < refValueList.size(); i++) {
-				MethodElement elem = refValueList.get(i);
-				if (value.length() > 0) {
-					value += DescriptorPropUtil.infoSeperator;
-				}
-				value += elem.getGuid();
-			}
-			xmlMep.setValue(value);
-
-			xmlMepList.add(xmlMep);
-		}
-	}
-	
+	// private boolean isSystemPackage(EDataObject element) {
+	//		
+	// if ( !(element instanceof MethodPackage) ) {
+	// return false;
+	// }
+	//		
+	// MethodPlugin plugin = LibraryUtil.getMethodPlugin(element);
+	// if ( plugin == null ) {
+	// return false;
+	// }
+	//		
+	// return TngUtil.getAllSystemPackages(plugin).contains(element);
+	//		
+	// }
 }

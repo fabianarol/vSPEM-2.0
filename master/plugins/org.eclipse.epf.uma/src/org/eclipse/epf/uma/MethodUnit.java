@@ -48,7 +48,7 @@ public interface MethodUnit extends MethodElement {
 	 * @return the value of the '<em>Authors</em>' attribute.
 	 * @see #setAuthors(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getMethodUnit_Authors()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getAuthors();
@@ -73,7 +73,7 @@ public interface MethodUnit extends MethodElement {
 	 * @return the value of the '<em>Change Date</em>' attribute.
 	 * @see #setChangeDate(Date)
 	 * @see org.eclipse.epf.uma.UmaPackage#getMethodUnit_ChangeDate()
-	 * @model dataType="org.eclipse.epf.uma.Date" ordered="false"
+	 * @model dataType="org.eclipse.epf.uma.Date"
 	 * @generated
 	 */
 	Date getChangeDate();
@@ -99,7 +99,7 @@ public interface MethodUnit extends MethodElement {
 	 * @return the value of the '<em>Change Description</em>' attribute.
 	 * @see #setChangeDescription(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getMethodUnit_ChangeDescription()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getChangeDescription();
@@ -125,7 +125,7 @@ public interface MethodUnit extends MethodElement {
 	 * @return the value of the '<em>Version</em>' attribute.
 	 * @see #setVersion(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getMethodUnit_Version()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getVersion();
@@ -147,7 +147,7 @@ public interface MethodUnit extends MethodElement {
 	 * @return the value of the '<em>Copyright Statement</em>' reference.
 	 * @see #setCopyrightStatement(SupportingMaterial)
 	 * @see org.eclipse.epf.uma.UmaPackage#getMethodUnit_CopyrightStatement()
-	 * @model ordered="false"
+	 * @model required="true"
 	 * @generated
 	 */
 	SupportingMaterial getCopyrightStatement();

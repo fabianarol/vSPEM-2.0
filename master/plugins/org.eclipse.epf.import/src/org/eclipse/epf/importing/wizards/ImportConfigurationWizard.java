@@ -11,29 +11,23 @@
 package org.eclipse.epf.importing.wizards;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.epf.authoring.ui.wizards.SaveAllEditorsPage;
-import org.eclipse.epf.common.ui.util.MsgBox;
+import org.eclipse.epf.common.serviceability.MsgBox;
 import org.eclipse.epf.importing.ImportPlugin;
 import org.eclipse.epf.importing.ImportResources;
 import org.eclipse.epf.importing.services.ConfigurationImportData;
 import org.eclipse.epf.importing.services.ConfigurationImportService;
 import org.eclipse.epf.library.ILibraryManager;
 import org.eclipse.epf.library.LibraryService;
-import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.library.ui.LibraryUIImages;
 import org.eclipse.epf.library.ui.wizards.LibraryBackupUtil;
 import org.eclipse.epf.services.IFileManager;
 import org.eclipse.epf.services.Services;
-import org.eclipse.epf.ui.wizards.BaseWizard;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
@@ -46,7 +40,7 @@ import org.eclipse.ui.IWorkbench;
  * @author Kelvin Low
  * @since 1.0
  */
-public class ImportConfigurationWizard extends BaseWizard implements IImportWizard {
+public class ImportConfigurationWizard extends Wizard implements IImportWizard {
 
 	public boolean okToComplete = false;
 
@@ -58,11 +52,9 @@ public class ImportConfigurationWizard extends BaseWizard implements IImportWiza
 
 	protected ConfigurationImportData data = new ConfigurationImportData();
 
-	protected ConfigurationImportService service = ConfigurationImportService.newInstance(
-			data);	
+	protected ConfigurationImportService service = new ConfigurationImportService(
+			data);
 
-	public static final String WIZARD_EXTENSION_POINT_ID = "org.eclipse.epf.import.importConfigurationWizard"; //$NON-NLS-1$
-	
 	/**
 	 * Creates a new instance.
 	 */
@@ -76,7 +68,6 @@ public class ImportConfigurationWizard extends BaseWizard implements IImportWiza
 	 *      IStructuredSelection)
 	 */
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
-		super.init(workbench, selection);
 	}
 
 	/**
@@ -102,64 +93,15 @@ public class ImportConfigurationWizard extends BaseWizard implements IImportWiza
 		SaveAllEditorsPage.addPageIfNeeded(this, true, null, null, ImportPlugin
 				.getDefault().getImageDescriptor(
 						"full/wizban/ImportLibraryConfiguration.gif")); //$NON-NLS-1$
-		if (wizardExtender == null) {
-			page1 = new SelectImportConfigurationSource(data, service);
-			addPage(page1);
-	
-			configPage = new SelectConfigsToImport(service);
-			addPage(configPage);
-	
-			specsPage = new SelectConfigSpecsToImportPage(data);
-			addPage(specsPage);
-			
-			return;
-		}
-		
-		
-		List<IWizardPage> wizardPages = new ArrayList<IWizardPage>();
 
-		IWizardPage page = wizardExtender
-				.getReplaceWizardPage(SelectImportConfigurationSource.PAGE_NAME);
-		if (page != null) {
-			page1 = (SelectImportConfigurationSource) page;
-			page1.setData(data);
-			page1.setService(service);
-			wizardPages.add(page);
-		} else {
-			page1 = new SelectImportConfigurationSource(data, service);
-			wizardPages.add(page1);
-		}
+		page1 = new SelectImportConfigurationSource(data, service);
+		addPage(page1);
 
-		page = wizardExtender
-				.getReplaceWizardPage(SelectPluginsToImport.PAGE_NAME);
-		if (page != null) {
-			configPage = (SelectConfigsToImport) page;
-			wizardPages.add(page);
-		} else {
-			configPage = new SelectConfigsToImport(service);
-			wizardPages.add(configPage);
-		}
+		configPage = new SelectConfigsToImport(service);
+		addPage(configPage);
 
-		page = wizardExtender
-				.getReplaceWizardPage(SelectConfigSpecsToImportPage.PAGE_NAME);
-		if (page != null) {
-			specsPage = (SelectConfigSpecsToImportPage) page;
-			wizardPages.add(page);
-		} else {
-			specsPage = new SelectConfigSpecsToImportPage(data);
-			wizardPages.add(specsPage);
-		}
-		
-		super.getNewWizardPages(wizardPages);
-
-		for (Iterator<IWizardPage> it = wizardPages.iterator(); it
-				.hasNext();) {
-			IWizardPage wizardPage = it.next();
-			super.addPage(wizardPage);
-		}
-
-		wizardExtender.initWizardPages(wizardPages);
-		
+		specsPage = new SelectConfigSpecsToImportPage(data);
+		addPage(specsPage);
 	}
 
 	/**
@@ -182,32 +124,6 @@ public class ImportConfigurationWizard extends BaseWizard implements IImportWiza
 	 * @see org.eclipse.jface.wizard.IWizard#performFinish()
 	 */
 	public boolean performFinish() {
-		if (ProcessUtil.isSynFree() && !service.isSynFreeLib()) {
-//			String message = ImportResources.ImportNoSynLib_ConvertMsg;
-//			boolean yes = ImportPlugin.getDefault().getMsgDialog()
-//					.displayConfirmation(
-//							ImportResources.importConfigWizard_title, message);
-//			if (!yes) {
-//				return false;
-//			}
-			
-			String message = ImportResources.ImportNoSynLibToSynLib_Error;
-			MessageDialog.openError(this.getShell(), ImportResources.importConfigWizard_title, message);			
-			
-			return false;
-			
-		} else if (!ProcessUtil.isSynFree() && service.isSynFreeLib()) {
-			String message = ImportResources.ImportSynLibToNoSynLib_Error;
-//			ImportPlugin.getDefault().getMsgDialog()
-//					.displayError(
-//							ImportResources.importConfigWizard_title, message);
-			
-			//Use the standard MessageDialog to avoid double-byte character display problem
-			MessageDialog.openError(this.getShell(), ImportResources.importConfigWizard_title, message);			
-			
-			return false;
-		}
-		
 		// Prompt the user to back up library.
 		LibraryBackupUtil.promptBackupCurrentLibrary(null, LibraryService
 				.getInstance());
@@ -246,11 +162,4 @@ public class ImportConfigurationWizard extends BaseWizard implements IImportWiza
 		return true;
 	}
 
-	/**
-	 * @see org.eclipse.epf.ui.wizards.BaseWizard#getWizardExtenderExtensionPointId()
-	 */
-	public String getWizardExtenderExtensionPointId() {
-		return WIZARD_EXTENSION_POINT_ID;
-	}
-	
 }

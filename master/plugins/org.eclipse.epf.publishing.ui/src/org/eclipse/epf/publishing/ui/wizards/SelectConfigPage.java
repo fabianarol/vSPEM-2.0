@@ -73,10 +73,6 @@ public class SelectConfigPage extends BaseWizardPage {
 	protected List processViews;
 
 	protected String selectedConfigName;
-	
-	private MethodConfiguration selectedConfig;
-	
-	private boolean enableConfigFree = true;
 
 	/**
 	 * 
@@ -158,7 +154,7 @@ public class SelectConfigPage extends BaseWizardPage {
 	/**
 	 * Initializes the wizard page controls with data.
 	 */
-	public void initControls() {
+	protected void initControls() {
 		// configViewer.setLabelProvider(new ConfigurationTableLabelProvider());
 		configViewer.setLabelProvider(labelProvider);
 		configViewer.setContentProvider(new ArrayContentProvider());
@@ -168,21 +164,13 @@ public class SelectConfigPage extends BaseWizardPage {
 		List<Object> configsList = new ArrayList<Object>();
 		configsList.addAll(Arrays.asList(configs));
 		Collections.sort(configsList, Comparators.DEFAULT_COMPARATOR);
-		
-		//For config free process publish
-		if (getEnableConfigFree()) {
-			MethodConfiguration mockConfig = ConfigFreeProcessPublishUtil.getInstance()
-				.getMethodConfigurationForConfigFreeProcess();
-			configsList.add(mockConfig);
-		}
-		
 		configViewer.setInput(configsList.toArray());
 		// configViewer.setInput(configs);
 
-		if (configsList.size() > 0) {
+		if (configs.length > 0) {
 			// Select the first config and display its brief description.
 			table.select(0);
-			setBriefDescription((MethodConfiguration)configsList.get(0));
+			setBriefDescription(configs[0]);
 		}
 	}
 
@@ -219,23 +207,11 @@ public class SelectConfigPage extends BaseWizardPage {
 		if (table.getSelectionCount() > 0) {
 			TableItem[] items = table.getSelection();
 			selectedConfigName = items[0].getText();
-			/*MethodConfiguration config = LibraryServiceUtil
+			MethodConfiguration config = LibraryServiceUtil
 					.getMethodConfiguration(LibraryService.getInstance()
-							.getCurrentMethodLibrary(), selectedConfigName);*/
-			
-			
-			MethodConfiguration config =  items[0].getData() instanceof MethodConfiguration ?
-					(MethodConfiguration) items[0].getData() : null;
-			setSelectedConfig(config);
-					
+							.getCurrentMethodLibrary(), selectedConfigName);
 			processViews = null;
 			if (config != null) {
-				//For config free process publish
-				//Data layer will add view for config free process during publishing
-				if (ConfigFreeProcessPublishUtil.getInstance().isSameMethodConfiguration(config)) {
-					return true;
-				}
-				
 				processViews = getValidConfigViews(config);
 			}
 
@@ -316,31 +292,15 @@ public class SelectConfigPage extends BaseWizardPage {
 	 * @return the name of the user selected configuration or <code>null</code>
 	 */
 	public String getConfigName() {
-		return selectedConfig.getName();
+		return selectedConfigName;
 	}
 
 	/**
 	 * Populates the Brief Description text control with the given
-	 * configuration's brief description.
+	 * configuration's brief descripotion.
 	 */
 	private void setBriefDescription(MethodConfiguration config) {
 		briefDescText.setText(config.getBriefDescription());
 	}
 
-	public MethodConfiguration getSelectedConfig() {
-		return selectedConfig;
-	}
-
-	public void setSelectedConfig(MethodConfiguration selectedConfig) {
-		this.selectedConfig = selectedConfig;
-	}
-	
-	public void setEnableConfigFree(boolean enable) {
-		enableConfigFree = enable;
-	}
-	
-	public boolean getEnableConfigFree() {
-		return enableConfigFree;
-	}
-	
 }

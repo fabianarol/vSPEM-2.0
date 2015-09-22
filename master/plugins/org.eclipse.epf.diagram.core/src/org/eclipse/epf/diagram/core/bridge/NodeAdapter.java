@@ -33,18 +33,15 @@ import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.Notifier;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.InternalEObject;
-import org.eclipse.emf.ecore.impl.ENotificationImpl;
 import org.eclipse.emf.transaction.impl.InternalTransactionalEditingDomain;
 import org.eclipse.epf.common.utils.StrUtil;
 import org.eclipse.epf.diagram.model.util.TxUtil;
 import org.eclipse.epf.library.edit.command.IActionManager;
 import org.eclipse.epf.library.edit.process.BreakdownElementWrapperItemProvider;
-import org.eclipse.epf.library.edit.util.ProcessUtil;
+import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.uma.BreakdownElement;
 import org.eclipse.epf.uma.DescribableElement;
 import org.eclipse.epf.uma.MethodElement;
-import org.eclipse.epf.uma.ProcessPackage;
 import org.eclipse.epf.uma.UmaPackage;
 import org.eclipse.epf.uma.WorkBreakdownElement;
 import org.eclipse.epf.uma.WorkOrder;
@@ -55,6 +52,7 @@ import org.eclipse.gmf.runtime.notation.View;
 import org.eclipse.uml2.uml.Activity;
 import org.eclipse.uml2.uml.ActivityEdge;
 import org.eclipse.uml2.uml.ActivityNode;
+import org.eclipse.uml2.uml.ControlNode;
 import org.eclipse.uml2.uml.UMLFactory;
 import org.eclipse.uml2.uml.UMLPackage;
 
@@ -63,7 +61,7 @@ import org.eclipse.uml2.uml.UMLPackage;
  *
  * @since 1.2
  */
-public abstract class NodeAdapter extends AdapterImpl {
+public class NodeAdapter extends AdapterImpl {
 	
 	protected class MethodElementAdapter extends AdapterImpl //implements INodeChangeListener 
 	{
@@ -76,16 +74,6 @@ public abstract class NodeAdapter extends AdapterImpl {
 			switch (msg.getFeatureID(DescribableElement.class)) {
 			case UmaPackage.DESCRIBABLE_ELEMENT__PRESENTATION_NAME:
 				setName(msg.getNewStringValue());
-				break;
-			case UmaPackage.DESCRIBABLE_ELEMENT__SHAPEICON:
-			case UmaPackage.DESCRIBABLE_ELEMENT__NODEICON:
-			   // Create a new notify when we've detected that the icons may have changed,
-			   // by just forcing a notify on the name, we cause the icons to get 
-			   // refreshed as well.
-				ActivityNode e = getNode();
-				e.eNotify(new ENotificationImpl((InternalEObject) e, Notification.SET,
-						UMLPackage.NAMED_ELEMENT__NAME, e.getName(), e.getName(), true));
-				e.eNotify(msg);
 				break;
 			}
 			return Collections.EMPTY_LIST;
@@ -155,13 +143,13 @@ public abstract class NodeAdapter extends AdapterImpl {
 		return nodeAdapter.getActionManager();
 	}
 	
-//	public NodeAdapter(BreakdownElementWrapperItemProvider wrapper) {
-//		this((MethodElement) TngUtil.unwrap(wrapper));
-//		this.wrapper = wrapper;
-//		targetReadOnly = wrapper.isReadOnly();
-//	}
+	public NodeAdapter(BreakdownElementWrapperItemProvider wrapper) {
+		this((MethodElement) TngUtil.unwrap(wrapper));
+		this.wrapper = wrapper;
+		targetReadOnly = wrapper.isReadOnly();
+	}
 
-	protected NodeAdapter(MethodElement e) {
+	public NodeAdapter(MethodElement e) {
 		element = e;
 		methodElementAdapter = createMethodElementAdapter();
 		e.eAdapters().add(methodElementAdapter);		
@@ -518,6 +506,64 @@ public abstract class NodeAdapter extends AdapterImpl {
 	}
 	
 	protected void removeFromUMA(ActivityEdge link, ActivityNode oldSource, ActivityNode oldTarget) {
+		MethodElement targetElement = BridgeHelper.getMethodElement(oldTarget);
+		if (targetElement instanceof WorkBreakdownElement) {
+			// this is a direct link
+			// remove WorkOrder
+			//
+			NodeAdapter targetNodeAdapter = BridgeHelper.getNodeAdapter(oldTarget);
+			boolean notify = targetNodeAdapter != null ? targetNodeAdapter.notificationEnabled : false;
+			try {
+				if(targetNodeAdapter != null) {
+					targetNodeAdapter.notificationEnabled = false;
+				}
+				if (BridgeHelper.canRemoveAllPreds(link, oldSource,
+						oldTarget)) {
+					Object pred = BridgeHelper.getMethodElement(oldSource);
+					if(pred instanceof WorkBreakdownElement) {
+						WorkBreakdownElement e = (WorkBreakdownElement) BridgeHelper.getMethodElement(oldTarget);
+						Collection<WorkOrder> workOrders = UmaUtil.findWorkOrder(e, (WorkBreakdownElement) pred, true);
+						if(!workOrders.isEmpty()) {
+							getActionManager().doAction(IActionManager.REMOVE_MANY, e, 
+									UmaPackage.Literals.WORK_BREAKDOWN_ELEMENT__LINK_TO_PREDECESSOR, workOrders, -1);
+						}
+					}
+				}
+			} finally {
+				if(targetNodeAdapter != null) {
+					targetNodeAdapter.notificationEnabled = notify;
+				}
+			}
+		} else if(oldTarget instanceof ControlNode && BridgeHelper.isSynchBar(oldTarget)) {
+			// get all the WorkBreakdownElementNodes that this synch bar is
+			// coming to and
+			// remove the WorkOrders with this WorkBreakdownElementNode's
+			// activity as predecessor from them
+			//
+			Collection<ActivityNode> actNodes = new ArrayList<ActivityNode>();
+			BridgeHelper.getSuccessorNodes(actNodes, oldTarget);
+			for (ActivityNode node : actNodes) {
+				WorkBreakdownElement e = (WorkBreakdownElement) BridgeHelper.getMethodElement(node);
+				NodeAdapter nodeAdapter = BridgeHelper.getNodeAdapter(node);
+				boolean notify = nodeAdapter != null ? nodeAdapter.notificationEnabled : false;
+				try {
+					if(nodeAdapter != null) {
+						nodeAdapter.notificationEnabled = false;
+					}
+					if (BridgeHelper.canRemoveAllPreds(link, oldSource, node)) {
+						WorkOrder wo;
+						while ((wo = UmaUtil.findWorkOrder(e, BridgeHelper.getMethodElement(oldSource))) != null) {
+							getActionManager().doAction(IActionManager.REMOVE, e, 
+									UmaPackage.Literals.WORK_BREAKDOWN_ELEMENT__LINK_TO_PREDECESSOR, wo, -1);
+						}
+					}
+				} finally {
+					if(nodeAdapter != null) {
+						nodeAdapter.notificationEnabled = notify;
+					}
+				}
+			}
+		}
 	}
 	
 	/**
@@ -538,7 +584,7 @@ public abstract class NodeAdapter extends AdapterImpl {
 	 * false, before creating a WorkOrder object.
 	 * 
 	 */
-	private WorkOrder addDefaultWorkOrder(ActivityNode node,
+	public WorkOrder addDefaultWorkOrder(ActivityNode node,
 			WorkBreakdownElement predBreakdownElement) {
 		NodeAdapter nodeAdapter = BridgeHelper.getNodeAdapter(node);
 		boolean notify = nodeAdapter.notificationEnabled;
@@ -574,45 +620,7 @@ public abstract class NodeAdapter extends AdapterImpl {
 			}
 		}
 	}
-	
-	private WorkOrder addCustomWorkOrder(org.eclipse.epf.uma.Activity diagramActivity, WorkBreakdownElement succ, WorkBreakdownElement pred, ActivityEdge link) {
-		ProcessPackage pkg = (ProcessPackage) diagramActivity.eContainer();
-		WorkOrder order = ProcessUtil.findWorkOrder(diagramActivity, succ, pred);
-		if(order == null) {
-			order = ProcessUtil.createDefaultWorkOrderForInheritedChild(diagramActivity, succ, pred);
-			getActionManager().doAction(IActionManager.ADD, pkg, 
-					UmaPackage.Literals.PROCESS_PACKAGE__PROCESS_ELEMENTS, order, -1);
-		}
-		if(link != null) {
-			BridgeHelper.associate(link, order);
-		}
-		return order;
-	}
-	
-	protected WorkOrder addWorkOrder(ActivityNode successorNode, WorkBreakdownElement successor, 
-			ActivityNode predecessorNode, WorkBreakdownElement predecessor, org.eclipse.epf.uma.Activity diagramActivity, ActivityEdge link) {
-		WorkOrder order = null;
-		if(diagramActivity == successor.getSuperActivities()) {
-			order = UmaUtil.findWorkOrder(successor, predecessor);
-			if (order == null) {
-				NodeAdapter sourceNodeAdapter = predecessorNode != null ? BridgeHelper.getNodeAdapter(predecessorNode) : null;	
-				// node adapter can be NULL if the node is not currently visible in the diagram
-				//
-				boolean sourceNotify = sourceNodeAdapter != null ? sourceNodeAdapter.notificationEnabled : false;
-				try {
-					// disable notification and create a work order
-					if(sourceNodeAdapter != null) sourceNodeAdapter.notificationEnabled = false;
-					order = addDefaultWorkOrder(successorNode, predecessor);
-				} finally {
-					if(sourceNodeAdapter != null) sourceNodeAdapter.notificationEnabled = sourceNotify;
-				}
-			}
-		} else {
-			order = addCustomWorkOrder(diagramActivity, successor, predecessor, link);
-		}
-		return order;
-	}
-	
+
 	public void setNotificationEnabled(boolean notify) {
 		notificationEnabled = notify;
 	}

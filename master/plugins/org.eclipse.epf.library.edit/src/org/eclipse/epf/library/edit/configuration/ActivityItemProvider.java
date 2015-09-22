@@ -63,7 +63,7 @@ public class ActivityItemProvider extends
 		return  child instanceof Milestone 
 			|| (child instanceof Activity
 				&& !TngUtil.isContributorOrReplacer((VariabilityElement) child)
-				&& ProcessUtil.accept((Activity) child, getFilter(), false));
+				&& ProcessUtil.accept((Activity) child, getFilter(), true));
 	}
 
 	/*

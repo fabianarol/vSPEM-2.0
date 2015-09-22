@@ -42,7 +42,7 @@ public interface Dimension extends IModelObject {
 	 * @return the value of the '<em>Width</em>' attribute.
 	 * @see #setWidth(Double)
 	 * @see org.eclipse.epf.uma.UmaPackage#getDimension_Width()
-	 * @model dataType="org.eclipse.epf.uma.Double" required="true" ordered="false"
+	 * @model
 	 * @generated
 	 */
 	Double getWidth();
@@ -68,7 +68,7 @@ public interface Dimension extends IModelObject {
 	 * @return the value of the '<em>Height</em>' attribute.
 	 * @see #setHeight(Double)
 	 * @see org.eclipse.epf.uma.UmaPackage#getDimension_Height()
-	 * @model dataType="org.eclipse.epf.uma.Double" required="true" ordered="false"
+	 * @model
 	 * @generated
 	 */
 	Double getHeight();

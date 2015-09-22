@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.uma;
 
+import org.eclipse.emf.common.util.EList;
 import java.util.List;
 
 /**
@@ -19,7 +20,6 @@ import java.util.List;
  *
  * <!-- begin-model-doc -->
  * A Role Set organizes Roles into categories.  It is used to group roles together that have certain commonalities.  For example, the "Analysts" Role Set could group the "Business Process Analyst", "System Analyst", as well as "Requirements Specifier" roles.  All of these work with similar techniques and have overlapping skills, but are required as distinct roles for a method (e.g. the method the IBM Rational Unified Process is based on).
- * 
  * <!-- end-model-doc -->
  *
  * <p>
@@ -45,9 +45,9 @@ public interface RoleSet extends ContentCategory {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Roles</em>' reference list.
 	 * @see org.eclipse.epf.uma.UmaPackage#getRoleSet_Roles()
-	 * @model ordered="false"
+	 * @model type="org.eclipse.epf.uma.Role" ordered="false"
 	 * @generated
 	 */
-	List<Role> getRoles();
+	List getRoles();
 
 } // RoleSet

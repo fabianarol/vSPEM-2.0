@@ -37,7 +37,6 @@ import org.eclipse.epf.uma.UmaPackage;
  *   <li>{@link org.eclipse.epf.uma.impl.ContentDescriptionImpl#getSections <em>Sections</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.impl.ContentDescriptionImpl#getExternalId <em>External Id</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.impl.ContentDescriptionImpl#getKeyConsiderations <em>Key Considerations</em>}</li>
- *   <li>{@link org.eclipse.epf.uma.impl.ContentDescriptionImpl#getLongPresentationName <em>Long Presentation Name</em>}</li>
  * </ul>
  * </p>
  *
@@ -45,6 +44,13 @@ import org.eclipse.epf.uma.UmaPackage;
  */
 public class ContentDescriptionImpl extends MethodUnitImpl implements
 		ContentDescription {
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * The default value of the '{@link #getMainDescription() <em>Main Description</em>}' attribute.
 	 * <!-- begin-user-doc -->
@@ -73,7 +79,7 @@ public class ContentDescriptionImpl extends MethodUnitImpl implements
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Section> sections;
+	protected EList sections = null;
 
 	/**
 	 * The default value of the '{@link #getExternalId() <em>External Id</em>}' attribute.
@@ -116,26 +122,6 @@ public class ContentDescriptionImpl extends MethodUnitImpl implements
 	protected String keyConsiderations = KEY_CONSIDERATIONS_EDEFAULT;
 
 	/**
-	 * The default value of the '{@link #getLongPresentationName() <em>Long Presentation Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getLongPresentationName()
-	 * @generated
-	 * @ordered
-	 */
-	protected static final String LONG_PRESENTATION_NAME_EDEFAULT = null;
-
-	/**
-	 * The cached value of the '{@link #getLongPresentationName() <em>Long Presentation Name</em>}' attribute.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getLongPresentationName()
-	 * @generated
-	 * @ordered
-	 */
-	protected String longPresentationName = LONG_PRESENTATION_NAME_EDEFAULT;
-
-	/**
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
@@ -145,7 +131,7 @@ public class ContentDescriptionImpl extends MethodUnitImpl implements
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -153,7 +139,6 @@ public class ContentDescriptionImpl extends MethodUnitImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.CONTENT_DESCRIPTION;
 	}
@@ -186,11 +171,10 @@ public class ContentDescriptionImpl extends MethodUnitImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<Section> getSections() {
+	public List getSections() {
 		if (sections == null) {
-			sections = new EObjectContainmentEList.Resolving<Section>(
-					Section.class, this,
-					UmaPackage.CONTENT_DESCRIPTION__SECTIONS);
+			sections = new EObjectContainmentEList.Resolving(Section.class,
+					this, UmaPackage.CONTENT_DESCRIPTION__SECTIONS);
 		}
 		return sections;
 	}
@@ -246,36 +230,11 @@ public class ContentDescriptionImpl extends MethodUnitImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public String getLongPresentationName() {
-		return longPresentationName;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public void setLongPresentationName(String newLongPresentationName) {
-		String oldLongPresentationName = longPresentationName;
-		longPresentationName = newLongPresentationName;
-		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET,
-					UmaPackage.CONTENT_DESCRIPTION__LONG_PRESENTATION_NAME,
-					oldLongPresentationName, longPresentationName));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case UmaPackage.CONTENT_DESCRIPTION__SECTIONS:
-			return ((InternalEList<?>) getSections()).basicRemove(otherEnd,
-					msgs);
+			return ((InternalEList) getSections()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -285,7 +244,6 @@ public class ContentDescriptionImpl extends MethodUnitImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.CONTENT_DESCRIPTION__MAIN_DESCRIPTION:
@@ -296,8 +254,6 @@ public class ContentDescriptionImpl extends MethodUnitImpl implements
 			return getExternalId();
 		case UmaPackage.CONTENT_DESCRIPTION__KEY_CONSIDERATIONS:
 			return getKeyConsiderations();
-		case UmaPackage.CONTENT_DESCRIPTION__LONG_PRESENTATION_NAME:
-			return getLongPresentationName();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -307,8 +263,6 @@ public class ContentDescriptionImpl extends MethodUnitImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.CONTENT_DESCRIPTION__MAIN_DESCRIPTION:
@@ -316,16 +270,13 @@ public class ContentDescriptionImpl extends MethodUnitImpl implements
 			return;
 		case UmaPackage.CONTENT_DESCRIPTION__SECTIONS:
 			getSections().clear();
-			getSections().addAll((Collection<? extends Section>) newValue);
+			getSections().addAll((Collection) newValue);
 			return;
 		case UmaPackage.CONTENT_DESCRIPTION__EXTERNAL_ID:
 			setExternalId((String) newValue);
 			return;
 		case UmaPackage.CONTENT_DESCRIPTION__KEY_CONSIDERATIONS:
 			setKeyConsiderations((String) newValue);
-			return;
-		case UmaPackage.CONTENT_DESCRIPTION__LONG_PRESENTATION_NAME:
-			setLongPresentationName((String) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -336,7 +287,6 @@ public class ContentDescriptionImpl extends MethodUnitImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.CONTENT_DESCRIPTION__MAIN_DESCRIPTION:
@@ -351,9 +301,6 @@ public class ContentDescriptionImpl extends MethodUnitImpl implements
 		case UmaPackage.CONTENT_DESCRIPTION__KEY_CONSIDERATIONS:
 			setKeyConsiderations(KEY_CONSIDERATIONS_EDEFAULT);
 			return;
-		case UmaPackage.CONTENT_DESCRIPTION__LONG_PRESENTATION_NAME:
-			setLongPresentationName(LONG_PRESENTATION_NAME_EDEFAULT);
-			return;
 		}
 		super.eUnset(featureID);
 	}
@@ -363,7 +310,6 @@ public class ContentDescriptionImpl extends MethodUnitImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);
@@ -383,10 +329,6 @@ public class ContentDescriptionImpl extends MethodUnitImpl implements
 		case UmaPackage.CONTENT_DESCRIPTION__KEY_CONSIDERATIONS:
 			return KEY_CONSIDERATIONS_EDEFAULT == null ? keyConsiderations != null
 					: !KEY_CONSIDERATIONS_EDEFAULT.equals(keyConsiderations);
-		case UmaPackage.CONTENT_DESCRIPTION__LONG_PRESENTATION_NAME:
-			return LONG_PRESENTATION_NAME_EDEFAULT == null ? longPresentationName != null
-					: !LONG_PRESENTATION_NAME_EDEFAULT
-							.equals(longPresentationName);
 		}
 		return super.eIsSet(featureID);
 	}
@@ -396,7 +338,6 @@ public class ContentDescriptionImpl extends MethodUnitImpl implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy())
 			return super.toString();
@@ -408,8 +349,6 @@ public class ContentDescriptionImpl extends MethodUnitImpl implements
 		result.append(externalId);
 		result.append(", keyConsiderations: "); //$NON-NLS-1$
 		result.append(keyConsiderations);
-		result.append(", longPresentationName: "); //$NON-NLS-1$
-		result.append(longPresentationName);
 		result.append(')');
 		return result.toString();
 	}

@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.uma;
 
+import org.eclipse.emf.common.util.EList;
 import java.util.List;
 
 /**
@@ -44,9 +45,9 @@ public interface Tool extends ContentCategory {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Tool Mentors</em>' reference list.
 	 * @see org.eclipse.epf.uma.UmaPackage#getTool_ToolMentors()
-	 * @model ordered="false"
+	 * @model type="org.eclipse.epf.uma.ToolMentor" ordered="false"
 	 * @generated
 	 */
-	List<ToolMentor> getToolMentors();
+	List getToolMentors();
 
 } // Tool

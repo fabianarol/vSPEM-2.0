@@ -10,7 +10,6 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.search;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -78,8 +77,7 @@ public class IndexBuilder {
 	private StringBuffer indexFolder = null;
 	private String productName = null;
 	private List filesToSkip = new ArrayList();
-	private File parentFolder = null;
-	
+
 	public IndexBuilder(String publishDir) {
 		int appletIndex = -1;
 		if (publishDir == null)
@@ -90,7 +88,6 @@ public class IndexBuilder {
 		pDirectory = UNCUtil.convertFilename((appletIndex > -1) ? publishDir
 				.substring(0, appletIndex + 1) : publishDir);
 		String siteName = pDirectory.replace(File.separatorChar, '/');
-		parentFolder = new File(pDirectory);
 		int index = siteName.length();
 		if (siteName.endsWith("/")) { //$NON-NLS-1$
 			index = index - 1;
@@ -322,7 +319,6 @@ public class IndexBuilder {
 		Document luceneDocument = null;
 		InputStreamReader input = null;
 		Reader reader = null;
-		BufferedReader bufferedReader = null; 
 		try {
 			
 			input = new InputStreamReader(new FileInputStream(file), "UTF-8"); //$NON-NLS-1$
@@ -333,44 +329,32 @@ public class IndexBuilder {
 			if ( reader == null ) {
 				return null;
 			}
-			
-			StringBuffer htmlContent = new StringBuffer("");
-			String line = "";
-			bufferedReader = new BufferedReader(reader);
-			while((line = bufferedReader.readLine()) != null)
-			{
-				htmlContent.append(line + "\n");
-			}
 
 			Properties metaTags = parser.getMetaTags();
 			if ( isNoSearchableDocument(metaTags) ) {
 				
 				// the LHTMLParser thread will not end if the reader is not processed
 				// causing major resource leak
-//				while ( reader.read(cbuf) > 0 ) {
-//					;
-//				}			
+				while ( reader.read(cbuf) > 0 ) {
+					;
+				}			
 				//System.out.println( ++skipCount + " file skipped: " + file.getAbsolutePath());
 				parser = null;
 				return null;
 			}
 			
 			luceneDocument = new Document();
-			
-			String url = productName
-					+ file.getPath().substring(parentFolder.getPath().length())
-							.replace(File.separatorChar, '/'); //$NON-NLS-1$
+
+			String url = file.getPath().replace(File.pathSeparatorChar, '/');
 			luceneDocument.add(Field.UnIndexed(URL_FIELD, url));
 			
-//			luceneDocument.add(Field.Text(CONTENT_FIELD, reader));
-			luceneDocument.add(Field.UnStored(CONTENT_FIELD, htmlContent.toString()));
-
+			luceneDocument.add(Field.Text(CONTENT_FIELD, reader));
+			
 			String title = parser.getTitle();
 			if (title != null && title.length() > 0) {
 				// Workaround a Linux specific issue.
 				title = title.replaceAll("\\xa0", " "); //$NON-NLS-1$ //$NON-NLS-2$
-				//luceneDocument.add(Field.Keyword(TITLE_FIELD, title));
-				luceneDocument.add(new Field(TITLE_FIELD, title, Field.Store.YES, Field.Index.TOKENIZED));//Tokenized the title to be searchable
+				luceneDocument.add(Field.Keyword(TITLE_FIELD, title));
 			} else {
 				return null;
 			}
@@ -420,12 +404,6 @@ public class IndexBuilder {
 			luceneDocument = null;
 			SearchPlugin.getDefault().getLogger().logError(e);
 		} finally {
-			if (bufferedReader != null) {
-				try {
-					bufferedReader.close();
-				} catch (Exception e) {
-				}
-			}
 			if (input != null) {
 				try {
 					input.close();

@@ -11,14 +11,13 @@
 package org.eclipse.epf.library.util;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
+import java.text.MessageFormat;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -27,9 +26,9 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.epf.common.utils.FileUtil;
 import org.eclipse.epf.common.utils.NetUtil;
-import org.eclipse.epf.common.utils.StrUtil;
 import org.eclipse.epf.common.utils.XMLUtil;
 import org.eclipse.epf.common.xml.XSLTProcessor;
 import org.eclipse.epf.library.ILibraryManager;
@@ -39,7 +38,6 @@ import org.eclipse.epf.library.LibraryResources;
 import org.eclipse.epf.library.LibraryService;
 import org.eclipse.epf.library.configuration.ConfigurationHelper;
 import org.eclipse.epf.library.edit.util.TngUtil;
-import org.eclipse.epf.library.layout.BrowsingLayoutSettings;
 import org.eclipse.epf.library.layout.DefaultContentValidator;
 import org.eclipse.epf.library.layout.IContentValidator;
 import org.eclipse.epf.library.layout.LayoutResources;
@@ -47,13 +45,17 @@ import org.eclipse.epf.library.layout.LinkInfo;
 import org.eclipse.epf.library.layout.elements.ActivityLayout;
 import org.eclipse.epf.library.layout.util.XmlElement;
 import org.eclipse.epf.library.layout.util.XmlHelper;
+import org.eclipse.epf.persistence.FileManager;
 import org.eclipse.epf.persistence.MethodLibraryPersister;
-import org.eclipse.epf.publish.layout.LayoutPlugin;
+import org.eclipse.epf.ui.EPFUIResources;
+import org.eclipse.epf.ui.dialogs.RenameFileConflictDialog;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.MethodLibrary;
 import org.eclipse.epf.uma.MethodPlugin;
 import org.eclipse.epf.uma.util.UmaUtil;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.swt.widgets.Shell;
 
 /**
  * @author Jinhua Xi
@@ -135,15 +137,15 @@ public class ResourceHelper {
 
 	public static final Pattern p_link_type_picker = Pattern
 			.compile(
-					"\\s*class\\s*?=\\s*?(.*?)\\s+", Pattern.CASE_INSENSITIVE | Pattern.DOTALL); //$NON-NLS-1$
+					" class\\s*?=\\s*?(.*?)\\s+", Pattern.CASE_INSENSITIVE | Pattern.DOTALL); //$NON-NLS-1$
 
 	public static final Pattern p_link_guid_picker = Pattern
 			.compile(
-					"\\s*guid\\s*?=\\s*?(.*?)\\s+", Pattern.CASE_INSENSITIVE | Pattern.DOTALL); //$NON-NLS-1$
+					" guid\\s*?=\\s*?(.*?)\\s+", Pattern.CASE_INSENSITIVE | Pattern.DOTALL); //$NON-NLS-1$
 
 	public static final Pattern p_link_href_picker = Pattern
 			.compile(
-					"\\s*href\\s*?=\\s*?\"(.*?)\"\\s+", Pattern.CASE_INSENSITIVE | Pattern.DOTALL); //$NON-NLS-1$
+					" href\\s*?=\\s*?\"(.*?)\"\\s+", Pattern.CASE_INSENSITIVE | Pattern.DOTALL); //$NON-NLS-1$
 
 	public static final Pattern p_tag_ref = Pattern
 			.compile(
@@ -153,10 +155,6 @@ public class ResourceHelper {
 			.compile(
 					"(<(img|iframe).*?src\\s*=\\s*\")(.*?)(\")", Pattern.CASE_INSENSITIVE | Pattern.DOTALL); //$NON-NLS-1$
 
-	public static final Pattern p_href_ref = Pattern
-	.compile(
-			"(<(a|area).*?href\\s*=\\s*\")(.*?)(\")", Pattern.CASE_INSENSITIVE | Pattern.DOTALL); //$NON-NLS-1$
-	
 	public static final Pattern p_url_decoder = Pattern
 			.compile(
 					"(<[^>]*?(src|href)\\s*=\\s*\")(.*?)(\"[^>]*?>)", Pattern.CASE_INSENSITIVE | Pattern.DOTALL); //$NON-NLS-1$
@@ -181,12 +179,6 @@ public class ResourceHelper {
 
 	private static ILibraryResourceManager defaultResourceMgr;
 		
-	private static boolean showSkinResource = false;
-	
-	public static String LAYOUT_XSL_ROOT_PATH = null;
-	
-	public static boolean birt_publishing = true;
-	
 	public ResourceHelper() {
 	}
 
@@ -526,24 +518,20 @@ public class ResourceHelper {
 	 * @param linkType String
 	 * @return String
 	 */
-	public static String getLinkText(MethodElement e, String linkType, MethodConfiguration config) {
+	public static String getLinkText(MethodElement e, String linkType) {
 		String linkedText = null;
-
+		
 		// RTE may change the case of attributes.
 		if ((linkType != null)
 				&& !ELEMENT_LINK_CLASS_elementLinkWithUserText.equalsIgnoreCase(linkType)) {
 			if (ELEMENT_LINK_CLASS_elementLinkWithType.equalsIgnoreCase(linkType)) {
-				linkedText = getElementLinkText(e, true, config);
+				linkedText = getElementLinkText(e, true);
 			} else if (ELEMENT_LINK_CLASS_elementLink.equalsIgnoreCase(linkType)) {
-				linkedText = getElementLinkText(e, false, config);
+				linkedText = getElementLinkText(e, false);
 			}
 		}
 
 		return linkedText;
-	}
-	
-	public static String getLinkText(MethodElement e, String linkType) {
-		return getLinkText(e, linkType, null);
 	}
 
 	/**
@@ -554,77 +542,12 @@ public class ResourceHelper {
 	 */
 	public static String getElementLinkText(MethodElement element,
 			boolean withType) {
-		return getElementLinkText(element, withType, null);
-	}
-	
-	public static String getElementLinkText(MethodElement element,
-			boolean withType, final MethodConfiguration config) {
-		
-		TngUtil.PresentationNameHelper pHelper = new TngUtil.PresentationNameHelper() {
-			
-			public String getPresentationName(MethodElement element) {
-				if (element == null) {
-					return null;
-				}
-				String str = ConfigurationHelper.getPresentationName(element, config);
-				return str;
-			}
-			
-		};
-		
-		String text = TngUtil.getPresentationName(element, pHelper);
-//		if (withType) {
-		
-//			return getElementTypeText(element) + LibraryResources.colon_with_space + text; 
-//		}
-//
-//		return text;
-		if (withType) {
-			if (showSkinResource) {
-				if ((LAYOUT_XSL_ROOT_PATH == null)
-						|| (LAYOUT_XSL_ROOT_PATH.equals(""))) {//$NON-NLS-1$
-					File xslPath = BrowsingLayoutSettings.INSTANCE.getXslPath();
-					if (xslPath != null) 
-						LAYOUT_XSL_ROOT_PATH = xslPath.getAbsolutePath();
-				}
-				Properties browsingResource = new Properties();
-				File file = new File(LAYOUT_XSL_ROOT_PATH, "resources.properties"); //$NON-NLS-1$
-//				Locale locale = Locale.getDefault();
-//				String localFileName = I18nUtil.getLocalizedFile(file
-//						.getAbsolutePath(), locale);
-//				if (localFileName != null) {
-//					file = new File(localFileName);
-//				}
-				if (file.exists()) {
-					try {
-						browsingResource.load(new FileInputStream(file));
-					} catch (FileNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
+		String text = TngUtil.getPresentationName(element);
 
-				String type = getElementTypeText(element);
-				String elementName = element.eClass().getName();
-				String key = elementName.substring(0, 1).toLowerCase()
-						+ elementName.substring(1) + "Text";//$NON-NLS-1$
-				String value = browsingResource.getProperty(key);
-				if (value != null) {
-					return value + LibraryResources.colon_with_space + text;
-				} else {
-					return type + LibraryResources.colon_with_space + text;
-				}
-			}
-			else
-			{
-				return getElementTypeText(element) + LibraryResources.colon_with_space + text;
-			}
-			
+		if (withType) {
+			return getElementTypeText(element) + LibraryResources.colon_with_space + text; 
 		}
-		
+
 		return text;
 	}
 
@@ -722,7 +645,7 @@ public class ResourceHelper {
 	 */
 	public static String validateContent(MethodElement element, String source) {
 		return validateContent(element, source, new DefaultContentValidator(),
-				null, null);
+				null);
 	}
 
 	/**
@@ -757,11 +680,8 @@ public class ResourceHelper {
 	 * @return String the validated content
 	 */
 	public static String validateContent(MethodElement element, String source,
-			IContentValidator validator, MethodConfiguration config, String layoutXslRootPath) {
-			
+			IContentValidator validator, MethodConfiguration config) {
 		try {
-			ResourceHelper.LAYOUT_XSL_ROOT_PATH = layoutXslRootPath;
-			showSkinResource = true;
 			// first validate the tags, remove any CF/LF from the tag text
 			source = validateTag(source);
 
@@ -844,11 +764,6 @@ public class ResourceHelper {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-		finally
-		{
-			ResourceHelper.LAYOUT_XSL_ROOT_PATH = null;
-			showSkinResource = false;
-		}
 
 		return source;
 	}
@@ -870,11 +785,7 @@ public class ResourceHelper {
 			Matcher m = ResourceHelper.p_url_decoder.matcher(content);
 			while (m.find()) {
 				String url = m.group(3);
-				if (NetUtil.isRawUrl(url)) {
-					url = restore(url); 
-				} else {
-					url = URLDecoder.decode(url, "UTF-8"); //$NON-NLS-1$
-				}
+				url = URLDecoder.decode(url, "UTF-8"); //$NON-NLS-1$
 				String text = m.group(1) + url + m.group(4);
 				m.appendReplacement(sb, regExpEscape(text)); 	
 			}
@@ -888,12 +799,6 @@ public class ResourceHelper {
 
 		return content;
 	}
-	
-	private static String restore(String url) {
-		int index = url.indexOf(NetUtil.RAW_URL_RAW);
-		
-		return url.substring(0, index);		
-	}
 
 	/**
 	 * escape the regexp reserved words, such as $
@@ -903,9 +808,22 @@ public class ResourceHelper {
 	public static String regExpEscape(String text) {
 		// escape the regExp reserved words,
 		// the $ sign is reserved for group matching 
-		String newtext = StrUtil.escapeChar(text, '\\');
-		newtext = StrUtil.escapeChar(newtext, '$');
-		return newtext;
+		int i=text.indexOf('$'); 
+		if ( i < 0 ) {
+			return text;
+		}
+		
+		int start = 0;
+		StringBuffer buffer = new StringBuffer();
+		while ( i > start ) {
+			buffer.append(text.substring(start, i)).append("\\"); //$NON-NLS-1$
+			start = i;
+			i=text.indexOf('$', start+1); 
+		}
+		
+		buffer.append(text.substring(start));
+		
+		return buffer.toString();
 	}
 	
 	/**
@@ -1127,7 +1045,53 @@ public class ResourceHelper {
 //		return relUri;
 //	}
 
+	/**
+	 * Returns file URL for an attachment
+	 * 
+	 * @param attachment
+	 *            the file to attach
+	 * @param element
+	 *            the MethodElement referencing the file
+	 * @param copyFile
+	 *            if true, will copy the file (if it isn't already in the plugin
+	 *            path)
+	 * @return URL of the form ./../&lt;roles&gt;/resources/&lt;filename of
+	 *         attachment&gt;
+	 * @throws IOException
+	 */
+	public static String getURLForAttachment(Shell shell, File attachment,
+			MethodElement element, boolean copyFile) throws IOException {
+		String pluginDir = FileUtil.appendSeparator(new File(UmaUtil.getMethodPlugin(element)
+				.eResource().getURI().toFileString()).getParent());
+		File formatFile = null;
+		String resourceLoc = getAbsoluteElementResourcePath(element);
+		// File resourceDir = new File(resourceLoc);
+		formatFile = new File(resourceLoc + File.separator
+				+ attachment.getName());
+		if (copyFile) {
+			File newFile = copyResourceToLib(shell, attachment, element);
+			if (newFile != null) {
+				formatFile = new File(resourceLoc + File.separator
+						+ newFile.getName());
+			} else {
+				// user hit cancel
+				return null;
+			}
+			IResource wsResource = FileManager.getResourceForLocation(formatFile.getAbsolutePath());
+			if(wsResource != null) {
+				try {
+					FileManager.refresh(wsResource);
+				}
+				catch(Exception e) {
+					LibraryPlugin.getDefault().getLogger().logError(e);
+				}
+			}
+		}
 
+		return ResourceHelper.getRelativePathToFileFromElement(element,
+				formatFile);
+
+	}
 
 	/**
 	 * 
@@ -1135,7 +1099,7 @@ public class ResourceHelper {
 	 * @param attachment
 	 * @return String
 	 */
-	public static String getRelativePathToFileFromElement(
+	private static String getRelativePathToFileFromElement(
 			MethodElement element, File attachment) {
 		String elementLoc = getFolderAbsolutePath(element);	
 		return FileUtil.getRelativePath(attachment, new File(elementLoc));
@@ -1213,8 +1177,7 @@ public class ResourceHelper {
 		
 		if ( isAbsolutepath(filePath) ) {
 			// assume this is an absolute path
-			return XMLUtil.unescape(NetUtil.decodedFileUrl(filePath));
-//			return url;
+			return url;
 		}
 
 		File f = new File(contentPath);
@@ -1281,29 +1244,19 @@ public class ResourceHelper {
 
 			content = sb.toString();
 			sb = new StringBuffer();
-			
+
 			// process attachments
 			m = ResourceHelper.p_link_ref_gen.matcher(content);
 			while (m.find()) {
 				StringBuffer sbLink = new StringBuffer();
 				// String tag = m.group(1);
 				String urltext = " " + m.group(2) + " "; //$NON-NLS-1$ //$NON-NLS-2$
-				
 				if (ResourceHelper.getGuidFromUrl(urltext) == null) {
 					Matcher m2 = ResourceHelper.p_link_href_picker
 							.matcher(urltext);
 					if (m2.find()) {
 						String url = m2.group(1).trim().replaceAll("\"", ""); //$NON-NLS-1$ //$NON-NLS-2$
-
-						if ( isExternalLink(url) ) {
-							// decode for external link 
-							url = XMLUtil.unescape(NetUtil.decodedFileUrl(url));
-							if (birt_publishing && NetUtil.isRawUrl(url)) {
-								url = restore(url);
-							}
-						} else {
-							url = resolveUrl(url, contentPath, backPath);
-						}
+						url = resolveUrl(url, contentPath, backPath);
 						if (url != null) {
 							String replacement = urltext.substring(m2.start(), m2.start(1))
 									+ url
@@ -1337,8 +1290,6 @@ public class ResourceHelper {
 	public static String resolveUrl(String url, String contentPath,
 			String backPath) {
 		String new_url = getFilePathFromUrl(url, contentPath);
-		if (isAbsolutepath(new_url))
-			return new_url;
 		if (new_url != null && !new_url.equals(url) ) {
 			if (backPath != null) {
 				new_url = backPath + new_url;
@@ -1514,25 +1465,12 @@ public class ResourceHelper {
 		
 		// if the file is not in the library, check the plugin layout folder
 		if (!source.exists()) {
-			source = new File(LayoutPlugin.getDefault().getLayoutPath(),
+			source = new File(LibraryPlugin.getDefault().getLayoutPath(),
 					filePath);
-		}
-		
-		boolean calledFromGuidanceTypeConvert = false;
-		File sourceRootParent = sourceRootPath.getParentFile();
-		if (sourceRootParent.getName().equals("guidances")) {	//$NON-NLS-1$ 
-			File targetRootParent = targetRootPath.getParentFile();
-			if (targetRootParent != null) {
-				targetRootParent = targetRootParent.getParentFile();
-			}
-			if (sourceRootParent.equals(targetRootParent)) {
-				calledFromGuidanceTypeConvert = true;
-				targetRootPath = targetRootPath.getParentFile();				
-			}
 		}
 
 		// if the filePath is relative to the pub root, fix the target path
-		if ( !calledFromGuidanceTypeConvert && usePubRoot && rootContentPath != null && rootContentPath.length() > 0 ) {
+		if ( usePubRoot && rootContentPath != null && rootContentPath.length() > 0 ) {
 			File tmpf =  new File(rootContentPath);
 			while ( tmpf != null ) {
 				tmpf = tmpf.getParentFile();
@@ -1541,18 +1479,6 @@ public class ResourceHelper {
 		}
 		
 		dest = new File(targetRootPath, filePath);
-		
-//			To be re-visited for SCM handling			
-//		if (calledFromGuidanceTypeConvert) {		
-//			IStatus status = Services.getFileManager().checkModify(
-//					new String[] { targetRootPath.getAbsolutePath(),
-//							dest.getAbsolutePath() },
-//					PersistencePlugin.getDefault().getContext());
-//			if (status != null && !status.isOK()) {
-//				Copy file using ws resource API			
-//				return newUrl + url_tail;
-//			}			
-//		}
 
 		if (source.exists()) {
 			FileUtil.copyFile(source, dest);
@@ -1819,7 +1745,7 @@ public class ResourceHelper {
 
 			OutputStreamWriter output = new OutputStreamWriter(
 					new FileOutputStream(outputFile), "utf-8"); //$NON-NLS-1$
-			Properties xslParams = LayoutPlugin.getDefault().getProperties(
+			Properties xslParams = LibraryPlugin.getDefault().getProperties(
 					"/layout/xsl/resources.properties"); //$NON-NLS-1$
 
 			XSLTProcessor
@@ -1969,39 +1895,55 @@ public class ResourceHelper {
 		return getFolderAbsolutePath(plugin);
 	}
 	
-	public static String convertToRteString(String attachmentString) {
-		String str = "<ul>";		//$NON-NLS-1$		
-		if ( (attachmentString != null) && (attachmentString.indexOf(ConfigurationHelper.ATTRIBUTE_VALUE_SEPERATOR) > 0) ) {
-			attachmentString = attachmentString.replaceAll(ConfigurationHelper.ATTRIBUTE_VALUE_SEPERATOR, TngUtil.GUIDANCE_FILESTRING_SEPARATOR); 
+	/**
+	 * Copies the given file into the methodElement's resource folder.
+	 * Resolves filename conflict by prompting user to overwrite or rename
+	 * @param shell if null, will overwrite file without prompting
+	 * @param resource
+	 * @param methodElement
+	 * @return the File representing the user's final choice of library resource file
+	 */
+	public static File copyResourceToLib(Shell shell, File resource, MethodElement methodElement) {
+		String resourceLoc = getAbsoluteElementResourcePath(methodElement);
+
+		File libFile = new File(resourceLoc, resource.getName());
+	
+		if (resource.equals(libFile)) {
+			// source file is already in resources dir
+			return libFile;
 		}
-		List attachmentList = TngUtil.convertGuidanceAttachmentsToList(attachmentString);
-		for (Iterator iter = attachmentList.iterator();iter.hasNext();) {
-			String attachmentFile = (String) iter.next();
-			if (attachmentFile != null) {
-				Matcher m = ResourceHelper.p_template_attachment_url.matcher(attachmentFile);
-				if (!m.find()) {
-					String fileName = FileUtil.getFileName(attachmentFile);
-					str += "<li>";										//$NON-NLS-1$
-					str += "<a  href=\"" + attachmentFile;				//$NON-NLS-1$					
-					str += "\" target=\"_blank\"; >" + fileName;		//$NON-NLS-1$					
-					str += "</a>";										//$NON-NLS-1$
-					str += "</li>";										//$NON-NLS-1$ 
-				} else {
-					String url = m.group(1);
-					String fileName = m.group(2);
-					str += "<li>";										//$NON-NLS-1$
-					str += "<a  href=\"" + url;				//$NON-NLS-1$					
-					str += "\" target=\"_blank\"; >" + fileName;		//$NON-NLS-1$					
-					str += "</a>";										//$NON-NLS-1$
-					str += "</li>";										//$NON-NLS-1$
-				}
+		
+		// if no shell, will just overwrite
+		if (libFile.exists() && shell != null) {
+			RenameFileConflictDialog dialog = new RenameFileConflictDialog(shell);
+			dialog.setMessageStr(MessageFormat.format(
+									EPFUIResources.Dialog_fileNameConflict_msg, 
+									new Object[] { resource.getName(), resourceLoc }));
+			dialog.setDestination(resourceLoc);
+			dialog.setFilePath(resource.getName());
+			dialog.open();
+
+			if (dialog.getReturnCode() == IDialogConstants.CANCEL_ID) {
+				return null;
+			} else {
+				libFile = new File(resourceLoc, dialog.getFilePath());
 			}
 		}
-		str += "<ul>";													//$NON-NLS-1$
-		return str;
-	}
-	
-	
 
+		FileUtil.copyFile(resource, libFile);
+		
+		IResource wsResource = FileManager.getResourceForLocation(libFile.getAbsolutePath());
+		if(wsResource != null) {
+			try {
+				FileManager.refresh(wsResource);
+			}
+			catch(Exception e) {
+				LibraryPlugin.getDefault().getLogger().logError(e);
+			}
+		}
+
+
+		return libFile;
+	}
 	
 }

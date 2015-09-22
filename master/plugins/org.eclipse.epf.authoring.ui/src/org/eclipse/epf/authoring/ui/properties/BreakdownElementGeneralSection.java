@@ -16,17 +16,14 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
-import org.eclipse.epf.authoring.ui.AuthoringUIExtensionManager;
 import org.eclipse.epf.authoring.ui.AuthoringUIPlugin;
 import org.eclipse.epf.authoring.ui.editors.MethodElementEditor;
 import org.eclipse.epf.authoring.ui.editors.ProcessEditor;
 import org.eclipse.epf.common.utils.StrUtil;
 import org.eclipse.epf.diagram.core.services.DiagramManager;
-import org.eclipse.epf.library.configuration.ConfigurationHelper;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
 import org.eclipse.epf.library.edit.command.IActionManager;
 import org.eclipse.epf.library.edit.process.BreakdownElementWrapperItemProvider;
-import org.eclipse.epf.library.edit.util.DescriptorPropUtil;
 import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.library.edit.util.Suppression;
 import org.eclipse.epf.library.edit.util.TngUtil;
@@ -35,24 +32,16 @@ import org.eclipse.epf.library.edit.validation.IValidatorFactory;
 import org.eclipse.epf.services.ILibraryPersister;
 import org.eclipse.epf.uma.Activity;
 import org.eclipse.epf.uma.BreakdownElement;
-import org.eclipse.epf.uma.Descriptor;
-import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.Process;
 import org.eclipse.epf.uma.ProcessComponent;
-import org.eclipse.epf.uma.RoleDescriptor;
-import org.eclipse.epf.uma.TaskDescriptor;
 import org.eclipse.epf.uma.UmaPackage;
 import org.eclipse.epf.uma.VariabilityElement;
 import org.eclipse.epf.uma.VariabilityType;
-import org.eclipse.epf.uma.WorkProductDescriptor;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
@@ -89,18 +78,6 @@ public class BreakdownElementGeneralSection extends AbstractSection {
 	protected Text nameText;
 
 	protected Text presentationNameText;
-	
-	protected Button nameRestoreBtn, presentationNameRestoreBtn;
-	
-	protected Composite buttonComposite_1, buttonComposite_2;
-	
-	private DescriptorPropUtil descriptorPropUtil;
-	
-	private ModifyListener syncFreeNameModifyListener, syncFreePresentationNameModifyListener;
-	
-	private boolean isNameReplace = false; 
-	
-	private boolean isPresentationNameReplace = false;
 
 	private Button multipleButton, optionalButton;
 
@@ -126,8 +103,6 @@ public class BreakdownElementGeneralSection extends AbstractSection {
 	private ILabelProvider labelProvider;
 
 	final boolean ignoreSuppressed = true;
-	
-	private BeGeneralSectionExtender extender;
 
 	protected Listener nameDeactivateListener = new Listener() {
 		public void handleEvent(Event e) {
@@ -302,7 +277,7 @@ public class BreakdownElementGeneralSection extends AbstractSection {
 				VariabilityElement ve = (VariabilityElement) element;
 				if (ve.getVariabilityBasedOnElement() != null
 						&& ve.getVariabilityType().equals(
-								VariabilityType.EXTENDS)) {
+								VariabilityType.EXTENDS_LITERAL)) {
 					
 					e.doit = true;
 					if (!presentationNameText.getText().equals(oldContent)) {
@@ -311,7 +286,7 @@ public class BreakdownElementGeneralSection extends AbstractSection {
 										IActionManager.SET,
 										element,
 										UmaPackage.eINSTANCE
-												.getMethodElement_PresentationName(),
+												.getDescribableElement_PresentationName(),
 										presentationNameText.getText(), -1);
 						if (!status) {
 							return;
@@ -337,7 +312,7 @@ public class BreakdownElementGeneralSection extends AbstractSection {
 									IActionManager.SET,
 									element,
 									UmaPackage.eINSTANCE
-											.getMethodElement_PresentationName(),
+											.getDescribableElement_PresentationName(),
 									presentationNameText.getText(), -1);
 					if (!status) {
 						return;
@@ -362,10 +337,7 @@ public class BreakdownElementGeneralSection extends AbstractSection {
 			}
 		}
 	};
-	
 	protected void init() {
-		extender = AuthoringUIExtensionManager.getInstance().createBeGeneralSectionExtender(this);
-			
 		// get BreakdownElement object
 		element = (BreakdownElement) getElement();
 
@@ -374,10 +346,8 @@ public class BreakdownElementGeneralSection extends AbstractSection {
 
 		// get action manager
 		actionMgr = EPFPropertySheetPage.getActionManager();
-		
-		// get descriptor util
-		descriptorPropUtil = DescriptorPropUtil.getDesciptorPropUtil(actionMgr);
 	}
+
 
 	/**
 	 * @see org.eclipse.epf.authoring.ui.properties.AbstractSection#createControls(org.eclipse.swt.widgets.Composite, org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage)
@@ -393,7 +363,6 @@ public class BreakdownElementGeneralSection extends AbstractSection {
 
 		// create general section
 		createGeneralSection(parent);
-		extender.modifyGeneralSectionContent(toolkit, actionMgr);
 
 		// addListeners
 		addListeners();
@@ -421,25 +390,12 @@ public class BreakdownElementGeneralSection extends AbstractSection {
 
 			public void handleEvent(Event event) {
 				((MethodElementEditor) getEditor()).setCurrentFeatureEditor(event.widget,
-						UmaPackage.eINSTANCE.getMethodElement_PresentationName());
+						UmaPackage.eINSTANCE.getDescribableElement_PresentationName());
 			}
 			
 		});		
 		presentationNameText.addListener(SWT.Deactivate, presentationNameDeactivateListener);
-		presentationNameText.addFocusListener(new FocusAdapter() {
-			public void focusGained(FocusEvent e) {
-				// when user tab to this field, select all text
-				presentationNameText.selectAll();
-				  
-			}
-			public void focusLost(FocusEvent e) {
-				// clear the selection when the focus of the component is lost 
-				if(presentationNameText.getSelectionCount() > 0){
-					presentationNameText.clearSelection();
-	            } 
-			}
-		});
-		
+
 		multipleButton.addSelectionListener(new SelectionListener() {
 			public void widgetSelected(SelectionEvent e) {
 				element = (BreakdownElement) getElement();
@@ -520,60 +476,6 @@ public class BreakdownElementGeneralSection extends AbstractSection {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 		});
-		
-		if (nameRestoreBtn != null) {
-			nameRestoreBtn.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent e) {
-					descriptorPropUtil.setNameRepalce((Descriptor)element, false);
-					isNameReplace = false;
-					updateNameRestoreBtn();
-					
-					Descriptor greenParent = descriptorPropUtil.getGreenParentDescriptor((Descriptor)element);
-					if (greenParent != null) {
-						element.setName(greenParent.getName());
-					} else {					
-						MethodElement reference = getReferenceMethodElement(element);
-						element.setName(reference.getName());
-					}
-				}
-			});
-		}
-		
-		if (presentationNameRestoreBtn != null) {
-			presentationNameRestoreBtn.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent e) {
-					descriptorPropUtil.setPresentationNameRepalce((Descriptor)element, false);
-					isPresentationNameReplace = false;
-					updatePresentationNameRestoreBtn();
-					
-					Descriptor greenParent = descriptorPropUtil.getGreenParentDescriptor((Descriptor)element);
-					if (greenParent != null) {
-						element.setPresentationName(greenParent.getPresentationName());
-					} else {
-						MethodElement reference = getReferenceMethodElement(element);
-						element.setPresentationName(reference.getPresentationName());
-					}
-				}
-			});
-		}		
-	}
-	
-	private MethodElement getReferenceMethodElement(BreakdownElement element) {
-		MethodElement e = null;
-		
-		if (element instanceof TaskDescriptor) {
-			e = ((TaskDescriptor)element).getTask();
-		} else if (element instanceof RoleDescriptor) {
-			e = ((RoleDescriptor)element).getRole();
-		} else if (element instanceof WorkProductDescriptor) {
-			e = ((WorkProductDescriptor)element).getWorkProduct();
-		}
-		
-		if (e != null) {
-			e = ConfigurationHelper.getCalculatedElement(e, getConfiguration());
-		}
-		
-		return e;
 	}
 
 	/**
@@ -594,29 +496,14 @@ public class BreakdownElementGeneralSection extends AbstractSection {
 				numOfColumns, false);
 
 		// name
-		FormUI.createLabel(toolkit, generalComposite, PropertiesResources.Process_name);
-		if (isSyncFree()) {
-			nameText = FormUI.createText(toolkit, generalComposite, SWT.DEFAULT, 1);
-			buttonComposite_1 = FormUI.createComposite(toolkit, generalComposite, SWT.NONE, 2, true);
-			nameRestoreBtn = FormUI.createButton(toolkit, buttonComposite_1, PropertiesResources.Process_name_restore);
-			nameRestoreBtn.setEnabled(false);
-			updateNameRestoreBtn();
-		} else {		 
-			nameText = FormUI.createText(toolkit, generalComposite, SWT.DEFAULT, horizontalSpan);
-		}
+		FormUI.createLabel(toolkit, generalComposite, PropertiesResources.Process_name); 
+		nameText = FormUI.createText(toolkit, generalComposite, SWT.DEFAULT,
+				horizontalSpan);
 
 		// presentation name
-		FormUI.createLabel(toolkit, generalComposite, PropertiesResources.Activity_presentationName);
-		if (isSyncFree()) {
-			presentationNameText = FormUI.createText(toolkit, generalComposite, SWT.DEFAULT, 1);
-			buttonComposite_2 = FormUI.createComposite(toolkit, generalComposite, SWT.NONE, 2, true);
-			presentationNameRestoreBtn = FormUI.createButton(toolkit, buttonComposite_2,
-					PropertiesResources.Process_PresentationName_restore);
-			presentationNameRestoreBtn.setEnabled(false);
-			updatePresentationNameRestoreBtn();
-		} else {		 
-			presentationNameText = FormUI.createText(toolkit, generalComposite, SWT.DEFAULT, horizontalSpan);
-		}
+		FormUI.createLabel(toolkit, generalComposite, PropertiesResources.Activity_presentationName); 
+		presentationNameText = FormUI.createText(toolkit, generalComposite,
+				SWT.DEFAULT, horizontalSpan);
 
 		// create composite for checkbox
 		checkBoxComposite = FormUI.createComposite(toolkit, generalComposite,
@@ -645,27 +532,9 @@ public class BreakdownElementGeneralSection extends AbstractSection {
 
 		toolkit.paintBordersFor(generalComposite);
 		toolkit.paintBordersFor(checkBoxComposite);
-		
-		if (isSyncFree()) {
-			toolkit.paintBordersFor(buttonComposite_1);
-			toolkit.paintBordersFor(buttonComposite_2);
-		}
+
 	}
-	
-	private void updateNameRestoreBtn() {
-		if (getReferenceMethodElement(element) != null) {
-			nameRestoreBtn.setEnabled(
-					descriptorPropUtil.isNameRepalce((Descriptor)element) && editable);
-		}
-	}
-	
-	private void updatePresentationNameRestoreBtn() {
-		if (getReferenceMethodElement(element) != null) {
-			presentationNameRestoreBtn.setEnabled(
-					descriptorPropUtil.isPresentationNameRepalce((Descriptor)element) && editable);
-		}
-	}
-	
+
 	/**
 	 * Modify listner for name and presentation name
 	 *
@@ -753,24 +622,17 @@ public class BreakdownElementGeneralSection extends AbstractSection {
 							.removeModifyListener(modelModifyListener);
 				}
 				modelModifyListener = getEditor().createModifyListener(element);
-				if (syncFreePresentationNameModifyListener != null) {
-					presentationNameText.removeModifyListener(syncFreePresentationNameModifyListener);
-				}
-				syncFreePresentationNameModifyListener = createSyncFreePresentationNameModifyListener();				
 
 				// Modify listener for name
 				if (nameModifyListener != null)
 					nameText.removeModifyListener(nameModifyListener);
+
 				if (element instanceof Process) {
 					nameModifyListener = createNameModifyListener(
 							((Process) element).eContainer(), true);
 				} else {
 					nameModifyListener = createNameModifyListener(element);
 				}
-				if (syncFreeNameModifyListener != null) {
-					nameText.removeModifyListener(syncFreeNameModifyListener);
-				}
-				syncFreeNameModifyListener = createSyncFreeNameModifyListener();				
 
 				if (modelModifyListener instanceof MethodElementEditor.ModifyListener) {
 					((MethodElementEditor.ModifyListener) modelModifyListener)
@@ -783,22 +645,8 @@ public class BreakdownElementGeneralSection extends AbstractSection {
 							.setDisable(true);
 				}
 
-				if (isNameReplace && descriptorPropUtil.isNameRepalce((Descriptor)element)) {
-					//
-				} else {
-					nameText.setText(element.getName());
-					if (isSyncFree()) {
-						updateNameRestoreBtn();
-					}
-				}				
-				if (isPresentationNameReplace && descriptorPropUtil.isPresentationNameRepalce((Descriptor)element)) {
-					//
-				} else {
-					presentationNameText.setText(element.getPresentationName());
-					if (isSyncFree()) {
-						updatePresentationNameRestoreBtn();
-					}
-				}
+				nameText.setText(element.getName());
+				presentationNameText.setText(element.getPresentationName());
 
 				if (modelModifyListener instanceof MethodElementEditor.ModifyListener) {
 					((MethodElementEditor.ModifyListener) modelModifyListener)
@@ -809,15 +657,8 @@ public class BreakdownElementGeneralSection extends AbstractSection {
 							.setDisable(false);
 				}
 
-				nameText.addModifyListener(nameModifyListener);				
+				nameText.addModifyListener(nameModifyListener);
 				presentationNameText.addModifyListener(modelModifyListener);
-				
-				if (syncFreeNameModifyListener != null) {
-					nameText.addModifyListener(syncFreeNameModifyListener);
-				}
-				if (syncFreePresentationNameModifyListener != null) {
-					presentationNameText.addModifyListener(syncFreePresentationNameModifyListener);
-				}				
 
 				multipleButton.setSelection(element.getHasMultipleOccurrences()
 						.booleanValue());
@@ -837,7 +678,7 @@ public class BreakdownElementGeneralSection extends AbstractSection {
 				} else
 				supressedButton.setSelection(element.getSuppressed()
 						.booleanValue());
-				extender.refresh();
+
 				updateControls();
 			}
 		} catch (Exception ex) {
@@ -850,77 +691,13 @@ public class BreakdownElementGeneralSection extends AbstractSection {
 	protected void updateControls() {
 		nameText.setEditable(editable);
 		presentationNameText.setEditable(editable);
+		nameText.setEnabled(editable);
+		presentationNameText.setEnabled(editable);
 
 		multipleButton.setEnabled(editable);
 		optionalButton.setEnabled(editable);
 		plannedButton.setEnabled(editable);
 //		supressedButton.setEnabled(editable);
-		
-		extender.updateControls(editable);
-	}
-	
-	private class SyncFreeNameModifyListener implements ModifyListener {
-		public void modifyText(ModifyEvent e) {
-			if (getReferenceMethodElement(element) != null) {
-				descriptorPropUtil.setNameRepalce((Descriptor)element, true);
-				isNameReplace = true;
-				updateNameRestoreBtn();
-			}
-		}		
-	}
-	
-	private ModifyListener createSyncFreeNameModifyListener() {
-		if (isSyncFree()) {
-			return new SyncFreeNameModifyListener();
-		}
-		
-		return null;
-	}
-		
-	private class SyncFreePresentationNameModifyListener implements ModifyListener {
-		public void modifyText(ModifyEvent e) {
-			if (getReferenceMethodElement(element) != null) {
-				descriptorPropUtil.setPresentationNameRepalce((Descriptor)element, true);
-				isPresentationNameReplace = true;
-				updatePresentationNameRestoreBtn();			
-			}
-		}		
-	}
-	
-	private ModifyListener createSyncFreePresentationNameModifyListener() {
-		if (isSyncFree()) {
-			return new SyncFreePresentationNameModifyListener();
-		}
-		
-		return null;
-	}
-	
-	public static class BeGeneralSectionExtender {
-
-		protected BreakdownElementGeneralSection section;
-		public BeGeneralSectionExtender(BreakdownElementGeneralSection section) {
-			this.section = section;
-		}
-		
-		public void modifyGeneralSectionContent(FormToolkit toolkit, IActionManager actionMgr) {
-		}
-		
-		public void dispose() {
-			
-		}
-		
-		public void refresh() {
-			
-		}
-		
-		public void updateControls(boolean editable) {
-			
-		}
-		
-		protected Composite getComposite() {
-			return section.generalComposite;
-		}
-		
 	}
 
 }

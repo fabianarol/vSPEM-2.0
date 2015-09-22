@@ -36,6 +36,13 @@ import org.eclipse.epf.uma.WorkProduct;
  */
 public class DeliverableImpl extends WorkProductImpl implements Deliverable {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The cached value of the '{@link #getDeliveredWorkProducts() <em>Delivered Work Products</em>}' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -43,7 +50,7 @@ public class DeliverableImpl extends WorkProductImpl implements Deliverable {
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<WorkProduct> deliveredWorkProducts;
+	protected EList deliveredWorkProducts = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -55,7 +62,7 @@ public class DeliverableImpl extends WorkProductImpl implements Deliverable {
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -63,7 +70,6 @@ public class DeliverableImpl extends WorkProductImpl implements Deliverable {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.DELIVERABLE;
 	}
@@ -73,9 +79,9 @@ public class DeliverableImpl extends WorkProductImpl implements Deliverable {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<WorkProduct> getDeliveredWorkProducts() {
+	public List getDeliveredWorkProducts() {
 		if (deliveredWorkProducts == null) {
-			deliveredWorkProducts = new EObjectResolvingEList<WorkProduct>(
+			deliveredWorkProducts = new EObjectResolvingEList(
 					WorkProduct.class, this,
 					UmaPackage.DELIVERABLE__DELIVERED_WORK_PRODUCTS);
 		}
@@ -87,7 +93,6 @@ public class DeliverableImpl extends WorkProductImpl implements Deliverable {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.DELIVERABLE__DELIVERED_WORK_PRODUCTS:
@@ -101,14 +106,11 @@ public class DeliverableImpl extends WorkProductImpl implements Deliverable {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.DELIVERABLE__DELIVERED_WORK_PRODUCTS:
 			getDeliveredWorkProducts().clear();
-			getDeliveredWorkProducts().addAll(
-					(Collection<? extends WorkProduct>) newValue);
+			getDeliveredWorkProducts().addAll((Collection) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -119,7 +121,6 @@ public class DeliverableImpl extends WorkProductImpl implements Deliverable {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.DELIVERABLE__DELIVERED_WORK_PRODUCTS:
@@ -134,7 +135,6 @@ public class DeliverableImpl extends WorkProductImpl implements Deliverable {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);

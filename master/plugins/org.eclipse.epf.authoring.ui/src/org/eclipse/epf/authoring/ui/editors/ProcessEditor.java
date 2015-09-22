@@ -17,10 +17,8 @@ import java.util.EventObject;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.emf.common.command.Command;
@@ -49,23 +47,19 @@ import org.eclipse.emf.edit.ui.action.EditingDomainActionBarContributor;
 import org.eclipse.emf.edit.ui.dnd.LocalTransfer;
 import org.eclipse.emf.edit.ui.dnd.ViewerDragAdapter;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryContentProvider;
-import org.eclipse.emf.edit.ui.provider.ExtendedImageRegistry;
 import org.eclipse.epf.authoring.ui.AuthoringUIPlugin;
 import org.eclipse.epf.authoring.ui.AuthoringUIResources;
 import org.eclipse.epf.authoring.ui.actions.IWorkbenchPartAction;
 import org.eclipse.epf.authoring.ui.actions.LibraryValidateAction;
 import org.eclipse.epf.authoring.ui.dnd.EditingDomainTableTreeViewerDropAdapter;
 import org.eclipse.epf.authoring.ui.forms.DeliveryProcessDescription;
+import org.eclipse.epf.authoring.ui.forms.IExtensionFormPage;
 import org.eclipse.epf.authoring.ui.forms.ProcessBreakdownStructureFormPage;
 import org.eclipse.epf.authoring.ui.forms.ProcessDescription;
 import org.eclipse.epf.authoring.ui.preferences.ApplicationPreferenceConstants;
 import org.eclipse.epf.authoring.ui.properties.EPFPropertySheetPage;
-import org.eclipse.epf.authoring.ui.providers.IMethodElementEditorPageProviderExtension;
-import org.eclipse.epf.authoring.ui.util.ProcessEditorUtil;
+import org.eclipse.epf.authoring.ui.providers.ProcessEditorPageProvider;
 import org.eclipse.epf.authoring.ui.views.ProcessViewer;
-import org.eclipse.epf.common.preferences.IPreferenceStoreWrapper;
-import org.eclipse.epf.common.preferences.IPropertyChangeEventWrapper;
-import org.eclipse.epf.common.preferences.IPropertyChangeListenerWrapper;
 import org.eclipse.epf.diagram.core.part.AbstractDiagramEditor;
 import org.eclipse.epf.diagram.core.part.DiagramEditorInput;
 import org.eclipse.epf.diagram.core.part.DiagramEditorInputProxy;
@@ -74,24 +68,15 @@ import org.eclipse.epf.library.ILibraryManager;
 import org.eclipse.epf.library.ILibraryServiceListener;
 import org.eclipse.epf.library.LibraryPlugin;
 import org.eclipse.epf.library.LibraryService;
-import org.eclipse.epf.library.configuration.ConfigurationHelper;
 import org.eclipse.epf.library.configuration.ProcessAuthoringConfigurator;
 import org.eclipse.epf.library.edit.IAdapterFactoryProvider;
 import org.eclipse.epf.library.edit.TngAdapterFactory;
-import org.eclipse.epf.library.edit.command.ActionManager;
 import org.eclipse.epf.library.edit.command.CommandStackChangedEvent;
-import org.eclipse.epf.library.edit.command.IResourceAwareCommand;
-import org.eclipse.epf.library.edit.meta.TypeDefUtil;
 import org.eclipse.epf.library.edit.process.BreakdownElementWrapperItemProvider;
 import org.eclipse.epf.library.edit.process.IBSItemProvider;
-import org.eclipse.epf.library.edit.process.command.ActivityDropCommand;
-import org.eclipse.epf.library.edit.realization.IRealizationManager;
 import org.eclipse.epf.library.edit.ui.IActionTypeProvider;
 import org.eclipse.epf.library.edit.util.ConfigurableComposedAdapterFactory;
-import org.eclipse.epf.library.edit.util.DescriptorPropUtil;
 import org.eclipse.epf.library.edit.util.EditingDomainComposedAdapterFactory;
-import org.eclipse.epf.library.edit.util.LibraryEditUtil;
-import org.eclipse.epf.library.edit.util.ProcessScopeUtil;
 import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.library.edit.util.Suppression;
 import org.eclipse.epf.library.edit.util.TngUtil;
@@ -104,25 +89,19 @@ import org.eclipse.epf.persistence.refresh.RefreshJob;
 import org.eclipse.epf.persistence.util.PersistenceUtil;
 import org.eclipse.epf.uma.Activity;
 import org.eclipse.epf.uma.BreakdownElement;
-import org.eclipse.epf.uma.ContentDescription;
+import org.eclipse.epf.uma.CapabilityPattern;
 import org.eclipse.epf.uma.DeliveryProcess;
-import org.eclipse.epf.uma.Descriptor;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.MethodLibrary;
 import org.eclipse.epf.uma.Milestone;
 import org.eclipse.epf.uma.Process;
 import org.eclipse.epf.uma.ProcessComponent;
-import org.eclipse.epf.uma.Role;
 import org.eclipse.epf.uma.RoleDescriptor;
-import org.eclipse.epf.uma.Task;
-import org.eclipse.epf.uma.TaskDescriptor;
 import org.eclipse.epf.uma.UmaPackage;
 import org.eclipse.epf.uma.WorkBreakdownElement;
-import org.eclipse.epf.uma.WorkProduct;
 import org.eclipse.epf.uma.WorkProductDescriptor;
 import org.eclipse.epf.uma.edit.domain.TraceableAdapterFactoryEditingDomain;
-import org.eclipse.epf.uma.util.Scope;
 import org.eclipse.epf.uma.util.UmaUtil;
 import org.eclipse.epf.validation.LibraryEValidator;
 import org.eclipse.jface.action.IAction;
@@ -130,6 +109,9 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -145,7 +127,6 @@ import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Widget;
@@ -500,9 +481,6 @@ public class ProcessEditor extends MethodElementEditor implements
 								.setMethodConfiguration(config);
 					}
 				}
-				
-				synUpdate(collection);
-				
 				break;
 			}
 				// handled by libSvcListener
@@ -512,50 +490,11 @@ public class ProcessEditor extends MethodElementEditor implements
 				// }
 
 			}
-			
+
 		}
 
-		private void synUpdate(Collection collection) {
-			if (! ProcessUtil.isSynFree()) {
-				return;
-			}
-			if (collection == null || collection.isEmpty()) {
-				return;
-			}
-			
-			for (Object obj : collection) {
-				if (! (obj instanceof MethodElement)) {
-					continue;
-				}
-				if (obj instanceof ContentDescription) {
-					obj = ((ContentDescription) obj).eContainer();
-				}
-				MethodElement element = (MethodElement) obj;
-				if (obj instanceof Task || obj instanceof Role
-						|| obj instanceof WorkProduct || TypeDefUtil.hasLinkTypes(element)) {					
-					if (changedElementSet == null) {
-						changedElementSet = new HashSet<MethodElement>();
-					}
-					changedElementSet.add((MethodElement) obj);
-				} else if (obj instanceof TaskDescriptor) {
-					DescriptorPropUtil propUtil = DescriptorPropUtil
-							.getDesciptorPropUtil();
-					Set<MethodElement> greenDescendents = new HashSet<MethodElement>();
-					propUtil.collectCustomizingDescendants(
-							(TaskDescriptor) obj, greenDescendents);
-					if (!greenDescendents.isEmpty()) {
-						if (changedElementSet == null) {
-							changedElementSet = new HashSet<MethodElement>();
-						}
-						changedElementSet.addAll(greenDescendents);
-					}
-				}
-			}
-			updateAndRefreshProcessModel();
-		}					
-
 	};
-	
+
 	protected ILibraryServiceListener libSvcListener = new ILibraryServiceListener() {
 
 		public void configurationSet(MethodConfiguration config) {
@@ -587,7 +526,7 @@ public class ProcessEditor extends MethodElementEditor implements
 
 	protected ProcessBreakdownStructureFormPage procTab;
 
-	protected Collection<ProcessBreakdownStructureFormPage> extensionTabs = null;
+	protected ProcessBreakdownStructureFormPage[] extensionTabs = null;
 
 	protected ProcessBreakdownStructureFormPage[] bsPages;
 
@@ -637,7 +576,7 @@ public class ProcessEditor extends MethodElementEditor implements
 		}
 	};
 
-	protected IPropertyChangeListenerWrapper prefStoreListener;
+	protected IPropertyChangeListener prefStoreListener;
 
 	// private ProcessConfigurator configurator;
 
@@ -719,10 +658,13 @@ public class ProcessEditor extends MethodElementEditor implements
 			}
 			
 			if (extensionTabs != null) {
-				for (ProcessBreakdownStructureFormPage extPage : extensionTabs) {
-					extPage.setProcess(selectedProcess);
+				for (int i = 0; i < extensionTabs.length; i++) {
+					if (extensionTabs[i] != null) {
+						extensionTabs[i].setProcess(selectedProcess);
+					}
 				}
 			}
+
 		}
 	}
 
@@ -770,8 +712,10 @@ public class ProcessEditor extends MethodElementEditor implements
 			if (obj instanceof ProcessComponent) {
 				ProcessComponent pc = (ProcessComponent) obj;
 				Process proc = pc.getProcess();
-				if(proc != null) {
-					return ExtendedImageRegistry.getInstance().getImage(TngUtil.getImage(proc));
+				if (proc instanceof CapabilityPattern) {
+					return LibraryUIImages.IMG_CAPABILITY_PATTERN;
+				} else if (proc instanceof DeliveryProcess) {
+					return LibraryUIImages.IMG_DELIVERY_PROCESS;
 				}
 			}
 		}
@@ -805,7 +749,6 @@ public class ProcessEditor extends MethodElementEditor implements
 	public void init(IEditorSite site, IEditorInput input)
 			throws PartInitException {
 		super.init(site, input);
-		site.setSelectionProvider(this);
 
 		// TODO: need revisit
 		// site.setSelectionProvider(new FormEditorSelectionProvider(this));
@@ -850,10 +793,8 @@ public class ProcessEditor extends MethodElementEditor implements
 									.getSource()).getMostRecentCommand();
 							if (mostRecentCommand != null) {
 									if (!(TngUtil.unwrap(mostRecentCommand) instanceof SetCommand)) {
-										if (mostRecentCommand.getAffectedObjects().size() == 1) {		//Multiple select does not make sense
-											setSelectionToViewer(mostRecentCommand
-													.getAffectedObjects());
-										}
+										setSelectionToViewer(mostRecentCommand
+												.getAffectedObjects());
 									}
 									if (mostRecentCommand instanceof CreateChildCommand
 											&& currentViewer instanceof ProcessViewer) {
@@ -928,9 +869,9 @@ public class ProcessEditor extends MethodElementEditor implements
 		// listen to the change of column list in preference store
 		//
 		if (prefStoreListener == null) {
-			prefStoreListener = new IPropertyChangeListenerWrapper() {
+			prefStoreListener = new IPropertyChangeListener() {
 
-				public void propertyChange(IPropertyChangeEventWrapper event) {
+				public void propertyChange(PropertyChangeEvent event) {
 					ProcessBreakdownStructureFormPage page = null;
 					if (event.getProperty().equals(
 							ApplicationPreferenceConstants.PREF_WBS_COLUMNS)) {
@@ -988,12 +929,7 @@ public class ProcessEditor extends MethodElementEditor implements
      */
     protected void setPartFacade(IEditorInput input) {
         setPartName(input.getName());
-        setTitleImage();
-    }
-    
-    @Override
-    protected void setTitleImage() {
-    	setTitleImage(getProcTitleImage());
+        setTitleImage(getProcTitleImage());
     }
 
 	/**
@@ -1016,13 +952,6 @@ public class ProcessEditor extends MethodElementEditor implements
 	}
 
 	public void dispose() {
-		if (getSelectedProcess() != null) {
-			Scope scope = ProcessScopeUtil.getInstance().getScope(getSelectedProcess());
-			if (scope != null) {
-				ProcessScopeUtil.getInstance().endProcessEdit(scope);
-			}
-		}
-		
 		// close all diagram editors of this process
 		//
 		closeAllDiagramEditors();
@@ -1153,7 +1082,7 @@ public class ProcessEditor extends MethodElementEditor implements
 			// IPreferenceStore store = AuthoringUIPlugin.getDefault()
 			// .getPreferenceStore();
 			PreferenceUtil.validatePreferences();
-			IPreferenceStoreWrapper store = getPreferenceStore();
+			IPreferenceStore store = getPreferenceStore();
 			
 			List pages = new ArrayList();
 
@@ -1168,27 +1097,9 @@ public class ProcessEditor extends MethodElementEditor implements
 					.getCurrentMethodConfiguration();
 			ProcessAuthoringConfigurator.INSTANCE
 					.setMethodConfiguration(currentConfig);
-			if (selectedProcess != null && selectedProcess.getDefaultContext() == null) {	
-				ProcessScopeUtil.getInstance().loadScope(selectedProcess);
-			}
-			
-			Scope scope = ProcessScopeUtil.getInstance().getScope(selectedProcess);
-			if (scope != null) {
-				ProcessScopeUtil.getInstance().beginProcessEdit(scope);
-			}
-			if (IRealizationManager.debug) {
-				if (selectedProcess == null) {
-					Thread.dumpStack();
-				}
-			}
-			
-			if (ProcessUtil.isSynFree()) {
-				updateProcessModel();
-			}
-			
 			if (adapterFactory instanceof ConfigurableComposedAdapterFactory) {
 				((ConfigurableComposedAdapterFactory) adapterFactory)
-						.setFilter(getConfiguratorInstance());
+						.setFilter(ProcessAuthoringConfigurator.INSTANCE);
 			}
 			WBSTab.setAdapterFactory(adapterFactory);
 			WBSTab.setColumnDescriptors(columnDescriptors);
@@ -1227,7 +1138,7 @@ public class ProcessEditor extends MethodElementEditor implements
 					.getOBS_ComposedAdapterFactory();
 			if (adapterFactory instanceof ConfigurableComposedAdapterFactory) {
 				((ConfigurableComposedAdapterFactory) adapterFactory)
-						.setFilter(getConfiguratorInstance());
+						.setFilter(ProcessAuthoringConfigurator.INSTANCE);
 			}
 			OBSTab.setAdapterFactory(adapterFactory);
 			OBSTab.setColumnDescriptors(columnDescriptors);
@@ -1252,7 +1163,7 @@ public class ProcessEditor extends MethodElementEditor implements
 					.getPBS_ComposedAdapterFactory();
 			if (adapterFactory instanceof ConfigurableComposedAdapterFactory) {
 				((ConfigurableComposedAdapterFactory) adapterFactory)
-						.setFilter(getConfiguratorInstance());
+						.setFilter(ProcessAuthoringConfigurator.INSTANCE);
 			}
 			PBSTab.setAdapterFactory(adapterFactory);
 			PBSTab.setColumnDescriptors(columnDescriptors);
@@ -1275,7 +1186,7 @@ public class ProcessEditor extends MethodElementEditor implements
 					.getProcessComposedAdapterFactory();
 			if (adapterFactory instanceof ConfigurableComposedAdapterFactory) {
 				((ConfigurableComposedAdapterFactory) adapterFactory)
-						.setFilter(getConfiguratorInstance());
+						.setFilter(ProcessAuthoringConfigurator.INSTANCE);
 			}
 			procTab.setAdapterFactory(adapterFactory);
 //			columnDescriptors = toColumnDescriptors(store
@@ -1309,53 +1220,43 @@ public class ProcessEditor extends MethodElementEditor implements
 			createContextMenuFor(viewer);
 			pages.add(procTab);
 
-			
-			// TODO: properly implement extension point
-			// this extension point is supposed to let extensions modify the 
-			// list of pages.  But this editor is so messy that we can't
-			// just put the pages in a map to be passed to extensions
-			// (like in the MethodElementEditor).
-			
 			// check for extenstion point and add the page if there
-			Map<Object,String> pageMap = new LinkedHashMap<Object,String>();
-			List<IMethodElementEditorPageProviderExtension> pageProviders = getAllPageProviders();
-			if (pageProviders != null && pageProviders.size() > 0) {
-				for (IMethodElementEditorPageProviderExtension extension : pageProviders) {
-					pageMap = extension.getPages(pageMap, this, selectedProcess);
-				}
-			}
+			List pageProviders = ProcessEditorPageProvider.getInstance()
+					.getPageProviders();
 
-			if (!pageMap.isEmpty()) {
-				extensionTabs = new ArrayList<ProcessBreakdownStructureFormPage>();
-				for (Map.Entry<Object, String> pageEntry : pageMap.entrySet()) {
-					Object page = pageEntry.getKey();
-					String name = pageEntry.getValue();
-					int index = -1;
-					if (page instanceof Control) {
-						index = addPage((Control)page);
-					} else if (page instanceof IFormPage) {
-						if (page instanceof ProcessBreakdownStructureFormPage) {
-							ProcessBreakdownStructureFormPage extendedPage = (ProcessBreakdownStructureFormPage) page;
-							extensionTabs.add(extendedPage);
-							index = addPage(extendedPage
+			if (pageProviders != null && pageProviders.size() > 0) {
+				try {
+					extensionTabs = new ProcessBreakdownStructureFormPage[pageProviders
+							.size()];
+					for (int i = 0; i < pageProviders.size(); i++) {
+						Object page = pageProviders.get(i);
+						if (page instanceof IExtensionFormPage) {
+
+							IExtensionFormPage formPage = (IExtensionFormPage) page;
+							IFormPage control = formPage.setEditor(this);
+							formPage.setInput(selectedProcess);
+							ProcessBreakdownStructureFormPage extendedPage = null;
+							if (control instanceof ProcessBreakdownStructureFormPage) {
+								extendedPage = (ProcessBreakdownStructureFormPage) control;
+								extensionTabs[i] = extendedPage;
+							}
+
+							id = addPage(extendedPage
 									.createControl(getContainer()));
-							setPageText(index, extendedPage.getTitle());
-							extendedPage.setTabIndex(index);
+							setPageText(id, extendedPage.getTitle());
+							extendedPage.setTabIndex(id);
 							viewer = (StructuredViewer) extendedPage
 									.getViewer();
 							createContextMenuFor(viewer);
-	
+
 							pages.add(extendedPage);
 						}
-					} else if (page instanceof IEditorPart) {
-						index = addPage((IEditorPart)page, getEditorInput());
 					}
-					if (name != null) {
-						setPageText(index, name);
-					}
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 			}
-			
+
 			bsPages = new ProcessBreakdownStructureFormPage[pages.size()];
 			for (int i = 0; i < pages.size(); i++) {
 				bsPages[i] = (ProcessBreakdownStructureFormPage) pages.get(i);
@@ -1378,29 +1279,6 @@ public class ProcessEditor extends MethodElementEditor implements
 		} catch (PartInitException e) {
 			AuthoringUIPlugin.getDefault().getLogger().logError(e);
 			e.printStackTrace();
-		}
-	}
-
-	public void updateConfigFreeProcessModelAndRefresh() {
-		updateProcessModel();
-		refreshAll();
-	}
-	
-	private void updateProcessModel() {
-		if (! ProcessUtil.isSynFree()) {
-			return;
-		}
-		Process proc = getSelectedProcess();
-		IRealizationManager mgr = getConfiguratorInstance()
-				.getRealizationManager();
-		if (mgr == null) {
-			mgr = LibraryEditUtil.getInstance().getRealizationManager(proc.getDefaultContext());
-		}
-		if (proc != null && mgr != null) {
-			if (ProcessScopeUtil.getInstance().isConfigFree(proc)) {
-				ConfigurationHelper.getDelegate().setLoadForBrowsingNeeded(true);
-			}
-			mgr.updateProcessModel(proc);
 		}
 	}
 
@@ -1458,11 +1336,11 @@ public class ProcessEditor extends MethodElementEditor implements
 			}
 		}
 		if(id == -1 && extensionTabs != null) {
-			for (ProcessBreakdownStructureFormPage extPage : extensionTabs) {
-				extPage.setProcess(selectedProcess);
-				if (extPage.getId().equals(pageId)) {
-					id = extPage.getTabIndex();
-					activePage = extPage;
+			for (int i = 0; i < extensionTabs.length; i++) {
+				ProcessBreakdownStructureFormPage page = extensionTabs[i];
+				if (page.getId().equals(pageId)) {
+					id = page.getTabIndex();
+					activePage = page;
 					break;
 				}
 			}
@@ -1491,9 +1369,9 @@ public class ProcessEditor extends MethodElementEditor implements
 			} else if (procTab != null && id == procTab.getTabIndex()) {
 				setCurrentViewer(procTab.getViewer());
 			} else if (extensionTabs != null) {
-				for (ProcessBreakdownStructureFormPage extPage : extensionTabs) {
-					if (id == extPage.getTabIndex())
-						setCurrentViewer(extPage.getViewer());
+				for (int i = 0; i < extensionTabs.length; i++) {
+					if (extensionTabs[i] != null && id == extensionTabs[i].getTabIndex())
+						setCurrentViewer(extensionTabs[i].getViewer());
 				}
 			} else {
 				setCurrentViewer(null);
@@ -1800,11 +1678,12 @@ public class ProcessEditor extends MethodElementEditor implements
 							selected = TngUtil.unwrap(selected);
 							selection = new StructuredSelection(selected);
 						} else if (extensionTabs != null) {
-							for (ProcessBreakdownStructureFormPage extPage : extensionTabs) {
-								if (extPage.getViewer() == currentViewer) {
+							for (int i = 0; i < extensionTabs.length; i++) {
+								if (extensionTabs[i].getViewer() == currentViewer) {
 									selected = TngUtil.unwrap(selected);
 									selection = new StructuredSelection(
-											selected);							
+											selected);
+
 								}
 							}
 						}
@@ -1814,9 +1693,10 @@ public class ProcessEditor extends MethodElementEditor implements
 							procTab.getViewer().setSelection(selection, false);
 						}
 						if (extensionTabs != null) {
-							for (ProcessBreakdownStructureFormPage extPage : extensionTabs) {
-								if (extPage.getViewer() != currentViewer)
-									extPage.getViewer().setSelection(selection, false);
+							for (int i = 0; i < extensionTabs.length; i++) {
+								if (extensionTabs[i].getViewer() != currentViewer)
+									extensionTabs[i].getViewer().setSelection(
+											selection, false);
 							}
 						}
 
@@ -1916,17 +1796,16 @@ public class ProcessEditor extends MethodElementEditor implements
 						}
 						
 						if (extensionTabs != null) {
-							for (ProcessBreakdownStructureFormPage extPage : extensionTabs) {
-								viewer = extPage.getViewer();
+							for (int i = 0; i < extensionTabs.length; i++) {
+								viewer = extensionTabs[i].getViewer();
 								if (viewer != currentViewer) {
 									selection = new StructuredSelection(
 											findSelection(
 													selectedPath,
-													extPage
+													extensionTabs[i]
 															.getAdapterFactory()));
 									viewer.setSelection(selection, false);
 								}
-								
 							}
 						}
 					}
@@ -2159,10 +2038,6 @@ public class ProcessEditor extends MethodElementEditor implements
 		MethodConfiguration config = LibraryService.getInstance()
 				.getCurrentMethodConfiguration();
 		if (config != currentConfig) {
-			if (! isEditingConfigFreeProcess()) {
-				updateProcessModel();
-			}
-			
 			// refresh only if the active part is this editor or diagram editor
 			// of any activity in this process
 			//
@@ -2203,7 +2078,7 @@ public class ProcessEditor extends MethodElementEditor implements
 		Resource modelResource = selectedProcess.eResource();
 		Resource contentResource = selectedProcess.getPresentation()
 				.eResource();
-		if (inputChanged || changedResources.contains(modelResource)
+		if (changedResources.contains(modelResource)
 				|| (contentResource != null && changedResources
 						.contains(contentResource))) {
 			removePage(0);
@@ -2272,8 +2147,8 @@ public class ProcessEditor extends MethodElementEditor implements
 
 		
 		if (extensionTabs != null) {
-			for (ProcessBreakdownStructureFormPage extPage : extensionTabs) {
-				extPage.getViewer().refresh();
+			for (int i = 0; i < extensionTabs.length; i++) {
+				extensionTabs[i].getViewer().refresh();
 			}
 		}
 
@@ -2348,19 +2223,7 @@ public class ProcessEditor extends MethodElementEditor implements
 	 */
 	public void doSave(IProgressMonitor monitor) {
 		suppression.saveToModel();
-//		Scope scope = ProcessScopeUtil.getInstance().getScope(selectedProcess);
-//		try {
-//			if (scope != null) {
-//				selectedProcess.setDefaultContext(null);
-//				selectedProcess.getValidContext().clear();
-//			}
 		super.doSave(monitor);
-//		} finally {
-//			if (scope != null) {
-//				selectedProcess.setDefaultContext(scope);
-//				selectedProcess.getValidContext().add(scope);
-//			}
-//		}
 		suppression.saveIsDone();
 		resourcesToSave.clear();
 		firePropertyChange(PROP_DIRTY);
@@ -2515,13 +2378,13 @@ public class ProcessEditor extends MethodElementEditor implements
 		return false;
 	}
 
-	protected IPreferenceStoreWrapper getPreferenceStore() {
+	protected IPreferenceStore getPreferenceStore() {
 		// preference is managed by library plugin,
 		// since this preferences is also used for browsing and publishing
 		// Jinhua Xi 08/21/2006
 		// IPreferenceStore store = AuthoringUIPlugin.getDefault()
 		// .getPreferenceStore();
-		IPreferenceStoreWrapper store = LibraryPlugin.getDefault()
+		IPreferenceStore store = LibraryPlugin.getDefault()
 				.getPreferenceStore();
 
 		return store;
@@ -2543,125 +2406,7 @@ public class ProcessEditor extends MethodElementEditor implements
 	 * Override without any code change just for {@link ProcessEditorActionBarContributor} to access it.
 	 */
 	@Override
-	public int getActivePage() {
+	protected int getActivePage() {
 		return super.getActivePage();
 	}
-	
-	protected ActionManager newActionManager() {
-
-		final Collection<ActivityDropCommand> adCommands = new ArrayList<ActivityDropCommand>();
-
-		ActionManager mgr = new MeEditorActionManager() {
-
-			protected void registerExecutedCommand(Command command) {
-				if (command instanceof ActivityDropCommand) {
-					ActivityDropCommand adc = (ActivityDropCommand) command;
-					if (adc.getResourceFileCopyHandler() != null) {
-						adCommands.add(adc);
-					}
-				}
-			}
-
-			public void saveIsDone() {
-				for (ActivityDropCommand adc : adCommands) {
-					adc.scanAndCopyResources();
-				}
-				adCommands.clear();
-				super.saveIsDone();
-			}
-
-			public void undo() {
-				adCommands.clear();
-				super.undo();
-			}
-			
-			public boolean execute(IResourceAwareCommand cmd) {
-				boolean ret = super.execute(cmd);
-				if (ret) {				
-					ProcessEditorUtil.deSelectSynchronize(cmd);
-				}
-				return ret;
-			}
-			
-			public boolean doAction(int actionType, EObject object,
-					org.eclipse.emf.ecore.EStructuralFeature feature,
-					Object value, int index) {
-				boolean ret = super.doAction(actionType, object, feature,
-						value, index);
-
-				if (ret) {
-					if (object instanceof Descriptor) {
-						ProcessEditorUtil.deSelectSynchonize((Descriptor) object, feature.getFeatureID());
-					}
-				}
-				return ret;
-			}
-		};
-		return mgr;
-	}
-	
-	private ProcessAuthoringConfigurator scopeConfigurator;
-	private ProcessAuthoringConfigurator getConfiguratorInstance() {
-		if (selectedProcess != null
-				&& selectedProcess.getDefaultContext() instanceof Scope) {
-			if (scopeConfigurator == null) {
-				Scope scope = (Scope) selectedProcess.getDefaultContext();
-				scopeConfigurator = new ProcessAuthoringConfigurator(scope) {
-					public IRealizationManager getRealizationManager() {
-						return LibraryEditUtil.getInstance().getDefaultRealizationManager();
-					}
-				};
-			}
-			return scopeConfigurator;
-		}
-		return ProcessAuthoringConfigurator.INSTANCE;
-	}
-	
-	private boolean isEditingConfigFreeProcess() {
-		return getConfiguratorInstance() == scopeConfigurator;
-	}
-	
-	public Process getSelectedProcess() {
-		return selectedProcess;
-	}
-	
-	private Set<MethodElement> changedElementSet;
-	public synchronized void updateAndRefreshProcessModel() {
-		if (changedElementSet == null) {
-			return;
-		}
-		//System.out.println("LD> getSite().getPage().getActiveEditor(): " + getSite().getPage().getActiveEditor());
-		
-		if (getSite().getPage().getActiveEditor() != this) {
-			return;
-		}
-		//System.out.println("LD> updateAndRefreshProcessModel: " + getSelectedProcess());
-		
-		Set<MethodElement> elementSet = changedElementSet;
-		changedElementSet = null;
-		
-		Process proc = getSelectedProcess();
-		IRealizationManager mgr = getConfiguratorInstance()
-				.getRealizationManager();
-		if (mgr == null) {
-			mgr = LibraryEditUtil.getInstance().getRealizationManager(proc.getDefaultContext());
-		}
-		if (proc != null && mgr != null)
-			mgr.elementUpdateProcessModel(proc, elementSet);
-		
-		refreshAll();
-	}
-	
-	public void updateOnLinkedElementChange(BreakdownElement be) {
-		if (! ProcessUtil.isSynFree()) {
-			return;
-		}
-		if (changedElementSet == null) {
-			changedElementSet = new HashSet<MethodElement>();
-		}
-		changedElementSet.add(be);
-		
-		updateAndRefreshProcessModel();
-	}
-	
 }

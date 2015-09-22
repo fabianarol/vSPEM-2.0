@@ -27,9 +27,7 @@ import org.eclipse.emf.ecore.xmi.XMLResource;
 import org.eclipse.emf.ecore.xmi.impl.XMIHelperImpl;
 import org.eclipse.epf.resourcemanager.ResourceDescriptor;
 import org.eclipse.epf.uma.MethodConfiguration;
-import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.ecore.impl.MultiResourceEObject;
-import org.eclipse.epf.uma.util.UmaUtil;
 
 /**
  * XMLHelper implementation for library XMI persistence
@@ -193,11 +191,7 @@ public class MultiFileXMIHelperImpl extends XMIHelperImpl {
 
 	public void setValue(EObject object, EStructuralFeature feature,
 			Object value, int position) {
-		
-		if(feature.isDerived()) {
-			return;
-		}
-		
+
 		int kind = getFeatureKind(feature);
 
 		try {
@@ -212,21 +206,6 @@ public class MultiFileXMIHelperImpl extends XMIHelperImpl {
 			}
 
 			super.setValue(object, feature, value, position);
-			if (feature instanceof EReference) {
-				EReference ref = (EReference) feature;
-				if (ref.isContainment()) {
-					if (value instanceof InternalEObject) {
-						if (!((InternalEObject) value).eIsProxy()) {
-							if (value instanceof MethodElement) {
-								if (! UmaUtil.unresolvedGuidSet.isEmpty()) {
-									UmaUtil.unresolvedGuidSet.remove(((MethodElement) value).getGuid());
-								}
-							}
-						}
-					}
-
-				}
-			}
 
 			switch (kind) {
 			case IS_MANY_ADD:

@@ -10,30 +10,19 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.uma.edit.command;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.edit.command.InitializeCopyCommand;
 import org.eclipse.emf.edit.command.CopyCommand.Helper;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.epf.uma.ContentDescription;
-import org.eclipse.epf.uma.DescribableElement;
-import org.eclipse.epf.uma.DescriptorDescription;
 import org.eclipse.epf.uma.MethodElement;
-import org.eclipse.epf.uma.Process;
-import org.eclipse.epf.uma.UmaPackage;
 import org.eclipse.epf.uma.ecore.util.OppositeFeature;
-import org.eclipse.epf.uma.edit.domain.TraceableAdapterFactoryEditingDomain;
-import org.eclipse.epf.uma.impl.DescribableElementImpl;
 import org.eclipse.epf.uma.provider.UmaEditPlugin;
-import org.eclipse.epf.uma.util.ContentDescriptionFactory;
 import org.eclipse.epf.uma.util.UmaUtil;
 
 /**
@@ -74,29 +63,19 @@ public class MethodElementInitializeCopyCommand extends InitializeCopyCommand {
 		if (copy instanceof MethodElement) {
 			MethodElement e = ((MethodElement) copy);
 			if (e instanceof ContentDescription) {
-//				EObject eContainer = e.eContainer();
-//				if (eContainer instanceof MethodElement) {
-//					e.setGuid(UmaUtil.generateGUID(((MethodElement) eContainer)
-//							.getGuid()));
-//				} else {
-//					e.setGuid(UmaUtil.generateGUID());
-//					UmaEditPlugin.INSTANCE
-//							.log("MethodElementInitializeCopyCommand: eContainer not initialized for " + e); //$NON-NLS-1$
-//				}
+				EObject eContainer = e.eContainer();
+				if (eContainer instanceof MethodElement) {
+					e.setGuid(UmaUtil.generateGUID(((MethodElement) eContainer)
+							.getGuid()));
+				} else {
+					e.setGuid(UmaUtil.generateGUID());
+					UmaEditPlugin.INSTANCE
+							.log("MethodElementInitializeCopyCommand: eContainer not initialized for " + e); //$NON-NLS-1$
+				}
 			} else {
 				e.setGuid(UmaUtil.generateGUID());
-				if (e instanceof DescribableElement) {
-					DescribableElement element = (DescribableElement) e;
-					if (ContentDescriptionFactory.hasPresentation(element)) {
-						ContentDescription pres = element.getPresentation();
-						if (pres != null) {
-							pres.setGuid(UmaUtil.generateGUID(e.getGuid()));
-						}
-					}
-				}
 			}
 		}
-	
 	}
 
 	/**
@@ -104,13 +83,6 @@ public class MethodElementInitializeCopyCommand extends InitializeCopyCommand {
 	 * accordingly in the copy. Includes coping of opposite features.
 	 */
 	private void doCopyReferences() {
-		if (domain instanceof TraceableAdapterFactoryEditingDomain) {
-			TraceableAdapterFactoryEditingDomain tDomain = (TraceableAdapterFactoryEditingDomain) domain;
-			Map map = tDomain.getExtenalMaintainedCopyMap();
-			if (map != null) {
-				map.put(copy, owner);
-			}
-		}
 		if (owner instanceof ContentDescription) {
 			super.copyReferences();
 			return;
@@ -154,18 +126,13 @@ public class MethodElementInitializeCopyCommand extends InitializeCopyCommand {
 						EObject target = copyHelper.getCopyTarget(object,
 								copiedTargetRequired);
 						if (target == null)
-							continue;
+							break; // if one is null, they'll all be null
 						if (reverseReference != null) {
 							int position = copyList.indexOf(target);
 							if (position == -1) {
-								copyList.add(target);
+								copyList.add(index, target);
 							} else {
-								// move to end
-								//
-								int newPosition = copyList.size() - 1;
-								if(newPosition != position) {
-									copyList.move(newPosition, position);
-								}
+								copyList.move(index, target);
 							}
 						} else {
 							copyList.add(target);
@@ -184,39 +151,6 @@ public class MethodElementInitializeCopyCommand extends InitializeCopyCommand {
 
 	protected void copyReferences() {
 		doCopyReferences();
-	}
-
-	@Override
-	protected Collection<? extends EAttribute> getAttributesToCopy() {
-		Collection<? extends EAttribute> ret = super.getAttributesToCopy();
-		List<EAttribute> list = new ArrayList<EAttribute>();
-		for (EAttribute att : ret) {
-			if (att != UmaPackage.eINSTANCE.getMethodElement_Guid()) {
-				list.add(att);
-			}
-		}
-		ret = list;
-		if (owner instanceof DescriptorDescription) {
-			boolean toRemove = UmaUtil.isSynFree();
-			if (!toRemove) {
-				Process process = UmaUtil
-						.getProcess((DescriptorDescription) owner);
-				toRemove = UmaUtil.isConfigFree(process);
-			}
-			if (toRemove) {
-				List<EAttribute> modifiedRet = new ArrayList<EAttribute>();
-				for (EAttribute att : ret) {
-					if (att != UmaPackage.eINSTANCE
-							.getDescriptorDescription_RefinedDescription()
-							&& att != UmaPackage.eINSTANCE
-									.getContentDescription_KeyConsiderations()) {
-						modifiedRet.add(att);
-					}
-				}				
-				ret = modifiedRet;
-			}
-		}
-		return ret;
 	}
 
 }

@@ -55,11 +55,10 @@ public class ChecklistLayout extends AbstractElementLayout {
 							.getElementRealizer());
 			
 			List activities = ConfigurationHelper.calc0nFeatureValue(super.element,
-					AssociationHelper.Checklist_BreakdownElements, layoutManager
+					AssociationHelper.Checklist_Activities, layoutManager
 							.getElementRealizer());
 
-//			contentElements.addAll(activities);
-			contentElements = addBreakdownElementsToContentElements(contentElements, activities);
+			contentElements.addAll(activities);
 
 			addReferences(AssociationHelper.Checklist_ContentElements, elementXml, "contentElements", contentElements); //$NON-NLS-1$
 		}

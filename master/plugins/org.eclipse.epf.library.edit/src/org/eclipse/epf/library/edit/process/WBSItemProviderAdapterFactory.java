@@ -13,11 +13,11 @@ package org.eclipse.epf.library.edit.process;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.edit.provider.ITableItemLabelProvider;
 import org.eclipse.emf.edit.provider.ItemProviderAdapter;
-import org.eclipse.epf.common.preferences.IPropertyChangeEventWrapper;
-import org.eclipse.epf.common.preferences.IPropertyChangeListenerWrapper;
 import org.eclipse.epf.library.edit.util.LibraryEditConstants;
 import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 
 
 /**
@@ -25,7 +25,7 @@ import org.eclipse.epf.library.edit.util.TngUtil;
  * @since 1.0
  */
 public class WBSItemProviderAdapterFactory extends ItemProviderAdapterFactory
-		implements IPropertyChangeListenerWrapper {
+		implements IPropertyChangeListener {
 
 	public WBSItemProviderAdapterFactory() {
 		super();
@@ -41,6 +41,15 @@ public class WBSItemProviderAdapterFactory extends ItemProviderAdapterFactory
 		return new WBSActivityItemProvider(this);
 	}
 
+	public Adapter createvpActivityAdapter() {
+		return createActivityAdapter();
+	}
+	
+	public Adapter createVarActivityAdapter() {
+		return createActivityAdapter();
+	}
+	
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -50,12 +59,28 @@ public class WBSItemProviderAdapterFactory extends ItemProviderAdapterFactory
 		return createActivityAdapter();
 	}
 
+	public Adapter createvpIterationAdapter() {
+		return createActivityAdapter();
+	}
+	
+	public Adapter createVarIterationAdapter() {
+		return createActivityAdapter();
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see org.eclipse.epf.uma.util.BreakdownAdapterFactory#createPhaseAdapter()
 	 */
 	public Adapter createPhaseAdapter() {
+		return createActivityAdapter();
+	}
+	
+	public Adapter createvpPhaseAdapter() {
+		return createActivityAdapter();
+	}
+	
+	public Adapter createVarPhaseAdapter() {
 		return createActivityAdapter();
 	}
 
@@ -67,6 +92,20 @@ public class WBSItemProviderAdapterFactory extends ItemProviderAdapterFactory
 	public Adapter createMilestoneAdapter() {
 		return new WBSMilestoneItemProvider(this, (ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
 				.createMilestoneAdapter());
+	}
+	
+	public Adapter createVarMilestoneAdapter() {
+		return new WBSMilestoneItemProvider(this, (ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
+				.createVarMilestoneAdapter());
+		
+//		return createMilestoneAdapter();
+	}
+	
+	public Adapter createvpMilestoneAdapter() {
+		return new WBSMilestoneItemProvider(this, (ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
+				.createvpMilestoneAdapter());
+		
+//		return createMilestoneAdapter();
 	}
 
 	/*
@@ -87,12 +126,13 @@ public class WBSItemProviderAdapterFactory extends ItemProviderAdapterFactory
 		return new WBSProcessItemProvider(this, (ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
 				.createDeliveryProcessAdapter());
 	}
-	
+
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.epf.common.preferences.IPropertyChangeListenerWrapper#propertyChange(org.eclipse.epf.common.preferences.IPropertyChangeEventWrapper)
+	 * 
+	 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
 	 */
-	public void propertyChange(IPropertyChangeEventWrapper event) {
+	public void propertyChange(PropertyChangeEvent event) {
 		if (event.getProperty().equals(LibraryEditConstants.PREF_WBS_COLUMNS)) {
 			setColumnIndexToNameMap(ProcessUtil
 					.toColumnIndexToNameMap((String) event.getNewValue()));

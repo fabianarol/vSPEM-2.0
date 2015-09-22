@@ -14,12 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.emf.common.notify.AdapterFactory;
-import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
 import org.eclipse.emf.edit.provider.ItemProviderAdapter;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryContentProvider;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
-import org.eclipse.epf.authoring.ui.filters.DescriptorConfigurationFilter;
 import org.eclipse.epf.authoring.ui.filters.DescriptorProcessFilter;
 import org.eclipse.epf.authoring.ui.filters.ProcessWorkProductFilter;
 import org.eclipse.epf.library.edit.IFilter;
@@ -28,17 +26,12 @@ import org.eclipse.epf.library.edit.command.IActionManager;
 import org.eclipse.epf.library.edit.itemsfilter.FilterConstants;
 import org.eclipse.epf.library.edit.process.command.AssignWPToRoleDescriptor;
 import org.eclipse.epf.library.edit.process.command.IActionTypeConstants;
-import org.eclipse.epf.library.edit.util.DescriptorPropUtil;
 import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.uma.Activity;
-import org.eclipse.epf.uma.Descriptor;
-import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.Process;
 import org.eclipse.epf.uma.RoleDescriptor;
 import org.eclipse.epf.uma.UmaPackage;
 import org.eclipse.epf.uma.WorkProductDescriptor;
-import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
@@ -60,8 +53,6 @@ public class RoleDescriptorWorkProductSection extends RelationSection {
 		if (filter == null) {
 			filter = new ProcessWorkProductFilter(getConfiguration(),
 					null, FilterConstants.WORKPRODUCTS);
-		} else if (filter instanceof DescriptorConfigurationFilter) {
-			((DescriptorConfigurationFilter) filter).setMethodConfiguration(getConfiguration());
 		}
 		return filter;
 	}
@@ -82,17 +73,9 @@ public class RoleDescriptorWorkProductSection extends RelationSection {
 	protected void initContentProvider1() {
 		contentProvider = new AdapterFactoryContentProvider(getAdapterFactory()) {
 			public Object[] getElements(Object object) {
-				RoleDescriptor td = (RoleDescriptor) element;
-				List<MethodElement> elements = new ArrayList<MethodElement>();
-				elements.addAll(td.getResponsibleFor());
-				
-				if (isSyncFree()
-						&& ! DescriptorPropUtil.getDesciptorPropUtil()
-								.isNoAutoSyn(td)) {
-					elements.addAll(td.getResponsibleForExclude());
-				}
-				
-				return getFilteredList(elements).toArray();
+				return getFilteredList(
+						((RoleDescriptor) element).getResponsibleFor())
+						.toArray();
 			}
 		};
 		tableViewer1.setContentProvider(contentProvider);
@@ -110,29 +93,6 @@ public class RoleDescriptorWorkProductSection extends RelationSection {
 		};
 		tableViewer2.setContentProvider(contentProvider);
 	}
-	
-	protected void initLabelProvider1() {
-		ILabelProvider provider = null; 
-		
-		if (isSyncFree()) {
-			provider = new SyncFreeLabelProvider(
-				TngAdapterFactory.INSTANCE.getWBS_ComposedAdapterFactory(),
-				(Descriptor)element,
-				UmaPackage.eINSTANCE.getRoleDescriptor_ResponsibleFor(), getConfiguration());
-		} else {
-			provider = new AdapterFactoryLabelProvider(
-					TngAdapterFactory.INSTANCE.getWBS_ComposedAdapterFactory());
-		}
-		
-		tableViewer1.setLabelProvider(provider);
-	}
-	
-	protected void initLabelProvider2() {
-		ILabelProvider provider = new AdapterFactoryLabelProvider(
-				TngAdapterFactory.INSTANCE.getWBS_ComposedAdapterFactory());
-		
-		tableViewer2.setLabelProvider(provider);
-	}
 
 	/**
 	 * @see org.eclipse.epf.authoring.ui.properties.RelationSection#init()
@@ -140,8 +100,8 @@ public class RoleDescriptorWorkProductSection extends RelationSection {
 	protected void init() {
 		super.init();
 
-//		labelProvider = new AdapterFactoryLabelProvider(
-//				TngAdapterFactory.INSTANCE.getWBS_ComposedAdapterFactory());
+		labelProvider = new AdapterFactoryLabelProvider(
+				TngAdapterFactory.INSTANCE.getWBS_ComposedAdapterFactory());
 
 		int numOfTables = 2;
 		
@@ -178,18 +138,14 @@ public class RoleDescriptorWorkProductSection extends RelationSection {
 				WorkProductDescriptor.class, items);
 	}
 
-	protected void addItems1(List items) {
-		addItems1(items, false);
-	}
-	
 	/**
 	 * @see org.eclipse.epf.authoring.ui.properties.RelationSection#addItems1(java.util.List)
 	 */
-	protected void addItems1(List items, boolean calledForExculded) {
+	protected void addItems1(List items) {
 		if (!items.isEmpty()) {
 			AssignWPToRoleDescriptor cmd = new AssignWPToRoleDescriptor(
 					(RoleDescriptor) element, items,
-					IActionTypeConstants.ADD_RESPONSIBLE_FOR, getConfiguration(), calledForExculded);
+					IActionTypeConstants.ADD_RESPONSIBLE_FOR, getConfiguration());
 			actionMgr.execute(cmd);
 		}
 	};
@@ -199,7 +155,7 @@ public class RoleDescriptorWorkProductSection extends RelationSection {
 	 */
 	protected void removeItems1(List items) {
 		if (!items.isEmpty()) {
-			RemoveDescriptorCommand cmd = new RemoveDescriptorCommand((Descriptor) element,
+			RemoveDescriptorCommand cmd = new RemoveDescriptorCommand(element,
 					items, UmaPackage.ROLE_DESCRIPTOR__RESPONSIBLE_FOR);
 			actionMgr.execute(cmd);
 		}
@@ -221,20 +177,7 @@ public class RoleDescriptorWorkProductSection extends RelationSection {
 	 * @see org.eclipse.epf.authoring.ui.properties.RelationSection#getExistingElements1()
 	 */
 	protected List getExistingElements1() {
-//		return getWorkProducts(((RoleDescriptor) element).getResponsibleFor());
-		return ((RoleDescriptor) element).getResponsibleFor();
-	};
-	
-	protected List getExistingContentElements1() {		
-		List<MethodElement> list = ProcessUtil.getAssociatedElementList(getExistingElements1());
-		
-		RoleDescriptor rd = (RoleDescriptor) element;
-		if (isSyncFree()
-				&& ! DescriptorPropUtil.getDesciptorPropUtil()
-						.isNoAutoSyn(rd)) {
-			list.addAll(rd.getResponsibleForExclude());
-		}
-		return list;
+		return getWorkProducts(((RoleDescriptor) element).getResponsibleFor());
 	};
 
 	/**
@@ -296,90 +239,6 @@ public class RoleDescriptorWorkProductSection extends RelationSection {
 			actionMgr.doAction(IActionManager.ADD_MANY, element,
 					UmaPackage.eINSTANCE.getRoleDescriptor_ResponsibleFor(),
 					items, -1);
-			if (isSyncFree()) {
-				for (Object item : items) {
-					if (item instanceof Descriptor) {
-						Descriptor des = (Descriptor) item;
-						propUtil.addLocalUse(des, (Descriptor)element,
-								UmaPackage.eINSTANCE.getRoleDescriptor_ResponsibleFor());
-					}
-				}
-			}
 		}
 	}
-	
-	protected boolean syncFreeAdd1(IStructuredSelection selection) {
-		if (selection.size() == 0) {
-			return false;			
-		} 
-		
-		EReference ref = UmaPackage.eINSTANCE.getRoleDescriptor_ResponsibleFor();
-		
-		boolean result = propUtil.checkSelection(selection.toList(), (Descriptor)element, ref, getConfiguration());
-		
-		if (! result) {
-			return true;
-		}
-		
-		Object testObj = selection.getFirstElement();
-		if (propUtil.isDynamicAndExclude(testObj, (Descriptor)element, ref, getConfiguration())) {				
-			addItems1(selection.toList(), true);
-			return true;
-		} 
-		
-		return false;
-	}
-	
-	protected boolean syncFreeRemove1(IStructuredSelection selection) {
-		if (selection.size() == 0) {
-			return true;			
-		} 
-		
-		EReference ref = UmaPackage.eINSTANCE.getRoleDescriptor_ResponsibleFor();
-		
-		boolean result = propUtil.checkSelection(selection.toList(), (Descriptor)element, ref, getConfiguration());
-		if (! result) {
-			return true;
-		}
-
-		Object testObj = selection.getFirstElement();
-		if (propUtil.isDynamicAndExclude(testObj, (Descriptor)element, ref, getConfiguration())) {
-			return true;
-		} 
-		
-		if (propUtil.isDynamic(testObj, (Descriptor)element, ref)) {
-			MoveDescriptorCommand cmd = new MoveDescriptorCommand((Descriptor)element, selection.toList(),
-					UmaPackage.ROLE_DESCRIPTOR__RESPONSIBLE_FOR,
-					UmaPackage.ROLE_DESCRIPTOR__RESPONSIBLE_FOR_EXCLUDE);
-			actionMgr.execute(cmd);
-			return true;
-		} 
-				
-		return false;
-	}
-	
-	protected void syncFreeUpdateBtnStatus1(IStructuredSelection selection) {
-		EReference ref = UmaPackage.eINSTANCE.getRoleDescriptor_ResponsibleFor();
-		
-		boolean result = propUtil.checkSelection(selection.toList(), (Descriptor)element, ref, getConfiguration());
-		
-		if (!result) {
-			ctrl_add_1.setEnabled(false);
-			ctrl_remove_1.setEnabled(false);
-		} else {
-			Object testObj = selection.getFirstElement();
-			if (propUtil.isDynamicAndExclude(testObj, (Descriptor)element, ref, getConfiguration())) {
-				ctrl_add_1.setEnabled(true);
-				ctrl_remove_1.setEnabled(false);
-			} else {
-				ctrl_add_1.setEnabled(true);
-				ctrl_remove_1.setEnabled(true);
-			}
-		}		
-	}
-	
-	protected boolean isSyncFree() {
-		return ProcessUtil.isSynFree();
-	}
-	
 }

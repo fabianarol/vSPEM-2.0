@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: MethodLibrary.java,v 1.4 2007/04/19 21:51:24 klow Exp $
+ */
 package org.eclipse.epf.xml.uma;
 
 import org.eclipse.emf.common.util.EList;
@@ -46,11 +42,11 @@ public interface MethodLibrary extends MethodUnit {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Method Plugin</em>' containment reference list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getMethodLibrary_MethodPlugin()
-	 * @model containment="true"
+	 * @model type="org.eclipse.epf.xml.uma.MethodPlugin" containment="true"
 	 *        extendedMetaData="kind='element' name='MethodPlugin'"
 	 * @generated
 	 */
-	EList<MethodPlugin> getMethodPlugin();
+	EList getMethodPlugin();
 
 	/**
 	 * Returns the value of the '<em><b>Method Configuration</b></em>' containment reference list.
@@ -63,11 +59,11 @@ public interface MethodLibrary extends MethodUnit {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Method Configuration</em>' containment reference list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getMethodLibrary_MethodConfiguration()
-	 * @model containment="true"
+	 * @model type="org.eclipse.epf.xml.uma.MethodConfiguration" containment="true"
 	 *        extendedMetaData="kind='element' name='MethodConfiguration'"
 	 * @generated
 	 */
-	EList<MethodConfiguration> getMethodConfiguration();
+	EList getMethodConfiguration();
 
 	/**
 	 * Returns the value of the '<em><b>Tool</b></em>' attribute.
@@ -83,7 +79,7 @@ public interface MethodLibrary extends MethodUnit {
 	 * @return the value of the '<em>Tool</em>' attribute.
 	 * @see #setTool(String)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getMethodLibrary_Tool()
-	 * @model dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="kind='attribute' name='tool'"
 	 * @generated
 	 */

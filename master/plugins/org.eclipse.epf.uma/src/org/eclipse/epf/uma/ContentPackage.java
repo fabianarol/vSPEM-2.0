@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.uma;
 
+import org.eclipse.emf.common.util.EList;
 import java.util.List;
 
 /**
@@ -44,9 +45,9 @@ public interface ContentPackage extends MethodPackage {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Content Elements</em>' containment reference list.
 	 * @see org.eclipse.epf.uma.UmaPackage#getContentPackage_ContentElements()
-	 * @model containment="true" resolveProxies="true" ordered="false"
+	 * @model type="org.eclipse.epf.uma.ContentElement" containment="true" resolveProxies="true" ordered="false"
 	 * @generated
 	 */
-	List<ContentElement> getContentElements();
+	List getContentElements();
 
 } // ContentPackage

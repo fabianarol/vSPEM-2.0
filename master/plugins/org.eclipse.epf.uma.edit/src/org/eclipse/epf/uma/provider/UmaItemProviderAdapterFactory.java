@@ -62,7 +62,7 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	protected Collection<Object> supportedTypes = new ArrayList<Object>();
+	protected Collection supportedTypes = new ArrayList();
 
 	/**
 	 * This constructs an instance.
@@ -92,7 +92,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createPackageAdapter() {
 		if (packageItemProvider == null) {
 			packageItemProvider = new PackageItemProvider(this);
@@ -115,7 +114,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createConstraintAdapter() {
 		if (constraintItemProvider == null) {
 			constraintItemProvider = new ConstraintItemProvider(this);
@@ -138,7 +136,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createMethodElementPropertyAdapter() {
 		if (methodElementPropertyItemProvider == null) {
 			methodElementPropertyItemProvider = new MethodElementPropertyItemProvider(
@@ -146,29 +143,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 		}
 
 		return methodElementPropertyItemProvider;
-	}
-
-	/**
-	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.Kind} instances.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected KindItemProvider kindItemProvider;
-
-	/**
-	 * This creates an adapter for a {@link org.eclipse.epf.uma.Kind}.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public Adapter createKindAdapter() {
-		if (kindItemProvider == null) {
-			kindItemProvider = new KindItemProvider(this);
-		}
-
-		return kindItemProvider;
 	}
 
 	/**
@@ -185,7 +159,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createRoleAdapter() {
 		if (roleItemProvider == null) {
 			roleItemProvider = new RoleItemProvider(this);
@@ -208,7 +181,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createTaskAdapter() {
 		if (taskItemProvider == null) {
 			taskItemProvider = new TaskItemProvider(this);
@@ -231,7 +203,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createStepAdapter() {
 		if (stepItemProvider == null) {
 			stepItemProvider = new StepItemProvider(this);
@@ -254,60 +225,12 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createArtifactAdapter() {
 		if (artifactItemProvider == null) {
 			artifactItemProvider = new ArtifactItemProvider(this);
 		}
 
 		return artifactItemProvider;
-	}
-
-	/**
-	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.WorkProduct} instances.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected WorkProductItemProvider workProductItemProvider;
-
-	/**
-	 * This creates an adapter for a {@link org.eclipse.epf.uma.WorkProduct}.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public Adapter createWorkProductAdapter() {
-		if (workProductItemProvider == null) {
-			workProductItemProvider = new WorkProductItemProvider(this);
-		}
-
-		return workProductItemProvider;
-	}
-
-	/**
-	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.FulfillableElement} instances.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected FulfillableElementItemProvider fulfillableElementItemProvider;
-
-	/**
-	 * This creates an adapter for a {@link org.eclipse.epf.uma.FulfillableElement}.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public Adapter createFulfillableElementAdapter() {
-		if (fulfillableElementItemProvider == null) {
-			fulfillableElementItemProvider = new FulfillableElementItemProvider(
-					this);
-		}
-
-		return fulfillableElementItemProvider;
 	}
 
 	/**
@@ -324,7 +247,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createDeliverableAdapter() {
 		if (deliverableItemProvider == null) {
 			deliverableItemProvider = new DeliverableItemProvider(this);
@@ -347,7 +269,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createOutcomeAdapter() {
 		if (outcomeItemProvider == null) {
 			outcomeItemProvider = new OutcomeItemProvider(this);
@@ -370,7 +291,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createPointAdapter() {
 		if (pointItemProvider == null) {
 			pointItemProvider = new PointItemProvider(this);
@@ -393,7 +313,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createDiagramLinkAdapter() {
 		if (diagramLinkItemProvider == null) {
 			diagramLinkItemProvider = new DiagramLinkItemProvider(this);
@@ -416,7 +335,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createGraphConnectorAdapter() {
 		if (graphConnectorItemProvider == null) {
 			graphConnectorItemProvider = new GraphConnectorItemProvider(this);
@@ -439,7 +357,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createDimensionAdapter() {
 		if (dimensionItemProvider == null) {
 			dimensionItemProvider = new DimensionItemProvider(this);
@@ -462,7 +379,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createReferenceAdapter() {
 		if (referenceItemProvider == null) {
 			referenceItemProvider = new ReferenceItemProvider(this);
@@ -485,7 +401,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createPropertyAdapter() {
 		if (propertyItemProvider == null) {
 			propertyItemProvider = new PropertyItemProvider(this);
@@ -508,7 +423,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createGraphEdgeAdapter() {
 		if (graphEdgeItemProvider == null) {
 			graphEdgeItemProvider = new GraphEdgeItemProvider(this);
@@ -531,7 +445,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createDiagramAdapter() {
 		if (diagramItemProvider == null) {
 			diagramItemProvider = new DiagramItemProvider(this);
@@ -554,7 +467,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createGraphNodeAdapter() {
 		if (graphNodeItemProvider == null) {
 			graphNodeItemProvider = new GraphNodeItemProvider(this);
@@ -577,7 +489,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createSimpleSemanticModelElementAdapter() {
 		if (simpleSemanticModelElementItemProvider == null) {
 			simpleSemanticModelElementItemProvider = new SimpleSemanticModelElementItemProvider(
@@ -601,7 +512,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createUMASemanticModelBridgeAdapter() {
 		if (umaSemanticModelBridgeItemProvider == null) {
 			umaSemanticModelBridgeItemProvider = new UMASemanticModelBridgeItemProvider(
@@ -625,7 +535,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createCoreSemanticModelBridgeAdapter() {
 		if (coreSemanticModelBridgeItemProvider == null) {
 			coreSemanticModelBridgeItemProvider = new CoreSemanticModelBridgeItemProvider(
@@ -649,7 +558,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createTextElementAdapter() {
 		if (textElementItemProvider == null) {
 			textElementItemProvider = new TextElementItemProvider(this);
@@ -672,7 +580,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createImageAdapter() {
 		if (imageItemProvider == null) {
 			imageItemProvider = new ImageItemProvider(this);
@@ -695,7 +602,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createPolylineAdapter() {
 		if (polylineItemProvider == null) {
 			polylineItemProvider = new PolylineItemProvider(this);
@@ -718,7 +624,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createEllipseAdapter() {
 		if (ellipseItemProvider == null) {
 			ellipseItemProvider = new EllipseItemProvider(this);
@@ -741,7 +646,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createActivityAdapter() {
 		if (activityItemProvider == null) {
 			activityItemProvider = new ActivityItemProvider(this);
@@ -764,7 +668,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createMilestoneAdapter() {
 		if (milestoneItemProvider == null) {
 			milestoneItemProvider = new MilestoneItemProvider(this);
@@ -787,7 +690,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createIterationAdapter() {
 		if (iterationItemProvider == null) {
 			iterationItemProvider = new IterationItemProvider(this);
@@ -810,7 +712,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createPhaseAdapter() {
 		if (phaseItemProvider == null) {
 			phaseItemProvider = new PhaseItemProvider(this);
@@ -833,7 +734,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createTeamProfileAdapter() {
 		if (teamProfileItemProvider == null) {
 			teamProfileItemProvider = new TeamProfileItemProvider(this);
@@ -856,7 +756,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createRoleDescriptorAdapter() {
 		if (roleDescriptorItemProvider == null) {
 			roleDescriptorItemProvider = new RoleDescriptorItemProvider(this);
@@ -879,7 +778,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createWorkOrderAdapter() {
 		if (workOrderItemProvider == null) {
 			workOrderItemProvider = new WorkOrderItemProvider(this);
@@ -902,7 +800,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createPlanningDataAdapter() {
 		if (planningDataItemProvider == null) {
 			planningDataItemProvider = new PlanningDataItemProvider(this);
@@ -925,7 +822,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createTaskDescriptorAdapter() {
 		if (taskDescriptorItemProvider == null) {
 			taskDescriptorItemProvider = new TaskDescriptorItemProvider(this);
@@ -948,7 +844,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createWorkProductDescriptorAdapter() {
 		if (workProductDescriptorItemProvider == null) {
 			workProductDescriptorItemProvider = new WorkProductDescriptorItemProvider(
@@ -972,7 +867,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createCompositeRoleAdapter() {
 		if (compositeRoleItemProvider == null) {
 			compositeRoleItemProvider = new CompositeRoleItemProvider(this);
@@ -995,7 +889,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createBreakdownElementDescriptionAdapter() {
 		if (breakdownElementDescriptionItemProvider == null) {
 			breakdownElementDescriptionItemProvider = new BreakdownElementDescriptionItemProvider(
@@ -1019,7 +912,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createActivityDescriptionAdapter() {
 		if (activityDescriptionItemProvider == null) {
 			activityDescriptionItemProvider = new ActivityDescriptionItemProvider(
@@ -1043,7 +935,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createDeliveryProcessDescriptionAdapter() {
 		if (deliveryProcessDescriptionItemProvider == null) {
 			deliveryProcessDescriptionItemProvider = new DeliveryProcessDescriptionItemProvider(
@@ -1067,7 +958,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createProcessDescriptionAdapter() {
 		if (processDescriptionItemProvider == null) {
 			processDescriptionItemProvider = new ProcessDescriptionItemProvider(
@@ -1091,7 +981,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createDescriptorDescriptionAdapter() {
 		if (descriptorDescriptionItemProvider == null) {
 			descriptorDescriptionItemProvider = new DescriptorDescriptionItemProvider(
@@ -1115,7 +1004,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createConceptAdapter() {
 		if (conceptItemProvider == null) {
 			conceptItemProvider = new ConceptItemProvider(this);
@@ -1138,7 +1026,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createChecklistAdapter() {
 		if (checklistItemProvider == null) {
 			checklistItemProvider = new ChecklistItemProvider(this);
@@ -1161,7 +1048,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createExampleAdapter() {
 		if (exampleItemProvider == null) {
 			exampleItemProvider = new ExampleItemProvider(this);
@@ -1184,7 +1070,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createGuidelineAdapter() {
 		if (guidelineItemProvider == null) {
 			guidelineItemProvider = new GuidelineItemProvider(this);
@@ -1207,7 +1092,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createEstimationConsiderationsAdapter() {
 		if (estimationConsiderationsItemProvider == null) {
 			estimationConsiderationsItemProvider = new EstimationConsiderationsItemProvider(
@@ -1231,7 +1115,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createReportAdapter() {
 		if (reportItemProvider == null) {
 			reportItemProvider = new ReportItemProvider(this);
@@ -1254,7 +1137,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createTemplateAdapter() {
 		if (templateItemProvider == null) {
 			templateItemProvider = new TemplateItemProvider(this);
@@ -1277,7 +1159,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createSupportingMaterialAdapter() {
 		if (supportingMaterialItemProvider == null) {
 			supportingMaterialItemProvider = new SupportingMaterialItemProvider(
@@ -1301,7 +1182,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createToolMentorAdapter() {
 		if (toolMentorItemProvider == null) {
 			toolMentorItemProvider = new ToolMentorItemProvider(this);
@@ -1324,7 +1204,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createWhitepaperAdapter() {
 		if (whitepaperItemProvider == null) {
 			whitepaperItemProvider = new WhitepaperItemProvider(this);
@@ -1347,37 +1226,12 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createTermDefinitionAdapter() {
 		if (termDefinitionItemProvider == null) {
 			termDefinitionItemProvider = new TermDefinitionItemProvider(this);
 		}
 
 		return termDefinitionItemProvider;
-	}
-
-	/**
-	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.ApplicableMetaClassInfo} instances.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected ApplicableMetaClassInfoItemProvider applicableMetaClassInfoItemProvider;
-
-	/**
-	 * This creates an adapter for a {@link org.eclipse.epf.uma.ApplicableMetaClassInfo}.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
-	public Adapter createApplicableMetaClassInfoAdapter() {
-		if (applicableMetaClassInfoItemProvider == null) {
-			applicableMetaClassInfoItemProvider = new ApplicableMetaClassInfoItemProvider(
-					this);
-		}
-
-		return applicableMetaClassInfoItemProvider;
 	}
 
 	/**
@@ -1394,7 +1248,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createPracticeAdapter() {
 		if (practiceItemProvider == null) {
 			practiceItemProvider = new PracticeItemProvider(this);
@@ -1417,13 +1270,144 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createReusableAssetAdapter() {
 		if (reusableAssetItemProvider == null) {
 			reusableAssetItemProvider = new ReusableAssetItemProvider(this);
 		}
 
 		return reusableAssetItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.State} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected StateItemProvider stateItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.State}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createStateAdapter() {
+		if (stateItemProvider == null) {
+			stateItemProvider = new StateItemProvider(this);
+		}
+
+		return stateItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.Vertex} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected VertexItemProvider vertexItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.Vertex}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createVertexAdapter() {
+		if (vertexItemProvider == null) {
+			vertexItemProvider = new VertexItemProvider(this);
+		}
+
+		return vertexItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.Region} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected RegionItemProvider regionItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.Region}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createRegionAdapter() {
+		if (regionItemProvider == null) {
+			regionItemProvider = new RegionItemProvider(this);
+		}
+
+		return regionItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.StateMachine} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected StateMachineItemProvider stateMachineItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.StateMachine}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createStateMachineAdapter() {
+		if (stateMachineItemProvider == null) {
+			stateMachineItemProvider = new StateMachineItemProvider(this);
+		}
+
+		return stateMachineItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.Transition} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected TransitionItemProvider transitionItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.Transition}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createTransitionAdapter() {
+		if (transitionItemProvider == null) {
+			transitionItemProvider = new TransitionItemProvider(this);
+		}
+
+		return transitionItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.PseudoState} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected PseudoStateItemProvider pseudoStateItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.PseudoState}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createPseudoStateAdapter() {
+		if (pseudoStateItemProvider == null) {
+			pseudoStateItemProvider = new PseudoStateItemProvider(this);
+		}
+
+		return pseudoStateItemProvider;
 	}
 
 	/**
@@ -1440,7 +1424,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createDisciplineAdapter() {
 		if (disciplineItemProvider == null) {
 			disciplineItemProvider = new DisciplineItemProvider(this);
@@ -1463,7 +1446,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createRoleSetAdapter() {
 		if (roleSetItemProvider == null) {
 			roleSetItemProvider = new RoleSetItemProvider(this);
@@ -1486,13 +1468,34 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createDomainAdapter() {
 		if (domainItemProvider == null) {
 			domainItemProvider = new DomainItemProvider(this);
 		}
 
 		return domainItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.PruebasLineas} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected PruebasLineasItemProvider pruebasLineasItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.PruebasLineas}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createPruebasLineasAdapter() {
+		if (pruebasLineasItemProvider == null) {
+			pruebasLineasItemProvider = new PruebasLineasItemProvider(this);
+		}
+
+		return pruebasLineasItemProvider;
 	}
 
 	/**
@@ -1509,7 +1512,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createWorkProductTypeAdapter() {
 		if (workProductTypeItemProvider == null) {
 			workProductTypeItemProvider = new WorkProductTypeItemProvider(this);
@@ -1532,7 +1534,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createDisciplineGroupingAdapter() {
 		if (disciplineGroupingItemProvider == null) {
 			disciplineGroupingItemProvider = new DisciplineGroupingItemProvider(
@@ -1556,7 +1557,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createToolAdapter() {
 		if (toolItemProvider == null) {
 			toolItemProvider = new ToolItemProvider(this);
@@ -1579,7 +1579,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createRoleSetGroupingAdapter() {
 		if (roleSetGroupingItemProvider == null) {
 			roleSetGroupingItemProvider = new RoleSetGroupingItemProvider(this);
@@ -1602,7 +1601,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createCustomCategoryAdapter() {
 		if (customCategoryItemProvider == null) {
 			customCategoryItemProvider = new CustomCategoryItemProvider(this);
@@ -1625,7 +1623,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createCapabilityPatternAdapter() {
 		if (capabilityPatternItemProvider == null) {
 			capabilityPatternItemProvider = new CapabilityPatternItemProvider(
@@ -1649,7 +1646,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createDeliveryProcessAdapter() {
 		if (deliveryProcessItemProvider == null) {
 			deliveryProcessItemProvider = new DeliveryProcessItemProvider(this);
@@ -1672,7 +1668,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createProcessPlanningTemplateAdapter() {
 		if (processPlanningTemplateItemProvider == null) {
 			processPlanningTemplateItemProvider = new ProcessPlanningTemplateItemProvider(
@@ -1696,7 +1691,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createRoadmapAdapter() {
 		if (roadmapItemProvider == null) {
 			roadmapItemProvider = new RoadmapItemProvider(this);
@@ -1719,7 +1713,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createContentPackageAdapter() {
 		if (contentPackageItemProvider == null) {
 			contentPackageItemProvider = new ContentPackageItemProvider(this);
@@ -1742,7 +1735,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createProcessComponentAdapter() {
 		if (processComponentItemProvider == null) {
 			processComponentItemProvider = new ProcessComponentItemProvider(
@@ -1766,7 +1758,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createProcessPackageAdapter() {
 		if (processPackageItemProvider == null) {
 			processPackageItemProvider = new ProcessPackageItemProvider(this);
@@ -1789,7 +1780,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createProcessComponentInterfaceAdapter() {
 		if (processComponentInterfaceItemProvider == null) {
 			processComponentInterfaceItemProvider = new ProcessComponentInterfaceItemProvider(
@@ -1813,7 +1803,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createProcessComponentDescriptorAdapter() {
 		if (processComponentDescriptorItemProvider == null) {
 			processComponentDescriptorItemProvider = new ProcessComponentDescriptorItemProvider(
@@ -1837,13 +1826,331 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createMethodPluginAdapter() {
 		if (methodPluginItemProvider == null) {
 			methodPluginItemProvider = new MethodPluginItemProvider(this);
 		}
 
 		return methodPluginItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.ProcessLinesPackage} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected ProcessLinesPackageItemProvider processLinesPackageItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.ProcessLinesPackage}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createProcessLinesPackageAdapter() {
+		if (processLinesPackageItemProvider == null) {
+			processLinesPackageItemProvider = new ProcessLinesPackageItemProvider(
+					this);
+		}
+
+		return processLinesPackageItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.ProcessLineElement} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected ProcessLineElementItemProvider processLineElementItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.ProcessLineElement}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createProcessLineElementAdapter() {
+		if (processLineElementItemProvider == null) {
+			processLineElementItemProvider = new ProcessLineElementItemProvider(
+					this);
+		}
+
+		return processLineElementItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.ProcessLineComponent} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected ProcessLineComponentItemProvider processLineComponentItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.ProcessLineComponent}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createProcessLineComponentAdapter() {
+		if (processLineComponentItemProvider == null) {
+			processLineComponentItemProvider = new ProcessLineComponentItemProvider(
+					this);
+		}
+
+		return processLineComponentItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.ProcessLineComponentPackage} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected ProcessLineComponentPackageItemProvider processLineComponentPackageItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.ProcessLineComponentPackage}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createProcessLineComponentPackageAdapter() {
+		if (processLineComponentPackageItemProvider == null) {
+			processLineComponentPackageItemProvider = new ProcessLineComponentPackageItemProvider(
+					this);
+		}
+
+		return processLineComponentPackageItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.ProcessLineComponentInterface} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected ProcessLineComponentInterfaceItemProvider processLineComponentInterfaceItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.ProcessLineComponentInterface}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createProcessLineComponentInterfaceAdapter() {
+		if (processLineComponentInterfaceItemProvider == null) {
+			processLineComponentInterfaceItemProvider = new ProcessLineComponentInterfaceItemProvider(
+					this);
+		}
+
+		return processLineComponentInterfaceItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.CoreProcessPackage} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected CoreProcessPackageItemProvider coreProcessPackageItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.CoreProcessPackage}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createCoreProcessPackageAdapter() {
+		if (coreProcessPackageItemProvider == null) {
+			coreProcessPackageItemProvider = new CoreProcessPackageItemProvider(
+					this);
+		}
+
+		return coreProcessPackageItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.TailoredProcess} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected TailoredProcessItemProvider tailoredProcessItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.TailoredProcess}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createTailoredProcessAdapter() {
+		if (tailoredProcessItemProvider == null) {
+			tailoredProcessItemProvider = new TailoredProcessItemProvider(this);
+		}
+
+		return tailoredProcessItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.TailoredProcessesPackage} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected TailoredProcessesPackageItemProvider tailoredProcessesPackageItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.TailoredProcessesPackage}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createTailoredProcessesPackageAdapter() {
+		if (tailoredProcessesPackageItemProvider == null) {
+			tailoredProcessesPackageItemProvider = new TailoredProcessesPackageItemProvider(
+					this);
+		}
+
+		return tailoredProcessesPackageItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.TailoredProcessComponent} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected TailoredProcessComponentItemProvider tailoredProcessComponentItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.TailoredProcessComponent}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createTailoredProcessComponentAdapter() {
+		if (tailoredProcessComponentItemProvider == null) {
+			tailoredProcessComponentItemProvider = new TailoredProcessComponentItemProvider(
+					this);
+		}
+
+		return tailoredProcessComponentItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.TailoredCoreProcessPackage} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected TailoredCoreProcessPackageItemProvider tailoredCoreProcessPackageItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.TailoredCoreProcessPackage}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createTailoredCoreProcessPackageAdapter() {
+		if (tailoredCoreProcessPackageItemProvider == null) {
+			tailoredCoreProcessPackageItemProvider = new TailoredCoreProcessPackageItemProvider(
+					this);
+		}
+
+		return tailoredCoreProcessPackageItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.VariationsPackage} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected VariationsPackageItemProvider variationsPackageItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.VariationsPackage}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createVariationsPackageAdapter() {
+		if (variationsPackageItemProvider == null) {
+			variationsPackageItemProvider = new VariationsPackageItemProvider(
+					this);
+		}
+
+		return variationsPackageItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.VariantsPackage} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected VariantsPackageItemProvider variantsPackageItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.VariantsPackage}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createVariantsPackageAdapter() {
+		if (variantsPackageItemProvider == null) {
+			variantsPackageItemProvider = new VariantsPackageItemProvider(this);
+		}
+
+		return variantsPackageItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.VarPointsPackage} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected VarPointsPackageItemProvider varPointsPackageItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.VarPointsPackage}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createVarPointsPackageAdapter() {
+		if (varPointsPackageItemProvider == null) {
+			varPointsPackageItemProvider = new VarPointsPackageItemProvider(
+					this);
+		}
+
+		return varPointsPackageItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.LineProcess} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected LineProcessItemProvider lineProcessItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.LineProcess}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createLineProcessAdapter() {
+		if (lineProcessItemProvider == null) {
+			lineProcessItemProvider = new LineProcessItemProvider(this);
+		}
+
+		return lineProcessItemProvider;
 	}
 
 	/**
@@ -1860,7 +2167,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createContentDescriptionAdapter() {
 		if (contentDescriptionItemProvider == null) {
 			contentDescriptionItemProvider = new ContentDescriptionItemProvider(
@@ -1884,7 +2190,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createSectionAdapter() {
 		if (sectionItemProvider == null) {
 			sectionItemProvider = new SectionItemProvider(this);
@@ -1907,7 +2212,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createArtifactDescriptionAdapter() {
 		if (artifactDescriptionItemProvider == null) {
 			artifactDescriptionItemProvider = new ArtifactDescriptionItemProvider(
@@ -1931,7 +2235,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createWorkProductDescriptionAdapter() {
 		if (workProductDescriptionItemProvider == null) {
 			workProductDescriptionItemProvider = new WorkProductDescriptionItemProvider(
@@ -1955,7 +2258,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createDeliverableDescriptionAdapter() {
 		if (deliverableDescriptionItemProvider == null) {
 			deliverableDescriptionItemProvider = new DeliverableDescriptionItemProvider(
@@ -1979,7 +2281,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createRoleDescriptionAdapter() {
 		if (roleDescriptionItemProvider == null) {
 			roleDescriptionItemProvider = new RoleDescriptionItemProvider(this);
@@ -2002,7 +2303,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createTaskDescriptionAdapter() {
 		if (taskDescriptionItemProvider == null) {
 			taskDescriptionItemProvider = new TaskDescriptionItemProvider(this);
@@ -2025,7 +2325,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createGuidanceDescriptionAdapter() {
 		if (guidanceDescriptionItemProvider == null) {
 			guidanceDescriptionItemProvider = new GuidanceDescriptionItemProvider(
@@ -2049,7 +2348,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createPracticeDescriptionAdapter() {
 		if (practiceDescriptionItemProvider == null) {
 			practiceDescriptionItemProvider = new PracticeDescriptionItemProvider(
@@ -2073,7 +2371,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createMethodConfigurationAdapter() {
 		if (methodConfigurationItemProvider == null) {
 			methodConfigurationItemProvider = new MethodConfigurationItemProvider(
@@ -2097,7 +2394,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createProcessFamilyAdapter() {
 		if (processFamilyItemProvider == null) {
 			processFamilyItemProvider = new ProcessFamilyItemProvider(this);
@@ -2120,13 +2416,833 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter createMethodLibraryAdapter() {
 		if (methodLibraryItemProvider == null) {
 			methodLibraryItemProvider = new MethodLibraryItemProvider(this);
 		}
 
 		return methodLibraryItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.VarPoint} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected VarPointItemProvider varPointItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.VarPoint}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createVarPointAdapter() {
+		if (varPointItemProvider == null) {
+			varPointItemProvider = new VarPointItemProvider(this);
+		}
+
+		return varPointItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.Variant} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected VariantItemProvider variantItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.Variant}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createVariantAdapter() {
+		if (variantItemProvider == null) {
+			variantItemProvider = new VariantItemProvider(this);
+		}
+
+		return variantItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.VarActivity} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected VarActivityItemProvider varActivityItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.VarActivity}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createVarActivityAdapter() {
+		if (varActivityItemProvider == null) {
+			varActivityItemProvider = new VarActivityItemProvider(this);
+		}
+
+		return varActivityItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.VarPhase} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected VarPhaseItemProvider varPhaseItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.VarPhase}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createVarPhaseAdapter() {
+		if (varPhaseItemProvider == null) {
+			varPhaseItemProvider = new VarPhaseItemProvider(this);
+		}
+
+		return varPhaseItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.VarIteration} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected VarIterationItemProvider varIterationItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.VarIteration}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createVarIterationAdapter() {
+		if (varIterationItemProvider == null) {
+			varIterationItemProvider = new VarIterationItemProvider(this);
+		}
+
+		return varIterationItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.VarRoleDescriptor} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected VarRoleDescriptorItemProvider varRoleDescriptorItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.VarRoleDescriptor}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createVarRoleDescriptorAdapter() {
+		if (varRoleDescriptorItemProvider == null) {
+			varRoleDescriptorItemProvider = new VarRoleDescriptorItemProvider(
+					this);
+		}
+
+		return varRoleDescriptorItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.VarTaskDescriptor} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected VarTaskDescriptorItemProvider varTaskDescriptorItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.VarTaskDescriptor}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createVarTaskDescriptorAdapter() {
+		if (varTaskDescriptorItemProvider == null) {
+			varTaskDescriptorItemProvider = new VarTaskDescriptorItemProvider(
+					this);
+		}
+
+		return varTaskDescriptorItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.VarMilestone} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected VarMilestoneItemProvider varMilestoneItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.VarMilestone}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createVarMilestoneAdapter() {
+		if (varMilestoneItemProvider == null) {
+			varMilestoneItemProvider = new VarMilestoneItemProvider(this);
+		}
+
+		return varMilestoneItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.VarTeamProfile} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected VarTeamProfileItemProvider varTeamProfileItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.VarTeamProfile}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createVarTeamProfileAdapter() {
+		if (varTeamProfileItemProvider == null) {
+			varTeamProfileItemProvider = new VarTeamProfileItemProvider(this);
+		}
+
+		return varTeamProfileItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.VarWorkProductDescriptor} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected VarWorkProductDescriptorItemProvider varWorkProductDescriptorItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.VarWorkProductDescriptor}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createVarWorkProductDescriptorAdapter() {
+		if (varWorkProductDescriptorItemProvider == null) {
+			varWorkProductDescriptorItemProvider = new VarWorkProductDescriptorItemProvider(
+					this);
+		}
+
+		return varWorkProductDescriptorItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.ProcAspect} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected ProcAspectItemProvider procAspectItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.ProcAspect}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createProcAspectAdapter() {
+		if (procAspectItemProvider == null) {
+			procAspectItemProvider = new ProcAspectItemProvider(this);
+		}
+
+		return procAspectItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.VariantsListPackage} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected VariantsListPackageItemProvider variantsListPackageItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.VariantsListPackage}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createVariantsListPackageAdapter() {
+		if (variantsListPackageItemProvider == null) {
+			variantsListPackageItemProvider = new VariantsListPackageItemProvider(
+					this);
+		}
+
+		return variantsListPackageItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.Variation} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected VariationItemProvider variationItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.Variation}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createVariationAdapter() {
+		if (variationItemProvider == null) {
+			variationItemProvider = new VariationItemProvider(this);
+		}
+
+		return variationItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.Occupation} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected OccupationItemProvider occupationItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.Occupation}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createOccupationAdapter() {
+		if (occupationItemProvider == null) {
+			occupationItemProvider = new OccupationItemProvider(this);
+		}
+
+		return occupationItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.ProcAdvice} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected ProcAdviceItemProvider procAdviceItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.ProcAdvice}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createProcAdviceAdapter() {
+		if (procAdviceItemProvider == null) {
+			procAdviceItemProvider = new ProcAdviceItemProvider(this);
+		}
+
+		return procAdviceItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.ProcPointcut} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected ProcPointcutItemProvider procPointcutItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.ProcPointcut}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createProcPointcutAdapter() {
+		if (procPointcutItemProvider == null) {
+			procPointcutItemProvider = new ProcPointcutItemProvider(this);
+		}
+
+		return procPointcutItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.Dependences} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected DependencesItemProvider dependencesItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.Dependences}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createDependencesAdapter() {
+		if (dependencesItemProvider == null) {
+			dependencesItemProvider = new DependencesItemProvider(this);
+		}
+
+		return dependencesItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.variant2varP} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected variant2varPItemProvider variant2varPItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.variant2varP}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createvariant2varPAdapter() {
+		if (variant2varPItemProvider == null) {
+			variant2varPItemProvider = new variant2varPItemProvider(this);
+		}
+
+		return variant2varPItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.variant2variant} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected variant2variantItemProvider variant2variantItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.variant2variant}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createvariant2variantAdapter() {
+		if (variant2variantItemProvider == null) {
+			variant2variantItemProvider = new variant2variantItemProvider(this);
+		}
+
+		return variant2variantItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.varp2variant} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected varp2variantItemProvider varp2variantItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.varp2variant}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createvarp2variantAdapter() {
+		if (varp2variantItemProvider == null) {
+			varp2variantItemProvider = new varp2variantItemProvider(this);
+		}
+
+		return varp2variantItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.varP2varP} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected varP2varPItemProvider varP2varPItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.varP2varP}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createvarP2varPAdapter() {
+		if (varP2varPItemProvider == null) {
+			varP2varPItemProvider = new varP2varPItemProvider(this);
+		}
+
+		return varP2varPItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.ProcessLine} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected ProcessLineItemProvider processLineItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.ProcessLine}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createProcessLineAdapter() {
+		if (processLineItemProvider == null) {
+			processLineItemProvider = new ProcessLineItemProvider(this);
+		}
+
+		return processLineItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.VariationType} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected VariationTypeItemProvider variationTypeItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.VariationType}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createVariationTypeAdapter() {
+		if (variationTypeItemProvider == null) {
+			variationTypeItemProvider = new VariationTypeItemProvider(this);
+		}
+
+		return variationTypeItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.Optative} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected OptativeItemProvider optativeItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.Optative}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createOptativeAdapter() {
+		if (optativeItemProvider == null) {
+			optativeItemProvider = new OptativeItemProvider(this);
+		}
+
+		return optativeItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.Mandatory} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected MandatoryItemProvider mandatoryItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.Mandatory}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createMandatoryAdapter() {
+		if (mandatoryItemProvider == null) {
+			mandatoryItemProvider = new MandatoryItemProvider(this);
+		}
+
+		return mandatoryItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.Optional} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected OptionalItemProvider optionalItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.Optional}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createOptionalAdapter() {
+		if (optionalItemProvider == null) {
+			optionalItemProvider = new OptionalItemProvider(this);
+		}
+
+		return optionalItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.vpIteration} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected vpIterationItemProvider vpIterationItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.vpIteration}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createvpIterationAdapter() {
+		if (vpIterationItemProvider == null) {
+			vpIterationItemProvider = new vpIterationItemProvider(this);
+		}
+
+		return vpIterationItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.vpRoleDescriptor} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected vpRoleDescriptorItemProvider vpRoleDescriptorItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.vpRoleDescriptor}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createvpRoleDescriptorAdapter() {
+		if (vpRoleDescriptorItemProvider == null) {
+			vpRoleDescriptorItemProvider = new vpRoleDescriptorItemProvider(
+					this);
+		}
+
+		return vpRoleDescriptorItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.vpTaskDescriptor} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected vpTaskDescriptorItemProvider vpTaskDescriptorItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.vpTaskDescriptor}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createvpTaskDescriptorAdapter() {
+		if (vpTaskDescriptorItemProvider == null) {
+			vpTaskDescriptorItemProvider = new vpTaskDescriptorItemProvider(
+					this);
+		}
+
+		return vpTaskDescriptorItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.vpMilestone} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected vpMilestoneItemProvider vpMilestoneItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.vpMilestone}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createvpMilestoneAdapter() {
+		if (vpMilestoneItemProvider == null) {
+			vpMilestoneItemProvider = new vpMilestoneItemProvider(this);
+		}
+
+		return vpMilestoneItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.vpTeamProfile} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected vpTeamProfileItemProvider vpTeamProfileItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.vpTeamProfile}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createvpTeamProfileAdapter() {
+		if (vpTeamProfileItemProvider == null) {
+			vpTeamProfileItemProvider = new vpTeamProfileItemProvider(this);
+		}
+
+		return vpTeamProfileItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.vpWorkProductDescriptor} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected vpWorkProductDescriptorItemProvider vpWorkProductDescriptorItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.vpWorkProductDescriptor}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createvpWorkProductDescriptorAdapter() {
+		if (vpWorkProductDescriptorItemProvider == null) {
+			vpWorkProductDescriptorItemProvider = new vpWorkProductDescriptorItemProvider(
+					this);
+		}
+
+		return vpWorkProductDescriptorItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.vIteration} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected vIterationItemProvider vIterationItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.vIteration}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createvIterationAdapter() {
+		if (vIterationItemProvider == null) {
+			vIterationItemProvider = new vIterationItemProvider(this);
+		}
+
+		return vIterationItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.vPhase} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected vPhaseItemProvider vPhaseItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.vPhase}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createvPhaseAdapter() {
+		if (vPhaseItemProvider == null) {
+			vPhaseItemProvider = new vPhaseItemProvider(this);
+		}
+
+		return vPhaseItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.vpPhase} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected vpPhaseItemProvider vpPhaseItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.vpPhase}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createvpPhaseAdapter() {
+		if (vpPhaseItemProvider == null) {
+			vpPhaseItemProvider = new vpPhaseItemProvider(this);
+		}
+
+		return vpPhaseItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.vActivity} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected vActivityItemProvider vActivityItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.vActivity}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createvActivityAdapter() {
+		if (vActivityItemProvider == null) {
+			vActivityItemProvider = new vActivityItemProvider(this);
+		}
+
+		return vActivityItemProvider;
+	}
+
+	/**
+	 * This keeps track of the one adapter used for all {@link org.eclipse.epf.uma.vpActivity} instances.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	protected vpActivityItemProvider vpActivityItemProvider;
+
+	/**
+	 * This creates an adapter for a {@link org.eclipse.epf.uma.vpActivity}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Adapter createvpActivityAdapter() {
+		if (vpActivityItemProvider == null) {
+			vpActivityItemProvider = new vpActivityItemProvider(this);
+		}
+
+		return vpActivityItemProvider;
 	}
 
 	/**
@@ -2156,7 +3272,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean isFactoryForType(Object type) {
 		return supportedTypes.contains(type) || super.isFactoryForType(type);
 	}
@@ -2167,7 +3282,6 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Adapter adapt(Notifier notifier, Object type) {
 		return super.adapt(notifier, this);
 	}
@@ -2177,12 +3291,11 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object adapt(Object object, Object type) {
 		if (isFactoryForType(type)) {
 			Object adapter = super.adapt(object, type);
 			if (!(type instanceof Class)
-					|| (((Class<?>) type).isInstance(adapter))) {
+					|| (((Class) type).isInstance(adapter))) {
 				return adapter;
 			}
 		}
@@ -2237,54 +3350,24 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 			constraintItemProvider.dispose();
 		if (methodElementPropertyItemProvider != null)
 			methodElementPropertyItemProvider.dispose();
-		if (kindItemProvider != null)
-			kindItemProvider.dispose();
 		if (contentDescriptionItemProvider != null)
 			contentDescriptionItemProvider.dispose();
-		if (supportingMaterialItemProvider != null)
-			supportingMaterialItemProvider.dispose();
 		if (sectionItemProvider != null)
 			sectionItemProvider.dispose();
-		if (conceptItemProvider != null)
-			conceptItemProvider.dispose();
-		if (checklistItemProvider != null)
-			checklistItemProvider.dispose();
-		if (guidelineItemProvider != null)
-			guidelineItemProvider.dispose();
-		if (exampleItemProvider != null)
-			exampleItemProvider.dispose();
-		if (reusableAssetItemProvider != null)
-			reusableAssetItemProvider.dispose();
-		if (termDefinitionItemProvider != null)
-			termDefinitionItemProvider.dispose();
-		if (applicableMetaClassInfoItemProvider != null)
-			applicableMetaClassInfoItemProvider.dispose();
+		if (roleItemProvider != null)
+			roleItemProvider.dispose();
+		if (taskItemProvider != null)
+			taskItemProvider.dispose();
+		if (stepItemProvider != null)
+			stepItemProvider.dispose();
 		if (artifactItemProvider != null)
 			artifactItemProvider.dispose();
-		if (workProductItemProvider != null)
-			workProductItemProvider.dispose();
-		if (fulfillableElementItemProvider != null)
-			fulfillableElementItemProvider.dispose();
-		if (reportItemProvider != null)
-			reportItemProvider.dispose();
-		if (templateItemProvider != null)
-			templateItemProvider.dispose();
-		if (toolMentorItemProvider != null)
-			toolMentorItemProvider.dispose();
-		if (estimationConsiderationsItemProvider != null)
-			estimationConsiderationsItemProvider.dispose();
 		if (deliverableItemProvider != null)
 			deliverableItemProvider.dispose();
 		if (outcomeItemProvider != null)
 			outcomeItemProvider.dispose();
-		if (stepItemProvider != null)
-			stepItemProvider.dispose();
-		if (whitepaperItemProvider != null)
-			whitepaperItemProvider.dispose();
-		if (taskItemProvider != null)
-			taskItemProvider.dispose();
-		if (roleItemProvider != null)
-			roleItemProvider.dispose();
+		if (contentPackageItemProvider != null)
+			contentPackageItemProvider.dispose();
 		if (artifactDescriptionItemProvider != null)
 			artifactDescriptionItemProvider.dispose();
 		if (workProductDescriptionItemProvider != null)
@@ -2299,96 +3382,24 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 			guidanceDescriptionItemProvider.dispose();
 		if (practiceDescriptionItemProvider != null)
 			practiceDescriptionItemProvider.dispose();
-		if (roleSetItemProvider != null)
-			roleSetItemProvider.dispose();
-		if (domainItemProvider != null)
-			domainItemProvider.dispose();
-		if (workProductTypeItemProvider != null)
-			workProductTypeItemProvider.dispose();
-		if (disciplineGroupingItemProvider != null)
-			disciplineGroupingItemProvider.dispose();
-		if (disciplineItemProvider != null)
-			disciplineItemProvider.dispose();
-		if (activityItemProvider != null)
-			activityItemProvider.dispose();
-		if (planningDataItemProvider != null)
-			planningDataItemProvider.dispose();
-		if (workOrderItemProvider != null)
-			workOrderItemProvider.dispose();
-		if (roadmapItemProvider != null)
-			roadmapItemProvider.dispose();
-		if (toolItemProvider != null)
-			toolItemProvider.dispose();
-		if (roleSetGroupingItemProvider != null)
-			roleSetGroupingItemProvider.dispose();
-		if (customCategoryItemProvider != null)
-			customCategoryItemProvider.dispose();
-		if (contentPackageItemProvider != null)
-			contentPackageItemProvider.dispose();
-		if (milestoneItemProvider != null)
-			milestoneItemProvider.dispose();
-		if (workProductDescriptorItemProvider != null)
-			workProductDescriptorItemProvider.dispose();
-		if (iterationItemProvider != null)
-			iterationItemProvider.dispose();
-		if (phaseItemProvider != null)
-			phaseItemProvider.dispose();
-		if (teamProfileItemProvider != null)
-			teamProfileItemProvider.dispose();
-		if (roleDescriptorItemProvider != null)
-			roleDescriptorItemProvider.dispose();
-		if (taskDescriptorItemProvider != null)
-			taskDescriptorItemProvider.dispose();
-		if (compositeRoleItemProvider != null)
-			compositeRoleItemProvider.dispose();
-		if (deliveryProcessItemProvider != null)
-			deliveryProcessItemProvider.dispose();
-		if (capabilityPatternItemProvider != null)
-			capabilityPatternItemProvider.dispose();
-		if (methodConfigurationItemProvider != null)
-			methodConfigurationItemProvider.dispose();
-		if (methodPluginItemProvider != null)
-			methodPluginItemProvider.dispose();
-		if (processPlanningTemplateItemProvider != null)
-			processPlanningTemplateItemProvider.dispose();
-		if (practiceItemProvider != null)
-			practiceItemProvider.dispose();
-		if (breakdownElementDescriptionItemProvider != null)
-			breakdownElementDescriptionItemProvider.dispose();
-		if (activityDescriptionItemProvider != null)
-			activityDescriptionItemProvider.dispose();
-		if (deliveryProcessDescriptionItemProvider != null)
-			deliveryProcessDescriptionItemProvider.dispose();
-		if (processDescriptionItemProvider != null)
-			processDescriptionItemProvider.dispose();
-		if (descriptorDescriptionItemProvider != null)
-			descriptorDescriptionItemProvider.dispose();
-		if (processComponentDescriptorItemProvider != null)
-			processComponentDescriptorItemProvider.dispose();
-		if (processComponentItemProvider != null)
-			processComponentItemProvider.dispose();
-		if (processPackageItemProvider != null)
-			processPackageItemProvider.dispose();
-		if (diagramItemProvider != null)
-			diagramItemProvider.dispose();
-		if (graphNodeItemProvider != null)
-			graphNodeItemProvider.dispose();
-		if (referenceItemProvider != null)
-			referenceItemProvider.dispose();
-		if (propertyItemProvider != null)
-			propertyItemProvider.dispose();
 		if (pointItemProvider != null)
 			pointItemProvider.dispose();
 		if (diagramLinkItemProvider != null)
 			diagramLinkItemProvider.dispose();
 		if (graphConnectorItemProvider != null)
 			graphConnectorItemProvider.dispose();
-		if (graphEdgeItemProvider != null)
-			graphEdgeItemProvider.dispose();
 		if (dimensionItemProvider != null)
 			dimensionItemProvider.dispose();
-		if (processComponentInterfaceItemProvider != null)
-			processComponentInterfaceItemProvider.dispose();
+		if (referenceItemProvider != null)
+			referenceItemProvider.dispose();
+		if (propertyItemProvider != null)
+			propertyItemProvider.dispose();
+		if (graphEdgeItemProvider != null)
+			graphEdgeItemProvider.dispose();
+		if (diagramItemProvider != null)
+			diagramItemProvider.dispose();
+		if (graphNodeItemProvider != null)
+			graphNodeItemProvider.dispose();
 		if (simpleSemanticModelElementItemProvider != null)
 			simpleSemanticModelElementItemProvider.dispose();
 		if (umaSemanticModelBridgeItemProvider != null)
@@ -2403,10 +3414,220 @@ public class UmaItemProviderAdapterFactory extends UmaAdapterFactory implements
 			polylineItemProvider.dispose();
 		if (ellipseItemProvider != null)
 			ellipseItemProvider.dispose();
+		if (milestoneItemProvider != null)
+			milestoneItemProvider.dispose();
+		if (iterationItemProvider != null)
+			iterationItemProvider.dispose();
+		if (phaseItemProvider != null)
+			phaseItemProvider.dispose();
+		if (teamProfileItemProvider != null)
+			teamProfileItemProvider.dispose();
+		if (roleDescriptorItemProvider != null)
+			roleDescriptorItemProvider.dispose();
+		if (workOrderItemProvider != null)
+			workOrderItemProvider.dispose();
+		if (planningDataItemProvider != null)
+			planningDataItemProvider.dispose();
+		if (workProductDescriptorItemProvider != null)
+			workProductDescriptorItemProvider.dispose();
+		if (taskDescriptorItemProvider != null)
+			taskDescriptorItemProvider.dispose();
+		if (compositeRoleItemProvider != null)
+			compositeRoleItemProvider.dispose();
+		if (breakdownElementDescriptionItemProvider != null)
+			breakdownElementDescriptionItemProvider.dispose();
+		if (activityDescriptionItemProvider != null)
+			activityDescriptionItemProvider.dispose();
+		if (deliveryProcessDescriptionItemProvider != null)
+			deliveryProcessDescriptionItemProvider.dispose();
+		if (processDescriptionItemProvider != null)
+			processDescriptionItemProvider.dispose();
+		if (descriptorDescriptionItemProvider != null)
+			descriptorDescriptionItemProvider.dispose();
+		if (conceptItemProvider != null)
+			conceptItemProvider.dispose();
+		if (checklistItemProvider != null)
+			checklistItemProvider.dispose();
+		if (exampleItemProvider != null)
+			exampleItemProvider.dispose();
+		if (guidelineItemProvider != null)
+			guidelineItemProvider.dispose();
+		if (reportItemProvider != null)
+			reportItemProvider.dispose();
+		if (templateItemProvider != null)
+			templateItemProvider.dispose();
+		if (supportingMaterialItemProvider != null)
+			supportingMaterialItemProvider.dispose();
+		if (toolMentorItemProvider != null)
+			toolMentorItemProvider.dispose();
+		if (whitepaperItemProvider != null)
+			whitepaperItemProvider.dispose();
+		if (termDefinitionItemProvider != null)
+			termDefinitionItemProvider.dispose();
+		if (practiceItemProvider != null)
+			practiceItemProvider.dispose();
+		if (estimationConsiderationsItemProvider != null)
+			estimationConsiderationsItemProvider.dispose();
+		if (reusableAssetItemProvider != null)
+			reusableAssetItemProvider.dispose();
+		if (stateItemProvider != null)
+			stateItemProvider.dispose();
+		if (vertexItemProvider != null)
+			vertexItemProvider.dispose();
+		if (regionItemProvider != null)
+			regionItemProvider.dispose();
+		if (stateMachineItemProvider != null)
+			stateMachineItemProvider.dispose();
+		if (transitionItemProvider != null)
+			transitionItemProvider.dispose();
+		if (pseudoStateItemProvider != null)
+			pseudoStateItemProvider.dispose();
+		if (disciplineItemProvider != null)
+			disciplineItemProvider.dispose();
+		if (roleSetItemProvider != null)
+			roleSetItemProvider.dispose();
+		if (domainItemProvider != null)
+			domainItemProvider.dispose();
+		if (pruebasLineasItemProvider != null)
+			pruebasLineasItemProvider.dispose();
+		if (workProductTypeItemProvider != null)
+			workProductTypeItemProvider.dispose();
+		if (disciplineGroupingItemProvider != null)
+			disciplineGroupingItemProvider.dispose();
+		if (toolItemProvider != null)
+			toolItemProvider.dispose();
+		if (roleSetGroupingItemProvider != null)
+			roleSetGroupingItemProvider.dispose();
+		if (customCategoryItemProvider != null)
+			customCategoryItemProvider.dispose();
+		if (deliveryProcessItemProvider != null)
+			deliveryProcessItemProvider.dispose();
+		if (capabilityPatternItemProvider != null)
+			capabilityPatternItemProvider.dispose();
+		if (processPlanningTemplateItemProvider != null)
+			processPlanningTemplateItemProvider.dispose();
+		if (roadmapItemProvider != null)
+			roadmapItemProvider.dispose();
+		if (processComponentItemProvider != null)
+			processComponentItemProvider.dispose();
+		if (processPackageItemProvider != null)
+			processPackageItemProvider.dispose();
+		if (processComponentInterfaceItemProvider != null)
+			processComponentInterfaceItemProvider.dispose();
+		if (processComponentDescriptorItemProvider != null)
+			processComponentDescriptorItemProvider.dispose();
+		if (methodPluginItemProvider != null)
+			methodPluginItemProvider.dispose();
+		if (lineProcessItemProvider != null)
+			lineProcessItemProvider.dispose();
+		if (processLinesPackageItemProvider != null)
+			processLinesPackageItemProvider.dispose();
+		if (processLineElementItemProvider != null)
+			processLineElementItemProvider.dispose();
+		if (processLineComponentItemProvider != null)
+			processLineComponentItemProvider.dispose();
+		if (processLineComponentPackageItemProvider != null)
+			processLineComponentPackageItemProvider.dispose();
+		if (processLineComponentInterfaceItemProvider != null)
+			processLineComponentInterfaceItemProvider.dispose();
+		if (coreProcessPackageItemProvider != null)
+			coreProcessPackageItemProvider.dispose();
+		if (tailoredProcessItemProvider != null)
+			tailoredProcessItemProvider.dispose();
+		if (tailoredProcessesPackageItemProvider != null)
+			tailoredProcessesPackageItemProvider.dispose();
+		if (tailoredProcessComponentItemProvider != null)
+			tailoredProcessComponentItemProvider.dispose();
+		if (tailoredCoreProcessPackageItemProvider != null)
+			tailoredCoreProcessPackageItemProvider.dispose();
+		if (methodConfigurationItemProvider != null)
+			methodConfigurationItemProvider.dispose();
 		if (processFamilyItemProvider != null)
 			processFamilyItemProvider.dispose();
 		if (methodLibraryItemProvider != null)
 			methodLibraryItemProvider.dispose();
+		if (varPointItemProvider != null)
+			varPointItemProvider.dispose();
+		if (vpActivityItemProvider != null)
+			vpActivityItemProvider.dispose();
+		if (vpPhaseItemProvider != null)
+			vpPhaseItemProvider.dispose();
+		if (vpIterationItemProvider != null)
+			vpIterationItemProvider.dispose();
+		if (vpRoleDescriptorItemProvider != null)
+			vpRoleDescriptorItemProvider.dispose();
+		if (vpTaskDescriptorItemProvider != null)
+			vpTaskDescriptorItemProvider.dispose();
+		if (vpMilestoneItemProvider != null)
+			vpMilestoneItemProvider.dispose();
+		if (vpTeamProfileItemProvider != null)
+			vpTeamProfileItemProvider.dispose();
+		if (vpWorkProductDescriptorItemProvider != null)
+			vpWorkProductDescriptorItemProvider.dispose();
+		if (variantItemProvider != null)
+			variantItemProvider.dispose();
+		if (varActivityItemProvider != null)
+			varActivityItemProvider.dispose();
+		if (varPhaseItemProvider != null)
+			varPhaseItemProvider.dispose();
+		if (varIterationItemProvider != null)
+			varIterationItemProvider.dispose();
+		if (varRoleDescriptorItemProvider != null)
+			varRoleDescriptorItemProvider.dispose();
+		if (varTaskDescriptorItemProvider != null)
+			varTaskDescriptorItemProvider.dispose();
+		if (varMilestoneItemProvider != null)
+			varMilestoneItemProvider.dispose();
+		if (varTeamProfileItemProvider != null)
+			varTeamProfileItemProvider.dispose();
+		if (varWorkProductDescriptorItemProvider != null)
+			varWorkProductDescriptorItemProvider.dispose();
+		if (activityItemProvider != null)
+			activityItemProvider.dispose();
+		if (procAspectItemProvider != null)
+			procAspectItemProvider.dispose();
+		if (variantsListPackageItemProvider != null)
+			variantsListPackageItemProvider.dispose();
+		if (variantsPackageItemProvider != null)
+			variantsPackageItemProvider.dispose();
+		if (varPointsPackageItemProvider != null)
+			varPointsPackageItemProvider.dispose();
+		if (variationsPackageItemProvider != null)
+			variationsPackageItemProvider.dispose();
+		if (variationItemProvider != null)
+			variationItemProvider.dispose();
+		if (variationTypeItemProvider != null)
+			variationTypeItemProvider.dispose();
+		if (occupationItemProvider != null)
+			occupationItemProvider.dispose();
+		if (procAdviceItemProvider != null)
+			procAdviceItemProvider.dispose();
+		if (procPointcutItemProvider != null)
+			procPointcutItemProvider.dispose();
+		if (dependencesItemProvider != null)
+			dependencesItemProvider.dispose();
+		if (variant2varPItemProvider != null)
+			variant2varPItemProvider.dispose();
+		if (variant2variantItemProvider != null)
+			variant2variantItemProvider.dispose();
+		if (varp2variantItemProvider != null)
+			varp2variantItemProvider.dispose();
+		if (varP2varPItemProvider != null)
+			varP2varPItemProvider.dispose();
+		if (processLineItemProvider != null)
+			processLineItemProvider.dispose();
+		if (optativeItemProvider != null)
+			optativeItemProvider.dispose();
+		if (mandatoryItemProvider != null)
+			mandatoryItemProvider.dispose();
+		if (optionalItemProvider != null)
+			optionalItemProvider.dispose();
+		if (vIterationItemProvider != null)
+			vIterationItemProvider.dispose();
+		if (vPhaseItemProvider != null)
+			vPhaseItemProvider.dispose();
+		if (vActivityItemProvider != null)
+			vActivityItemProvider.dispose();
 	}
 
 }

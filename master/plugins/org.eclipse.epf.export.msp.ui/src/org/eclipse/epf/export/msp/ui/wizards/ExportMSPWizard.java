@@ -15,13 +15,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.epf.authoring.ui.wizards.SelectProcessPage;
 import org.eclipse.epf.export.msp.ExportMSPOptions;
 import org.eclipse.epf.export.msp.ExportMSPService;
 import org.eclipse.epf.export.msp.ExportMSPServiceException;
 import org.eclipse.epf.export.msp.IExportMSPService;
 import org.eclipse.epf.export.msp.ui.ExportMSPUIPlugin;
 import org.eclipse.epf.export.msp.ui.ExportMSPUIResources;
+import org.eclipse.epf.library.ui.wizards.SelectProcessPage;
 import org.eclipse.epf.publishing.services.PublishOptions;
 import org.eclipse.epf.publishing.util.PublishingUtil;
 import org.eclipse.epf.ui.wizards.BaseWizard;
@@ -164,7 +164,7 @@ public class ExportMSPWizard extends BaseWizard implements IExportWizard {
 		super.createPageControls(pageContainer);
 		pageContainer.getShell().setImage(
 				ExportMSPUIPlugin.getDefault().getSharedImage(
-						"full/wizban/exp_ms_prj_wizban.gif")); //$NON-NLS-1$
+						"full/obj16/MSProject.gif")); //$NON-NLS-1$
 	}
 
 	/**

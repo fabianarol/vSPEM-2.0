@@ -37,6 +37,13 @@ import org.eclipse.epf.uma.VariabilityType;
 public abstract class VariabilityElementImpl extends MethodElementImpl
 		implements VariabilityElement {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The default value of the '{@link #getVariabilityType() <em>Variability Type</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -44,7 +51,7 @@ public abstract class VariabilityElementImpl extends MethodElementImpl
 	 * @generated
 	 * @ordered
 	 */
-	protected static final VariabilityType VARIABILITY_TYPE_EDEFAULT = VariabilityType.NA;
+	protected static final VariabilityType VARIABILITY_TYPE_EDEFAULT = VariabilityType.NA_LITERAL;
 
 	/**
 	 * The cached value of the '{@link #getVariabilityType() <em>Variability Type</em>}' attribute.
@@ -64,7 +71,7 @@ public abstract class VariabilityElementImpl extends MethodElementImpl
 	 * @generated
 	 * @ordered
 	 */
-	protected VariabilityElement variabilityBasedOnElement;
+	protected VariabilityElement variabilityBasedOnElement = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -76,7 +83,7 @@ public abstract class VariabilityElementImpl extends MethodElementImpl
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -84,7 +91,6 @@ public abstract class VariabilityElementImpl extends MethodElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.VARIABILITY_ELEMENT;
 	}
@@ -167,7 +173,6 @@ public abstract class VariabilityElementImpl extends MethodElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.VARIABILITY_ELEMENT__VARIABILITY_TYPE:
@@ -185,7 +190,6 @@ public abstract class VariabilityElementImpl extends MethodElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.VARIABILITY_ELEMENT__VARIABILITY_TYPE:
@@ -203,7 +207,6 @@ public abstract class VariabilityElementImpl extends MethodElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.VARIABILITY_ELEMENT__VARIABILITY_TYPE:
@@ -221,7 +224,6 @@ public abstract class VariabilityElementImpl extends MethodElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);
@@ -243,7 +245,6 @@ public abstract class VariabilityElementImpl extends MethodElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy())
 			return super.toString();

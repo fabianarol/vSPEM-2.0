@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: MethodPackage.java,v 1.4 2007/05/04 22:46:43 klow Exp $
+ */
 package org.eclipse.epf.xml.uma;
 
 import org.eclipse.emf.common.util.EList;
@@ -49,7 +45,7 @@ public interface MethodPackage extends MethodElement {
 	 * @return the value of the '<em>Group1</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getMethodPackage_Group1()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
-	 *        extendedMetaData="kind='group' name='group:9'"
+	 *        extendedMetaData="kind='group' name='group:8'"
 	 * @generated
 	 */
 	FeatureMap getGroup1();
@@ -65,11 +61,11 @@ public interface MethodPackage extends MethodElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Reused Package</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getMethodPackage_ReusedPackage()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='ReusedPackage' group='#group:9'"
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='ReusedPackage' group='#group:8'"
 	 * @generated
 	 */
-	EList<String> getReusedPackage();
+	EList getReusedPackage();
 
 	/**
 	 * Returns the value of the '<em><b>Method Package</b></em>' containment reference list.
@@ -82,11 +78,11 @@ public interface MethodPackage extends MethodElement {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Method Package</em>' containment reference list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getMethodPackage_MethodPackage()
-	 * @model containment="true" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='MethodPackage' group='#group:9'"
+	 * @model type="org.eclipse.epf.xml.uma.MethodPackage" containment="true" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='MethodPackage' group='#group:8'"
 	 * @generated
 	 */
-	EList<MethodPackage> getMethodPackage();
+	EList getMethodPackage();
 
 	/**
 	 * Returns the value of the '<em><b>Global</b></em>' attribute.
@@ -100,7 +96,7 @@ public interface MethodPackage extends MethodElement {
 	 * @see #unsetGlobal()
 	 * @see #setGlobal(boolean)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getMethodPackage_Global()
-	 * @model unsettable="true" dataType="org.eclipse.emf.ecore.xml.type.Boolean"
+	 * @model unique="false" unsettable="true" dataType="org.eclipse.emf.ecore.xml.type.Boolean"
 	 *        extendedMetaData="kind='attribute' name='global'"
 	 * @generated
 	 */

@@ -45,8 +45,6 @@ public final class ImportXMLResources extends NLS {
 	public static String overwriteRadioButton_text;
 
 	public static String mergeRadioButton_text;
-	
-	public static String mergeRadioButton2_text;
 
 	public static String importingXML_text;
 

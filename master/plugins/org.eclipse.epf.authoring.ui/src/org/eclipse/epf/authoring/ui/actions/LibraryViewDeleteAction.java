@@ -26,11 +26,10 @@ import org.eclipse.epf.authoring.ui.AuthoringUIPlugin;
 import org.eclipse.epf.authoring.ui.AuthoringUIResources;
 import org.eclipse.epf.authoring.ui.editors.IEditorKeeper;
 import org.eclipse.epf.authoring.ui.views.LibraryView;
-import org.eclipse.epf.common.utils.FileUtil;
+import org.eclipse.epf.common.serviceability.MsgBox;
 import org.eclipse.epf.library.LibraryService;
 import org.eclipse.epf.library.LibraryServiceUtil;
 import org.eclipse.epf.library.edit.FeatureValueWrapperItemProvider;
-import org.eclipse.epf.library.edit.LibraryEditPlugin;
 import org.eclipse.epf.library.edit.command.DeleteMethodElementCommand;
 import org.eclipse.epf.library.edit.ui.UserInteractionHelper;
 import org.eclipse.epf.library.edit.util.TngUtil;
@@ -195,7 +194,6 @@ public class LibraryViewDeleteAction extends MethodElementDeleteAction {
 						modifiedResources.add(container.eResource());
 					}
 				}
-				FileUtil.getValidateEdit().addDeleteResourceToCheck(modifiedResources, object);
 			}
 		}
 
@@ -241,7 +239,7 @@ public class LibraryViewDeleteAction extends MethodElementDeleteAction {
 		}
 
 		IStatus status = UserInteractionHelper.checkModify(modifiedResources,
-				LibraryEditPlugin.getDefault().getContext());
+				MsgBox.getDefaultShell());
 		if (!status.isOK()) {
 			AuthoringUIPlugin.getDefault().getMsgDialog().display(
 					AuthoringUIResources.deleteDialog_title, 
@@ -265,8 +263,6 @@ public class LibraryViewDeleteAction extends MethodElementDeleteAction {
 							refreshList.add(aReference);
 						}
 					}
-					
-					IEditorKeeper.REFERENCE.getEditorKeeper().closeEditors(deletingObject, false);
 				}
 			}
 

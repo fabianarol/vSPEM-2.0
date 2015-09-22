@@ -41,7 +41,7 @@ public interface ArtifactDescription extends WorkProductDescription {
 	 * @return the value of the '<em>Brief Outline</em>' attribute.
 	 * @see #setBriefOutline(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getArtifactDescription_BriefOutline()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getBriefOutline();
@@ -67,7 +67,7 @@ public interface ArtifactDescription extends WorkProductDescription {
 	 * @return the value of the '<em>Representation Options</em>' attribute.
 	 * @see #setRepresentationOptions(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getArtifactDescription_RepresentationOptions()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getRepresentationOptions();
@@ -94,7 +94,7 @@ public interface ArtifactDescription extends WorkProductDescription {
 	 * @return the value of the '<em>Representation</em>' attribute.
 	 * @see #setRepresentation(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getArtifactDescription_Representation()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getRepresentation();
@@ -121,7 +121,7 @@ public interface ArtifactDescription extends WorkProductDescription {
 	 * @return the value of the '<em>Notation</em>' attribute.
 	 * @see #setNotation(String)
 	 * @see org.eclipse.epf.uma.UmaPackage#getArtifactDescription_Notation()
-	 * @model default="" dataType="org.eclipse.epf.uma.String" ordered="false"
+	 * @model default="" dataType="org.eclipse.epf.uma.String"
 	 * @generated
 	 */
 	String getNotation();

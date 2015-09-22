@@ -37,6 +37,13 @@ import org.eclipse.epf.uma.WorkOrderType;
  */
 public class WorkOrderImpl extends ProcessElementImpl implements WorkOrder {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The default value of the '{@link #getLinkType() <em>Link Type</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -44,7 +51,7 @@ public class WorkOrderImpl extends ProcessElementImpl implements WorkOrder {
 	 * @generated
 	 * @ordered
 	 */
-	protected static final WorkOrderType LINK_TYPE_EDEFAULT = WorkOrderType.FINISH_TO_START;
+	protected static final WorkOrderType LINK_TYPE_EDEFAULT = WorkOrderType.FINISH_TO_START_LITERAL;
 
 	/**
 	 * The cached value of the '{@link #getLinkType() <em>Link Type</em>}' attribute.
@@ -64,7 +71,7 @@ public class WorkOrderImpl extends ProcessElementImpl implements WorkOrder {
 	 * @generated
 	 * @ordered
 	 */
-	protected WorkBreakdownElement pred;
+	protected WorkBreakdownElement pred = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -76,7 +83,7 @@ public class WorkOrderImpl extends ProcessElementImpl implements WorkOrder {
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -84,7 +91,6 @@ public class WorkOrderImpl extends ProcessElementImpl implements WorkOrder {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.WORK_ORDER;
 	}
@@ -156,7 +162,6 @@ public class WorkOrderImpl extends ProcessElementImpl implements WorkOrder {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.WORK_ORDER__LINK_TYPE:
@@ -174,7 +179,6 @@ public class WorkOrderImpl extends ProcessElementImpl implements WorkOrder {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.WORK_ORDER__LINK_TYPE:
@@ -192,7 +196,6 @@ public class WorkOrderImpl extends ProcessElementImpl implements WorkOrder {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.WORK_ORDER__LINK_TYPE:
@@ -210,7 +213,6 @@ public class WorkOrderImpl extends ProcessElementImpl implements WorkOrder {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);
@@ -232,7 +234,6 @@ public class WorkOrderImpl extends ProcessElementImpl implements WorkOrder {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy())
 			return super.toString();

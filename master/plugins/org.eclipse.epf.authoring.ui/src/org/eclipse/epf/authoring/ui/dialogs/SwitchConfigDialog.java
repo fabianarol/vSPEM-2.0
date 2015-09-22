@@ -14,7 +14,7 @@ import org.eclipse.epf.authoring.ui.editors.AbstractDiagramEditor;
 import org.eclipse.epf.authoring.ui.editors.BreakdownElementEditorInput;
 import org.eclipse.epf.authoring.ui.editors.EditorChooser;
 import org.eclipse.epf.authoring.ui.editors.ProcessEditor;
-import org.eclipse.epf.common.ui.util.MsgBox;
+import org.eclipse.epf.common.serviceability.MsgBox;
 import org.eclipse.epf.library.LibraryService;
 import org.eclipse.epf.library.LibraryServiceUtil;
 import org.eclipse.epf.library.ui.LibraryUIPlugin;
@@ -22,7 +22,6 @@ import org.eclipse.epf.library.ui.LibraryUIResources;
 import org.eclipse.epf.library.ui.preferences.LibraryUIPreferences;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.ProcessComponent;
-import org.eclipse.epf.uma.util.Scope;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.swt.widgets.Display;
@@ -93,10 +92,6 @@ public class SwitchConfigDialog {
 				}
 				if (obj != null && obj instanceof ProcessComponent) {
 					MethodConfiguration recommendedConfig = ((ProcessComponent) obj).getProcess().getDefaultContext();
-					if (recommendedConfig instanceof Scope || recommendedConfig == null) {
-						return;
-					}
-
 					String switchConfigPref = LibraryUIPreferences.getSwitchConfig();
 					if (MessageDialogWithToggle.NEVER.equals(switchConfigPref)) {
 						// Call this to refresh active part if needed.

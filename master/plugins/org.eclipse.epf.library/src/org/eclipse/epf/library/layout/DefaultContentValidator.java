@@ -13,11 +13,8 @@ package org.eclipse.epf.library.layout;
 import java.io.File;
 import java.io.PrintStream;
 
-import org.eclipse.epf.library.ILibraryResourceManager;
 import org.eclipse.epf.library.LibraryResources;
-import org.eclipse.epf.library.util.ContentResourceScanner;
 import org.eclipse.epf.library.util.LibraryUtil;
-import org.eclipse.epf.library.util.ResourceHelper;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.osgi.util.NLS;
@@ -77,34 +74,6 @@ public class DefaultContentValidator implements IContentValidator {
 	
 	public boolean showBrokenLinks() {
 		return true; // default
-	}
-	
-	public void scanContent(IElementLayout layout, String content) throws Exception {
-		
-		MethodElement owner = layout.getElement();
-		String contentPath = layout.getFilePath();
-
-		ContentResourceScanner scanner = getScanner(owner);
-		if ( scanner != null ) {
-			scanner.resolveResources(owner, content, contentPath);
-		}
-	}
-	
-	/**
-	 * Returns the content resource scanner for the element.
-	 */
-	private ContentResourceScanner getScanner(MethodElement owner) {
-		ILibraryResourceManager resMgr = ResourceHelper.getResourceMgr(owner);
-		if ( resMgr == null ) {
-			return null;
-		}
-		
-		String rootContentPath = resMgr.getLogicalPluginPath(owner);
-		File src_root = new File(resMgr.getPhysicalPluginPath(owner));
-		File tgt_root = new File(pubDir, rootContentPath);
-		ContentResourceScanner scanner = new ContentResourceScanner(src_root, tgt_root, rootContentPath, this);
-
-		return scanner;
 	}
 	
 	public LinkInfo validateLink(MethodElement owner, String attributes,
@@ -196,10 +165,6 @@ public class DefaultContentValidator implements IContentValidator {
 	public boolean isDiscarded(MethodElement owner, Object feature, MethodElement e) {
 		return false;
 	}
-	
-	public boolean isDiscarded(MethodElement owner, Object feature, MethodElement e, MethodConfiguration config) {
-		return false;
-	}
 
 	public void dispose() {
 	}
@@ -231,10 +196,6 @@ public class DefaultContentValidator implements IContentValidator {
 	 */
 	public String getDefaultActivityTab() {
 		return null;  // use the default
-	}
-	
-	public boolean showLinkedPageForDescriptor() {
-		return BrowsingLayoutSettings.INSTANCE.isShowLinkedPageForDescriptor();
 	}
 }
 

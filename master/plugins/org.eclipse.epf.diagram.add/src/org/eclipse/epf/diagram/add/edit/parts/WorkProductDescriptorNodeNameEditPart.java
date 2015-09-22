@@ -23,11 +23,8 @@ import org.eclipse.emf.transaction.RunnableWithResult;
 import org.eclipse.epf.diagram.add.edit.policies.DiagramTextSelectionEditPolicy;
 import org.eclipse.epf.diagram.add.part.ActivityDetailDiagramEditorPlugin;
 import org.eclipse.epf.diagram.add.providers.DiagramElementTypes;
-import org.eclipse.epf.diagram.core.providers.DiagramIconProviderManager;
 import org.eclipse.epf.diagram.core.util.DiagramConstants;
 import org.eclipse.epf.diagram.core.util.DiagramCoreUtil;
-import org.eclipse.epf.diagram.model.ModelPackage;
-import org.eclipse.epf.diagram.model.WorkProductDescriptorNode;
 import org.eclipse.gef.AccessibleEditPart;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.GraphicalEditPart;
@@ -211,13 +208,8 @@ public class WorkProductDescriptorNodeNameEditPart extends CompartmentEditPart
 	 * @modified
 	 */
 	protected Image getLabelIcon() {
-		Image image = DiagramIconProviderManager.getInstance().getIcon(resolveSemanticElement(), true);
-		if (image == null) {
-			image =  ActivityDetailDiagramEditorPlugin.getInstance().getSharedImage(
-				"diagram/WorkProductDescriptor.gif");	//$NON-NLS-1$
-		}
-
-		return image;
+		return ActivityDetailDiagramEditorPlugin.getInstance().getSharedImage(
+				"diagram/WorkProductDescriptor.gif"); //$NON-NLS-1$
 
 	}
 
@@ -233,14 +225,6 @@ public class WorkProductDescriptorNodeNameEditPart extends CompartmentEditPart
 		}
 		if (text == null || text.length() == 0) {
 			text = defaultText;
-		}
-
-		Object element = getParserElement();
-		if (element   instanceof WorkProductDescriptorNode) {
-			String state = ((WorkProductDescriptorNode) element).getState();
-			if (state != null && !state.equals("")) {	//$NON-NLS-1$
-				text = text + " [" + state + "]";		//$NON-NLS-1$	//$NON-NLS-2$
-			}
 		}
 		text = DiagramCoreUtil.wrap(text, 3);
 		return text;
@@ -573,7 +557,9 @@ public class WorkProductDescriptorNodeNameEditPart extends CompartmentEditPart
 		removeListenerFilter("PrimaryView"); //$NON-NLS-1$
 	}
 
-	@Override
+	/**
+	 * @generated
+	 */
 	protected void handleNotificationEvent(Notification event) {
 		Object feature = event.getFeature();
 		if (NotationPackage.eINSTANCE.getFontStyle_FontColor().equals(feature)) {
@@ -609,10 +595,6 @@ public class WorkProductDescriptorNodeNameEditPart extends CompartmentEditPart
 					}
 					refreshLabel();
 				}
-			}
-			// if state changes, refresh the label.
-			if (ModelPackage.eINSTANCE.getWorkProductDescriptorNode_State().equals(feature)){
-				refreshLabel();
 			}
 		}
 		super.handleNotificationEvent(event);

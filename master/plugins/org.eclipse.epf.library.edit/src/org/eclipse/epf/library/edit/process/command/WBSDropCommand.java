@@ -46,13 +46,11 @@ public class WBSDropCommand extends BSDropCommand {
 
 	private HashMap wpDescToDeliverableParts;
 
-	private HashMap<WorkProductDescriptor, WorkProductDescriptor> wpdToDeliverableDescriptorMap;
+	private HashMap wpdToDeliverableDescriptorMap;
 
-	private HashMap<RoleDescriptor, TeamProfile> roleDescTeamProfileMap;
+	private HashMap roleDescTeamProfileMap;
 	
 	private IExecutor executor;
-	
-	private List<TaskDescriptor> taskDescriptorsToSyn;
 
 	private class Executor implements IExecutor {
 
@@ -65,17 +63,11 @@ public class WBSDropCommand extends BSDropCommand {
 			Set descriptorsToRefresh = synchronize ? batchCommand.getDescriptorsToRefresh() : null;
 
 			List bes = activity.getBreakdownElements();
-			UniqueNamePNameHandler uniqueNamesHandler = new UniqueNamePNameHandler(bes);
+			UniqueNamePNameHandler uniqueNamesHandler = new UniqueNamePNameHandler(bes, bes);
 			
 			for (int i = 0; i < dropElements.size(); i++) {
 				Task task = (Task) dropElements.get(i);
-				TaskDescriptor td = null;
-				if (taskDescriptorsToSyn != null && i < taskDescriptorsToSyn.size()) {
-					td = taskDescriptorsToSyn.get(i);
-				}
-				
 				TaskDescriptor desc = ProcessCommandUtil.createTaskDescriptor(task,
-						td,
 						activity, roleDescList, wpDescList,
 						wpDescToDeliverableParts,
 						wpdToDeliverableDescriptorMap, descriptorsToRefresh,
@@ -88,12 +80,6 @@ public class WBSDropCommand extends BSDropCommand {
 					taskDescList.add(desc);
 				}
 			}
-			
-			//For DND a task with a Deliverable to process, don't
-			//bring over with the deliverable parts of the deliverable.
-			//This is to be consistent with DND a task with a artifact:
-			//the sub-artifacts don't get bring over.
-			wpDescToDeliverableParts.clear();
 
 			// Add unique name check for roledesc and wp descriptors as well
 			for (int i = 0; i < roleDescList.size(); i++) {
@@ -120,8 +106,9 @@ public class WBSDropCommand extends BSDropCommand {
 			// automatically add work product descriptor to deliverable part
 			//
 			if (!wpdToDeliverableDescriptorMap.isEmpty()) {
-				for (Map.Entry<WorkProductDescriptor, WorkProductDescriptor> entry : 
-					wpdToDeliverableDescriptorMap.entrySet()) {
+				for (Iterator iter = wpdToDeliverableDescriptorMap.entrySet()
+						.iterator(); iter.hasNext();) {
+					Map.Entry entry = (Map.Entry) iter.next();
 					WorkProductDescriptor deliverable = (WorkProductDescriptor) entry
 							.getValue();
 					if (!deliverable.getDeliverableParts().contains(
@@ -175,7 +162,9 @@ public class WBSDropCommand extends BSDropCommand {
 			}
 			// add role descriptors to team profiles
 			//
-			for (Map.Entry<RoleDescriptor, TeamProfile> entry : roleDescTeamProfileMap.entrySet()) {
+			for (Iterator iter = roleDescTeamProfileMap.entrySet().iterator(); iter
+					.hasNext();) {
+				Map.Entry entry = (Map.Entry) iter.next();
 				TeamProfile team = (TeamProfile) entry.getValue();
 				team.getTeamRoles().add(entry.getKey());
 			}
@@ -286,17 +275,7 @@ public class WBSDropCommand extends BSDropCommand {
 			MethodConfiguration config, Set synchFeatures) {
 		super(activity, dropElements, config, synchFeatures);
 	}
-	
-	public WBSDropCommand(Activity activity, List<Task> sourceTasks,
-			List<TaskDescriptor> tdsToSyn, MethodConfiguration config, Set synchFeatures) {
-		this(activity, sourceTasks, config, synchFeatures);
-		this.taskDescriptorsToSyn = tdsToSyn;
-	}
 
-	protected boolean allowDuplicateDropElements() {
-		return taskDescriptorsToSyn != null && taskDescriptorsToSyn.size() > 1;
-	}
-	
 	public IExecutor getExecutor() {
 		if (executor == null) {
 			executor = new Executor();

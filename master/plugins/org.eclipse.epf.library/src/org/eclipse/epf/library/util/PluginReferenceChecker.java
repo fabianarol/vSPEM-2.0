@@ -77,11 +77,11 @@ public class PluginReferenceChecker {
 	 * @param aPlugin
 	 * @return List
 	 */
-	public static List<MethodPlugin> getApplicableBasePlugins(MethodPlugin aPlugin) {
-		List<MethodPlugin> models = ModelStorage.getBaseModels();
+	public static List getApplicableBasePlugins(MethodPlugin aPlugin) {
+		List models = ModelStorage.getBaseModels();
 
-		List<MethodPlugin> descendantList = getDescendants(aPlugin);
-		for (Iterator<MethodPlugin> iter = descendantList.iterator(); iter.hasNext();) {
+		List descendantList = getDescendants(aPlugin);
+		for (Iterator iter = descendantList.iterator(); iter.hasNext();) {
 			MethodPlugin element = (MethodPlugin) iter.next();
 			if (aPlugin.getBases().contains(element)) {		//part of 170367: allow it to show for unselect
 				continue;
@@ -93,10 +93,10 @@ public class PluginReferenceChecker {
 	}
 
 	// those two getDescendants() methods should be moved into lower layer
-	private static List<MethodPlugin> getDescendants(MethodPlugin methodObject) {
-		List<MethodPlugin> descendantList = new ArrayList<MethodPlugin>();
+	private static List getDescendants(MethodPlugin methodObject) {
+		List descendantList = new ArrayList();
 
-		List<MethodPlugin> objList = new ArrayList<MethodPlugin>();
+		List objList = new ArrayList();
 		objList.add(methodObject);
 
 		getDescendants(descendantList, objList);
@@ -104,25 +104,25 @@ public class PluginReferenceChecker {
 		return descendantList;
 	}
 
-	private static List<MethodPlugin> getDescendants(List<MethodPlugin> allDescendantList,
-			List<MethodPlugin> methodObjectList) {
+	private static List getDescendants(List allDescendantList,
+			List methodObjectList) {
 		if (methodObjectList.isEmpty())
 			return allDescendantList;
 
-		List<MethodPlugin> combDescendantList = new ArrayList<MethodPlugin>();
+		List combDescendantList = new ArrayList();
 
-		for (Iterator<MethodPlugin> iter = methodObjectList.iterator(); iter.hasNext();) {
+		for (Iterator iter = methodObjectList.iterator(); iter.hasNext();) {
 			MethodPlugin element = (MethodPlugin) iter.next();
-			List<MethodPlugin> descendantList = AssociationHelper
+			List descendantList = AssociationHelper
 					.getPluginDirectExtensions(element);
 			combDescendantList.addAll(descendantList);
 
 		}
 
 		allDescendantList.addAll(methodObjectList);
-		List<MethodPlugin> nextCheckList = new ArrayList<MethodPlugin>();
-		for (Iterator<MethodPlugin> iter = combDescendantList.iterator(); iter.hasNext();) {
-			MethodPlugin element = iter.next();
+		List nextCheckList = new ArrayList();
+		for (Iterator iter = combDescendantList.iterator(); iter.hasNext();) {
+			Object element = iter.next();
 			if (!allDescendantList.contains(element))
 				nextCheckList.add(element);
 		}

@@ -30,6 +30,7 @@ import org.eclipse.epf.uma.ReusableAsset;
 import org.eclipse.epf.uma.SupportingMaterial;
 import org.eclipse.epf.uma.TermDefinition;
 import org.eclipse.epf.uma.UmaPackage;
+import org.eclipse.epf.uma.Variability;
 import org.eclipse.epf.uma.VariabilityElement;
 import org.eclipse.epf.uma.VariabilityType;
 import org.eclipse.epf.uma.util.UmaUtil;
@@ -49,7 +50,7 @@ import org.eclipse.epf.uma.util.UmaUtil;
  *   <li>{@link org.eclipse.epf.uma.impl.ContentElementImpl#getGuidelines <em>Guidelines</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.impl.ContentElementImpl#getExamples <em>Examples</em>}</li>
  *   <li>{@link org.eclipse.epf.uma.impl.ContentElementImpl#getAssets <em>Assets</em>}</li>
- *   <li>{@link org.eclipse.epf.uma.impl.ContentElementImpl#getTermdefinition <em>Termdefinition</em>}</li>
+ *   <li>{@link org.eclipse.epf.uma.impl.ContentElementImpl#getTermDefinition <em>Term Definition</em>}</li>
  * </ul>
  * </p>
  *
@@ -58,6 +59,13 @@ import org.eclipse.epf.uma.util.UmaUtil;
 public abstract class ContentElementImpl extends DescribableElementImpl
 		implements ContentElement {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The default value of the '{@link #getVariabilityType() <em>Variability Type</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -65,7 +73,7 @@ public abstract class ContentElementImpl extends DescribableElementImpl
 	 * @generated
 	 * @ordered
 	 */
-	protected static final VariabilityType VARIABILITY_TYPE_EDEFAULT = VariabilityType.NA;
+	protected static final VariabilityType VARIABILITY_TYPE_EDEFAULT = VariabilityType.NA_LITERAL;
 
 	/**
 	 * The cached value of the '{@link #getVariabilityType() <em>Variability Type</em>}' attribute.
@@ -85,7 +93,7 @@ public abstract class ContentElementImpl extends DescribableElementImpl
 	 * @generated
 	 * @ordered
 	 */
-	protected VariabilityElement variabilityBasedOnElement;
+	protected VariabilityElement variabilityBasedOnElement = null;
 
 	/**
 	 * The cached value of the '{@link #getSupportingMaterials() <em>Supporting Materials</em>}' reference list.
@@ -95,7 +103,7 @@ public abstract class ContentElementImpl extends DescribableElementImpl
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<SupportingMaterial> supportingMaterials;
+	protected EList supportingMaterials = null;
 
 	/**
 	 * The cached value of the '{@link #getConceptsAndPapers() <em>Concepts And Papers</em>}' reference list.
@@ -105,7 +113,7 @@ public abstract class ContentElementImpl extends DescribableElementImpl
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Concept> conceptsAndPapers;
+	protected EList conceptsAndPapers = null;
 
 	/**
 	 * The cached value of the '{@link #getChecklists() <em>Checklists</em>}' reference list.
@@ -115,7 +123,7 @@ public abstract class ContentElementImpl extends DescribableElementImpl
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Checklist> checklists;
+	protected EList checklists = null;
 
 	/**
 	 * The cached value of the '{@link #getGuidelines() <em>Guidelines</em>}' reference list.
@@ -125,7 +133,7 @@ public abstract class ContentElementImpl extends DescribableElementImpl
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Guideline> guidelines;
+	protected EList guidelines = null;
 
 	/**
 	 * The cached value of the '{@link #getExamples() <em>Examples</em>}' reference list.
@@ -135,7 +143,7 @@ public abstract class ContentElementImpl extends DescribableElementImpl
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Example> examples;
+	protected EList examples = null;
 
 	/**
 	 * The cached value of the '{@link #getAssets() <em>Assets</em>}' reference list.
@@ -145,17 +153,17 @@ public abstract class ContentElementImpl extends DescribableElementImpl
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<ReusableAsset> assets;
+	protected EList assets = null;
 
 	/**
-	 * The cached value of the '{@link #getTermdefinition() <em>Termdefinition</em>}' reference list.
+	 * The cached value of the '{@link #getTermDefinition() <em>Term Definition</em>}' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getTermdefinition()
+	 * @see #getTermDefinition()
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<TermDefinition> termdefinition;
+	protected EList termDefinition = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -167,7 +175,7 @@ public abstract class ContentElementImpl extends DescribableElementImpl
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -175,7 +183,6 @@ public abstract class ContentElementImpl extends DescribableElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.CONTENT_ELEMENT;
 	}
@@ -256,10 +263,9 @@ public abstract class ContentElementImpl extends DescribableElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<Concept> getConceptsAndPapers() {
+	public List getConceptsAndPapers() {
 		if (conceptsAndPapers == null) {
-			conceptsAndPapers = new EObjectResolvingEList<Concept>(
-					Concept.class, this,
+			conceptsAndPapers = new EObjectResolvingEList(Concept.class, this,
 					UmaPackage.CONTENT_ELEMENT__CONCEPTS_AND_PAPERS);
 		}
 		return conceptsAndPapers;
@@ -270,10 +276,10 @@ public abstract class ContentElementImpl extends DescribableElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<Checklist> getChecklists() {
+	public List getChecklists() {
 		if (checklists == null) {
-			checklists = new EObjectResolvingEList<Checklist>(Checklist.class,
-					this, UmaPackage.CONTENT_ELEMENT__CHECKLISTS);
+			checklists = new EObjectResolvingEList(Checklist.class, this,
+					UmaPackage.CONTENT_ELEMENT__CHECKLISTS);
 		}
 		return checklists;
 	}
@@ -283,10 +289,10 @@ public abstract class ContentElementImpl extends DescribableElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<Guideline> getGuidelines() {
+	public List getGuidelines() {
 		if (guidelines == null) {
-			guidelines = new EObjectResolvingEList<Guideline>(Guideline.class,
-					this, UmaPackage.CONTENT_ELEMENT__GUIDELINES);
+			guidelines = new EObjectResolvingEList(Guideline.class, this,
+					UmaPackage.CONTENT_ELEMENT__GUIDELINES);
 		}
 		return guidelines;
 	}
@@ -296,9 +302,9 @@ public abstract class ContentElementImpl extends DescribableElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<Example> getExamples() {
+	public List getExamples() {
 		if (examples == null) {
-			examples = new EObjectResolvingEList<Example>(Example.class, this,
+			examples = new EObjectResolvingEList(Example.class, this,
 					UmaPackage.CONTENT_ELEMENT__EXAMPLES);
 		}
 		return examples;
@@ -309,10 +315,9 @@ public abstract class ContentElementImpl extends DescribableElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<ReusableAsset> getAssets() {
+	public List getAssets() {
 		if (assets == null) {
-			assets = new EObjectResolvingEList<ReusableAsset>(
-					ReusableAsset.class, this,
+			assets = new EObjectResolvingEList(ReusableAsset.class, this,
 					UmaPackage.CONTENT_ELEMENT__ASSETS);
 		}
 		return assets;
@@ -323,13 +328,12 @@ public abstract class ContentElementImpl extends DescribableElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<TermDefinition> getTermdefinition() {
-		if (termdefinition == null) {
-			termdefinition = new EObjectResolvingEList<TermDefinition>(
-					TermDefinition.class, this,
-					UmaPackage.CONTENT_ELEMENT__TERMDEFINITION);
+	public List getTermDefinition() {
+		if (termDefinition == null) {
+			termDefinition = new EObjectResolvingEList(TermDefinition.class,
+					this, UmaPackage.CONTENT_ELEMENT__TERM_DEFINITION);
 		}
-		return termdefinition;
+		return termDefinition;
 	}
 
 	/**
@@ -337,7 +341,6 @@ public abstract class ContentElementImpl extends DescribableElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.CONTENT_ELEMENT__VARIABILITY_TYPE:
@@ -358,8 +361,8 @@ public abstract class ContentElementImpl extends DescribableElementImpl
 			return getExamples();
 		case UmaPackage.CONTENT_ELEMENT__ASSETS:
 			return getAssets();
-		case UmaPackage.CONTENT_ELEMENT__TERMDEFINITION:
-			return getTermdefinition();
+		case UmaPackage.CONTENT_ELEMENT__TERM_DEFINITION:
+			return getTermDefinition();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -369,8 +372,6 @@ public abstract class ContentElementImpl extends DescribableElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.CONTENT_ELEMENT__VARIABILITY_TYPE:
@@ -381,34 +382,31 @@ public abstract class ContentElementImpl extends DescribableElementImpl
 			return;
 		case UmaPackage.CONTENT_ELEMENT__SUPPORTING_MATERIALS:
 			getSupportingMaterials().clear();
-			getSupportingMaterials().addAll(
-					(Collection<? extends SupportingMaterial>) newValue);
+			getSupportingMaterials().addAll((Collection) newValue);
 			return;
 		case UmaPackage.CONTENT_ELEMENT__CONCEPTS_AND_PAPERS:
 			getConceptsAndPapers().clear();
-			getConceptsAndPapers().addAll(
-					(Collection<? extends Concept>) newValue);
+			getConceptsAndPapers().addAll((Collection) newValue);
 			return;
 		case UmaPackage.CONTENT_ELEMENT__CHECKLISTS:
 			getChecklists().clear();
-			getChecklists().addAll((Collection<? extends Checklist>) newValue);
+			getChecklists().addAll((Collection) newValue);
 			return;
 		case UmaPackage.CONTENT_ELEMENT__GUIDELINES:
 			getGuidelines().clear();
-			getGuidelines().addAll((Collection<? extends Guideline>) newValue);
+			getGuidelines().addAll((Collection) newValue);
 			return;
 		case UmaPackage.CONTENT_ELEMENT__EXAMPLES:
 			getExamples().clear();
-			getExamples().addAll((Collection<? extends Example>) newValue);
+			getExamples().addAll((Collection) newValue);
 			return;
 		case UmaPackage.CONTENT_ELEMENT__ASSETS:
 			getAssets().clear();
-			getAssets().addAll((Collection<? extends ReusableAsset>) newValue);
+			getAssets().addAll((Collection) newValue);
 			return;
-		case UmaPackage.CONTENT_ELEMENT__TERMDEFINITION:
-			getTermdefinition().clear();
-			getTermdefinition().addAll(
-					(Collection<? extends TermDefinition>) newValue);
+		case UmaPackage.CONTENT_ELEMENT__TERM_DEFINITION:
+			getTermDefinition().clear();
+			getTermDefinition().addAll((Collection) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -419,7 +417,6 @@ public abstract class ContentElementImpl extends DescribableElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.CONTENT_ELEMENT__VARIABILITY_TYPE:
@@ -446,8 +443,8 @@ public abstract class ContentElementImpl extends DescribableElementImpl
 		case UmaPackage.CONTENT_ELEMENT__ASSETS:
 			getAssets().clear();
 			return;
-		case UmaPackage.CONTENT_ELEMENT__TERMDEFINITION:
-			getTermdefinition().clear();
+		case UmaPackage.CONTENT_ELEMENT__TERM_DEFINITION:
+			getTermDefinition().clear();
 			return;
 		}
 		super.eUnset(featureID);
@@ -458,7 +455,6 @@ public abstract class ContentElementImpl extends DescribableElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);
@@ -484,8 +480,8 @@ public abstract class ContentElementImpl extends DescribableElementImpl
 			return examples != null && !examples.isEmpty();
 		case UmaPackage.CONTENT_ELEMENT__ASSETS:
 			return assets != null && !assets.isEmpty();
-		case UmaPackage.CONTENT_ELEMENT__TERMDEFINITION:
-			return termdefinition != null && !termdefinition.isEmpty();
+		case UmaPackage.CONTENT_ELEMENT__TERM_DEFINITION:
+			return termDefinition != null && !termDefinition.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}
@@ -495,9 +491,9 @@ public abstract class ContentElementImpl extends DescribableElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<SupportingMaterial> getSupportingMaterials() {
+	public List getSupportingMaterials() {
 		if (supportingMaterials == null) {
-			supportingMaterials = new EObjectResolvingEList<SupportingMaterial>(
+			supportingMaterials = new EObjectResolvingEList(
 					SupportingMaterial.class, this,
 					UmaPackage.CONTENT_ELEMENT__SUPPORTING_MATERIALS);
 		}
@@ -509,8 +505,13 @@ public abstract class ContentElementImpl extends DescribableElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	public int eBaseStructuralFeatureID(int derivedFeatureID, Class<?> baseClass) {
+	public int eBaseStructuralFeatureID(int derivedFeatureID, Class baseClass) {
+		if (baseClass == Variability.class) {
+			switch (derivedFeatureID) {
+			default:
+				return -1;
+			}
+		}
 		if (baseClass == VariabilityElement.class) {
 			switch (derivedFeatureID) {
 			case UmaPackage.CONTENT_ELEMENT__VARIABILITY_TYPE:
@@ -529,8 +530,13 @@ public abstract class ContentElementImpl extends DescribableElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	public int eDerivedStructuralFeatureID(int baseFeatureID, Class<?> baseClass) {
+	public int eDerivedStructuralFeatureID(int baseFeatureID, Class baseClass) {
+		if (baseClass == Variability.class) {
+			switch (baseFeatureID) {
+			default:
+				return -1;
+			}
+		}
 		if (baseClass == VariabilityElement.class) {
 			switch (baseFeatureID) {
 			case UmaPackage.VARIABILITY_ELEMENT__VARIABILITY_TYPE:
@@ -549,7 +555,6 @@ public abstract class ContentElementImpl extends DescribableElementImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy())
 			return super.toString();

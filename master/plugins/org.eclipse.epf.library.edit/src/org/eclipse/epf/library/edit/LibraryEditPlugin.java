@@ -10,27 +10,23 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.library.edit;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
+import java.io.File;
 import java.net.URI;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.emf.common.util.WrappedException;
-import org.eclipse.epf.common.AbstractActivator;
-import org.eclipse.epf.library.edit.util.UmaUtilProvider;
+import org.eclipse.epf.common.plugin.AbstractPlugin;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
 import org.osgi.framework.BundleContext;
 
 /**
  * The Library Edit plug-in class.
  * 
  * @author Kelvin Low
- * @author Phong Nguyen Le
  * @since 1.0
  */
-public class LibraryEditPlugin extends AbstractActivator {
+public class LibraryEditPlugin extends AbstractPlugin {
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.eclipse.epf.library.edit"; //$NON-NLS-1$
@@ -41,8 +37,8 @@ public class LibraryEditPlugin extends AbstractActivator {
 	public static LibraryEditPlugin INSTANCE;
 
 	// The shared image hash map.
-	protected Map<String, Object> images = new HashMap<String, Object>();
-	
+	private static Map sharedImages = new HashMap();
+
 	/**
 	 * Creates a new instance.
 	 */
@@ -57,8 +53,6 @@ public class LibraryEditPlugin extends AbstractActivator {
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		
-		UmaUtilProvider.init();
 	}
 
 	/**
@@ -92,27 +86,57 @@ public class LibraryEditPlugin extends AbstractActivator {
 		return getId();
 	}
 
-	public Object getImage(String key) {
-	    Object result = images.get(key);
-		if (result == null) {
-			try {
-				result = doGetImage(key);
-			} catch (Exception exception) {
-				throw new WrappedException(exception);
-			}
-			if(result != null) {
-				images.put(key, result);
-			}
-		}
-
-		return result;
+	/**
+	 * @see org.eclipse.epf.common.plugin.AbstractPlugin#getImage(String)
+	 */
+	public Image getImage(String relativePath) {
+		return super.getSharedImage(relativePath + ".gif"); //$NON-NLS-1$
 	}
 	
-	private Object doGetImage(String key) throws IOException {
-	    URL url = new URL(iconURL + key + ".gif"); //$NON-NLS-1$
-	    InputStream inputStream = url.openStream(); 
-	    inputStream.close();
-	    return url;
+	/**
+	 * @see org.eclipse.epf.common.plugin.AbstractPlugin#getImage(String)
+	 */
+	
+	/***/
+	//VEPF --> GetsFIles
+	public File getHtml(String relativePath) {
+		return super.getSharedHtml(relativePath + ".html"); //$NON-NLS-1$
+	}
+	
+	public File getJasper(String relativePath) {
+		return super.getSharedJasper(relativePath + ".jasper"); //$NON-NLS-1$
+	}
+	
+	public File getGif(String relativePath){
+		return super.getSharedGif(relativePath + ".gif");
+	}
+	
+	public File getPng(String relativePath){
+		return super.getSharedGif(relativePath + ".png");
+	}
+	/***/
+	
+	
+	/**
+	 * @see org.eclipse.epf.common.plugin.AbstractPlugin#getSharedImage(String)
+	 */
+	public Image getSharedImage(String relativePath) {
+		return super.getSharedImage(relativePath + ".gif"); //$NON-NLS-1$
+	}
+
+	/**
+	 * Returns the image descriptor given the URI.
+	 * 
+	 * @param imageURI
+	 *            The image's URI.
+	 * @return The image descriptor.
+	 */
+	public ImageDescriptor getImageDescriptor(URI imageURI) {
+		try {
+			return ImageDescriptor.createFromURL(imageURI.toURL());
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	/**
@@ -122,14 +146,34 @@ public class LibraryEditPlugin extends AbstractActivator {
 	 *            The image's URI.
 	 * @return The image.
 	 */
-	public Object getSharedImage(URI imageURI) {
-		if(imageURI == null) {
+	public Image getSharedImage(URI imageURI) {
+		if (imageURI == null) {
 			return null;
 		}
-		try {
-			return imageURI.toURL();
-		} catch (MalformedURLException e) {
-			return null;
+		Image image = (Image) sharedImages.get(imageURI);
+		if (image != null) {
+			return image;
+		}
+
+		ImageDescriptor imageDescriptor = getImageDescriptor(imageURI);
+		if (imageDescriptor != null) {
+			image = imageDescriptor.createImage(false);
+			if (image != null) {
+				sharedImages.put(imageURI, image);
+			}
+		}
+
+		return image;
+	}
+
+	/**
+	 * Logs the given object or message.
+	 */
+	public void log(Object logEntry) {
+		if (logEntry instanceof Throwable) {
+			((Throwable) logEntry).printStackTrace(System.err);
+		} else {
+			System.err.println(logEntry);
 		}
 	}
 

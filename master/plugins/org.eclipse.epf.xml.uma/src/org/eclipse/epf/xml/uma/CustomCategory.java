@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: CustomCategory.java,v 1.4 2007/05/04 22:46:43 klow Exp $
+ */
 package org.eclipse.epf.xml.uma;
 
 import org.eclipse.emf.common.util.EList;
@@ -48,7 +44,7 @@ public interface CustomCategory extends ContentCategory {
 	 * @return the value of the '<em>Group2</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getCustomCategory_Group2()
 	 * @model unique="false" dataType="org.eclipse.emf.ecore.EFeatureMapEntry" many="true"
-	 *        extendedMetaData="kind='group' name='group:24'"
+	 *        extendedMetaData="kind='group' name='group:22'"
 	 * @generated
 	 */
 	FeatureMap getGroup2();
@@ -64,11 +60,11 @@ public interface CustomCategory extends ContentCategory {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Categorized Element</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getCustomCategory_CategorizedElement()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='CategorizedElement' group='#group:24'"
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='CategorizedElement' group='#group:22'"
 	 * @generated
 	 */
-	EList<String> getCategorizedElement();
+	EList getCategorizedElement();
 
 	/**
 	 * Returns the value of the '<em><b>Sub Category</b></em>' attribute list.
@@ -81,10 +77,10 @@ public interface CustomCategory extends ContentCategory {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Sub Category</em>' attribute list.
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getCustomCategory_SubCategory()
-	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
-	 *        extendedMetaData="kind='element' name='SubCategory' group='#group:24'"
+	 * @model type="java.lang.String" unique="false" dataType="org.eclipse.emf.ecore.xml.type.String" transient="true" volatile="true" derived="true"
+	 *        extendedMetaData="kind='element' name='SubCategory' group='#group:22'"
 	 * @generated
 	 */
-	EList<String> getSubCategory();
+	EList getSubCategory();
 
 } // CustomCategory

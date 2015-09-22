@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: DeliverableDescription.java,v 1.2 2006/06/23 00:01:27 jxi Exp $
+ */
 package org.eclipse.epf.xml.uma;
 
 
@@ -43,7 +39,7 @@ public interface DeliverableDescription extends WorkProductDescription {
 	 * @return the value of the '<em>External Description</em>' attribute.
 	 * @see #setExternalDescription(String)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getDeliverableDescription_ExternalDescription()
-	 * @model dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="kind='element' name='ExternalDescription'"
 	 * @generated
 	 */
@@ -69,7 +65,7 @@ public interface DeliverableDescription extends WorkProductDescription {
 	 * @return the value of the '<em>Packaging Guidance</em>' attribute.
 	 * @see #setPackagingGuidance(String)
 	 * @see org.eclipse.epf.xml.uma.UmaPackage#getDeliverableDescription_PackagingGuidance()
-	 * @model dataType="org.eclipse.emf.ecore.xml.type.String"
+	 * @model unique="false" dataType="org.eclipse.emf.ecore.xml.type.String"
 	 *        extendedMetaData="kind='element' name='PackagingGuidance'"
 	 * @generated
 	 */

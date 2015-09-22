@@ -32,6 +32,22 @@ public class CBSItemProviderAdapterFactory extends ItemProviderAdapterFactory {
 		return new CBSActivityItemProvider(this);
 	}
 	
+	public Adapter createvpActivityAdapter() {
+		//return createActivityAdapter();
+		return new CBSProcessItemProvider(this,
+				(ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
+						.createvpActivityAdapter());
+	}
+	
+	public Adapter createVarActivityAdapter() {
+		//return createActivityAdapter();
+		return new CBSProcessItemProvider(this,
+				(ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
+						.createVarActivityAdapter());
+	}
+	
+	
+	
 	public Adapter createCapabilityPatternAdapter() {
 		return new CBSProcessItemProvider(this,
 				(ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
@@ -49,16 +65,52 @@ public class CBSItemProviderAdapterFactory extends ItemProviderAdapterFactory {
 				(ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
 						.createTaskDescriptorAdapter());
 	}
+	//VarTask
+	public Adapter createVarTaskDescriptorAdapter() {
+		return new CBSTaskDescriptorItemProvider(this,
+				(ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
+						.createVarTaskDescriptorAdapter());
+	}
+	//VpTask
+	public Adapter createvpTaskDescriptorAdapter() {
+		return new CBSTaskDescriptorItemProvider(this,
+				(ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
+						.createvpTaskDescriptorAdapter());
+	}
 
 	public Adapter createRoleDescriptorAdapter() {
 		return new CBSRoleDescriptorItemProvider(this,
 				(ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
 						.createRoleDescriptorAdapter());
 	}
+	//VarRole
+	public Adapter createVarRoleDescriptorAdapter() {
+		return new CBSRoleDescriptorItemProvider(this,
+				(ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
+						.createVarRoleDescriptorAdapter());
+	}
+	//VpRole
+	public Adapter createvpRoleDescriptorAdapter() {
+		return new CBSRoleDescriptorItemProvider(this,
+				(ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
+						.createvpRoleDescriptorAdapter());
+	}
 
 	public Adapter createWorkProductDescriptorAdapter() {
 		return new CBSWorkProductDescriptorItemProvider(this,
 				(ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
 						.createWorkProductDescriptorAdapter());
-	}	
+	}
+	
+	public Adapter createVarWorkProductDescriptorAdapter() {
+		return new CBSWorkProductDescriptorItemProvider(this,
+				(ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
+						.createVarWorkProductDescriptorAdapter());
+	}
+	
+	public Adapter createvpWorkProductDescriptorAdapter() {
+		return new CBSWorkProductDescriptorItemProvider(this,
+				(ItemProviderAdapter) TngUtil.umaItemProviderAdapterFactory
+						.createvpWorkProductDescriptorAdapter());
+	}
 }

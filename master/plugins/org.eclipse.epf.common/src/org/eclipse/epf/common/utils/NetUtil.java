@@ -98,8 +98,6 @@ public class NetUtil {
 			"%F0", "%F1", "%F2", "%F3", "%F4", "%F5", "%F6", "%F7", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
 			"%F8", "%F9", "%FA", "%FB", "%FC", "%FD", "%FE", "%FF" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
 	};
-	
-	public static final String RAW_URL_RAW = "raw_URL_raw"; //$NON-NLS-1$
 
 	/**
 	 * Private constructor to prevent this class from being instantiated. All
@@ -333,7 +331,7 @@ public class NetUtil {
 			char ch = url.charAt(i);
 			switch (ch) {
 			case ' ':
-				strBuf.append("+"); //$NON-NLS-1$
+				strBuf.append("%20"); //$NON-NLS-1$
 				break;
 			default:
 				strBuf.append(ch);
@@ -351,19 +349,12 @@ public class NetUtil {
 	 * @return the ASCII-escaped respresentation.
 	 */
 	public static String decodedFileUrl(String fileURL) {
-		if (isRawUrl(fileURL)) {
-			return fileURL;
-		}
-		
 		String url = fileURL;
 		StringBuffer strBuf = new StringBuffer();
 		int urlLength = url.length();
 		for (int i = 0; i < urlLength; i++) {
 			char ch = url.charAt(i);
 			switch (ch) {
-			case '+':
-				strBuf.append(' ');
-				break;
 			case '%':
 				try {
 					strBuf.append((char) Integer.parseInt(url.substring(i + 1,
@@ -385,16 +376,6 @@ public class NetUtil {
 //		url = url.replaceAll("\\+", "%2B"); //$NON-NLS-1$
 		url = URLDecoder.decode(url, "UTF-8"); //$NON-NLS-1$
 		return url;
-	}
-	
-	public static boolean isRawUrl(String url) {
-		boolean result = false;
-		
-		if (url.endsWith(RAW_URL_RAW)) {
-			result = true;
-		}
-		
-		return result;
 	}
 
 }

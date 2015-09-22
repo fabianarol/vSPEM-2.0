@@ -335,7 +335,7 @@ public class Migrator {
 		protected EObject findEObjectInUnloadedResources(String id) {
 			Object object = null;
 			if (getResourceManager() != null) {
-				object = super.findEObjectInUnloadedResources(id, false);
+				object = super.findEObjectInUnloadedResources(id);
 			}
 			if (object == null) {
 				URI uri = ((MigratorURIConverter) getURIConverter())

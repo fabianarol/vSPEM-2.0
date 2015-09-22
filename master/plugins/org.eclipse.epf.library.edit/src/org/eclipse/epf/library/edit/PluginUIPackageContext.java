@@ -14,6 +14,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+
 /**
  * Stores (in memory only) the Flat/Hierarchical plugin-package layout
  * @author Jeff Hardy
@@ -55,10 +58,6 @@ public class PluginUIPackageContext {
 	public void setLayoutFlat() {
 		isFlatLayout = true;
 		notifyListeners();
-	}
-	
-	public void setLayoutFlatWithoutNotify(boolean flag) {
-		isFlatLayout = flag;
 	}
 	
 	public void addListener(IPluginUIPackageContextChangedListener listener) {

@@ -65,7 +65,6 @@ public class RoleDescriptionPage extends DescriptionFormPage {
 		super.init(site, input);
 		role = (Role) contentElement;
 		notationSectionOn = true;
-		setExternalIDOn(true);
 	}
 
 	/**
@@ -102,101 +101,99 @@ public class RoleDescriptionPage extends DescriptionFormPage {
 
 		final MethodElementEditor editor = (MethodElementEditor) getEditor();
 
-		if (notationSectionOn) {
-			ctrl_skills.setModalObject(contentElement.getPresentation());
-			ctrl_skills.setModalObjectFeature(UmaPackage.eINSTANCE
-					.getRoleDescription_Skills());
-			ctrl_skills.addModifyListener(contentModifyListener);
-			ctrl_skills.addListener(SWT.Deactivate, new Listener() {
-				public void handleEvent(Event e) {
-					IMethodRichText control = descExpandFlag ? ctrl_expanded
-							: ctrl_skills;
-					if (!control.getModified()) {
-						return;
-					}
-					String oldContent = ((org.eclipse.epf.uma.RoleDescription) role
-							.getPresentation()).getSkills();
-					if (((MethodElementEditor) getEditor()).mustRestoreValue(
-							control, oldContent)) {
-						return;
-					}
-					String newContent = control.getText();
-					if (!newContent.equals(oldContent)) {
-						boolean success = editor.getActionManager().doAction(
-								IActionManager.SET,
-								contentElement.getPresentation(),
-								UmaPackage.eINSTANCE.getRoleDescription_Skills(),
-								newContent, -1);
-						if (success && isVersionSectionOn()) {
-							updateChangeDate();
-						}
+		ctrl_skills.setModalObject(contentElement.getPresentation());
+		ctrl_skills.setModalObjectFeature(UmaPackage.eINSTANCE
+				.getRoleDescription_Skills());
+		ctrl_skills.addModifyListener(contentModifyListener);
+		ctrl_skills.addListener(SWT.Deactivate, new Listener() {
+			public void handleEvent(Event e) {
+				IMethodRichText control = descExpandFlag ? ctrl_expanded
+						: ctrl_skills;
+				if (!control.getModified()) {
+					return;
+				}
+				String oldContent = ((org.eclipse.epf.uma.RoleDescription) role
+						.getPresentation()).getSkills();
+				if (((MethodElementEditor) getEditor()).mustRestoreValue(
+						control, oldContent)) {
+					return;
+				}
+				String newContent = control.getText();
+				if (!newContent.equals(oldContent)) {
+					boolean success = editor.getActionManager().doAction(
+							IActionManager.SET,
+							contentElement.getPresentation(),
+							UmaPackage.eINSTANCE.getRoleDescription_Skills(),
+							newContent, -1);
+					if (success && isVersionSectionOn()) {
+						updateChangeDate();
 					}
 				}
-			});
+			}
+		});
 
-			ctrl_assign.setModalObject(contentElement.getPresentation());
-			ctrl_assign.setModalObjectFeature(UmaPackage.eINSTANCE
-					.getRoleDescription_AssignmentApproaches());
-			ctrl_assign.addModifyListener(contentModifyListener);
-			ctrl_assign.addListener(SWT.Deactivate, new Listener() {
-				public void handleEvent(Event e) {
-					IMethodRichText control = descExpandFlag ? ctrl_expanded
-							: ctrl_assign;
-					if (!control.getModified()) {
-						return;
-					}
-					String oldContent = ((org.eclipse.epf.uma.RoleDescription) role
-							.getPresentation()).getAssignmentApproaches();
-					if (((MethodElementEditor) getEditor()).mustRestoreValue(
-							control, oldContent)) {
-						return;
-					}
-					String newContent = control.getText();
-					if (!newContent.equals(oldContent)) {
-						boolean success = editor.getActionManager().doAction(
-								IActionManager.SET,
-								contentElement.getPresentation(),
-								UmaPackage.eINSTANCE
-										.getRoleDescription_AssignmentApproaches(),
-								newContent, -1);
-						if (success && isVersionSectionOn()) {
-							updateChangeDate();
-						}
+		ctrl_assign.setModalObject(contentElement.getPresentation());
+		ctrl_assign.setModalObjectFeature(UmaPackage.eINSTANCE
+				.getRoleDescription_AssignmentApproaches());
+		ctrl_assign.addModifyListener(contentModifyListener);
+		ctrl_assign.addListener(SWT.Deactivate, new Listener() {
+			public void handleEvent(Event e) {
+				IMethodRichText control = descExpandFlag ? ctrl_expanded
+						: ctrl_assign;
+				if (!control.getModified()) {
+					return;
+				}
+				String oldContent = ((org.eclipse.epf.uma.RoleDescription) role
+						.getPresentation()).getAssignmentApproaches();
+				if (((MethodElementEditor) getEditor()).mustRestoreValue(
+						control, oldContent)) {
+					return;
+				}
+				String newContent = control.getText();
+				if (!newContent.equals(oldContent)) {
+					boolean success = editor.getActionManager().doAction(
+							IActionManager.SET,
+							contentElement.getPresentation(),
+							UmaPackage.eINSTANCE
+									.getRoleDescription_AssignmentApproaches(),
+							newContent, -1);
+					if (success && isVersionSectionOn()) {
+						updateChangeDate();
 					}
 				}
-			});
+			}
+		});
 
-			ctrl_synonyms.setModalObject(contentElement.getPresentation());
-			ctrl_synonyms.setModalObjectFeature(UmaPackage.eINSTANCE
-					.getRoleDescription_Synonyms());
-			ctrl_synonyms.addModifyListener(contentModifyListener);
-			ctrl_synonyms.addListener(SWT.Deactivate, new Listener() {
-				public void handleEvent(Event e) {
-					IMethodRichText control = descExpandFlag ? ctrl_expanded
-							: ctrl_synonyms;
-					if (!control.getModified()) {
-						return;
-					}
-					String oldContent = ((org.eclipse.epf.uma.RoleDescription) role
-							.getPresentation()).getSynonyms();
-					if (((MethodElementEditor) getEditor()).mustRestoreValue(
-							control, oldContent)) {
-						return;
-					}
-					String newContent = control.getText();
-					if (!newContent.equals(oldContent)) {
-						boolean success = editor.getActionManager().doAction(
-								IActionManager.SET,
-								contentElement.getPresentation(),
-								UmaPackage.eINSTANCE.getRoleDescription_Synonyms(),
-								newContent, -1);
-						if (success && isVersionSectionOn()) {
-							updateChangeDate();
-						}
+		ctrl_synonyms.setModalObject(contentElement.getPresentation());
+		ctrl_synonyms.setModalObjectFeature(UmaPackage.eINSTANCE
+				.getRoleDescription_Synonyms());
+		ctrl_synonyms.addModifyListener(contentModifyListener);
+		ctrl_synonyms.addListener(SWT.Deactivate, new Listener() {
+			public void handleEvent(Event e) {
+				IMethodRichText control = descExpandFlag ? ctrl_expanded
+						: ctrl_synonyms;
+				if (!control.getModified()) {
+					return;
+				}
+				String oldContent = ((org.eclipse.epf.uma.RoleDescription) role
+						.getPresentation()).getSynonyms();
+				if (((MethodElementEditor) getEditor()).mustRestoreValue(
+						control, oldContent)) {
+					return;
+				}
+				String newContent = control.getText();
+				if (!newContent.equals(oldContent)) {
+					boolean success = editor.getActionManager().doAction(
+							IActionManager.SET,
+							contentElement.getPresentation(),
+							UmaPackage.eINSTANCE.getRoleDescription_Synonyms(),
+							newContent, -1);
+					if (success && isVersionSectionOn()) {
+						updateChangeDate();
 					}
 				}
-			});
-		}
+			}
+		});
 	}
 
 	/**
@@ -204,12 +201,9 @@ public class RoleDescriptionPage extends DescriptionFormPage {
 	 */
 	protected void refresh(boolean editable) {
 		super.refresh(editable);
-		
-		if (notationSectionOn) {
-			ctrl_skills.setEditable(editable);
-			ctrl_assign.setEditable(editable);
-			ctrl_synonyms.setEditable(editable);
-		}
+		ctrl_skills.setEditable(editable);
+		ctrl_assign.setEditable(editable);
+		ctrl_synonyms.setEditable(editable);
 	}
 
 	/**
@@ -218,18 +212,16 @@ public class RoleDescriptionPage extends DescriptionFormPage {
 	protected void loadData() {
 		super.loadData();
 
-		if (notationSectionOn) {
-			String skills = ((org.eclipse.epf.uma.RoleDescription) role.getPresentation())
-					.getSkills();
-			String assign = ((org.eclipse.epf.uma.RoleDescription) role.getPresentation())
-					.getAssignmentApproaches();
-			String synonyms = ((org.eclipse.epf.uma.RoleDescription) role.getPresentation())
-					.getSynonyms();
-	
-			ctrl_skills.setText(skills == null ? "" : skills); //$NON-NLS-1$
-			ctrl_assign.setText(assign == null ? "" : assign); //$NON-NLS-1$
-			ctrl_synonyms.setText(synonyms == null ? "" : synonyms); //$NON-NLS-1$
-		}
+		String skills = ((org.eclipse.epf.uma.RoleDescription) role.getPresentation())
+				.getSkills();
+		String assign = ((org.eclipse.epf.uma.RoleDescription) role.getPresentation())
+				.getAssignmentApproaches();
+		String synonyms = ((org.eclipse.epf.uma.RoleDescription) role.getPresentation())
+				.getSynonyms();
+
+		ctrl_skills.setText(skills == null ? "" : skills); //$NON-NLS-1$
+		ctrl_assign.setText(assign == null ? "" : assign); //$NON-NLS-1$
+		ctrl_synonyms.setText(synonyms == null ? "" : synonyms); //$NON-NLS-1$
 	}
 
 	/**

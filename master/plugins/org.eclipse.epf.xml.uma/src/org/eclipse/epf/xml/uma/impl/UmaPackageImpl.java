@@ -1,13 +1,9 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: UmaPackageImpl.java,v 1.11 2007/06/05 21:14:59 klow Exp $
+ */
 package org.eclipse.epf.xml.uma.impl;
 
 import org.eclipse.emf.ecore.EAttribute;
@@ -23,7 +19,6 @@ import org.eclipse.emf.ecore.xml.type.XMLTypePackage;
 
 import org.eclipse.epf.xml.uma.Activity;
 import org.eclipse.epf.xml.uma.ActivityDescription;
-import org.eclipse.epf.xml.uma.ApplicableMetaClassInfo;
 import org.eclipse.epf.xml.uma.Artifact;
 import org.eclipse.epf.xml.uma.ArtifactDescription;
 import org.eclipse.epf.xml.uma.BreakdownElement;
@@ -58,7 +53,6 @@ import org.eclipse.epf.xml.uma.Guidance;
 import org.eclipse.epf.xml.uma.GuidanceDescription;
 import org.eclipse.epf.xml.uma.Guideline;
 import org.eclipse.epf.xml.uma.Iteration;
-import org.eclipse.epf.xml.uma.Kind;
 import org.eclipse.epf.xml.uma.MethodConfiguration;
 import org.eclipse.epf.xml.uma.MethodElement;
 import org.eclipse.epf.xml.uma.MethodElementProperty;
@@ -131,13 +125,6 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 	 * @generated
 	 */
 	private EClass activityDescriptionEClass = null;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	private EClass applicableMetaClassInfoEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -383,13 +370,6 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 	 * @generated
 	 */
 	private EClass iterationEClass = null;
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	private EClass kindEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -858,7 +838,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getActivity_Group3() {
+	public EAttribute getActivity_Group2() {
 		return (EAttribute)activityEClass.getEStructuralFeatures().get(2);
 	}
 
@@ -876,7 +856,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getActivity_Roadmap() {
+	public EAttribute getActivity_Checklist() {
 		return (EAttribute)activityEClass.getEStructuralFeatures().get(4);
 	}
 
@@ -885,7 +865,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getActivity_IsEnactable() {
+	public EAttribute getActivity_Concept() {
 		return (EAttribute)activityEClass.getEStructuralFeatures().get(5);
 	}
 
@@ -894,7 +874,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getActivity_VariabilityBasedOnElement() {
+	public EAttribute getActivity_Example() {
 		return (EAttribute)activityEClass.getEStructuralFeatures().get(6);
 	}
 
@@ -903,8 +883,71 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getActivity_VariabilityType() {
+	public EAttribute getActivity_Guideline() {
 		return (EAttribute)activityEClass.getEStructuralFeatures().get(7);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getActivity_Roadmap() {
+		return (EAttribute)activityEClass.getEStructuralFeatures().get(8);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getActivity_ReusableAsset() {
+		return (EAttribute)activityEClass.getEStructuralFeatures().get(9);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getActivity_SupportingMaterial() {
+		return (EAttribute)activityEClass.getEStructuralFeatures().get(10);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getActivity_Whitepaper() {
+		return (EAttribute)activityEClass.getEStructuralFeatures().get(11);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getActivity_IsEnactable() {
+		return (EAttribute)activityEClass.getEStructuralFeatures().get(12);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getActivity_VariabilityBasedOnElement() {
+		return (EAttribute)activityEClass.getEStructuralFeatures().get(13);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public EAttribute getActivity_VariabilityType() {
+		return (EAttribute)activityEClass.getEStructuralFeatures().get(14);
 	}
 
 	/**
@@ -941,24 +984,6 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 	 */
 	public EAttribute getActivityDescription_Purpose() {
 		return (EAttribute)activityDescriptionEClass.getEStructuralFeatures().get(2);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EClass getApplicableMetaClassInfo() {
-		return applicableMetaClassInfoEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getApplicableMetaClassInfo_IsPrimaryExtension() {
-		return (EAttribute)applicableMetaClassInfoEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -1083,7 +1108,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getBreakdownElement_Group1() {
+	public EAttribute getBreakdownElement_HasMultipleOccurrences() {
 		return (EAttribute)breakdownElementEClass.getEStructuralFeatures().get(4);
 	}
 
@@ -1092,7 +1117,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getBreakdownElement_Checklist() {
+	public EAttribute getBreakdownElement_IsOptional() {
 		return (EAttribute)breakdownElementEClass.getEStructuralFeatures().get(5);
 	}
 
@@ -1101,7 +1126,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getBreakdownElement_Concept() {
+	public EAttribute getBreakdownElement_IsPlanned() {
 		return (EAttribute)breakdownElementEClass.getEStructuralFeatures().get(6);
 	}
 
@@ -1110,80 +1135,8 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getBreakdownElement_Example() {
-		return (EAttribute)breakdownElementEClass.getEStructuralFeatures().get(7);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getBreakdownElement_Guideline() {
-		return (EAttribute)breakdownElementEClass.getEStructuralFeatures().get(8);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getBreakdownElement_ReusableAsset() {
-		return (EAttribute)breakdownElementEClass.getEStructuralFeatures().get(9);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getBreakdownElement_SupportingMaterial() {
-		return (EAttribute)breakdownElementEClass.getEStructuralFeatures().get(10);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getBreakdownElement_Whitepaper() {
-		return (EAttribute)breakdownElementEClass.getEStructuralFeatures().get(11);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getBreakdownElement_HasMultipleOccurrences() {
-		return (EAttribute)breakdownElementEClass.getEStructuralFeatures().get(12);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getBreakdownElement_IsOptional() {
-		return (EAttribute)breakdownElementEClass.getEStructuralFeatures().get(13);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getBreakdownElement_IsPlanned() {
-		return (EAttribute)breakdownElementEClass.getEStructuralFeatures().get(14);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EAttribute getBreakdownElement_Prefix() {
-		return (EAttribute)breakdownElementEClass.getEStructuralFeatures().get(15);
+		return (EAttribute)breakdownElementEClass.getEStructuralFeatures().get(7);
 	}
 
 	/**
@@ -1236,7 +1189,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getCompositeRole_Group2() {
+	public EAttribute getCompositeRole_Group1() {
 		return (EAttribute)compositeRoleEClass.getEStructuralFeatures().get(0);
 	}
 
@@ -1587,7 +1540,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getDeliveryProcess_Group4() {
+	public EAttribute getDeliveryProcess_Group3() {
 		return (EAttribute)deliveryProcessEClass.getEStructuralFeatures().get(0);
 	}
 
@@ -1695,7 +1648,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getDescribableElement_Fulfill() {
+	public EAttribute getDescribableElement_Nodeicon() {
 		return (EAttribute)describableElementEClass.getEStructuralFeatures().get(1);
 	}
 
@@ -1704,7 +1657,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getDescribableElement_IsAbstract() {
+	public EAttribute getDescribableElement_PresentationName() {
 		return (EAttribute)describableElementEClass.getEStructuralFeatures().get(2);
 	}
 
@@ -1713,17 +1666,8 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getDescribableElement_Nodeicon() {
-		return (EAttribute)describableElementEClass.getEStructuralFeatures().get(3);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EAttribute getDescribableElement_Shapeicon() {
-		return (EAttribute)describableElementEClass.getEStructuralFeatures().get(4);
+		return (EAttribute)describableElementEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -2055,24 +1999,6 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EClass getKind() {
-		return kindEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getKind_ApplicableMetaClassInfo() {
-		return (EAttribute)kindEClass.getEStructuralFeatures().get(0);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EClass getMethodConfiguration() {
 		return methodConfigurationEClass;
 	}
@@ -2208,17 +2134,8 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getMethodElement_PresentationName() {
-		return (EAttribute)methodElementEClass.getEStructuralFeatures().get(6);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EAttribute getMethodElement_Suppressed() {
-		return (EAttribute)methodElementEClass.getEStructuralFeatures().get(7);
+		return (EAttribute)methodElementEClass.getEStructuralFeatures().get(6);
 	}
 
 	/**
@@ -2352,17 +2269,8 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getMethodPlugin_Supporting() {
-		return (EAttribute)methodPluginEClass.getEStructuralFeatures().get(2);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
 	public EAttribute getMethodPlugin_UserChangeable() {
-		return (EAttribute)methodPluginEClass.getEStructuralFeatures().get(3);
+		return (EAttribute)methodPluginEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -2426,15 +2334,6 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 	 */
 	public EClass getMilestone() {
 		return milestoneEClass;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getMilestone_RequiredResult() {
-		return (EAttribute)milestoneEClass.getEStructuralFeatures().get(0);
 	}
 
 	/**
@@ -2757,7 +2656,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getProcessComponentInterface_Group2() {
+	public EAttribute getProcessComponentInterface_Group1() {
 		return (EAttribute)processComponentInterfaceEClass.getEStructuralFeatures().get(0);
 	}
 
@@ -2856,7 +2755,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getProcessPlanningTemplate_Group4() {
+	public EAttribute getProcessPlanningTemplate_Group3() {
 		return (EAttribute)processPlanningTemplateEClass.getEStructuralFeatures().get(0);
 	}
 
@@ -3271,7 +3170,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 	 * @generated
 	 */
 	public EAttribute getTaskDescriptor_PerformedPrimarilyBy() {
-		return (EAttribute)taskDescriptorEClass.getEStructuralFeatures().get(2);
+		return (EAttribute)taskDescriptorEClass.getEStructuralFeatures().get(1);
 	}
 
 	/**
@@ -3279,8 +3178,8 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getTaskDescriptor_Group3() {
-		return (EAttribute)taskDescriptorEClass.getEStructuralFeatures().get(1);
+	public EAttribute getTaskDescriptor_Group2() {
+		return (EAttribute)taskDescriptorEClass.getEStructuralFeatures().get(2);
 	}
 
 	/**
@@ -3369,7 +3268,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getTeamProfile_Group2() {
+	public EAttribute getTeamProfile_Group1() {
 		return (EAttribute)teamProfileEClass.getEStructuralFeatures().get(0);
 	}
 
@@ -3477,7 +3376,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getWorkBreakdownElement_Group2() {
+	public EAttribute getWorkBreakdownElement_Group1() {
 		return (EAttribute)workBreakdownElementEClass.getEStructuralFeatures().get(0);
 	}
 
@@ -3578,15 +3477,6 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 	 */
 	public EAttribute getWorkOrder_LinkType() {
 		return (EAttribute)workOrderEClass.getEStructuralFeatures().get(2);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EAttribute getWorkOrder_Properties() {
-		return (EAttribute)workOrderEClass.getEStructuralFeatures().get(3);
 	}
 
 	/**
@@ -3720,7 +3610,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public EAttribute getWorkProductDescriptor_Group2() {
+	public EAttribute getWorkProductDescriptor_Group1() {
 		return (EAttribute)workProductDescriptorEClass.getEStructuralFeatures().get(2);
 	}
 
@@ -3899,9 +3789,16 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		activityEClass = createEClass(ACTIVITY);
 		createEAttribute(activityEClass, ACTIVITY__PRECONDITION);
 		createEAttribute(activityEClass, ACTIVITY__POSTCONDITION);
-		createEAttribute(activityEClass, ACTIVITY__GROUP3);
+		createEAttribute(activityEClass, ACTIVITY__GROUP2);
 		createEReference(activityEClass, ACTIVITY__BREAKDOWN_ELEMENT);
+		createEAttribute(activityEClass, ACTIVITY__CHECKLIST);
+		createEAttribute(activityEClass, ACTIVITY__CONCEPT);
+		createEAttribute(activityEClass, ACTIVITY__EXAMPLE);
+		createEAttribute(activityEClass, ACTIVITY__GUIDELINE);
 		createEAttribute(activityEClass, ACTIVITY__ROADMAP);
+		createEAttribute(activityEClass, ACTIVITY__REUSABLE_ASSET);
+		createEAttribute(activityEClass, ACTIVITY__SUPPORTING_MATERIAL);
+		createEAttribute(activityEClass, ACTIVITY__WHITEPAPER);
 		createEAttribute(activityEClass, ACTIVITY__IS_ENACTABLE);
 		createEAttribute(activityEClass, ACTIVITY__VARIABILITY_BASED_ON_ELEMENT);
 		createEAttribute(activityEClass, ACTIVITY__VARIABILITY_TYPE);
@@ -3910,9 +3807,6 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		createEAttribute(activityDescriptionEClass, ACTIVITY_DESCRIPTION__ALTERNATIVES);
 		createEAttribute(activityDescriptionEClass, ACTIVITY_DESCRIPTION__HOW_TO_STAFF);
 		createEAttribute(activityDescriptionEClass, ACTIVITY_DESCRIPTION__PURPOSE);
-
-		applicableMetaClassInfoEClass = createEClass(APPLICABLE_META_CLASS_INFO);
-		createEAttribute(applicableMetaClassInfoEClass, APPLICABLE_META_CLASS_INFO__IS_PRIMARY_EXTENSION);
 
 		artifactEClass = createEClass(ARTIFACT);
 		createEAttribute(artifactEClass, ARTIFACT__GROUP3);
@@ -3929,14 +3823,6 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		createEAttribute(breakdownElementEClass, BREAKDOWN_ELEMENT__PRESENTED_BEFORE);
 		createEAttribute(breakdownElementEClass, BREAKDOWN_ELEMENT__PLANNING_DATA);
 		createEAttribute(breakdownElementEClass, BREAKDOWN_ELEMENT__SUPER_ACTIVITY);
-		createEAttribute(breakdownElementEClass, BREAKDOWN_ELEMENT__GROUP1);
-		createEAttribute(breakdownElementEClass, BREAKDOWN_ELEMENT__CHECKLIST);
-		createEAttribute(breakdownElementEClass, BREAKDOWN_ELEMENT__CONCEPT);
-		createEAttribute(breakdownElementEClass, BREAKDOWN_ELEMENT__EXAMPLE);
-		createEAttribute(breakdownElementEClass, BREAKDOWN_ELEMENT__GUIDELINE);
-		createEAttribute(breakdownElementEClass, BREAKDOWN_ELEMENT__REUSABLE_ASSET);
-		createEAttribute(breakdownElementEClass, BREAKDOWN_ELEMENT__SUPPORTING_MATERIAL);
-		createEAttribute(breakdownElementEClass, BREAKDOWN_ELEMENT__WHITEPAPER);
 		createEAttribute(breakdownElementEClass, BREAKDOWN_ELEMENT__HAS_MULTIPLE_OCCURRENCES);
 		createEAttribute(breakdownElementEClass, BREAKDOWN_ELEMENT__IS_OPTIONAL);
 		createEAttribute(breakdownElementEClass, BREAKDOWN_ELEMENT__IS_PLANNED);
@@ -3950,7 +3836,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		checklistEClass = createEClass(CHECKLIST);
 
 		compositeRoleEClass = createEClass(COMPOSITE_ROLE);
-		createEAttribute(compositeRoleEClass, COMPOSITE_ROLE__GROUP2);
+		createEAttribute(compositeRoleEClass, COMPOSITE_ROLE__GROUP1);
 		createEReference(compositeRoleEClass, COMPOSITE_ROLE__AGGREGATED_ROLE);
 
 		conceptEClass = createEClass(CONCEPT);
@@ -4000,7 +3886,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		createEAttribute(deliverableDescriptionEClass, DELIVERABLE_DESCRIPTION__PACKAGING_GUIDANCE);
 
 		deliveryProcessEClass = createEClass(DELIVERY_PROCESS);
-		createEAttribute(deliveryProcessEClass, DELIVERY_PROCESS__GROUP4);
+		createEAttribute(deliveryProcessEClass, DELIVERY_PROCESS__GROUP3);
 		createEAttribute(deliveryProcessEClass, DELIVERY_PROCESS__COMMUNICATIONS_MATERIAL);
 		createEAttribute(deliveryProcessEClass, DELIVERY_PROCESS__EDUCATION_MATERIAL);
 
@@ -4014,9 +3900,8 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 
 		describableElementEClass = createEClass(DESCRIBABLE_ELEMENT);
 		createEReference(describableElementEClass, DESCRIBABLE_ELEMENT__PRESENTATION);
-		createEAttribute(describableElementEClass, DESCRIBABLE_ELEMENT__FULFILL);
-		createEAttribute(describableElementEClass, DESCRIBABLE_ELEMENT__IS_ABSTRACT);
 		createEAttribute(describableElementEClass, DESCRIBABLE_ELEMENT__NODEICON);
+		createEAttribute(describableElementEClass, DESCRIBABLE_ELEMENT__PRESENTATION_NAME);
 		createEAttribute(describableElementEClass, DESCRIBABLE_ELEMENT__SHAPEICON);
 
 		descriptorEClass = createEClass(DESCRIPTOR);
@@ -4070,9 +3955,6 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 
 		iterationEClass = createEClass(ITERATION);
 
-		kindEClass = createEClass(KIND);
-		createEAttribute(kindEClass, KIND__APPLICABLE_META_CLASS_INFO);
-
 		methodConfigurationEClass = createEClass(METHOD_CONFIGURATION);
 		createEAttribute(methodConfigurationEClass, METHOD_CONFIGURATION__BASE_CONFIGURATION);
 		createEAttribute(methodConfigurationEClass, METHOD_CONFIGURATION__METHOD_PLUGIN_SELECTION);
@@ -4089,7 +3971,6 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		createEAttribute(methodElementEClass, METHOD_ELEMENT__BRIEF_DESCRIPTION);
 		createEAttribute(methodElementEClass, METHOD_ELEMENT__ID);
 		createEAttribute(methodElementEClass, METHOD_ELEMENT__ORDERING_GUIDE);
-		createEAttribute(methodElementEClass, METHOD_ELEMENT__PRESENTATION_NAME);
 		createEAttribute(methodElementEClass, METHOD_ELEMENT__SUPPRESSED);
 
 		methodElementPropertyEClass = createEClass(METHOD_ELEMENT_PROPERTY);
@@ -4109,7 +3990,6 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		methodPluginEClass = createEClass(METHOD_PLUGIN);
 		createEAttribute(methodPluginEClass, METHOD_PLUGIN__REFERENCED_METHOD_PLUGIN);
 		createEReference(methodPluginEClass, METHOD_PLUGIN__METHOD_PACKAGE);
-		createEAttribute(methodPluginEClass, METHOD_PLUGIN__SUPPORTING);
 		createEAttribute(methodPluginEClass, METHOD_PLUGIN__USER_CHANGEABLE);
 
 		methodUnitEClass = createEClass(METHOD_UNIT);
@@ -4120,7 +4000,6 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		createEAttribute(methodUnitEClass, METHOD_UNIT__VERSION);
 
 		milestoneEClass = createEClass(MILESTONE);
-		createEAttribute(milestoneEClass, MILESTONE__REQUIRED_RESULT);
 
 		namedElementEClass = createEClass(NAMED_ELEMENT);
 		createEAttribute(namedElementEClass, NAMED_ELEMENT__NAME);
@@ -4166,7 +4045,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		createEAttribute(processComponentEClass, PROCESS_COMPONENT__VERSION);
 
 		processComponentInterfaceEClass = createEClass(PROCESS_COMPONENT_INTERFACE);
-		createEAttribute(processComponentInterfaceEClass, PROCESS_COMPONENT_INTERFACE__GROUP2);
+		createEAttribute(processComponentInterfaceEClass, PROCESS_COMPONENT_INTERFACE__GROUP1);
 		createEReference(processComponentInterfaceEClass, PROCESS_COMPONENT_INTERFACE__INTERFACE_SPECIFICATION);
 		createEReference(processComponentInterfaceEClass, PROCESS_COMPONENT_INTERFACE__INTERFACE_IO);
 
@@ -4181,7 +4060,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		createEReference(processPackageEClass, PROCESS_PACKAGE__PROCESS_ELEMENT);
 
 		processPlanningTemplateEClass = createEClass(PROCESS_PLANNING_TEMPLATE);
-		createEAttribute(processPlanningTemplateEClass, PROCESS_PLANNING_TEMPLATE__GROUP4);
+		createEAttribute(processPlanningTemplateEClass, PROCESS_PLANNING_TEMPLATE__GROUP3);
 		createEAttribute(processPlanningTemplateEClass, PROCESS_PLANNING_TEMPLATE__BASE_PROCESS);
 
 		reportEClass = createEClass(REPORT);
@@ -4240,8 +4119,8 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 
 		taskDescriptorEClass = createEClass(TASK_DESCRIPTOR);
 		createEAttribute(taskDescriptorEClass, TASK_DESCRIPTOR__TASK);
-		createEAttribute(taskDescriptorEClass, TASK_DESCRIPTOR__GROUP3);
 		createEAttribute(taskDescriptorEClass, TASK_DESCRIPTOR__PERFORMED_PRIMARILY_BY);
+		createEAttribute(taskDescriptorEClass, TASK_DESCRIPTOR__GROUP2);
 		createEAttribute(taskDescriptorEClass, TASK_DESCRIPTOR__ADDITIONALLY_PERFORMED_BY);
 		createEAttribute(taskDescriptorEClass, TASK_DESCRIPTOR__ASSISTED_BY);
 		createEAttribute(taskDescriptorEClass, TASK_DESCRIPTOR__EXTERNAL_INPUT);
@@ -4252,7 +4131,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		createEAttribute(taskDescriptorEClass, TASK_DESCRIPTOR__IS_SYNCHRONIZED_WITH_SOURCE);
 
 		teamProfileEClass = createEClass(TEAM_PROFILE);
-		createEAttribute(teamProfileEClass, TEAM_PROFILE__GROUP2);
+		createEAttribute(teamProfileEClass, TEAM_PROFILE__GROUP1);
 		createEAttribute(teamProfileEClass, TEAM_PROFILE__ROLE);
 		createEAttribute(teamProfileEClass, TEAM_PROFILE__SUPER_TEAM);
 		createEAttribute(teamProfileEClass, TEAM_PROFILE__SUB_TEAM);
@@ -4270,7 +4149,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		whitepaperEClass = createEClass(WHITEPAPER);
 
 		workBreakdownElementEClass = createEClass(WORK_BREAKDOWN_ELEMENT);
-		createEAttribute(workBreakdownElementEClass, WORK_BREAKDOWN_ELEMENT__GROUP2);
+		createEAttribute(workBreakdownElementEClass, WORK_BREAKDOWN_ELEMENT__GROUP1);
 		createEReference(workBreakdownElementEClass, WORK_BREAKDOWN_ELEMENT__PREDECESSOR);
 		createEAttribute(workBreakdownElementEClass, WORK_BREAKDOWN_ELEMENT__IS_EVENT_DRIVEN);
 		createEAttribute(workBreakdownElementEClass, WORK_BREAKDOWN_ELEMENT__IS_ONGOING);
@@ -4284,7 +4163,6 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		createEAttribute(workOrderEClass, WORK_ORDER__VALUE);
 		createEAttribute(workOrderEClass, WORK_ORDER__ID);
 		createEAttribute(workOrderEClass, WORK_ORDER__LINK_TYPE);
-		createEAttribute(workOrderEClass, WORK_ORDER__PROPERTIES);
 
 		workProductEClass = createEClass(WORK_PRODUCT);
 		createEAttribute(workProductEClass, WORK_PRODUCT__GROUP2);
@@ -4302,7 +4180,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		workProductDescriptorEClass = createEClass(WORK_PRODUCT_DESCRIPTOR);
 		createEAttribute(workProductDescriptorEClass, WORK_PRODUCT_DESCRIPTOR__WORK_PRODUCT);
 		createEAttribute(workProductDescriptorEClass, WORK_PRODUCT_DESCRIPTOR__RESPONSIBLE_ROLE);
-		createEAttribute(workProductDescriptorEClass, WORK_PRODUCT_DESCRIPTOR__GROUP2);
+		createEAttribute(workProductDescriptorEClass, WORK_PRODUCT_DESCRIPTOR__GROUP1);
 		createEAttribute(workProductDescriptorEClass, WORK_PRODUCT_DESCRIPTOR__EXTERNAL_INPUT_TO);
 		createEAttribute(workProductDescriptorEClass, WORK_PRODUCT_DESCRIPTOR__IMPACTED_BY);
 		createEAttribute(workProductDescriptorEClass, WORK_PRODUCT_DESCRIPTOR__IMPACTS);
@@ -4352,14 +4230,9 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		// Obtain other dependent packages
 		XMLTypePackage theXMLTypePackage = (XMLTypePackage)EPackage.Registry.INSTANCE.getEPackage(XMLTypePackage.eNS_URI);
 
-		// Create type parameters
-
-		// Set bounds for type parameters
-
 		// Add supertypes to classes
 		activityEClass.getESuperTypes().add(this.getWorkBreakdownElement());
 		activityDescriptionEClass.getESuperTypes().add(this.getBreakdownElementDescription());
-		applicableMetaClassInfoEClass.getESuperTypes().add(this.getPackageableElement());
 		artifactEClass.getESuperTypes().add(this.getWorkProduct());
 		artifactDescriptionEClass.getESuperTypes().add(this.getWorkProductDescription());
 		breakdownElementEClass.getESuperTypes().add(this.getProcessElement());
@@ -4393,7 +4266,6 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		guidanceDescriptionEClass.getESuperTypes().add(this.getContentDescription());
 		guidelineEClass.getESuperTypes().add(this.getGuidance());
 		iterationEClass.getESuperTypes().add(this.getActivity());
-		kindEClass.getESuperTypes().add(this.getContentElement());
 		methodConfigurationEClass.getESuperTypes().add(this.getMethodUnit());
 		methodElementEClass.getESuperTypes().add(this.getPackageableElement());
 		methodElementPropertyEClass.getESuperTypes().add(this.getPackageableElement());
@@ -4444,66 +4316,62 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 
 		// Initialize classes and features; add operations and parameters
 		initEClass(activityEClass, Activity.class, "Activity", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getActivity_Precondition(), theXMLTypePackage.getString(), "precondition", null, 0, 1, Activity.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getActivity_Postcondition(), theXMLTypePackage.getString(), "postcondition", null, 0, 1, Activity.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getActivity_Group3(), ecorePackage.getEFeatureMapEntry(), "group3", null, 0, -1, Activity.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getActivity_Precondition(), theXMLTypePackage.getString(), "precondition", null, 0, 1, Activity.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getActivity_Postcondition(), theXMLTypePackage.getString(), "postcondition", null, 0, 1, Activity.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getActivity_Group2(), ecorePackage.getEFeatureMapEntry(), "group2", null, 0, -1, Activity.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getActivity_BreakdownElement(), this.getBreakdownElement(), null, "breakdownElement", null, 0, -1, Activity.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
+		initEAttribute(getActivity_Checklist(), theXMLTypePackage.getString(), "checklist", null, 0, -1, Activity.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
+		initEAttribute(getActivity_Concept(), theXMLTypePackage.getString(), "concept", null, 0, -1, Activity.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
+		initEAttribute(getActivity_Example(), theXMLTypePackage.getString(), "example", null, 0, -1, Activity.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
+		initEAttribute(getActivity_Guideline(), theXMLTypePackage.getString(), "guideline", null, 0, -1, Activity.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEAttribute(getActivity_Roadmap(), theXMLTypePackage.getString(), "roadmap", null, 0, -1, Activity.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getActivity_IsEnactable(), theXMLTypePackage.getBoolean(), "isEnactable", null, 0, 1, Activity.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getActivity_VariabilityBasedOnElement(), theXMLTypePackage.getString(), "variabilityBasedOnElement", null, 0, 1, Activity.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getActivity_VariabilityType(), this.getVariabilityType(), "variabilityType", "na", 0, 1, Activity.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getActivity_ReusableAsset(), theXMLTypePackage.getString(), "reusableAsset", null, 0, -1, Activity.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
+		initEAttribute(getActivity_SupportingMaterial(), theXMLTypePackage.getString(), "supportingMaterial", null, 0, -1, Activity.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
+		initEAttribute(getActivity_Whitepaper(), theXMLTypePackage.getString(), "whitepaper", null, 0, -1, Activity.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
+		initEAttribute(getActivity_IsEnactable(), theXMLTypePackage.getBoolean(), "isEnactable", null, 0, 1, Activity.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getActivity_VariabilityBasedOnElement(), theXMLTypePackage.getString(), "variabilityBasedOnElement", null, 0, 1, Activity.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getActivity_VariabilityType(), this.getVariabilityType(), "variabilityType", "na", 0, 1, Activity.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(activityDescriptionEClass, ActivityDescription.class, "ActivityDescription", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getActivityDescription_Alternatives(), theXMLTypePackage.getString(), "alternatives", null, 0, 1, ActivityDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getActivityDescription_HowToStaff(), theXMLTypePackage.getString(), "howToStaff", null, 0, 1, ActivityDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getActivityDescription_Purpose(), theXMLTypePackage.getString(), "purpose", null, 0, 1, ActivityDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
-		initEClass(applicableMetaClassInfoEClass, ApplicableMetaClassInfo.class, "ApplicableMetaClassInfo", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getApplicableMetaClassInfo_IsPrimaryExtension(), theXMLTypePackage.getBoolean(), "isPrimaryExtension", null, 0, 1, ApplicableMetaClassInfo.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getActivityDescription_Alternatives(), theXMLTypePackage.getString(), "alternatives", null, 0, 1, ActivityDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getActivityDescription_HowToStaff(), theXMLTypePackage.getString(), "howToStaff", null, 0, 1, ActivityDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getActivityDescription_Purpose(), theXMLTypePackage.getString(), "purpose", null, 0, 1, ActivityDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(artifactEClass, Artifact.class, "Artifact", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getArtifact_Group3(), ecorePackage.getEFeatureMapEntry(), "group3", null, 0, -1, Artifact.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getArtifact_ContainedArtifact(), this.getArtifact(), null, "containedArtifact", null, 0, -1, Artifact.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 
 		initEClass(artifactDescriptionEClass, ArtifactDescription.class, "ArtifactDescription", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getArtifactDescription_BriefOutline(), theXMLTypePackage.getString(), "briefOutline", null, 0, 1, ArtifactDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getArtifactDescription_RepresentationOptions(), theXMLTypePackage.getString(), "representationOptions", null, 0, 1, ArtifactDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getArtifactDescription_Representation(), theXMLTypePackage.getString(), "representation", null, 0, 1, ArtifactDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getArtifactDescription_Notation(), theXMLTypePackage.getString(), "notation", null, 0, 1, ArtifactDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getArtifactDescription_BriefOutline(), theXMLTypePackage.getString(), "briefOutline", null, 0, 1, ArtifactDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getArtifactDescription_RepresentationOptions(), theXMLTypePackage.getString(), "representationOptions", null, 0, 1, ArtifactDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getArtifactDescription_Representation(), theXMLTypePackage.getString(), "representation", null, 0, 1, ArtifactDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getArtifactDescription_Notation(), theXMLTypePackage.getString(), "notation", null, 0, 1, ArtifactDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(breakdownElementEClass, BreakdownElement.class, "BreakdownElement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getBreakdownElement_PresentedAfter(), theXMLTypePackage.getString(), "presentedAfter", null, 0, 1, BreakdownElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getBreakdownElement_PresentedBefore(), theXMLTypePackage.getString(), "presentedBefore", null, 0, 1, BreakdownElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getBreakdownElement_PlanningData(), theXMLTypePackage.getString(), "planningData", null, 0, 1, BreakdownElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getBreakdownElement_SuperActivity(), theXMLTypePackage.getString(), "superActivity", null, 0, 1, BreakdownElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getBreakdownElement_Group1(), ecorePackage.getEFeatureMapEntry(), "group1", null, 0, -1, BreakdownElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getBreakdownElement_Checklist(), theXMLTypePackage.getString(), "checklist", null, 0, -1, BreakdownElement.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getBreakdownElement_Concept(), theXMLTypePackage.getString(), "concept", null, 0, -1, BreakdownElement.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getBreakdownElement_Example(), theXMLTypePackage.getString(), "example", null, 0, -1, BreakdownElement.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getBreakdownElement_Guideline(), theXMLTypePackage.getString(), "guideline", null, 0, -1, BreakdownElement.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getBreakdownElement_ReusableAsset(), theXMLTypePackage.getString(), "reusableAsset", null, 0, -1, BreakdownElement.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getBreakdownElement_SupportingMaterial(), theXMLTypePackage.getString(), "supportingMaterial", null, 0, -1, BreakdownElement.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getBreakdownElement_Whitepaper(), theXMLTypePackage.getString(), "whitepaper", null, 0, -1, BreakdownElement.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getBreakdownElement_HasMultipleOccurrences(), theXMLTypePackage.getBoolean(), "hasMultipleOccurrences", null, 0, 1, BreakdownElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getBreakdownElement_IsOptional(), theXMLTypePackage.getBoolean(), "isOptional", null, 0, 1, BreakdownElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getBreakdownElement_IsPlanned(), theXMLTypePackage.getBoolean(), "isPlanned", null, 0, 1, BreakdownElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getBreakdownElement_Prefix(), theXMLTypePackage.getString(), "prefix", null, 0, 1, BreakdownElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getBreakdownElement_PresentedAfter(), theXMLTypePackage.getString(), "presentedAfter", null, 0, 1, BreakdownElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getBreakdownElement_PresentedBefore(), theXMLTypePackage.getString(), "presentedBefore", null, 0, 1, BreakdownElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getBreakdownElement_PlanningData(), theXMLTypePackage.getString(), "planningData", null, 0, 1, BreakdownElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getBreakdownElement_SuperActivity(), theXMLTypePackage.getString(), "superActivity", null, 0, 1, BreakdownElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getBreakdownElement_HasMultipleOccurrences(), theXMLTypePackage.getBoolean(), "hasMultipleOccurrences", null, 0, 1, BreakdownElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getBreakdownElement_IsOptional(), theXMLTypePackage.getBoolean(), "isOptional", null, 0, 1, BreakdownElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getBreakdownElement_IsPlanned(), theXMLTypePackage.getBoolean(), "isPlanned", null, 0, 1, BreakdownElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getBreakdownElement_Prefix(), theXMLTypePackage.getString(), "prefix", null, 0, 1, BreakdownElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(breakdownElementDescriptionEClass, BreakdownElementDescription.class, "BreakdownElementDescription", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getBreakdownElementDescription_UsageGuidance(), theXMLTypePackage.getString(), "usageGuidance", null, 0, 1, BreakdownElementDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getBreakdownElementDescription_UsageGuidance(), theXMLTypePackage.getString(), "usageGuidance", null, 0, 1, BreakdownElementDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(capabilityPatternEClass, CapabilityPattern.class, "CapabilityPattern", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		initEClass(checklistEClass, Checklist.class, "Checklist", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		initEClass(compositeRoleEClass, CompositeRole.class, "CompositeRole", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getCompositeRole_Group2(), ecorePackage.getEFeatureMapEntry(), "group2", null, 0, -1, CompositeRole.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getCompositeRole_Group1(), ecorePackage.getEFeatureMapEntry(), "group1", null, 0, -1, CompositeRole.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getCompositeRole_AggregatedRole(), this.getRole(), null, "aggregatedRole", null, 0, -1, CompositeRole.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 
 		initEClass(conceptEClass, Concept.class, "Concept", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		initEClass(constraintEClass, Constraint.class, "Constraint", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getConstraint_MainDescription(), theXMLTypePackage.getString(), "mainDescription", null, 0, 1, Constraint.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getConstraint_MainDescription(), theXMLTypePackage.getString(), "mainDescription", null, 0, 1, Constraint.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(contentCategoryEClass, ContentCategory.class, "ContentCategory", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
@@ -4512,10 +4380,10 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		initEReference(getContentCategoryPackage_ContentCategory(), this.getContentCategory(), null, "contentCategory", null, 0, -1, ContentCategoryPackage.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 
 		initEClass(contentDescriptionEClass, ContentDescription.class, "ContentDescription", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getContentDescription_MainDescription(), theXMLTypePackage.getString(), "mainDescription", null, 0, 1, ContentDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getContentDescription_KeyConsiderations(), theXMLTypePackage.getString(), "keyConsiderations", null, 0, 1, ContentDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getContentDescription_MainDescription(), theXMLTypePackage.getString(), "mainDescription", null, 0, 1, ContentDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getContentDescription_KeyConsiderations(), theXMLTypePackage.getString(), "keyConsiderations", null, 0, 1, ContentDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getContentDescription_Section(), this.getSection(), null, "section", null, 0, -1, ContentDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getContentDescription_ExternalId(), theXMLTypePackage.getString(), "externalId", null, 0, 1, ContentDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getContentDescription_ExternalId(), theXMLTypePackage.getString(), "externalId", null, 0, 1, ContentDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(contentElementEClass, ContentElement.class, "ContentElement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getContentElement_Group1(), ecorePackage.getEFeatureMapEntry(), "group1", null, 0, -1, ContentElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -4526,8 +4394,8 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		initEAttribute(getContentElement_ReusableAsset(), theXMLTypePackage.getString(), "reusableAsset", null, 0, -1, ContentElement.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEAttribute(getContentElement_SupportingMaterial(), theXMLTypePackage.getString(), "supportingMaterial", null, 0, -1, ContentElement.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEAttribute(getContentElement_Whitepaper(), theXMLTypePackage.getString(), "whitepaper", null, 0, -1, ContentElement.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getContentElement_VariabilityBasedOnElement(), theXMLTypePackage.getString(), "variabilityBasedOnElement", null, 0, 1, ContentElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getContentElement_VariabilityType(), this.getVariabilityType(), "variabilityType", "na", 0, 1, ContentElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getContentElement_VariabilityBasedOnElement(), theXMLTypePackage.getString(), "variabilityBasedOnElement", null, 0, 1, ContentElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getContentElement_VariabilityType(), this.getVariabilityType(), "variabilityType", "na", 0, 1, ContentElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(contentPackageEClass, ContentPackage.class, "ContentPackage", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getContentPackage_Group2(), ecorePackage.getEFeatureMapEntry(), "group2", null, 0, -1, ContentPackage.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -4543,34 +4411,33 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		initEAttribute(getDeliverable_DeliveredWorkProduct(), theXMLTypePackage.getString(), "deliveredWorkProduct", null, 0, -1, Deliverable.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 
 		initEClass(deliverableDescriptionEClass, DeliverableDescription.class, "DeliverableDescription", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getDeliverableDescription_ExternalDescription(), theXMLTypePackage.getString(), "externalDescription", null, 0, 1, DeliverableDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getDeliverableDescription_PackagingGuidance(), theXMLTypePackage.getString(), "packagingGuidance", null, 0, 1, DeliverableDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getDeliverableDescription_ExternalDescription(), theXMLTypePackage.getString(), "externalDescription", null, 0, 1, DeliverableDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getDeliverableDescription_PackagingGuidance(), theXMLTypePackage.getString(), "packagingGuidance", null, 0, 1, DeliverableDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(deliveryProcessEClass, DeliveryProcess.class, "DeliveryProcess", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getDeliveryProcess_Group4(), ecorePackage.getEFeatureMapEntry(), "group4", null, 0, -1, DeliveryProcess.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getDeliveryProcess_Group3(), ecorePackage.getEFeatureMapEntry(), "group3", null, 0, -1, DeliveryProcess.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getDeliveryProcess_CommunicationsMaterial(), theXMLTypePackage.getString(), "communicationsMaterial", null, 0, -1, DeliveryProcess.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEAttribute(getDeliveryProcess_EducationMaterial(), theXMLTypePackage.getString(), "educationMaterial", null, 0, -1, DeliveryProcess.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 
 		initEClass(deliveryProcessDescriptionEClass, DeliveryProcessDescription.class, "DeliveryProcessDescription", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getDeliveryProcessDescription_Scale(), theXMLTypePackage.getString(), "scale", null, 0, 1, DeliveryProcessDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getDeliveryProcessDescription_ProjectCharacteristics(), theXMLTypePackage.getString(), "projectCharacteristics", null, 0, 1, DeliveryProcessDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getDeliveryProcessDescription_RiskLevel(), theXMLTypePackage.getString(), "riskLevel", null, 0, 1, DeliveryProcessDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getDeliveryProcessDescription_EstimatingTechnique(), theXMLTypePackage.getString(), "estimatingTechnique", null, 0, 1, DeliveryProcessDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getDeliveryProcessDescription_ProjectMemberExpertise(), theXMLTypePackage.getString(), "projectMemberExpertise", null, 0, 1, DeliveryProcessDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getDeliveryProcessDescription_TypeOfContract(), theXMLTypePackage.getString(), "typeOfContract", null, 0, 1, DeliveryProcessDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getDeliveryProcessDescription_Scale(), theXMLTypePackage.getString(), "scale", null, 0, 1, DeliveryProcessDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getDeliveryProcessDescription_ProjectCharacteristics(), theXMLTypePackage.getString(), "projectCharacteristics", null, 0, 1, DeliveryProcessDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getDeliveryProcessDescription_RiskLevel(), theXMLTypePackage.getString(), "riskLevel", null, 0, 1, DeliveryProcessDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getDeliveryProcessDescription_EstimatingTechnique(), theXMLTypePackage.getString(), "estimatingTechnique", null, 0, 1, DeliveryProcessDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getDeliveryProcessDescription_ProjectMemberExpertise(), theXMLTypePackage.getString(), "projectMemberExpertise", null, 0, 1, DeliveryProcessDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getDeliveryProcessDescription_TypeOfContract(), theXMLTypePackage.getString(), "typeOfContract", null, 0, 1, DeliveryProcessDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(describableElementEClass, DescribableElement.class, "DescribableElement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getDescribableElement_Presentation(), this.getContentDescription(), null, "presentation", null, 0, 1, DescribableElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getDescribableElement_Fulfill(), theXMLTypePackage.getString(), "fulfill", null, 0, -1, DescribableElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getDescribableElement_IsAbstract(), theXMLTypePackage.getBoolean(), "isAbstract", null, 0, 1, DescribableElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getDescribableElement_Nodeicon(), theXMLTypePackage.getString(), "nodeicon", null, 0, 1, DescribableElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getDescribableElement_Shapeicon(), theXMLTypePackage.getString(), "shapeicon", null, 0, 1, DescribableElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getDescribableElement_Nodeicon(), theXMLTypePackage.getString(), "nodeicon", null, 0, 1, DescribableElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getDescribableElement_PresentationName(), theXMLTypePackage.getString(), "presentationName", null, 0, 1, DescribableElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getDescribableElement_Shapeicon(), theXMLTypePackage.getString(), "shapeicon", null, 0, 1, DescribableElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(descriptorEClass, org.eclipse.epf.xml.uma.Descriptor.class, "Descriptor", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getDescriptor_IsSynchronizedWithSource(), theXMLTypePackage.getBoolean(), "isSynchronizedWithSource", null, 0, 1, org.eclipse.epf.xml.uma.Descriptor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getDescriptor_IsSynchronizedWithSource(), theXMLTypePackage.getBoolean(), "isSynchronizedWithSource", null, 0, 1, org.eclipse.epf.xml.uma.Descriptor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(descriptorDescriptionEClass, DescriptorDescription.class, "DescriptorDescription", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getDescriptorDescription_RefinedDescription(), theXMLTypePackage.getString(), "refinedDescription", null, 0, 1, DescriptorDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getDescriptorDescription_RefinedDescription(), theXMLTypePackage.getString(), "refinedDescription", null, 0, 1, DescriptorDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(disciplineEClass, Discipline.class, "Discipline", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getDiscipline_Group2(), ecorePackage.getEFeatureMapEntry(), "group2", null, 0, -1, Discipline.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -4611,20 +4478,17 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		initEClass(guidanceEClass, Guidance.class, "Guidance", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		initEClass(guidanceDescriptionEClass, GuidanceDescription.class, "GuidanceDescription", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getGuidanceDescription_Attachment(), theXMLTypePackage.getString(), "attachment", null, 0, 1, GuidanceDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getGuidanceDescription_Attachment(), theXMLTypePackage.getString(), "attachment", null, 0, 1, GuidanceDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(guidelineEClass, Guideline.class, "Guideline", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		initEClass(iterationEClass, Iteration.class, "Iteration", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
-		initEClass(kindEClass, Kind.class, "Kind", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getKind_ApplicableMetaClassInfo(), theXMLTypePackage.getString(), "applicableMetaClassInfo", null, 0, -1, Kind.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-
 		initEClass(methodConfigurationEClass, MethodConfiguration.class, "MethodConfiguration", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getMethodConfiguration_BaseConfiguration(), theXMLTypePackage.getString(), "baseConfiguration", null, 0, -1, MethodConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getMethodConfiguration_MethodPluginSelection(), theXMLTypePackage.getString(), "methodPluginSelection", null, 0, -1, MethodConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getMethodConfiguration_MethodPackageSelection(), theXMLTypePackage.getString(), "methodPackageSelection", null, 0, -1, MethodConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getMethodConfiguration_DefaultView(), theXMLTypePackage.getString(), "defaultView", null, 0, 1, MethodConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getMethodConfiguration_DefaultView(), theXMLTypePackage.getString(), "defaultView", null, 0, 1, MethodConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getMethodConfiguration_ProcessView(), theXMLTypePackage.getString(), "processView", null, 0, -1, MethodConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getMethodConfiguration_SubtractedCategory(), theXMLTypePackage.getString(), "subtractedCategory", null, 0, -1, MethodConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getMethodConfiguration_AddedCategory(), theXMLTypePackage.getString(), "addedCategory", null, 0, -1, MethodConfiguration.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -4633,44 +4497,41 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		initEAttribute(getMethodElement_Group(), ecorePackage.getEFeatureMapEntry(), "group", null, 0, -1, MethodElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getMethodElement_OwnedRule(), this.getConstraint(), null, "ownedRule", null, 0, -1, MethodElement.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getMethodElement_MethodElementProperty(), this.getMethodElementProperty(), null, "methodElementProperty", null, 0, -1, MethodElement.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getMethodElement_BriefDescription(), theXMLTypePackage.getString(), "briefDescription", null, 0, 1, MethodElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getMethodElement_Id(), theXMLTypePackage.getString(), "id", null, 0, 1, MethodElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getMethodElement_OrderingGuide(), theXMLTypePackage.getString(), "orderingGuide", null, 0, 1, MethodElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getMethodElement_PresentationName(), theXMLTypePackage.getString(), "presentationName", null, 0, 1, MethodElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getMethodElement_Suppressed(), theXMLTypePackage.getBoolean(), "suppressed", null, 0, 1, MethodElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getMethodElement_BriefDescription(), theXMLTypePackage.getString(), "briefDescription", null, 0, 1, MethodElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getMethodElement_Id(), theXMLTypePackage.getString(), "id", null, 0, 1, MethodElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getMethodElement_OrderingGuide(), theXMLTypePackage.getString(), "orderingGuide", null, 0, 1, MethodElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getMethodElement_Suppressed(), theXMLTypePackage.getBoolean(), "suppressed", null, 0, 1, MethodElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(methodElementPropertyEClass, MethodElementProperty.class, "MethodElementProperty", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getMethodElementProperty_Value(), theXMLTypePackage.getString(), "value", null, 0, 1, MethodElementProperty.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getMethodElementProperty_Value(), theXMLTypePackage.getString(), "value", null, 0, 1, MethodElementProperty.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(methodLibraryEClass, MethodLibrary.class, "MethodLibrary", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getMethodLibrary_MethodPlugin(), this.getMethodPlugin(), null, "methodPlugin", null, 0, -1, MethodLibrary.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getMethodLibrary_MethodConfiguration(), this.getMethodConfiguration(), null, "methodConfiguration", null, 0, -1, MethodLibrary.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getMethodLibrary_Tool(), theXMLTypePackage.getString(), "tool", null, 0, 1, MethodLibrary.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getMethodLibrary_Tool(), theXMLTypePackage.getString(), "tool", null, 0, 1, MethodLibrary.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(methodPackageEClass, MethodPackage.class, "MethodPackage", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getMethodPackage_Group1(), ecorePackage.getEFeatureMapEntry(), "group1", null, 0, -1, MethodPackage.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getMethodPackage_ReusedPackage(), theXMLTypePackage.getString(), "reusedPackage", null, 0, -1, MethodPackage.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getMethodPackage_MethodPackage(), this.getMethodPackage(), null, "methodPackage", null, 0, -1, MethodPackage.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getMethodPackage_Global(), theXMLTypePackage.getBoolean(), "global", null, 0, 1, MethodPackage.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getMethodPackage_Global(), theXMLTypePackage.getBoolean(), "global", null, 0, 1, MethodPackage.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(methodPluginEClass, MethodPlugin.class, "MethodPlugin", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getMethodPlugin_ReferencedMethodPlugin(), theXMLTypePackage.getString(), "referencedMethodPlugin", null, 0, -1, MethodPlugin.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getMethodPlugin_MethodPackage(), this.getMethodPackage(), null, "methodPackage", null, 0, -1, MethodPlugin.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getMethodPlugin_Supporting(), theXMLTypePackage.getBoolean(), "supporting", null, 0, 1, MethodPlugin.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getMethodPlugin_UserChangeable(), theXMLTypePackage.getBoolean(), "userChangeable", null, 0, 1, MethodPlugin.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getMethodPlugin_UserChangeable(), theXMLTypePackage.getBoolean(), "userChangeable", null, 0, 1, MethodPlugin.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(methodUnitEClass, MethodUnit.class, "MethodUnit", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getMethodUnit_Copyright(), theXMLTypePackage.getString(), "copyright", null, 0, 1, MethodUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getMethodUnit_Authors(), theXMLTypePackage.getString(), "authors", null, 0, 1, MethodUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getMethodUnit_ChangeDate(), theXMLTypePackage.getDateTime(), "changeDate", null, 0, 1, MethodUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getMethodUnit_ChangeDescription(), theXMLTypePackage.getString(), "changeDescription", null, 0, 1, MethodUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getMethodUnit_Version(), theXMLTypePackage.getString(), "version", null, 0, 1, MethodUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getMethodUnit_Copyright(), theXMLTypePackage.getString(), "copyright", null, 0, 1, MethodUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getMethodUnit_Authors(), theXMLTypePackage.getString(), "authors", null, 0, 1, MethodUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getMethodUnit_ChangeDate(), theXMLTypePackage.getDateTime(), "changeDate", null, 0, 1, MethodUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getMethodUnit_ChangeDescription(), theXMLTypePackage.getString(), "changeDescription", null, 0, 1, MethodUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getMethodUnit_Version(), theXMLTypePackage.getString(), "version", null, 0, 1, MethodUnit.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(milestoneEClass, Milestone.class, "Milestone", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getMilestone_RequiredResult(), theXMLTypePackage.getString(), "requiredResult", null, 0, -1, Milestone.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(namedElementEClass, NamedElement.class, "NamedElement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getNamedElement_Name(), theXMLTypePackage.getString(), "name", null, 0, 1, NamedElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getNamedElement_Name(), theXMLTypePackage.getString(), "name", null, 0, 1, NamedElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(outcomeEClass, Outcome.class, "Outcome", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
@@ -4679,9 +4540,9 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		initEClass(phaseEClass, Phase.class, "Phase", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		initEClass(planningDataEClass, PlanningData.class, "PlanningData", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getPlanningData_FinishDate(), theXMLTypePackage.getDateTime(), "finishDate", null, 0, 1, PlanningData.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getPlanningData_Rank(), theXMLTypePackage.getString(), "rank", null, 0, 1, PlanningData.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getPlanningData_StartDate(), theXMLTypePackage.getDateTime(), "startDate", null, 0, 1, PlanningData.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getPlanningData_FinishDate(), theXMLTypePackage.getDateTime(), "finishDate", null, 0, 1, PlanningData.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getPlanningData_Rank(), theXMLTypePackage.getString(), "rank", null, 0, 1, PlanningData.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getPlanningData_StartDate(), theXMLTypePackage.getDateTime(), "startDate", null, 0, 1, PlanningData.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(practiceEClass, Practice.class, "Practice", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getPractice_Group2(), ecorePackage.getEFeatureMapEntry(), "group2", null, 0, -1, Practice.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -4690,36 +4551,36 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		initEReference(getPractice_SubPractice(), this.getPractice(), null, "subPractice", null, 0, -1, Practice.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 
 		initEClass(practiceDescriptionEClass, PracticeDescription.class, "PracticeDescription", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getPracticeDescription_AdditionalInfo(), theXMLTypePackage.getString(), "additionalInfo", null, 0, 1, PracticeDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getPracticeDescription_Application(), theXMLTypePackage.getString(), "application", null, 0, 1, PracticeDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getPracticeDescription_Background(), theXMLTypePackage.getString(), "background", null, 0, 1, PracticeDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getPracticeDescription_Goals(), theXMLTypePackage.getString(), "goals", null, 0, 1, PracticeDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getPracticeDescription_LevelsOfAdoption(), theXMLTypePackage.getString(), "levelsOfAdoption", null, 0, 1, PracticeDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getPracticeDescription_Problem(), theXMLTypePackage.getString(), "problem", null, 0, 1, PracticeDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getPracticeDescription_AdditionalInfo(), theXMLTypePackage.getString(), "additionalInfo", null, 0, 1, PracticeDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getPracticeDescription_Application(), theXMLTypePackage.getString(), "application", null, 0, 1, PracticeDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getPracticeDescription_Background(), theXMLTypePackage.getString(), "background", null, 0, 1, PracticeDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getPracticeDescription_Goals(), theXMLTypePackage.getString(), "goals", null, 0, 1, PracticeDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getPracticeDescription_LevelsOfAdoption(), theXMLTypePackage.getString(), "levelsOfAdoption", null, 0, 1, PracticeDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getPracticeDescription_Problem(), theXMLTypePackage.getString(), "problem", null, 0, 1, PracticeDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(processEClass, org.eclipse.epf.xml.uma.Process.class, "Process", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getProcess_IncludesPattern(), theXMLTypePackage.getString(), "includesPattern", null, 0, -1, org.eclipse.epf.xml.uma.Process.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getProcess_DefaultContext(), theXMLTypePackage.getString(), "defaultContext", null, 0, 1, org.eclipse.epf.xml.uma.Process.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getProcess_DefaultContext(), theXMLTypePackage.getString(), "defaultContext", null, 0, 1, org.eclipse.epf.xml.uma.Process.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getProcess_ValidContext(), theXMLTypePackage.getString(), "validContext", null, 0, -1, org.eclipse.epf.xml.uma.Process.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getProcess_DiagramURI(), theXMLTypePackage.getString(), "diagramURI", null, 0, 1, org.eclipse.epf.xml.uma.Process.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getProcess_DiagramURI(), theXMLTypePackage.getString(), "diagramURI", null, 0, 1, org.eclipse.epf.xml.uma.Process.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(processComponentEClass, ProcessComponent.class, "ProcessComponent", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getProcessComponent_Copyright(), theXMLTypePackage.getString(), "copyright", null, 0, 1, ProcessComponent.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getProcessComponent_Copyright(), theXMLTypePackage.getString(), "copyright", null, 0, 1, ProcessComponent.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getProcessComponent_Interface(), this.getProcessComponentInterface(), null, "interface", null, 0, 1, ProcessComponent.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getProcessComponent_Process(), this.getProcess(), null, "process", null, 1, 1, ProcessComponent.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getProcessComponent_Authors(), theXMLTypePackage.getString(), "authors", null, 0, 1, ProcessComponent.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getProcessComponent_ChangeDate(), theXMLTypePackage.getDateTime(), "changeDate", null, 0, 1, ProcessComponent.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getProcessComponent_ChangeDescription(), theXMLTypePackage.getString(), "changeDescription", null, 0, 1, ProcessComponent.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getProcessComponent_Version(), theXMLTypePackage.getString(), "version", null, 0, 1, ProcessComponent.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getProcessComponent_Authors(), theXMLTypePackage.getString(), "authors", null, 0, 1, ProcessComponent.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getProcessComponent_ChangeDate(), theXMLTypePackage.getDateTime(), "changeDate", null, 0, 1, ProcessComponent.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getProcessComponent_ChangeDescription(), theXMLTypePackage.getString(), "changeDescription", null, 0, 1, ProcessComponent.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getProcessComponent_Version(), theXMLTypePackage.getString(), "version", null, 0, 1, ProcessComponent.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(processComponentInterfaceEClass, ProcessComponentInterface.class, "ProcessComponentInterface", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getProcessComponentInterface_Group2(), ecorePackage.getEFeatureMapEntry(), "group2", null, 0, -1, ProcessComponentInterface.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getProcessComponentInterface_Group1(), ecorePackage.getEFeatureMapEntry(), "group1", null, 0, -1, ProcessComponentInterface.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getProcessComponentInterface_InterfaceSpecification(), this.getTaskDescriptor(), null, "interfaceSpecification", null, 0, -1, ProcessComponentInterface.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getProcessComponentInterface_InterfaceIO(), this.getWorkProductDescriptor(), null, "interfaceIO", null, 0, -1, ProcessComponentInterface.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 
 		initEClass(processDescriptionEClass, ProcessDescription.class, "ProcessDescription", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getProcessDescription_Scope(), theXMLTypePackage.getString(), "scope", null, 0, 1, ProcessDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getProcessDescription_UsageNotes(), theXMLTypePackage.getString(), "usageNotes", null, 0, 1, ProcessDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getProcessDescription_Scope(), theXMLTypePackage.getString(), "scope", null, 0, 1, ProcessDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getProcessDescription_UsageNotes(), theXMLTypePackage.getString(), "usageNotes", null, 0, 1, ProcessDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(processElementEClass, ProcessElement.class, "ProcessElement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
@@ -4728,7 +4589,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		initEReference(getProcessPackage_ProcessElement(), this.getProcessElement(), null, "processElement", null, 0, -1, ProcessPackage.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 
 		initEClass(processPlanningTemplateEClass, ProcessPlanningTemplate.class, "ProcessPlanningTemplate", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getProcessPlanningTemplate_Group4(), ecorePackage.getEFeatureMapEntry(), "group4", null, 0, -1, ProcessPlanningTemplate.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getProcessPlanningTemplate_Group3(), ecorePackage.getEFeatureMapEntry(), "group3", null, 0, -1, ProcessPlanningTemplate.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getProcessPlanningTemplate_BaseProcess(), theXMLTypePackage.getString(), "baseProcess", null, 0, -1, ProcessPlanningTemplate.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 
 		initEClass(reportEClass, Report.class, "Report", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -4742,12 +4603,12 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		initEAttribute(getRole_ResponsibleFor(), theXMLTypePackage.getString(), "responsibleFor", null, 0, -1, Role.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 
 		initEClass(roleDescriptionEClass, RoleDescription.class, "RoleDescription", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getRoleDescription_AssignmentApproaches(), theXMLTypePackage.getString(), "assignmentApproaches", null, 0, 1, RoleDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getRoleDescription_Skills(), theXMLTypePackage.getString(), "skills", null, 0, 1, RoleDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getRoleDescription_Synonyms(), theXMLTypePackage.getString(), "synonyms", null, 0, 1, RoleDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getRoleDescription_AssignmentApproaches(), theXMLTypePackage.getString(), "assignmentApproaches", null, 0, 1, RoleDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getRoleDescription_Skills(), theXMLTypePackage.getString(), "skills", null, 0, 1, RoleDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getRoleDescription_Synonyms(), theXMLTypePackage.getString(), "synonyms", null, 0, 1, RoleDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(roleDescriptorEClass, RoleDescriptor.class, "RoleDescriptor", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getRoleDescriptor_Role(), theXMLTypePackage.getString(), "role", null, 0, 1, RoleDescriptor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getRoleDescriptor_Role(), theXMLTypePackage.getString(), "role", null, 0, 1, RoleDescriptor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getRoleDescriptor_ResponsibleFor(), theXMLTypePackage.getString(), "responsibleFor", null, 0, -1, RoleDescriptor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(roleSetEClass, RoleSet.class, "RoleSet", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -4760,18 +4621,18 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 
 		initEClass(sectionEClass, Section.class, "Section", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getSection_SubSection(), this.getSection(), null, "subSection", null, 0, 1, Section.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getSection_Predecessor(), theXMLTypePackage.getString(), "predecessor", null, 0, 1, Section.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getSection_Description(), theXMLTypePackage.getString(), "description", null, 0, 1, Section.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getSection_SectionName(), theXMLTypePackage.getString(), "sectionName", null, 0, 1, Section.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getSection_VariabilityBasedOnElement(), theXMLTypePackage.getString(), "variabilityBasedOnElement", null, 0, 1, Section.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getSection_VariabilityType(), this.getVariabilityType(), "variabilityType", "na", 0, 1, Section.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getSection_Predecessor(), theXMLTypePackage.getString(), "predecessor", null, 0, 1, Section.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getSection_Description(), theXMLTypePackage.getString(), "description", null, 0, 1, Section.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getSection_SectionName(), theXMLTypePackage.getString(), "sectionName", null, 0, 1, Section.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getSection_VariabilityBasedOnElement(), theXMLTypePackage.getString(), "variabilityBasedOnElement", null, 0, 1, Section.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getSection_VariabilityType(), this.getVariabilityType(), "variabilityType", "na", 0, 1, Section.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(supportingMaterialEClass, SupportingMaterial.class, "SupportingMaterial", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		initEClass(taskEClass, Task.class, "Task", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getTask_Precondition(), theXMLTypePackage.getString(), "precondition", null, 0, 1, Task.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getTask_Postcondition(), theXMLTypePackage.getString(), "postcondition", null, 0, 1, Task.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getTask_PerformedBy(), theXMLTypePackage.getString(), "performedBy", null, 0, -1, Task.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getTask_Precondition(), theXMLTypePackage.getString(), "precondition", null, 0, 1, Task.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getTask_Postcondition(), theXMLTypePackage.getString(), "postcondition", null, 0, 1, Task.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getTask_PerformedBy(), theXMLTypePackage.getString(), "performedBy", null, 0, 1, Task.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getTask_Group2(), ecorePackage.getEFeatureMapEntry(), "group2", null, 0, -1, Task.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getTask_MandatoryInput(), theXMLTypePackage.getString(), "mandatoryInput", null, 0, -1, Task.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEAttribute(getTask_Output(), theXMLTypePackage.getString(), "output", null, 0, -1, Task.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
@@ -4782,13 +4643,13 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		initEAttribute(getTask_ToolMentor(), theXMLTypePackage.getString(), "toolMentor", null, 0, -1, Task.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 
 		initEClass(taskDescriptionEClass, TaskDescription.class, "TaskDescription", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getTaskDescription_Alternatives(), theXMLTypePackage.getString(), "alternatives", null, 0, 1, TaskDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getTaskDescription_Purpose(), theXMLTypePackage.getString(), "purpose", null, 0, 1, TaskDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getTaskDescription_Alternatives(), theXMLTypePackage.getString(), "alternatives", null, 0, 1, TaskDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getTaskDescription_Purpose(), theXMLTypePackage.getString(), "purpose", null, 0, 1, TaskDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(taskDescriptorEClass, TaskDescriptor.class, "TaskDescriptor", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getTaskDescriptor_Task(), theXMLTypePackage.getString(), "task", null, 0, 1, TaskDescriptor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getTaskDescriptor_Group3(), ecorePackage.getEFeatureMapEntry(), "group3", null, 0, -1, TaskDescriptor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getTaskDescriptor_PerformedPrimarilyBy(), theXMLTypePackage.getString(), "performedPrimarilyBy", null, 0, -1, TaskDescriptor.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
+		initEAttribute(getTaskDescriptor_Task(), theXMLTypePackage.getString(), "task", null, 0, 1, TaskDescriptor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getTaskDescriptor_PerformedPrimarilyBy(), theXMLTypePackage.getString(), "performedPrimarilyBy", null, 0, 1, TaskDescriptor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getTaskDescriptor_Group2(), ecorePackage.getEFeatureMapEntry(), "group2", null, 0, -1, TaskDescriptor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getTaskDescriptor_AdditionallyPerformedBy(), theXMLTypePackage.getString(), "additionallyPerformedBy", null, 0, -1, TaskDescriptor.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEAttribute(getTaskDescriptor_AssistedBy(), theXMLTypePackage.getString(), "assistedBy", null, 0, -1, TaskDescriptor.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEAttribute(getTaskDescriptor_ExternalInput(), theXMLTypePackage.getString(), "externalInput", null, 0, -1, TaskDescriptor.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
@@ -4796,10 +4657,10 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		initEAttribute(getTaskDescriptor_OptionalInput(), theXMLTypePackage.getString(), "optionalInput", null, 0, -1, TaskDescriptor.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEAttribute(getTaskDescriptor_Output(), theXMLTypePackage.getString(), "output", null, 0, -1, TaskDescriptor.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEReference(getTaskDescriptor_Step(), this.getSection(), null, "step", null, 0, -1, TaskDescriptor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getTaskDescriptor_IsSynchronizedWithSource(), theXMLTypePackage.getBoolean(), "isSynchronizedWithSource", null, 0, 1, TaskDescriptor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getTaskDescriptor_IsSynchronizedWithSource(), theXMLTypePackage.getBoolean(), "isSynchronizedWithSource", null, 0, 1, TaskDescriptor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(teamProfileEClass, TeamProfile.class, "TeamProfile", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getTeamProfile_Group2(), ecorePackage.getEFeatureMapEntry(), "group2", null, 0, -1, TeamProfile.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getTeamProfile_Group1(), ecorePackage.getEFeatureMapEntry(), "group1", null, 0, -1, TeamProfile.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getTeamProfile_Role(), theXMLTypePackage.getString(), "role", null, 0, -1, TeamProfile.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEAttribute(getTeamProfile_SuperTeam(), theXMLTypePackage.getString(), "superTeam", null, 0, -1, TeamProfile.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEAttribute(getTeamProfile_SubTeam(), theXMLTypePackage.getString(), "subTeam", null, 0, -1, TeamProfile.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
@@ -4817,21 +4678,20 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		initEClass(whitepaperEClass, Whitepaper.class, "Whitepaper", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 
 		initEClass(workBreakdownElementEClass, WorkBreakdownElement.class, "WorkBreakdownElement", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getWorkBreakdownElement_Group2(), ecorePackage.getEFeatureMapEntry(), "group2", null, 0, -1, WorkBreakdownElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getWorkBreakdownElement_Group1(), ecorePackage.getEFeatureMapEntry(), "group1", null, 0, -1, WorkBreakdownElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getWorkBreakdownElement_Predecessor(), this.getWorkOrder(), null, "predecessor", null, 0, -1, WorkBreakdownElement.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getWorkBreakdownElement_IsEventDriven(), theXMLTypePackage.getBoolean(), "isEventDriven", null, 0, 1, WorkBreakdownElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getWorkBreakdownElement_IsOngoing(), theXMLTypePackage.getBoolean(), "isOngoing", null, 0, 1, WorkBreakdownElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getWorkBreakdownElement_IsRepeatable(), theXMLTypePackage.getBoolean(), "isRepeatable", null, 0, 1, WorkBreakdownElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getWorkBreakdownElement_IsEventDriven(), theXMLTypePackage.getBoolean(), "isEventDriven", null, 0, 1, WorkBreakdownElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getWorkBreakdownElement_IsOngoing(), theXMLTypePackage.getBoolean(), "isOngoing", null, 0, 1, WorkBreakdownElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getWorkBreakdownElement_IsRepeatable(), theXMLTypePackage.getBoolean(), "isRepeatable", null, 0, 1, WorkBreakdownElement.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(workDefinitionEClass, WorkDefinition.class, "WorkDefinition", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getWorkDefinition_Precondition(), theXMLTypePackage.getString(), "precondition", null, 0, 1, WorkDefinition.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getWorkDefinition_Postcondition(), theXMLTypePackage.getString(), "postcondition", null, 0, 1, WorkDefinition.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getWorkDefinition_Precondition(), theXMLTypePackage.getString(), "precondition", null, 0, 1, WorkDefinition.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getWorkDefinition_Postcondition(), theXMLTypePackage.getString(), "postcondition", null, 0, 1, WorkDefinition.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(workOrderEClass, WorkOrder.class, "WorkOrder", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getWorkOrder_Value(), theXMLTypePackage.getString(), "value", null, 0, 1, WorkOrder.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getWorkOrder_Id(), theXMLTypePackage.getString(), "id", null, 0, 1, WorkOrder.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getWorkOrder_LinkType(), this.getWorkOrderType(), "linkType", "finishToStart", 0, 1, WorkOrder.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getWorkOrder_Properties(), theXMLTypePackage.getString(), "properties", null, 0, 1, WorkOrder.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getWorkOrder_Value(), theXMLTypePackage.getString(), "value", null, 0, 1, WorkOrder.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getWorkOrder_Id(), theXMLTypePackage.getString(), "id", null, 0, 1, WorkOrder.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getWorkOrder_LinkType(), this.getWorkOrderType(), "linkType", "finishToStart", 0, 1, WorkOrder.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(workProductEClass, WorkProduct.class, "WorkProduct", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getWorkProduct_Group2(), ecorePackage.getEFeatureMapEntry(), "group2", null, 0, -1, WorkProduct.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -4842,14 +4702,14 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		initEAttribute(getWorkProduct_ToolMentor(), theXMLTypePackage.getString(), "toolMentor", null, 0, -1, WorkProduct.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 
 		initEClass(workProductDescriptionEClass, WorkProductDescription.class, "WorkProductDescription", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getWorkProductDescription_ImpactOfNotHaving(), theXMLTypePackage.getString(), "impactOfNotHaving", null, 0, 1, WorkProductDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getWorkProductDescription_Purpose(), theXMLTypePackage.getString(), "purpose", null, 0, 1, WorkProductDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getWorkProductDescription_ReasonsForNotNeeding(), theXMLTypePackage.getString(), "reasonsForNotNeeding", null, 0, 1, WorkProductDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getWorkProductDescription_ImpactOfNotHaving(), theXMLTypePackage.getString(), "impactOfNotHaving", null, 0, 1, WorkProductDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getWorkProductDescription_Purpose(), theXMLTypePackage.getString(), "purpose", null, 0, 1, WorkProductDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getWorkProductDescription_ReasonsForNotNeeding(), theXMLTypePackage.getString(), "reasonsForNotNeeding", null, 0, 1, WorkProductDescription.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(workProductDescriptorEClass, WorkProductDescriptor.class, "WorkProductDescriptor", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getWorkProductDescriptor_WorkProduct(), theXMLTypePackage.getString(), "workProduct", null, 0, 1, WorkProductDescriptor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getWorkProductDescriptor_ResponsibleRole(), theXMLTypePackage.getString(), "responsibleRole", null, 0, 1, WorkProductDescriptor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getWorkProductDescriptor_Group2(), ecorePackage.getEFeatureMapEntry(), "group2", null, 0, -1, WorkProductDescriptor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getWorkProductDescriptor_WorkProduct(), theXMLTypePackage.getString(), "workProduct", null, 0, 1, WorkProductDescriptor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getWorkProductDescriptor_ResponsibleRole(), theXMLTypePackage.getString(), "responsibleRole", null, 0, 1, WorkProductDescriptor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getWorkProductDescriptor_Group1(), ecorePackage.getEFeatureMapEntry(), "group1", null, 0, -1, WorkProductDescriptor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getWorkProductDescriptor_ExternalInputTo(), theXMLTypePackage.getString(), "externalInputTo", null, 0, -1, WorkProductDescriptor.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEAttribute(getWorkProductDescriptor_ImpactedBy(), theXMLTypePackage.getString(), "impactedBy", null, 0, -1, WorkProductDescriptor.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEAttribute(getWorkProductDescriptor_Impacts(), theXMLTypePackage.getString(), "impacts", null, 0, -1, WorkProductDescriptor.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
@@ -4857,8 +4717,8 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		initEAttribute(getWorkProductDescriptor_OptionalInputTo(), theXMLTypePackage.getString(), "optionalInputTo", null, 0, -1, WorkProductDescriptor.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEAttribute(getWorkProductDescriptor_OutputFrom(), theXMLTypePackage.getString(), "outputFrom", null, 0, -1, WorkProductDescriptor.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
 		initEAttribute(getWorkProductDescriptor_DeliverableParts(), theXMLTypePackage.getString(), "deliverableParts", null, 0, -1, WorkProductDescriptor.class, IS_TRANSIENT, IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, IS_DERIVED, IS_ORDERED);
-		initEAttribute(getWorkProductDescriptor_ActivityEntryState(), theXMLTypePackage.getString(), "activityEntryState", null, 0, 1, WorkProductDescriptor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getWorkProductDescriptor_ActivityExitState(), theXMLTypePackage.getString(), "activityExitState", null, 0, 1, WorkProductDescriptor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getWorkProductDescriptor_ActivityEntryState(), theXMLTypePackage.getString(), "activityEntryState", null, 0, 1, WorkProductDescriptor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getWorkProductDescriptor_ActivityExitState(), theXMLTypePackage.getString(), "activityExitState", null, 0, 1, WorkProductDescriptor.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(workProductTypeEClass, WorkProductType.class, "WorkProductType", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getWorkProductType_Group2(), ecorePackage.getEFeatureMapEntry(), "group2", null, 0, -1, WorkProductType.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, !IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -4866,19 +4726,19 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 
 		// Initialize enums and add enum literals
 		initEEnum(variabilityTypeEEnum, VariabilityType.class, "VariabilityType");
-		addEEnumLiteral(variabilityTypeEEnum, VariabilityType.NA);
-		addEEnumLiteral(variabilityTypeEEnum, VariabilityType.CONTRIBUTES);
-		addEEnumLiteral(variabilityTypeEEnum, VariabilityType.EXTENDS);
-		addEEnumLiteral(variabilityTypeEEnum, VariabilityType.REPLACES);
-		addEEnumLiteral(variabilityTypeEEnum, VariabilityType.LOCAL_CONTRIBUTION);
-		addEEnumLiteral(variabilityTypeEEnum, VariabilityType.LOCAL_REPLACEMENT);
-		addEEnumLiteral(variabilityTypeEEnum, VariabilityType.EXTENDS_REPLACES);
+		addEEnumLiteral(variabilityTypeEEnum, VariabilityType.NA_LITERAL);
+		addEEnumLiteral(variabilityTypeEEnum, VariabilityType.CONTRIBUTES_LITERAL);
+		addEEnumLiteral(variabilityTypeEEnum, VariabilityType.EXTENDS_LITERAL);
+		addEEnumLiteral(variabilityTypeEEnum, VariabilityType.REPLACES_LITERAL);
+		addEEnumLiteral(variabilityTypeEEnum, VariabilityType.LOCAL_CONTRIBUTION_LITERAL);
+		addEEnumLiteral(variabilityTypeEEnum, VariabilityType.LOCAL_REPLACEMENT_LITERAL);
+		addEEnumLiteral(variabilityTypeEEnum, VariabilityType.EXTENDS_REPLACES_LITERAL);
 
 		initEEnum(workOrderTypeEEnum, WorkOrderType.class, "WorkOrderType");
-		addEEnumLiteral(workOrderTypeEEnum, WorkOrderType.FINISH_TO_START);
-		addEEnumLiteral(workOrderTypeEEnum, WorkOrderType.FINISH_TO_FINISH);
-		addEEnumLiteral(workOrderTypeEEnum, WorkOrderType.START_TO_START);
-		addEEnumLiteral(workOrderTypeEEnum, WorkOrderType.START_TO_FINISH);
+		addEEnumLiteral(workOrderTypeEEnum, WorkOrderType.FINISH_TO_START_LITERAL);
+		addEEnumLiteral(workOrderTypeEEnum, WorkOrderType.FINISH_TO_FINISH_LITERAL);
+		addEEnumLiteral(workOrderTypeEEnum, WorkOrderType.START_TO_START_LITERAL);
+		addEEnumLiteral(workOrderTypeEEnum, WorkOrderType.START_TO_FINISH_LITERAL);
 
 		// Initialize data types
 		initEDataType(variabilityTypeObjectEDataType, VariabilityType.class, "VariabilityTypeObject", IS_SERIALIZABLE, IS_GENERATED_INSTANCE_CLASS);
@@ -4922,11 +4782,11 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 			 "name", "Postcondition"
 		   });		
 		addAnnotation
-		  (getActivity_Group3(), 
+		  (getActivity_Group2(), 
 		   source, 
 		   new String[] {
 			 "kind", "group",
-			 "name", "group:37"
+			 "name", "group:27"
 		   });		
 		addAnnotation
 		  (getActivity_BreakdownElement(), 
@@ -4934,7 +4794,39 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "BreakdownElement",
-			 "group", "#group:37"
+			 "group", "#group:27"
+		   });		
+		addAnnotation
+		  (getActivity_Checklist(), 
+		   source, 
+		   new String[] {
+			 "kind", "element",
+			 "name", "Checklist",
+			 "group", "#group:27"
+		   });		
+		addAnnotation
+		  (getActivity_Concept(), 
+		   source, 
+		   new String[] {
+			 "kind", "element",
+			 "name", "Concept",
+			 "group", "#group:27"
+		   });		
+		addAnnotation
+		  (getActivity_Example(), 
+		   source, 
+		   new String[] {
+			 "kind", "element",
+			 "name", "Example",
+			 "group", "#group:27"
+		   });		
+		addAnnotation
+		  (getActivity_Guideline(), 
+		   source, 
+		   new String[] {
+			 "kind", "element",
+			 "name", "Guideline",
+			 "group", "#group:27"
 		   });		
 		addAnnotation
 		  (getActivity_Roadmap(), 
@@ -4942,7 +4834,31 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "Roadmap",
-			 "group", "#group:37"
+			 "group", "#group:27"
+		   });		
+		addAnnotation
+		  (getActivity_ReusableAsset(), 
+		   source, 
+		   new String[] {
+			 "kind", "element",
+			 "name", "ReusableAsset",
+			 "group", "#group:27"
+		   });		
+		addAnnotation
+		  (getActivity_SupportingMaterial(), 
+		   source, 
+		   new String[] {
+			 "kind", "element",
+			 "name", "SupportingMaterial",
+			 "group", "#group:27"
+		   });		
+		addAnnotation
+		  (getActivity_Whitepaper(), 
+		   source, 
+		   new String[] {
+			 "kind", "element",
+			 "name", "Whitepaper",
+			 "group", "#group:27"
 		   });		
 		addAnnotation
 		  (getActivity_IsEnactable(), 
@@ -4992,20 +4908,6 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "Purpose"
-		   });		
-		addAnnotation
-		  (applicableMetaClassInfoEClass, 
-		   source, 
-		   new String[] {
-			 "name", "ApplicableMetaClassInfo",
-			 "kind", "empty"
-		   });		
-		addAnnotation
-		  (getApplicableMetaClassInfo_IsPrimaryExtension(), 
-		   source, 
-		   new String[] {
-			 "kind", "attribute",
-			 "name", "isPrimaryExtension"
 		   });			
 		addAnnotation
 		  (artifactEClass, 
@@ -5019,7 +4921,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "group",
-			 "name", "group:30"
+			 "name", "group:28"
 		   });		
 		addAnnotation
 		  (getArtifact_ContainedArtifact(), 
@@ -5027,7 +4929,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "ContainedArtifact",
-			 "group", "#group:30"
+			 "group", "#group:28"
 		   });			
 		addAnnotation
 		  (artifactDescriptionEClass, 
@@ -5098,69 +5000,6 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "SuperActivity"
-		   });		
-		addAnnotation
-		  (getBreakdownElement_Group1(), 
-		   source, 
-		   new String[] {
-			 "kind", "group",
-			 "name", "group:18"
-		   });		
-		addAnnotation
-		  (getBreakdownElement_Checklist(), 
-		   source, 
-		   new String[] {
-			 "kind", "element",
-			 "name", "Checklist",
-			 "group", "#group:18"
-		   });		
-		addAnnotation
-		  (getBreakdownElement_Concept(), 
-		   source, 
-		   new String[] {
-			 "kind", "element",
-			 "name", "Concept",
-			 "group", "#group:18"
-		   });		
-		addAnnotation
-		  (getBreakdownElement_Example(), 
-		   source, 
-		   new String[] {
-			 "kind", "element",
-			 "name", "Example",
-			 "group", "#group:18"
-		   });		
-		addAnnotation
-		  (getBreakdownElement_Guideline(), 
-		   source, 
-		   new String[] {
-			 "kind", "element",
-			 "name", "Guideline",
-			 "group", "#group:18"
-		   });		
-		addAnnotation
-		  (getBreakdownElement_ReusableAsset(), 
-		   source, 
-		   new String[] {
-			 "kind", "element",
-			 "name", "ReusableAsset",
-			 "group", "#group:18"
-		   });		
-		addAnnotation
-		  (getBreakdownElement_SupportingMaterial(), 
-		   source, 
-		   new String[] {
-			 "kind", "element",
-			 "name", "SupportingMaterial",
-			 "group", "#group:18"
-		   });		
-		addAnnotation
-		  (getBreakdownElement_Whitepaper(), 
-		   source, 
-		   new String[] {
-			 "kind", "element",
-			 "name", "Whitepaper",
-			 "group", "#group:18"
 		   });			
 		addAnnotation
 		  (getBreakdownElement_HasMultipleOccurrences(), 
@@ -5226,11 +5065,11 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 			 "kind", "elementOnly"
 		   });		
 		addAnnotation
-		  (getCompositeRole_Group2(), 
+		  (getCompositeRole_Group1(), 
 		   source, 
 		   new String[] {
 			 "kind", "group",
-			 "name", "group:33"
+			 "name", "group:23"
 		   });		
 		addAnnotation
 		  (getCompositeRole_AggregatedRole(), 
@@ -5238,7 +5077,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "AggregatedRole",
-			 "group", "#group:33"
+			 "group", "#group:23"
 		   });			
 		addAnnotation
 		  (conceptEClass, 
@@ -5280,7 +5119,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "group",
-			 "name", "group:13"
+			 "name", "group:12"
 		   });		
 		addAnnotation
 		  (getContentCategoryPackage_ContentCategory(), 
@@ -5288,7 +5127,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "ContentCategory",
-			 "group", "#group:13"
+			 "group", "#group:12"
 		   });			
 		addAnnotation
 		  (contentDescriptionEClass, 
@@ -5337,7 +5176,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "group",
-			 "name", "group:14"
+			 "name", "group:12"
 		   });		
 		addAnnotation
 		  (getContentElement_Checklist(), 
@@ -5345,7 +5184,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "Checklist",
-			 "group", "#group:14"
+			 "group", "#group:12"
 		   });		
 		addAnnotation
 		  (getContentElement_Concept(), 
@@ -5353,7 +5192,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "Concept",
-			 "group", "#group:14"
+			 "group", "#group:12"
 		   });		
 		addAnnotation
 		  (getContentElement_Example(), 
@@ -5361,7 +5200,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "Example",
-			 "group", "#group:14"
+			 "group", "#group:12"
 		   });		
 		addAnnotation
 		  (getContentElement_Guideline(), 
@@ -5369,7 +5208,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "Guideline",
-			 "group", "#group:14"
+			 "group", "#group:12"
 		   });		
 		addAnnotation
 		  (getContentElement_ReusableAsset(), 
@@ -5377,7 +5216,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "ReusableAsset",
-			 "group", "#group:14"
+			 "group", "#group:12"
 		   });		
 		addAnnotation
 		  (getContentElement_SupportingMaterial(), 
@@ -5385,7 +5224,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "SupportingMaterial",
-			 "group", "#group:14"
+			 "group", "#group:12"
 		   });		
 		addAnnotation
 		  (getContentElement_Whitepaper(), 
@@ -5393,7 +5232,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "Whitepaper",
-			 "group", "#group:14"
+			 "group", "#group:12"
 		   });		
 		addAnnotation
 		  (getContentElement_VariabilityBasedOnElement(), 
@@ -5421,7 +5260,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "group",
-			 "name", "group:13"
+			 "name", "group:12"
 		   });		
 		addAnnotation
 		  (getContentPackage_ContentElement(), 
@@ -5429,7 +5268,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "ContentElement",
-			 "group", "#group:13"
+			 "group", "#group:12"
 		   });			
 		addAnnotation
 		  (customCategoryEClass, 
@@ -5443,7 +5282,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "group",
-			 "name", "group:24"
+			 "name", "group:22"
 		   });		
 		addAnnotation
 		  (getCustomCategory_CategorizedElement(), 
@@ -5451,7 +5290,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "CategorizedElement",
-			 "group", "#group:24"
+			 "group", "#group:22"
 		   });		
 		addAnnotation
 		  (getCustomCategory_SubCategory(), 
@@ -5459,7 +5298,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "SubCategory",
-			 "group", "#group:24"
+			 "group", "#group:22"
 		   });			
 		addAnnotation
 		  (deliverableEClass, 
@@ -5473,7 +5312,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "group",
-			 "name", "group:30"
+			 "name", "group:28"
 		   });		
 		addAnnotation
 		  (getDeliverable_DeliveredWorkProduct(), 
@@ -5481,7 +5320,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "DeliveredWorkProduct",
-			 "group", "#group:30"
+			 "group", "#group:28"
 		   });			
 		addAnnotation
 		  (deliverableDescriptionEClass, 
@@ -5512,11 +5351,11 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 			 "kind", "elementOnly"
 		   });		
 		addAnnotation
-		  (getDeliveryProcess_Group4(), 
+		  (getDeliveryProcess_Group3(), 
 		   source, 
 		   new String[] {
 			 "kind", "group",
-			 "name", "group:47"
+			 "name", "group:44"
 		   });		
 		addAnnotation
 		  (getDeliveryProcess_CommunicationsMaterial(), 
@@ -5524,7 +5363,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "CommunicationsMaterial",
-			 "group", "#group:47"
+			 "group", "#group:44"
 		   });		
 		addAnnotation
 		  (getDeliveryProcess_EducationMaterial(), 
@@ -5532,7 +5371,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "EducationMaterial",
-			 "group", "#group:47"
+			 "group", "#group:44"
 		   });			
 		addAnnotation
 		  (deliveryProcessDescriptionEClass, 
@@ -5596,20 +5435,6 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "Presentation"
-		   });		
-		addAnnotation
-		  (getDescribableElement_Fulfill(), 
-		   source, 
-		   new String[] {
-			 "kind", "element",
-			 "name", "Fulfill"
-		   });		
-		addAnnotation
-		  (getDescribableElement_IsAbstract(), 
-		   source, 
-		   new String[] {
-			 "kind", "attribute",
-			 "name", "isAbstract"
 		   });			
 		addAnnotation
 		  (getDescribableElement_Nodeicon(), 
@@ -5617,6 +5442,13 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "attribute",
 			 "name", "nodeicon"
+		   });			
+		addAnnotation
+		  (getDescribableElement_PresentationName(), 
+		   source, 
+		   new String[] {
+			 "kind", "attribute",
+			 "name", "presentationName"
 		   });			
 		addAnnotation
 		  (getDescribableElement_Shapeicon(), 
@@ -5665,7 +5497,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "group",
-			 "name", "group:24"
+			 "name", "group:22"
 		   });		
 		addAnnotation
 		  (getDiscipline_Task(), 
@@ -5673,7 +5505,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "Task",
-			 "group", "#group:24"
+			 "group", "#group:22"
 		   });		
 		addAnnotation
 		  (getDiscipline_SubDiscipline(), 
@@ -5681,7 +5513,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "SubDiscipline",
-			 "group", "#group:24"
+			 "group", "#group:22"
 		   });		
 		addAnnotation
 		  (getDiscipline_ReferenceWorkflow(), 
@@ -5689,7 +5521,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "ReferenceWorkflow",
-			 "group", "#group:24"
+			 "group", "#group:22"
 		   });			
 		addAnnotation
 		  (disciplineGroupingEClass, 
@@ -5703,7 +5535,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "group",
-			 "name", "group:24"
+			 "name", "group:22"
 		   });		
 		addAnnotation
 		  (getDisciplineGrouping_Discipline(), 
@@ -5711,7 +5543,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "Discipline",
-			 "group", "#group:24"
+			 "group", "#group:22"
 		   });		
 		addAnnotation
 		  (documentRootEClass, 
@@ -5777,7 +5609,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "group",
-			 "name", "group:24"
+			 "name", "group:22"
 		   });		
 		addAnnotation
 		  (getDomain_WorkProduct(), 
@@ -5785,7 +5617,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "WorkProduct",
-			 "group", "#group:24"
+			 "group", "#group:22"
 		   });		
 		addAnnotation
 		  (getDomain_Subdomain(), 
@@ -5793,7 +5625,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "Subdomain",
-			 "group", "#group:24"
+			 "group", "#group:22"
 		   });			
 		addAnnotation
 		  (elementEClass, 
@@ -5814,7 +5646,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "group",
-			 "name", "group:24"
+			 "name", "group:22"
 		   });		
 		addAnnotation
 		  (getEstimate_EstimationMetric(), 
@@ -5822,7 +5654,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "EstimationMetric",
-			 "group", "#group:24"
+			 "group", "#group:22"
 		   });		
 		addAnnotation
 		  (getEstimate_EstimationConsiderations(), 
@@ -5830,7 +5662,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "EstimationConsiderations",
-			 "group", "#group:24"
+			 "group", "#group:22"
 		   });			
 		addAnnotation
 		  (estimatingMetricEClass, 
@@ -5887,20 +5719,6 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "name", "Iteration",
 			 "kind", "elementOnly"
-		   });		
-		addAnnotation
-		  (kindEClass, 
-		   source, 
-		   new String[] {
-			 "name", "Kind",
-			 "kind", "elementOnly"
-		   });		
-		addAnnotation
-		  (getKind_ApplicableMetaClassInfo(), 
-		   source, 
-		   new String[] {
-			 "kind", "element",
-			 "name", "ApplicableMetaClassInfo"
 		   });			
 		addAnnotation
 		  (methodConfigurationEClass, 
@@ -6010,13 +5828,6 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 			 "name", "orderingGuide"
 		   });			
 		addAnnotation
-		  (getMethodElement_PresentationName(), 
-		   source, 
-		   new String[] {
-			 "kind", "attribute",
-			 "name", "presentationName"
-		   });			
-		addAnnotation
 		  (getMethodElement_Suppressed(), 
 		   source, 
 		   new String[] {
@@ -6077,7 +5888,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "group",
-			 "name", "group:9"
+			 "name", "group:8"
 		   });		
 		addAnnotation
 		  (getMethodPackage_ReusedPackage(), 
@@ -6085,7 +5896,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "ReusedPackage",
-			 "group", "#group:9"
+			 "group", "#group:8"
 		   });		
 		addAnnotation
 		  (getMethodPackage_MethodPackage(), 
@@ -6093,7 +5904,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "MethodPackage",
-			 "group", "#group:9"
+			 "group", "#group:8"
 		   });			
 		addAnnotation
 		  (getMethodPackage_Global(), 
@@ -6122,13 +5933,6 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "MethodPackage"
-		   });		
-		addAnnotation
-		  (getMethodPlugin_Supporting(), 
-		   source, 
-		   new String[] {
-			 "kind", "attribute",
-			 "name", "supporting"
 		   });		
 		addAnnotation
 		  (getMethodPlugin_UserChangeable(), 
@@ -6185,13 +5989,6 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "name", "Milestone",
 			 "kind", "elementOnly"
-		   });		
-		addAnnotation
-		  (getMilestone_RequiredResult(), 
-		   source, 
-		   new String[] {
-			 "kind", "element",
-			 "name", "RequiredResult"
 		   });			
 		addAnnotation
 		  (namedElementEClass, 
@@ -6268,7 +6065,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "group",
-			 "name", "group:24"
+			 "name", "group:22"
 		   });		
 		addAnnotation
 		  (getPractice_ActivityReference(), 
@@ -6276,7 +6073,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "ActivityReference",
-			 "group", "#group:24"
+			 "group", "#group:22"
 		   });		
 		addAnnotation
 		  (getPractice_ContentReference(), 
@@ -6284,7 +6081,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "ContentReference",
-			 "group", "#group:24"
+			 "group", "#group:22"
 		   });		
 		addAnnotation
 		  (getPractice_SubPractice(), 
@@ -6292,7 +6089,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "SubPractice",
-			 "group", "#group:24"
+			 "group", "#group:22"
 		   });			
 		addAnnotation
 		  (practiceDescriptionEClass, 
@@ -6442,11 +6239,11 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 			 "kind", "elementOnly"
 		   });		
 		addAnnotation
-		  (getProcessComponentInterface_Group2(), 
+		  (getProcessComponentInterface_Group1(), 
 		   source, 
 		   new String[] {
 			 "kind", "group",
-			 "name", "group:30"
+			 "name", "group:20"
 		   });		
 		addAnnotation
 		  (getProcessComponentInterface_InterfaceSpecification(), 
@@ -6454,7 +6251,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "InterfaceSpecification",
-			 "group", "#group:30"
+			 "group", "#group:20"
 		   });		
 		addAnnotation
 		  (getProcessComponentInterface_InterfaceIO(), 
@@ -6462,7 +6259,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "InterfaceIO",
-			 "group", "#group:30"
+			 "group", "#group:20"
 		   });			
 		addAnnotation
 		  (processDescriptionEClass, 
@@ -6504,7 +6301,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "group",
-			 "name", "group:13"
+			 "name", "group:12"
 		   });		
 		addAnnotation
 		  (getProcessPackage_ProcessElement(), 
@@ -6512,7 +6309,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "ProcessElement",
-			 "group", "#group:13"
+			 "group", "#group:12"
 		   });			
 		addAnnotation
 		  (processPlanningTemplateEClass, 
@@ -6522,11 +6319,11 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 			 "kind", "elementOnly"
 		   });		
 		addAnnotation
-		  (getProcessPlanningTemplate_Group4(), 
+		  (getProcessPlanningTemplate_Group3(), 
 		   source, 
 		   new String[] {
 			 "kind", "group",
-			 "name", "group:47"
+			 "name", "group:44"
 		   });		
 		addAnnotation
 		  (getProcessPlanningTemplate_BaseProcess(), 
@@ -6534,7 +6331,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "BaseProcess",
-			 "group", "#group:47"
+			 "group", "#group:44"
 		   });			
 		addAnnotation
 		  (reportEClass, 
@@ -6569,7 +6366,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "group",
-			 "name", "group:24"
+			 "name", "group:22"
 		   });		
 		addAnnotation
 		  (getRole_ResponsibleFor(), 
@@ -6577,7 +6374,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "ResponsibleFor",
-			 "group", "#group:24"
+			 "group", "#group:22"
 		   });			
 		addAnnotation
 		  (roleDescriptionEClass, 
@@ -6640,7 +6437,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "group",
-			 "name", "group:24"
+			 "name", "group:22"
 		   });		
 		addAnnotation
 		  (getRoleSet_Role(), 
@@ -6648,7 +6445,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "Role",
-			 "group", "#group:24"
+			 "group", "#group:22"
 		   });			
 		addAnnotation
 		  (roleSetGroupingEClass, 
@@ -6662,7 +6459,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "group",
-			 "name", "group:24"
+			 "name", "group:22"
 		   });		
 		addAnnotation
 		  (getRoleSetGrouping_RoleSet(), 
@@ -6670,7 +6467,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "RoleSet",
-			 "group", "#group:24"
+			 "group", "#group:22"
 		   });			
 		addAnnotation
 		  (sectionEClass, 
@@ -6761,7 +6558,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "group",
-			 "name", "group:27"
+			 "name", "group:25"
 		   });		
 		addAnnotation
 		  (getTask_MandatoryInput(), 
@@ -6769,7 +6566,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "MandatoryInput",
-			 "group", "#group:27"
+			 "group", "#group:25"
 		   });		
 		addAnnotation
 		  (getTask_Output(), 
@@ -6777,7 +6574,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "Output",
-			 "group", "#group:27"
+			 "group", "#group:25"
 		   });		
 		addAnnotation
 		  (getTask_AdditionallyPerformedBy(), 
@@ -6785,7 +6582,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "AdditionallyPerformedBy",
-			 "group", "#group:27"
+			 "group", "#group:25"
 		   });		
 		addAnnotation
 		  (getTask_OptionalInput(), 
@@ -6793,7 +6590,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "OptionalInput",
-			 "group", "#group:27"
+			 "group", "#group:25"
 		   });		
 		addAnnotation
 		  (getTask_Estimate(), 
@@ -6801,7 +6598,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "Estimate",
-			 "group", "#group:27"
+			 "group", "#group:25"
 		   });		
 		addAnnotation
 		  (getTask_EstimationConsiderations(), 
@@ -6809,7 +6606,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "EstimationConsiderations",
-			 "group", "#group:27"
+			 "group", "#group:25"
 		   });		
 		addAnnotation
 		  (getTask_ToolMentor(), 
@@ -6817,7 +6614,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "ToolMentor",
-			 "group", "#group:27"
+			 "group", "#group:25"
 		   });			
 		addAnnotation
 		  (taskDescriptionEClass, 
@@ -6855,19 +6652,18 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 			 "name", "Task"
 		   });		
 		addAnnotation
-		  (getTaskDescriptor_Group3(), 
-		   source, 
-		   new String[] {
-			 "kind", "group",
-			 "name", "group:36"
-		   });		
-		addAnnotation
 		  (getTaskDescriptor_PerformedPrimarilyBy(), 
 		   source, 
 		   new String[] {
 			 "kind", "element",
-			 "name", "PerformedPrimarilyBy",
-			 "group", "#group:36"
+			 "name", "PerformedPrimarilyBy"
+		   });		
+		addAnnotation
+		  (getTaskDescriptor_Group2(), 
+		   source, 
+		   new String[] {
+			 "kind", "group",
+			 "name", "group:27"
 		   });		
 		addAnnotation
 		  (getTaskDescriptor_AdditionallyPerformedBy(), 
@@ -6875,7 +6671,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "AdditionallyPerformedBy",
-			 "group", "#group:36"
+			 "group", "#group:27"
 		   });		
 		addAnnotation
 		  (getTaskDescriptor_AssistedBy(), 
@@ -6883,7 +6679,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "AssistedBy",
-			 "group", "#group:36"
+			 "group", "#group:27"
 		   });		
 		addAnnotation
 		  (getTaskDescriptor_ExternalInput(), 
@@ -6891,7 +6687,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "ExternalInput",
-			 "group", "#group:36"
+			 "group", "#group:27"
 		   });		
 		addAnnotation
 		  (getTaskDescriptor_MandatoryInput(), 
@@ -6899,7 +6695,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "MandatoryInput",
-			 "group", "#group:36"
+			 "group", "#group:27"
 		   });		
 		addAnnotation
 		  (getTaskDescriptor_OptionalInput(), 
@@ -6907,7 +6703,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "OptionalInput",
-			 "group", "#group:36"
+			 "group", "#group:27"
 		   });		
 		addAnnotation
 		  (getTaskDescriptor_Output(), 
@@ -6915,7 +6711,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "Output",
-			 "group", "#group:36"
+			 "group", "#group:27"
 		   });		
 		addAnnotation
 		  (getTaskDescriptor_Step(), 
@@ -6939,11 +6735,11 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 			 "kind", "elementOnly"
 		   });		
 		addAnnotation
-		  (getTeamProfile_Group2(), 
+		  (getTeamProfile_Group1(), 
 		   source, 
 		   new String[] {
 			 "kind", "group",
-			 "name", "group:30"
+			 "name", "group:20"
 		   });		
 		addAnnotation
 		  (getTeamProfile_Role(), 
@@ -6951,7 +6747,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "Role",
-			 "group", "#group:30"
+			 "group", "#group:20"
 		   });		
 		addAnnotation
 		  (getTeamProfile_SuperTeam(), 
@@ -6959,7 +6755,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "SuperTeam",
-			 "group", "#group:30"
+			 "group", "#group:20"
 		   });		
 		addAnnotation
 		  (getTeamProfile_SubTeam(), 
@@ -6967,7 +6763,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "SubTeam",
-			 "group", "#group:30"
+			 "group", "#group:20"
 		   });			
 		addAnnotation
 		  (templateEClass, 
@@ -6995,7 +6791,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "group",
-			 "name", "group:24"
+			 "name", "group:22"
 		   });		
 		addAnnotation
 		  (getTool_ToolMentor(), 
@@ -7003,7 +6799,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "ToolMentor",
-			 "group", "#group:24"
+			 "group", "#group:22"
 		   });			
 		addAnnotation
 		  (toolMentorEClass, 
@@ -7040,11 +6836,11 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 			 "kind", "elementOnly"
 		   });		
 		addAnnotation
-		  (getWorkBreakdownElement_Group2(), 
+		  (getWorkBreakdownElement_Group1(), 
 		   source, 
 		   new String[] {
 			 "kind", "group",
-			 "name", "group:30"
+			 "name", "group:20"
 		   });		
 		addAnnotation
 		  (getWorkBreakdownElement_Predecessor(), 
@@ -7052,7 +6848,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "Predecessor",
-			 "group", "#group:30"
+			 "group", "#group:20"
 		   });			
 		addAnnotation
 		  (getWorkBreakdownElement_IsEventDriven(), 
@@ -7125,13 +6921,6 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 			 "name", "linkType"
 		   });			
 		addAnnotation
-		  (getWorkOrder_Properties(), 
-		   source, 
-		   new String[] {
-			 "kind", "attribute",
-			 "name", "properties"
-		   });			
-		addAnnotation
 		  (workOrderTypeEEnum, 
 		   source, 
 		   new String[] {
@@ -7156,7 +6945,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "group",
-			 "name", "group:24"
+			 "name", "group:22"
 		   });		
 		addAnnotation
 		  (getWorkProduct_Estimate(), 
@@ -7164,7 +6953,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "Estimate",
-			 "group", "#group:24"
+			 "group", "#group:22"
 		   });		
 		addAnnotation
 		  (getWorkProduct_EstimationConsiderations(), 
@@ -7172,7 +6961,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "EstimationConsiderations",
-			 "group", "#group:24"
+			 "group", "#group:22"
 		   });		
 		addAnnotation
 		  (getWorkProduct_Report(), 
@@ -7180,7 +6969,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "Report",
-			 "group", "#group:24"
+			 "group", "#group:22"
 		   });		
 		addAnnotation
 		  (getWorkProduct_Template(), 
@@ -7188,7 +6977,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "Template",
-			 "group", "#group:24"
+			 "group", "#group:22"
 		   });		
 		addAnnotation
 		  (getWorkProduct_ToolMentor(), 
@@ -7196,7 +6985,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "ToolMentor",
-			 "group", "#group:24"
+			 "group", "#group:22"
 		   });			
 		addAnnotation
 		  (workProductDescriptionEClass, 
@@ -7248,11 +7037,11 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 			 "name", "ResponsibleRole"
 		   });		
 		addAnnotation
-		  (getWorkProductDescriptor_Group2(), 
+		  (getWorkProductDescriptor_Group1(), 
 		   source, 
 		   new String[] {
 			 "kind", "group",
-			 "name", "group:33"
+			 "name", "group:23"
 		   });		
 		addAnnotation
 		  (getWorkProductDescriptor_ExternalInputTo(), 
@@ -7260,7 +7049,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "ExternalInputTo",
-			 "group", "#group:33"
+			 "group", "#group:23"
 		   });		
 		addAnnotation
 		  (getWorkProductDescriptor_ImpactedBy(), 
@@ -7268,7 +7057,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "ImpactedBy",
-			 "group", "#group:33"
+			 "group", "#group:23"
 		   });		
 		addAnnotation
 		  (getWorkProductDescriptor_Impacts(), 
@@ -7276,7 +7065,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "Impacts",
-			 "group", "#group:33"
+			 "group", "#group:23"
 		   });		
 		addAnnotation
 		  (getWorkProductDescriptor_MandatoryInputTo(), 
@@ -7284,7 +7073,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "MandatoryInputTo",
-			 "group", "#group:33"
+			 "group", "#group:23"
 		   });		
 		addAnnotation
 		  (getWorkProductDescriptor_OptionalInputTo(), 
@@ -7292,7 +7081,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "OptionalInputTo",
-			 "group", "#group:33"
+			 "group", "#group:23"
 		   });		
 		addAnnotation
 		  (getWorkProductDescriptor_OutputFrom(), 
@@ -7300,7 +7089,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "OutputFrom",
-			 "group", "#group:33"
+			 "group", "#group:23"
 		   });		
 		addAnnotation
 		  (getWorkProductDescriptor_DeliverableParts(), 
@@ -7308,7 +7097,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "DeliverableParts",
-			 "group", "#group:33"
+			 "group", "#group:23"
 		   });			
 		addAnnotation
 		  (getWorkProductDescriptor_ActivityEntryState(), 
@@ -7336,7 +7125,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   source, 
 		   new String[] {
 			 "kind", "group",
-			 "name", "group:24"
+			 "name", "group:22"
 		   });		
 		addAnnotation
 		  (getWorkProductType_WorkProduct(), 
@@ -7344,7 +7133,7 @@ public class UmaPackageImpl extends EPackageImpl implements UmaPackage {
 		   new String[] {
 			 "kind", "element",
 			 "name", "WorkProduct",
-			 "group", "#group:24"
+			 "group", "#group:22"
 		   });
 	}
 

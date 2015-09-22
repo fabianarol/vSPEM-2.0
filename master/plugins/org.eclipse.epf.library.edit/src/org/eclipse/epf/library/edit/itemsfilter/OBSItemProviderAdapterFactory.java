@@ -26,6 +26,14 @@ public class OBSItemProviderAdapterFactory extends
 	public Adapter createActivityAdapter() {
 		return new OBSActivityItemProvider(this);
 	}
+	
+	public Adapter createvpActivityAdapter() {
+		return createActivityAdapter();
+	}
+	
+	public Adapter createVarActivityAdapter() {
+		return createActivityAdapter();
+	}
 
 	public Adapter createCapabilityPatternAdapter() {
 		return new OBSProcessItemProvider(this, (ItemProviderAdapter) super

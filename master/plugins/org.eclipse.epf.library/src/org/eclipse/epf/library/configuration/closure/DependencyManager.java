@@ -12,33 +12,23 @@ package org.eclipse.epf.library.configuration.closure;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
-import org.eclipse.epf.library.IConfigurationManager;
 import org.eclipse.epf.library.ILibraryManager;
+import org.eclipse.epf.library.ILibraryServiceListener;
 import org.eclipse.epf.library.LibraryPlugin;
 import org.eclipse.epf.library.LibraryService;
-import org.eclipse.epf.library.configuration.SupportingElementData;
-import org.eclipse.epf.library.edit.meta.TypeDefUtil;
 import org.eclipse.epf.library.events.ILibraryChangeListener;
 import org.eclipse.epf.library.util.LibraryUtil;
 import org.eclipse.epf.uma.MethodConfiguration;
 import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.MethodLibrary;
-import org.eclipse.epf.uma.ProcessComponent;
-import org.eclipse.epf.uma.ProcessPackage;
-import org.eclipse.epf.uma.Task;
-import org.eclipse.epf.uma.TaskDescriptor;
-import org.eclipse.epf.uma.UmaPackage;
-import org.eclipse.epf.uma.VariabilityElement;
-import org.eclipse.epf.uma.VariabilityType;
 
 /**
  * Manages the method element dependencies in a method library.
@@ -64,24 +54,14 @@ public class DependencyManager {
 	// A library change listener.
 	private ILibraryChangeListener libListener = null;
 
-	private Set<VariabilityElement> replacerSet = new HashSet<VariabilityElement>();
-	
-	private MethodConfiguration config;	
-	
 	/**
 	 * Creates a new instance.
 	 */
-	public DependencyManager(MethodLibrary library, MethodConfiguration config) {
+	public DependencyManager(MethodLibrary library) {
 		this.library = library;
 		this.libraryManager = LibraryService.getInstance().getLibraryManager(
 				library);
-		this.config = config;
 		init();
-	}
-	
-	private void reset() {
-		dependencyMap = new HashMap();
-		replacerSet = new HashSet<VariabilityElement>();
 	}
 
 	/**
@@ -97,11 +77,28 @@ public class DependencyManager {
 //					// refresh();
 //				} else 
 				if (option == ILibraryChangeListener.OPTION_DELETED) {
-					reset();
+					handleDeletedElement(changedItems);
 				} else if (option == ILibraryChangeListener.OPTION_CHANGED
 						|| option == ILibraryChangeListener.OPTION_NEWCHILD) {
 					if (changedItems != null && changedItems.size() > 0) {
-						reset();
+						for (Iterator it = changedItems.iterator(); it
+								.hasNext();) {
+							try {
+								Object e = it.next();
+								if (e instanceof MethodElement) {
+									buildDependencyFor((MethodElement) e);
+								} else {
+									if (debug) {
+										System.out.println(e
+												+ " is not a method element"); //$NON-NLS-1$
+									}
+								}
+							} catch (Exception e) {
+								if (debug) {
+									e.printStackTrace();
+								}
+							}
+						}
 					}
 				}
 			}
@@ -150,33 +147,18 @@ public class DependencyManager {
 	private void buildDependency(MethodElement element) {
 		if (element == null) {
 			return;
-		}		
+		}
 
 		try {
 			PackageDependency dependency = buildDependencyFor(element);
-			boolean isProcess = element instanceof ProcessComponent;
-			
+
 			EList elements = element.eContents();
 			if (elements != null) {
 				for (Iterator it = elements.iterator(); it.hasNext();) {
-					Object obj = it.next();
-					if (! (obj instanceof MethodElement)) {
-						continue;
-					}
-					MethodElement methodElement = (MethodElement) obj;
+					MethodElement methodElement = (MethodElement) it.next();
 					if (methodElement != null
 							&& !LibraryUtil.selectable(methodElement)) {
 						buildDependencyFor(methodElement);
-					} else if (isProcess && methodElement instanceof ProcessPackage) {
-						for (Iterator itt = methodElement.eAllContents(); itt.hasNext();) {
-							Object objj = itt.next();
-							if (objj instanceof MethodElement) {
-								MethodElement m = (MethodElement) objj;
-								if (!LibraryUtil.selectable(m)) {
-									buildDependencyFor(m);
-								}
-							}
-						}
 					}
 				}
 			}
@@ -206,14 +188,6 @@ public class DependencyManager {
 			return null;
 		}
 
-		IConfigurationManager configMgr = LibraryService.getInstance().getConfigurationManager(config);
-		if (configMgr != null) {
-			SupportingElementData seData = configMgr.getSupportingElementData();
-			if (seData != null && seData.isEnabled()) {
-				seData.processVariabilityChildren(element, null);
-			}
-		}
-		
 		// Build the dependency on the selectable element/parent only
 		MethodElement selectableElement = (MethodElement)LibraryUtil.getSelectable(element);
 		if (selectableElement == null) {
@@ -282,7 +256,7 @@ public class DependencyManager {
 			}
 		}
 */
-		List properties = LibraryUtil.getStructuralFeatures(element, true);			
+		List properties = LibraryUtil.getStructuralFeatures(element);
 		for (int i = 0; i < properties.size(); i++) {
 			EStructuralFeature f = (EStructuralFeature) properties.get(i);
 			if (!(f instanceof EReference) ) {
@@ -294,19 +268,7 @@ public class DependencyManager {
 				continue;
 			}
 						
-			if (element instanceof Task) {
-				if (feature == UmaPackage.eINSTANCE.getTask_Steps()) {
-					continue;
-				}
-			}
-			
-			if (element instanceof TaskDescriptor) {
-				if (feature == UmaPackage.eINSTANCE.getTaskDescriptor_SelectedSteps()) {
-					continue;
-				}
-			}
-			
-			Object value =  TypeDefUtil.getInstance().eGet(element, feature);
+			Object value = element.eGet(feature);
 			if ( value == null ) {
 				continue;
 			}
@@ -315,35 +277,17 @@ public class DependencyManager {
 			List values = null;
 			int count = 0;
 			
-			if ( feature.isMany()) {
+			if ( feature.isMany() ) {
 				values = (List)value;
 				if ( values.size() > 0 ) {
 					refElement = (MethodElement)values.get(count);
 				}
 			} else if ( value instanceof MethodElement ) {
 				refElement = (MethodElement)value;				
-				
-				if (replacerSet != null) {
-					if (feature == UmaPackage.eINSTANCE.getVariabilityElement_VariabilityBasedOnElement()) {
-						VariabilityElement ve = element instanceof VariabilityElement ?
-								(VariabilityElement) element : null;
-						VariabilityType type = ve == null ? null : ve.getVariabilityType();
-						if (type == VariabilityType.EXTENDS_REPLACES ||
-								type == VariabilityType.REPLACES) {
-							replacerSet.add(ve);
-						}
-					}				
-				}
 			}
 			 
 			while ( refElement != null ) {
-				
-				boolean skip = false;
-				if (feature == UmaPackage.eINSTANCE.getRole_Modifies()) {
-					skip = true;
-				}				
-				
-				MethodElement selectableRef = skip ? null : (MethodElement)LibraryUtil.getSelectable(refElement);
+				MethodElement selectableRef = (MethodElement)LibraryUtil.getSelectable(refElement);
 				if (selectableRef != null) {
 					PackageReference pkgRef = dependency.getReference(
 							selectableRef, true);
@@ -424,29 +368,6 @@ public class DependencyManager {
 		}
 
 		dependency.removeReference(element);
-	}
-
-	public Set<VariabilityElement> getReplacerSet() {
-		return replacerSet;
-	}
-
-	public void setReplacerSet(Set<VariabilityElement> replacerSet) {
-		this.replacerSet = replacerSet;
-	}
-	
-	public void dispose() {
-
-		if (libraryManager != null) {
-			libraryManager.removeListener(libListener);
-		}
-		
-		library = null;
-		libraryManager = null;
-		dependencyMap = null;
-		libListener = null;
-		replacerSet = null;
-		config = null;
-		
 	}
 
 }

@@ -13,16 +13,11 @@ package org.eclipse.epf.library.layout.elements;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.emf.ecore.EAttribute;
@@ -31,7 +26,6 @@ import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.epf.common.serviceability.Logger;
 import org.eclipse.epf.common.utils.FileUtil;
 import org.eclipse.epf.common.utils.NetUtil;
 import org.eclipse.epf.common.utils.StrUtil;
@@ -39,19 +33,8 @@ import org.eclipse.epf.library.ILibraryResourceManager;
 import org.eclipse.epf.library.LibraryPlugin;
 import org.eclipse.epf.library.LibraryService;
 import org.eclipse.epf.library.configuration.ConfigurationHelper;
-import org.eclipse.epf.library.configuration.ElementRealizer;
-import org.eclipse.epf.library.edit.PresentationContext;
-import org.eclipse.epf.library.edit.meta.IMetaDef;
-import org.eclipse.epf.library.edit.meta.ReferenceTable;
-import org.eclipse.epf.library.edit.meta.TypeDefUtil;
-import org.eclipse.epf.library.edit.util.CategorySortHelper;
-import org.eclipse.epf.library.edit.util.MethodElementPropUtil;
-import org.eclipse.epf.library.edit.util.PracticePropUtil;
-import org.eclipse.epf.library.edit.util.ProcessUtil;
-import org.eclipse.epf.library.edit.util.PropUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.layout.ElementLayoutManager;
-import org.eclipse.epf.library.layout.ElementPropertyProviderManager;
 import org.eclipse.epf.library.layout.IElementLayout;
 import org.eclipse.epf.library.layout.LayoutInfo;
 import org.eclipse.epf.library.layout.LayoutResources;
@@ -76,59 +59,30 @@ import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.MethodElementProperty;
 import org.eclipse.epf.uma.MethodLibrary;
 import org.eclipse.epf.uma.MethodPlugin;
-import org.eclipse.epf.uma.Practice;
 import org.eclipse.epf.uma.ReusableAsset;
 import org.eclipse.epf.uma.Roadmap;
 import org.eclipse.epf.uma.Role;
 import org.eclipse.epf.uma.SupportingMaterial;
 import org.eclipse.epf.uma.Task;
 import org.eclipse.epf.uma.UmaPackage;
-import org.eclipse.epf.uma.VariabilityElement;
-import org.eclipse.epf.uma.VariabilityType;
 import org.eclipse.epf.uma.Whitepaper;
 import org.eclipse.epf.uma.WorkOrder;
 import org.eclipse.epf.uma.WorkProduct;
-import org.eclipse.epf.uma.WorkProductDescriptor;
 import org.eclipse.epf.uma.ecore.util.OppositeFeature;
 import org.eclipse.epf.uma.util.AssociationHelper;
-import org.eclipse.epf.uma.util.ExtendedAttribute;
-import org.eclipse.epf.uma.util.ExtendedOpposite;
-import org.eclipse.epf.uma.util.ExtendedReference;
-import org.eclipse.epf.uma.util.ExtendedSection;
-import org.eclipse.epf.uma.util.ExtendedTable;
-import org.eclipse.epf.uma.util.MetaElement;
-import org.eclipse.epf.uma.util.ModifiedTypeMeta;
-import org.eclipse.epf.uma.util.QualifiedReference;
 import org.eclipse.epf.uma.util.UmaUtil;
-import org.eclipse.epf.uma.util.UserDefinedTypeMeta;
 
 /**
  * The abstract layout for all Method Elements.
  * 
  * @author Jinhua Xi
  * @author Kelvin Low
- * @author Weiping Lu
  * @sicne 1.0
  */
 public abstract class AbstractElementLayout implements IElementLayout {
 
-	public static boolean processDescritorsNewOption = false;
-	
-	public static final String TAG_REFERENCE = "reference"; 		//$NON-NLS-1$
+	public static final String TAG_REFERENCE = "reference"; //$NON-NLS-1$
 	public static final String TAG_REFERENCELIST = "referenceList"; //$NON-NLS-1$
-	public static final String TAG_SECTION = "section";				//$NON-NLS-1$
-	public static final String TAG_RTE = "rte";						//$NON-NLS-1$
-	public static final String TAG_TABLE = "table";					//$NON-NLS-1$
-	public static final String TAG_ColumnList = "columnList";		//$NON-NLS-1$
-	public static final String TAG_RowList = "rowList";				//$NON-NLS-1$
-	public static final String TAG_Column = "column";				//$NON-NLS-1$
-	public static final String TAG_Row = "row";						//$NON-NLS-1$
-	public static final String TAG_Cell = "Cell";					//$NON-NLS-1$
-	
-	//Use "new String" to make sure the following instances are not the same
-	private static final String Att_ExtendeReference_1 = new String("ExtendedReference");	//$NON-NLS-1$	
-	private static final String Att_ExtendeReference_2 = new String("ExtendedReference");	//$NON-NLS-1$
-	private static final String Att_ReferenceType = "referenceType"; 						//$NON-NLS-1$
 	
 	protected ElementLayoutManager layoutManager;
 
@@ -154,10 +108,6 @@ public abstract class AbstractElementLayout implements IElementLayout {
 	
 	protected boolean debug = LibraryPlugin.getDefault().isDebugging();
 
-	private ElementLayoutExtender extender;
-	
-	private String noAdjustedElementPath;
-	
 	public AbstractElementLayout() {
 	}
 
@@ -232,26 +182,18 @@ public abstract class AbstractElementLayout implements IElementLayout {
 		// we need to pass parameters in the file url, 
 		// however, if the file does not exist, the parameters is not passed over in browsing
 		// so create a dummy file
-		
-		if ((!this.layoutManager.isPublishingMode() || ConfigurationHelper.serverMode )&& !(
+		if (!this.layoutManager.isPublishingMode() && !(
 					element instanceof ContentDescription 
 				|| element.eContainer() instanceof ContentDescription
-				|| element instanceof MethodConfiguration) )			
+				|| element instanceof MethodConfiguration) )
 		{
 			try {
-				String path = this.getFilePath() + getFileName(ResourceHelper.FILE_EXT_HTML);
-				String html_file = this.layoutManager.getPublishDir() + path;
+				String html_file = this.layoutManager.getPublishDir() + this.getFilePath() + getFileName(ResourceHelper.FILE_EXT_HTML);
 				File f = new File(html_file);
 				if ( !f.exists() )
 				{
 					f.getParentFile().mkdirs();
 					f.createNewFile();
-				}
-				if (ConfigurationHelper.serverMode) {
-					Map<String, MethodElement> htmlElementMap = layoutManager.getUriElementMap();
-					if (htmlElementMap != null) {
-						htmlElementMap.put("/" + path, element);
-					}
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -291,26 +233,27 @@ public abstract class AbstractElementLayout implements IElementLayout {
 		} else if ( this.element instanceof WorkProduct ) {
 			oppositeFeatures.add(AssociationHelper.WorkProduct_WorkProductDescriptors);
 		} else if ( this.element instanceof Checklist ) {
-			oppositeFeatures.add(AssociationHelper.Checklist_BreakdownElements);
+			oppositeFeatures.add(AssociationHelper.Checklist_Activities);
 		} else if ( this.element instanceof Concept || this.element instanceof Whitepaper ) {
-			oppositeFeatures.add(AssociationHelper.Concept_BreakdownElements);
+			oppositeFeatures.add(AssociationHelper.Concept_Activities);
 		} else if ( this.element instanceof Checklist ) {
-			oppositeFeatures.add(AssociationHelper.Checklist_BreakdownElements);
+			oppositeFeatures.add(AssociationHelper.Checklist_Activities);
 		} else if ( this.element instanceof Example ) {
-			oppositeFeatures.add(AssociationHelper.Example_BreakdownElements);
+			oppositeFeatures.add(AssociationHelper.Example_Activities);
 		} else if ( this.element instanceof Guideline ) {
-			oppositeFeatures.add(AssociationHelper.Guideline_BreakdownElements);
+			oppositeFeatures.add(AssociationHelper.Guideline_Activities);
 		} else if ( this.element instanceof ReusableAsset ) {
-			oppositeFeatures.add(AssociationHelper.ReusableAsset_BreakdownElements);
+			oppositeFeatures.add(AssociationHelper.ReusableAsset_Activities);
 		} else if ( this.element instanceof Roadmap ) {
 			oppositeFeatures.add(AssociationHelper.Roadmap_Activites);
 		} else if ( this.element instanceof SupportingMaterial ) {
-			oppositeFeatures.add(AssociationHelper.SupportingMaterial_BreakdownElements);
+			oppositeFeatures.add(AssociationHelper.SupportingMaterial_Activities);
 		} 
 	
 		if ( oppositeFeatures.size() > 0 ) {
-			ConfigurationHelper.getDelegate().loadOppositeFeatures(
-					(ILibraryResourceSet) resSet, oppositeFeatures, element);
+			Set<String> GUIDs = new HashSet<String>();
+			GUIDs.add(element.getGuid());
+			((ILibraryResourceSet)resSet).loadOppositeFeatures(oppositeFeatures, GUIDs);
 		}
 	}
 
@@ -369,11 +312,6 @@ public abstract class AbstractElementLayout implements IElementLayout {
 	 * @see org.eclipse.epf.library.layout.IElementLayout#getType()
 	 */
 	public String getType() {
-		//For user defined type
-		if ((element instanceof Practice) && (PracticePropUtil.getPracticePropUtil().isUdtType((Practice)element))) {
-			return "udt";  //$NON-NLS-1$
-		}		
-		
 		return element.getType().getName();
 	}
 
@@ -418,13 +356,9 @@ public abstract class AbstractElementLayout implements IElementLayout {
 	 * @see org.eclipse.epf.library.layout.IElementLayout#getFilePath()
 	 */
 	public String getFilePath() {
-		return 	elementPath;
+		return elementPath;
 	}
 
-	public String getNoAdjustedElementPath() {
-		return 	noAdjustedElementPath == null ? elementPath : noAdjustedElementPath;
-	}
-	
 	/**
 	 * Returns the file path relative to another element. This is the
 	 * relativeTo.backpath + this.elementpath.
@@ -443,8 +377,7 @@ public abstract class AbstractElementLayout implements IElementLayout {
 	 */
 
 	public String getFileName(String ext) {
-		MethodElement elementForElementPath = getElementForElementPath();
-		return ResourceHelper.getFileName(elementForElementPath, ext);
+		return ResourceHelper.getFileName(element, ext);
 	}
 
 
@@ -467,21 +400,13 @@ public abstract class AbstractElementLayout implements IElementLayout {
 		backPath = "./"; //$NON-NLS-1$
 		if ( !(element instanceof MethodConfiguration || element instanceof MethodLibrary) )
 		{
-			MethodElement elementForElementPath = getElementForElementPath();
-			String path = ResourceHelper.getElementPath(elementForElementPath);
+			String path = ResourceHelper.getElementPath(element);
 			if ( path != null ) {
 				elementPath = path.replace(File.separatorChar, '/');
-				backPath = ResourceHelper.getBackPath(elementForElementPath);
-				
-				noAdjustedElementPath = elementPath;
-				elementPath = getLayoutMgr().getAdjustedElementPath(elementPath);
+				backPath = ResourceHelper.getBackPath(element);
 			}
 
 		}
-	}
-	
-	protected MethodElement getElementForElementPath() {
-		return element;
 	}
 
 	/**
@@ -525,9 +450,7 @@ public abstract class AbstractElementLayout implements IElementLayout {
 					}
 					l.setElementOwner(element);
 				}
-				XmlElement childXmlElement = l.getXmlElement(includeReferences);
-				parent.addChild(childXmlElement);
-				processGrandChild(feature, e, l, childXmlElement);
+				parent.addChild(l.getXmlElement(includeReferences));
 			}
 		}
 	}
@@ -546,33 +469,14 @@ public abstract class AbstractElementLayout implements IElementLayout {
 						if (l != null) {							
 							// don't include the references of the refereced
 							// elements, otherwise, may cause deadlock
-							XmlElement childXmlElement = l.getXmlElement(ConfigurationHelper
+							parent.addChild(l.getXmlElement(ConfigurationHelper
 									.isDescriptionElement(me) ? true
-									: includeReferences);
-							modifyChildDisplayName(feature, childXmlElement, me);
-							parent.addChild(childXmlElement);
-							processGrandChild(feature, me, l, childXmlElement);
+									: includeReferences));
 						}
 					}
-				} else {
-					processNonMethodElementInProcessChild(e, feature, parent, includeReferences);
 				}
 			}
 		}
-	}
-	
-	protected void modifyChildDisplayName(Object feature,
-			XmlElement childXmlElement, MethodElement childElement) {
-	}
-	
-	protected void processNonMethodElementInProcessChild(
-			Object nonMethodElementChild, Object feature, XmlElement parent,
-			boolean includeReferences) {
-	}
-	
-	protected void processGrandChild(Object feature,
-			MethodElement childElememt, IElementLayout childLayout,
-			XmlElement childXmlElement) {
 	}
 
 	/**
@@ -605,16 +509,11 @@ public abstract class AbstractElementLayout implements IElementLayout {
 				.setAttribute("Name", getName()) //$NON-NLS-1$
 				.setAttribute("BackPath", getBackPath()) //$NON-NLS-1$
 				.setAttribute("ShapeiconUrl", getShapeiconUrl()) //$NON-NLS-1$
-				.setAttribute("DisplayName", getDisplayName())
-				.setAttribute("NodeiconUrl", getNodeiconUrl()); //$NON-NLS-1$ only for UDT
+				.setAttribute("DisplayName", getDisplayName()); //$NON-NLS-1$
 
 		if ( showElementLink ) {
 			elementXml.setAttribute("Url", getUrl()); //$NON-NLS-1$
 		} 
-		
-		if (getExtender() != null) {
-			getExtender().addAttributes(elementXml);
-		}
 		
 		return elementXml;
 	}
@@ -640,7 +539,7 @@ public abstract class AbstractElementLayout implements IElementLayout {
 				}
 				EAttribute attrib = (EAttribute)p;
 				String name = p.getName();
-				
+									
 				Object value;
 				if (name.equals("presentationName")) //$NON-NLS-1$
 				{
@@ -665,8 +564,6 @@ public abstract class AbstractElementLayout implements IElementLayout {
 				elementXml
 						.newChild("attribute").setAttribute("name", name).setValue((value == null) ? "" : value.toString()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			}
-			// Get the singleton of the ElementPropertyProviderManager and have it add any additional attributes as needed
-			ElementPropertyProviderManager.getInstance().loadAdditionalElementProperties(element, elementXml);
 		}
 	}
 
@@ -696,9 +593,9 @@ public abstract class AbstractElementLayout implements IElementLayout {
 
 			value = ResourceHelper.fixContentUrlPath(value.toString(),
 					contentPath, backPath);
-			
+
 		}
-		
+
 		return value;
 	}
 
@@ -779,9 +676,6 @@ public abstract class AbstractElementLayout implements IElementLayout {
 	 */
 	public void loadFeature(EStructuralFeature feature, XmlElement elementXml,
 			boolean includeReferences) {
-		if (isExcludeFeature(feature)) {
-			return;
-		}
 		getFeatureValue(feature,  elementXml, includeReferences);
 	}
 	
@@ -800,7 +694,7 @@ public abstract class AbstractElementLayout implements IElementLayout {
 		}
 
 		String name = feature.getName();
-		
+
 		if (!feature.isMany()) {
 			MethodElement e = ConfigurationHelper.calc01FeatureValue(element, ownerElement,
 					feature, layoutManager.getElementRealizer());
@@ -828,17 +722,11 @@ public abstract class AbstractElementLayout implements IElementLayout {
 				}
 			}
 		} else if (feature.isMany()) {
-			List pv = calc0nFeatureValue(element, ownerElement, feature,
+			List pv = ConfigurationHelper.calc0nFeatureValue(element, ownerElement, feature,
 					layoutManager.getElementRealizer());
 			if ( acceptFeatureValue(feature, pv) ) {
 				if ( elementXml != null ) {
-					XmlElement childXml = addReferences(feature, elementXml, name, pv);
-					if (childXml != null) {
-						String sortValue = CategorySortHelper.getCategorySortValue(element);
-						if (sortValue != null && sortValue.length() > 0) {
-							childXml.setAttribute("sortValue", sortValue);  //$NON-NLS-1$
-						}
-					}
+					addReferences(feature, elementXml, name, pv);
 				}
 				return pv;
 			} else {
@@ -849,12 +737,6 @@ public abstract class AbstractElementLayout implements IElementLayout {
 		return null;
 	}
 
-	protected List calc0nFeatureValue(MethodElement element, MethodElement ownerElement, 
-			EStructuralFeature feature, ElementRealizer realizer) {
-		return ConfigurationHelper.calc0nFeatureValue(element, ownerElement, feature,
-				layoutManager.getElementRealizer());
-	}	
-	
 	/**
 	 * load the non-attribute feature
 	 * 
@@ -889,56 +771,14 @@ public abstract class AbstractElementLayout implements IElementLayout {
 				}
 			}
 		} else if (feature.isMany()) {
-			if (feature == AssociationHelper.ContentElement_Practices || feature == AssociationHelper.Activity_Pratices) {
-				loadPractices(elementXml);
-			}
-			List pv = calc0nFeatureValue(element, feature,
+			List pv = ConfigurationHelper.calc0nFeatureValue(element, feature,
 					layoutManager.getElementRealizer());
 			if ( acceptFeatureValue(feature, pv) && pv.size() > 0) {
 				addReferences(feature, elementXml, name, pv);
 			}
 		}
 	}
-	
-	private void loadPractices(XmlElement elementXml) {
-		if ( ! (element instanceof ContentElement || element instanceof Activity)) {
-			return;
-		}
-		List resultList = new ArrayList();
-		Object container = element.eContainer();
-		if (container instanceof Practice) {
-			container = ConfigurationHelper.getCalculatedElement((Practice) container, layoutManager.getElementRealizer());
-			if (container != null) {
-				resultList.add(container);
-			}
-		}		
-		OppositeFeature feature = element instanceof Activity ? AssociationHelper.Activity_Pratices :  AssociationHelper.ContentElement_Practices;		
-		List list = calc0nFeatureValue(element, feature, layoutManager.getElementRealizer());;
-		if (list != null && ! list.isEmpty()) {
-			resultList.addAll(list);
-		}
 
-		for (int i = resultList.size() - 1; i >=0 ; i--) {
-			MethodElement element = (MethodElement) resultList.get(i);
-			if (! getPublishCategoryProperty(element)) {
-				resultList.remove(i);
-			}			
-		}
-		
-		if (resultList.size() > 1) {
-			Comparator comparator = PresentationContext.INSTANCE.getPresNameComparator();		
-			Collections.<MethodElement>sort(resultList, comparator);
-		}
-		
-		addReferences(feature, elementXml, "Practices", resultList);			//$NON-NLS-1$ 
-	}
-	
-	protected List calc0nFeatureValue(MethodElement element,
-			OppositeFeature feature, ElementRealizer realizer) {
-		return ConfigurationHelper.calc0nFeatureValue(element, feature,
-				layoutManager.getElementRealizer());
-	}
-	
 	/**
 	 * load references for the element
 	 * @param elementXml XmlElement
@@ -965,10 +805,6 @@ public abstract class AbstractElementLayout implements IElementLayout {
 		}
 		//elementXml.setAttribute("ShowFullMethodContent", (layoutManager.getValidator().showExtraInfoForDescriptors()) ? "true" : "false");
 	}
-	
-	protected boolean isExcludeFeature(EStructuralFeature feature) {
-		return false;
-	}
 
 	/**
 	 * add the reference layout to the result
@@ -991,76 +827,11 @@ public abstract class AbstractElementLayout implements IElementLayout {
 	 * @param referenceName
 	 * @param items
 	 */
-	public XmlElement addReferences(Object feature, XmlElement elementXml, String referenceName,
+	public void addReferences(Object feature, XmlElement elementXml, String referenceName,
 			List items) {
-		if (items == null || items.isEmpty()) {
-			return null;
-		}
-		boolean excludeThisElement = false;
-		if (feature == AssociationHelper.VariabilityElement_ImmediateVarieties) {
-			excludeThisElement = true;
-		}
-		
-		HashSet<Object> itemSet = new HashSet<Object>();
-		List uniqueItems = new ArrayList();
-		for (Object item: items) {
-			if (! itemSet.contains(item)) {
-				if (excludeThisElement && item == element) {
-					continue;
-				}
-				itemSet.add(item);
-				uniqueItems.add(item);
-			}
-		}
-		XmlElement childXml = elementXml.newChild(TAG_REFERENCELIST);
-		if (feature instanceof ExtendedOpposite) {
-			ExtendedOpposite opposite = (ExtendedOpposite) feature;
-			childXml.setAttribute(Att_ReferenceType, "customOpposite");	//$NON-NLS-1$
-			if (opposite.getLayout() != null && opposite.getLayout().length() > 0) {
-				childXml.setAttribute(IMetaDef.layout, opposite.getLayout());
-			}
-		}
-//		processChild(feature, childXml.setAttribute("name", referenceName), uniqueItems, false); //$NON-NLS-1$
-		if (feature instanceof QualifiedReference) {
-			ExtendedReference qRef = (QualifiedReference) feature;
-			childXml.setAttribute("qualifierId", qRef.getId());		//$NON-NLS-1$
-			childXml.setAttribute("qualifierName", qRef.getName());	//$NON-NLS-1$	
-
-		} else if (feature instanceof ExtendedReference) {
-			ExtendedReference eRef = (ExtendedReference) feature;					
-			childXml.setAttribute("referenceId", eRef.getId());		//$NON-NLS-1$
-			childXml.setAttribute("referenceName", eRef.getName());	//$NON-NLS-1$
-			if (eRef.getContributeTo() != null) {
-				childXml.setAttribute("contributeTo", eRef.getContributeTo());	//$NON-NLS-1$
-			}			
-			
-			if (referenceName == Att_ExtendeReference_1) {
-				childXml.setAttribute("format", "immidate child list");	//$NON-NLS-1$ 	//$NON-NLS-2$
-
-			} else if (referenceName == Att_ExtendeReference_2) {	
-				for (QualifiedReference qRef : eRef.getQualifiedReferences()) {
-					List<MethodElement> list = ConfigurationHelper.calc0nFeatureValue(
-							element, qRef.getReference(), layoutManager
-									.getElementRealizer());
-					if (list != null && !list.isEmpty()) {
-						uniqueItems.removeAll(list);
-					}
-				}				
-				processChild(feature, childXml.setAttribute("name", referenceName), uniqueItems, false); //$NON-NLS-1$
-				for (QualifiedReference qRef : eRef.getQualifiedReferences()) {
-					List<MethodElement> list = ConfigurationHelper.calc0nFeatureValue(
-							element, qRef.getReference(), layoutManager
-									.getElementRealizer());
-					if (list != null && !list.isEmpty()) {
-						addReferences(qRef, childXml, "Qualified references", list);		//$NON-NLS-1$
-					}
-				}
-				childXml.setAttribute("format", "nested list");	//$NON-NLS-1$	//$NON-NLS-2$
-				return childXml;
-			}
-		}
-		processChild(feature, childXml.setAttribute("name", referenceName), uniqueItems, false); //$NON-NLS-1$		
-		return childXml;
+		processChild(feature, 
+				elementXml
+						.newChild(TAG_REFERENCELIST).setAttribute("name", referenceName), items, false); //$NON-NLS-1$ 
 	}
 
 	/**
@@ -1077,293 +848,13 @@ public abstract class AbstractElementLayout implements IElementLayout {
 
 			// load the attributes
 			loadAttributes(elementXml);
-			loadExtendedAttributes(elementXml);
 
 			loadReferences(elementXml, false);
-			
-			loadUdtReferences(elementXml);			
-		
-			loadQrReferences(elementXml);
-			
-			loadExtendedReferences(elementXml);
-			
-			loadExtendedOpposites(elementXml);
 		}
 
 		return elementXml;
 	}
-	
-	protected void loadExtendedOpposites(XmlElement elementXml) {
-		List<ExtendedOpposite> opposites = LibraryService.getInstance().getCurrentLibraryManager().getLoadedOpposites();
-		if (opposites == null || opposites.isEmpty()) {
-			return;
-		}
-		for (ExtendedOpposite opposite : opposites) {
-			if (! opposite.publish()) {
-				continue;
-			}
-//			List list = PropUtil.getPropUtil().getReferencingList(element, opposite.getTargetReference());
-//			if (list != null && !list.isEmpty()) {
-//				list = ConfigurationHelper.getCalculatedElements(list,  layoutManager.getElementRealizer());
-//			}
-			
-			List list = calc0nFeatureValue(element, opposite.getOFeature(), layoutManager.getElementRealizer());
-			if (list != null && !list.isEmpty()) {
-				addReferences(opposite, elementXml, opposite.getName(), list);
-			}			
-		}
-	}
-	
-	public void loadUdtReferences(XmlElement elementXml) {
-		List<Practice> udtList = ConfigurationHelper.calc0nFeatureValue(
-				element, UmaUtil.MethodElement_UdtList, layoutManager
-						.getElementRealizer());
-		if (udtList != null && !udtList.isEmpty()) {
-			addReferences(UmaUtil.MethodElement_UdtList, elementXml,
-					"User defined type references", //$NON-NLS-1$
-					udtList);
-		}
-	}
-	
-	boolean skipExtendedSection(ModifiedTypeMeta meta, ExtendedSection section, MethodElement e) {
-		if (! (e instanceof BreakdownElement)) {
-			return false;
-		}
-		if (null != TypeDefUtil.getInstance().getLinkedElement(e)) {
-			return false;
-		}
-		return meta.isLinkedSection(section);
-	}
-	
-	public void loadExtendedAttributes(XmlElement elementXml) {
-		if (ownerElement == null) {
-			return;
-		}
-		PropUtil propUtil = PropUtil.getPropUtil();
-		ModifiedTypeMeta meta = propUtil.getGlobalMdtMeta(ownerElement);
-		if (meta == null) {
-			return;
-		}
-		
-		if (!  meta.getAttributeSections().isEmpty()) {
-			for (ExtendedSection section : meta.getAttributeSections()) {
-				if (skipExtendedSection(meta, section, ownerElement)) {
-					continue;
-				}
-				List<ExtendedAttribute> attributes = section.getAttributes();
-				if (attributes == null || attributes.isEmpty()) {
-					continue;
-				}
-				XmlElement sectionXml = elementXml.newChild(TAG_SECTION);
-				setXmlAttributes(section, sectionXml);
-				boolean toRemoveSection = true;
-				for (ExtendedAttribute eAtt : attributes) {
-					XmlElement attXml = sectionXml.newChild(TAG_RTE);
-					String value = (String) getAttributeFeatureValue(eAtt.getAttribute());
-					if (IMetaDef.choice.equalsIgnoreCase(eAtt.getValueType())) {
-						for (MetaElement me : eAtt.getChoiceValues()) {
-							if (me.getId().equals(value)) {
-								value = me.getTextContent();
-							}
-						}
-						
-					} else if (IMetaDef.attachment.equalsIgnoreCase(eAtt.getValueType())) {
-						value = ResourceHelper.convertToRteString(value);
-					}
-					if (value != null && value.trim().length() > 0) {
-						toRemoveSection = false;	
-					}
-					setXmlAttributes(eAtt, attXml);
-					attXml.setValue(value);//$NON-NLS-1$
-				}
-				if (toRemoveSection) {
-					elementXml.removeChild(sectionXml);
-				}
-			}
-			return;
-		}
-		
-		for (ExtendedSection section : meta.getRteSections()) {
-			if (skipExtendedSection(meta, section, ownerElement)) {
-				continue;
-			}
-			List<ExtendedAttribute> attributes = section.getRtes();
-			if (attributes == null || attributes.isEmpty()) {
-				continue;
-			}
-			XmlElement sectionXml = elementXml.newChild(TAG_SECTION);
-			setXmlAttributes(section, sectionXml);
-			boolean toRemoveSection = true;
-			for (ExtendedAttribute eAtt : attributes) {
-				XmlElement attXml = sectionXml.newChild(TAG_RTE);
-				String value = (String) getAttributeFeatureValue(eAtt.getAttribute());
-				if (value != null && value.trim().length() > 0) {
-					toRemoveSection = false;	
-				}
-				setXmlAttributes(eAtt, attXml);
-				attXml.setValue(value);//$NON-NLS-1$
-			}
-			if (toRemoveSection) {
-				elementXml.removeChild(sectionXml);
-			}
-		}
-	}
-	
-	private void setXmlAttributes(ExtendedAttribute att, XmlElement xmlElement) {
-		xmlElement.setAttribute("name", att.getName());		//$NON-NLS-1$
-		xmlElement.setAttribute("id", att.getId());			//$NON-NLS-1$
-	}
-	
-	public void loadExtendedReferences(XmlElement elementXml) {
-		PropUtil propUtil = PropUtil.getPropUtil();
-		ModifiedTypeMeta meta = propUtil.getGlobalMdtMeta(element);
-		if (meta == null) {
-			return;
-		}
-		
-		ElementRealizer realizer = layoutManager.getElementRealizer();
-		
-		for (ExtendedSection section : meta.getReferenceSections()) {
-			if (skipExtendedSection(meta, section, element)) {
-				continue;
-			}
-			List<ExtendedReference> references = section.getReferences();
-			if (references == null || references.isEmpty()) {
-				continue;
-			}
-			XmlElement sectionXml = elementXml.newChild(TAG_SECTION);
-			setXmlAttributes(section, sectionXml);
-			
-			Map<ExtendedReference, List<MethodElement>> tableRefMap = new HashMap<ExtendedReference, List<MethodElement>>();
-			List<ExtendedTable> tables = section.getTables();
-			if (tables != null && !tables.isEmpty()) {
-				for (ExtendedTable table : tables) {
-					tableRefMap.put(table.getColumnReference(), Collections.EMPTY_LIST);
-					tableRefMap.put(table.getRowReference(), Collections.EMPTY_LIST);
-					tableRefMap.put(table.getCellReference(), Collections.EMPTY_LIST);
-				}
-			}
-			
-			boolean toRemoveSection = true;
-			for (ExtendedReference eRef : references) {
-//				if (! eRef.publish()) {
-//					continue;
-//				}
-				List<MethodElement> list = ConfigurationHelper.calc0nFeatureValue(
-						element, eRef.getReference(), realizer);
-				if (list != null && !list.isEmpty()) {
-					toRemoveSection = false;
-					
-					if (tableRefMap.containsKey(eRef)) {
-						tableRefMap.put(eRef, list);
-					}
-					if (eRef.publish()) {
-						addReferences(eRef, sectionXml, Att_ExtendeReference_1, list);	//$NON-NLS-1$
-						addReferences(eRef, sectionXml, Att_ExtendeReference_2, list);	//$NON-NLS-1$
-					}
-				}
-			}
-			if (toRemoveSection) {
-				elementXml.removeChild(sectionXml);
-			}
-						
-			if (tables == null || tables.isEmpty()) {
-				continue;
-			}
-			
-			for (ExtendedTable table : tables) {
-				List<MethodElement> colList = tableRefMap.get(table.getColumnReference());
-				List<MethodElement> rowList = tableRefMap.get(table.getRowReference());
-				List<MethodElement> celList = tableRefMap.get(table.getCellReference());
-				if (colList.isEmpty() || rowList.isEmpty()) {
-					continue;
-				}
-				
-				XmlElement cXml = sectionXml.newChild(TAG_TABLE);
-				cXml.setAttribute("tableId", table.getId());		//$NON-NLS-1$
-				cXml.setAttribute("tableName", table.getName());	//$NON-NLS-1$
-				cXml.setAttribute("columnSplit", table.getColumnSplit());//$NON-NLS-1$
-				
-				List<MethodElement> colList0 = propUtil.getExtendedReferenceList(element, table.getColumnReference(), false);
-				List<MethodElement> rowList0 = propUtil.getExtendedReferenceList(element, table.getRowReference(), false);
-				if (colList0 == null || colList0.isEmpty() || rowList0 == null || rowList0.isEmpty()) {
-					return;
-				}
-				
-				ReferenceTable referenceTable = propUtil.getReferenceTable(element, table, false);								
-				
-				if (referenceTable == null && this instanceof DescriptorLayout) {
-					MethodElement linkedElement = ((DescriptorLayout) this).getLinkedElement();
-					if (linkedElement != null) {
-						referenceTable = propUtil.getReferenceTable(linkedElement, table, false);
-						colList0 = propUtil.getExtendedReferenceList(linkedElement, table.getColumnReference(), false);
-						rowList0 = propUtil.getExtendedReferenceList(linkedElement, table.getRowReference(), false);					
-					}
-				}
-				
-				Map<MethodElement, MethodElement> colMap = new HashMap<MethodElement, MethodElement>();
-				Map<MethodElement, MethodElement> rowMap = new HashMap<MethodElement, MethodElement>();
-				for (MethodElement e : colList0) {
-					MethodElement r = ConfigurationHelper.getCalculatedElement(e, realizer);
-					if (r != null) {
-						colMap.put(r, e);
-					}
-				}
-				for (MethodElement e : rowList0) {
-					MethodElement r = ConfigurationHelper.getCalculatedElement(e, realizer);
-					if (r != null) {
-						rowMap.put(r, e);
-					}				
-				}				
-				XmlElement ccXml = cXml.newChild(TAG_ColumnList);
-				for (MethodElement e : colList) {
-					XmlElement cccXml = ccXml.newChild(TAG_Column);
-					String name = ConfigurationHelper.getPresentationName(e, layoutManager.getConfiguration());
-					cccXml.setAttribute("name", name);				//$NON-NLS-1$
-					addReference(table.getColumnReference().getReference(), cccXml, table.getColumnReference().getId(), e);
-				}
-				
-				ccXml = cXml.newChild(TAG_RowList);
-				for (MethodElement rowE : rowList) {
-					XmlElement cccXml = ccXml.newChild(TAG_Row);
-					String name = ConfigurationHelper.getPresentationName(rowE, layoutManager.getConfiguration());
-					cccXml.setAttribute("name", name);				//$NON-NLS-1$
-					addReference(table.getColumnReference().getReference(), cccXml, table.getColumnReference().getId(), rowE);
-					MethodElement rowE0 = rowMap.get(rowE);
-					for (MethodElement colE : colList) {
-						MethodElement colE0 = colMap.get(colE);
-						MethodElement celE = referenceTable == null ? null : referenceTable.getCellElement(rowE0, colE0);
-						if (celE != null) {
-							celE = ConfigurationHelper.getCalculatedElement(celE, realizer);
-						}
-						XmlElement ccccXml = cccXml.newChild(TAG_Cell);
-						name = celE == null ? "" : ConfigurationHelper.getPresentationName(celE, layoutManager.getConfiguration());		//$NON-NLS-1$
-						ccccXml.setAttribute("name", name);				//$NON-NLS-1$
-						if (celE != null) {
-							addReference(table.getCellReference().getReference(), ccccXml, table.getCellReference().getId(), celE);
-						}
-					}
-				}
-			}
-		}
-	}
-	
-	private void setXmlAttributes(ExtendedSection section, XmlElement xmlElement) {
-		xmlElement.setAttribute("name", section.getName());		//$NON-NLS-1$
-		String type = section.getType();
-		if (type.equals(IMetaDef.ATTRIBUTE)) {
-			type = IMetaDef.RTE;
-		}
-		xmlElement.setAttribute("type", type);		//$NON-NLS-1$
-		xmlElement.setAttribute("id", section.getId());			//$NON-NLS-1$
-		if (section.getLayout() != null && section.getLayout().length() > 0) {
-			xmlElement.setAttribute(IMetaDef.layout, section.getLayout());
-		}
-	}
-	
-	protected void loadQrReferences(XmlElement elementXml) {
-	}
-	
+
 	/**
 	 * some layout need to have the feature values for further processing. So
 	 * this method will be called when a feature is calculated in this abstract
@@ -1421,21 +912,11 @@ public abstract class AbstractElementLayout implements IElementLayout {
 		String imageUrl;
 		
 		// String imageFile;
-		VariabilityElement uriInheritingBase = null;
 		if (element instanceof DescribableElement) {
 			uri = ((DescribableElement) element).getShapeicon();
-
-			if (uri == null && element instanceof VariabilityElement) {
-				VariabilityElement[] uriInheritingBases = new VariabilityElement[1];
-				uri = ConfigurationHelper.getInheritingUri(
-						(DescribableElement) element, uri, uriInheritingBases,
-						getLayoutMgr().getConfiguration(), 1);
-				uriInheritingBase = uriInheritingBases[0];
-			}
 		}
-		MethodElement element1 = uriInheritingBase == null ? element : uriInheritingBase;
 
-		ILibraryResourceManager resMgr = ResourceHelper.getResourceMgr(element1);
+		ILibraryResourceManager resMgr = ResourceHelper.getResourceMgr(element);
 
 		if (uri == null || resMgr == null ) {
 			imageUrl = getDefaultShapeiconUrl();
@@ -1449,7 +930,7 @@ public abstract class AbstractElementLayout implements IElementLayout {
 		
 			// From EPF 1.2, shapeIcon/nodeIcon stores uri relative to plugin path. 
 			// Below section of code is necessary to append plugin name to shapeIcon/nodeIcon uri.
-			MethodPlugin plugin = UmaUtil.getMethodPlugin(element1);
+			MethodPlugin plugin = UmaUtil.getMethodPlugin(element);
 			if(plugin != null){
 				if(!imageUrl.startsWith(plugin.getName()) ){
 //					String pluginPath = ResourceHelper.getPluginPath(element);
@@ -1463,7 +944,7 @@ public abstract class AbstractElementLayout implements IElementLayout {
 			if ( resMgr != null ) {
 				// need decoded URL for file ops
 				String decodedImageUrl = NetUtil.decodedFileUrl(imageUrl);
-				File source = new File(resMgr.resolve(element1, decodedImageUrl));
+				File source = new File(resMgr.resolve(element, decodedImageUrl));
 				File dest = new File(getLayoutMgr().getPublishDir(), decodedImageUrl);
 				FileUtil.copyFile(source, dest);
 			}
@@ -1476,87 +957,12 @@ public abstract class AbstractElementLayout implements IElementLayout {
 	 * @see org.eclipse.epf.library.layout.IElementLayout#getNodeiconUrl()
 	 */
 	public String getNodeiconUrl() {
-		//For user defined type
-		if ((element instanceof Practice) && (PracticePropUtil.getPracticePropUtil().isUdtType((Practice)element))) {
-			try {
-				boolean debug = LibraryPlugin.getDefault().isDebugging();
-				Logger logger = LibraryPlugin.getDefault().getLogger();
-				
-				String imagesPath = getLayoutMgr().getPublishDir() + "icons"; //$NON-NLS-1$
-				UserDefinedTypeMeta udtMeta = PracticePropUtil.getPracticePropUtil().getUtdData((Practice)element);
-				String shapeIcon = udtMeta.getRteNameMap().get(UserDefinedTypeMeta._icon);
-				if (debug) {
-					logger.logInfo("The udt shape icon get from meta: " + shapeIcon); //$NON-NLS-1$
-				}
-				if (shapeIcon != null) {
-					File shapeIconFile = new File(NetUtil.decodedFileUrl(new URL(shapeIcon).getFile()));
-					if (debug) {
-						logger.logInfo("The udt shape icon file: " + shapeIconFile); //$NON-NLS-1$
-					}
-					if (FileUtil.copyFileToDir(shapeIconFile, imagesPath)) {
-						if (debug) {
-							logger.logInfo("Copy the udt shape icon succeed"); //$NON-NLS-1$
-						}
-						return "icons/" + shapeIconFile.getName(); //$NON-NLS-1$
-					}					
-				}
-			} catch (Exception e) {
-				LibraryPlugin.getDefault().getLogger().logError(e);
-			}			
-		}
 		return ""; //$NON-NLS-1$
 	}
 
 	public String getDefaultShapeiconUrl() {
-		String type = element.getType().getName().toLowerCase();
-		if (element instanceof CustomCategory) {
-			CustomCategory cc = (CustomCategory) element;
-			if (MethodElementPropUtil.getMethodElementPropUtil().isTransientElement(cc)) {
-				if (cc.getName().equals("Roles")) {//$NON-NLS-1$
-					type = "roleset";//$NON-NLS-1$
-				} else if (cc.getName().equals("Tasks")) {//$NON-NLS-1$
-					type = "discipline";//$NON-NLS-1$
-				} else if (cc.getName().equals("Work Products")) {//$NON-NLS-1$
-					type = "domain";//$NON-NLS-1$
-				} else if (cc.getName().equals("Guidance")) {//$NON-NLS-1$
-					type = "guidances";//$NON-NLS-1$
-				} else if (cc.getName().equals("Processes")) {//$NON-NLS-1$
-					type = "processes";//$NON-NLS-1$
-				}
-			}
-		}
-		
-		//For user defined type
-		if ((element instanceof Practice) && (PracticePropUtil.getPracticePropUtil().isUdtType((Practice)element))) {
-			try {
-				boolean debug = LibraryPlugin.getDefault().isDebugging();
-				Logger logger = LibraryPlugin.getDefault().getLogger();
-				
-				String imagesPath = getLayoutMgr().getPublishDir() + "images"; //$NON-NLS-1$
-				UserDefinedTypeMeta udtMeta = PracticePropUtil.getPracticePropUtil().getUtdData((Practice)element);
-				String shapeIcon = udtMeta.getRteNameMap().get(UserDefinedTypeMeta._shapeIcon);
-				if (debug) {
-					logger.logInfo("The udt shape icon get from meta: " + shapeIcon); //$NON-NLS-1$
-				}
-				if (shapeIcon != null) {
-					File shapeIconFile = new File(NetUtil.decodedFileUrl(new URL(shapeIcon).getFile()));
-					if (debug) {
-						logger.logInfo("The udt shape icon file: " + shapeIconFile); //$NON-NLS-1$
-					}
-					if (FileUtil.copyFileToDir(shapeIconFile, imagesPath)) {
-						if (debug) {
-							logger.logInfo("Copy the udt shape icon succeed"); //$NON-NLS-1$
-						}
-						return "images/" + shapeIconFile.getName(); //$NON-NLS-1$
-					}					
-				}
-				type = "UDT";	//$NON-NLS-1$
-			} catch (Exception e) {
-				LibraryPlugin.getDefault().getLogger().logError(e);
-			}			
-		}		
-		
-		return LayoutResources.getDefaultShapeiconUrl(type);
+		return LayoutResources.getDefaultShapeiconUrl(element.getType()
+				.getName().toLowerCase());
 	}
 
 	/**
@@ -1629,137 +1035,20 @@ public abstract class AbstractElementLayout implements IElementLayout {
 		// create a element nodes for cescriptor list
 		XmlElement descListXml = elementXml.newChild(TAG_REFERENCELIST).setAttribute("name", "descriptors"); //$NON-NLS-1$ //$NON-NLS-2$
 		
-		addDescriptors(descriptors, descListXml);
-	}
-
-	private void addDescriptors(List descriptors, XmlElement descListXml) {
 		for (int i = 0; i < descriptors.size(); i++ ) {
 			Descriptor desc = (Descriptor)descriptors.get(i);
+			IElementLayout layout = getChildLayout(desc);
+			XmlElement descXml = layout.getXmlElement(false);
+			descListXml.addChild(descXml);
+			
 			List parents = __getSuperActivities(desc);
-			addDescriptor(descListXml, desc, parents, true);			
+			for (int p = 0; p < parents.size(); p++ ) {
+				Activity act = (Activity)parents.get(p);
+				layout = getChildLayout(act);
+				XmlElement actXml = layout.getXmlElement(false);
+				descXml.addChild(actXml);
+			}			
 		}
-	}
-
-	private void addDescriptor(XmlElement descListXml, Descriptor desc, List parents, boolean topLevelCall) {
-		IElementLayout layout = getChildLayout(desc);
-		XmlElement descXml = layout.getXmlElement(false);
-		descListXml.addChild(descXml);
-		
-		//Show entry/exist state values
-		if (desc instanceof WorkProductDescriptor && layout instanceof AbstractElementLayout) {
-			AbstractElementLayout aLayout = (AbstractElementLayout) layout;
-			
-			EAttribute att;
-			String value;
-			att = UmaPackage.eINSTANCE.getWorkProductDescriptor_ActivityEntryState();
-			value = (String) aLayout.getAttributeFeatureValue(att);
-			
-			if (value != null && value.length() > 0) {
-				descXml
-				.newChild("attribute").setAttribute(att.getName(), value); //$NON-NLS-1$ 
-			}
-			att = UmaPackage.eINSTANCE.getWorkProductDescriptor_ActivityExitState();
-			value = (String) aLayout.getAttributeFeatureValue(att);
-			if (value != null && value.length() > 0) {
-				descXml
-				.newChild("attribute").setAttribute(att.getName(), value); //$NON-NLS-1$ 
-			}
-		}
-		
-		boolean toProcessExtendedActs = processDescritorsNewOption
-				&& topLevelCall;
-		Set<Activity> processedExtendedActSet = null;
-		Set<Activity> allLocalActSet = null;
-		if (toProcessExtendedActs) {
-			processedExtendedActSet = new HashSet<Activity>();
-			allLocalActSet = getAllLocalActSet(parents);
-		}
-		
-		// List parents = __getSuperActivities(desc);
-		for (int p = 0; p < parents.size(); p++) {
-			Activity act = (Activity) parents.get(p);
-			layout = getChildLayout(act);
-			XmlElement actXml = layout.getXmlElement(false);
-			descXml.addChild(actXml);
-			if (toProcessExtendedActs) {
-				processExtendedAct(desc, descListXml, parents, p, act,
-						processedExtendedActSet, allLocalActSet);
-			}
-		}
-	}
-	
-	private Set getAllLocalActSet(List<Activity> bases) {
-		MethodConfiguration config = getLayoutMgr().getConfiguration();
-		Set ret = new HashSet<Activity>();
-		for (Activity act: bases) {
-			ret.addAll(ConfigurationHelper.getLocalContributersAndReplacers(act, config));
-		}		
-		return ret;
-	}
-	
-	private void processExtendedAct(Descriptor desc, XmlElement descListXml,
-			List parents, int p, Activity act,
-			Set<Activity> processedExtendedActSet,
-			Set<Activity> allLocalActSet) {
-		MethodConfiguration config = getLayoutMgr().getConfiguration();
-
-		List actExtenders = ConfigurationHelper.getExtenders(act, config);
-		if (!actExtenders.isEmpty()) {
-			for (Object obj : actExtenders) {
-				Activity extAct = (Activity) obj;
-				if (processedExtendedActSet.contains(extAct)) {
-					continue;
-				}
-				processedExtendedActSet.add(extAct);
-
-				List<Activity> extenderParents = __getSuperActivities(extAct);
-				extenderParents.add(extAct);
-				
-				boolean toAdd = true;
-				if (p < parents.size() - 1) {
-					Activity superAct = extAct;
-					for (int pp = p + 1; pp < parents.size(); pp++) {
-						Activity parent = (Activity) parents.get(pp);						
-						parent = checkLocalAct(allLocalActSet, superAct, parent);
-						if (parent != null) {
-							extenderParents.add(parent);
-						} else {
-							toAdd = false;
-							break;
-						}
-					}
-				}
-				
-				if (toAdd) {
-					addDescriptor(descListXml, desc, extenderParents, false);
-				}
-			}
-		}
-
-	}
-
-	//1. return locally contributing act if superAct has a BE locally contributing to parent
-	//2. return null if if superAct has a BE locally replacing parent
-	//3. return parent otherwise
-	private Activity checkLocalAct(Set<Activity> allLocalActSet, Activity superAct,
-			Activity parent) {
-		for (BreakdownElement be : superAct
-				.getBreakdownElements()) {
-			if (be instanceof Activity) {
-				Activity actBe = (Activity) be;
-				if (allLocalActSet.contains(be) && 
-						parent == actBe.getVariabilityBasedOnElement()) {
-					if (actBe.getVariabilityType() == VariabilityType.LOCAL_REPLACEMENT) {
-						return null;
-					}
-					if (actBe.getVariabilityType() == VariabilityType.LOCAL_CONTRIBUTION) {
-						return actBe;
-					}
-				}
-			}
-		}
-		
-		return parent;
 	}
 	
 	private List __getSuperActivities(BreakdownElement element) {
@@ -1785,76 +1074,4 @@ public abstract class AbstractElementLayout implements IElementLayout {
 
 		return items;
 	}
-	
-	protected boolean isBreakdownElement_Guidances(EStructuralFeature feature) {
-		UmaPackage umaPkg = UmaPackage.eINSTANCE;
-		if (feature == umaPkg.getBreakdownElement_Checklists()) {
-			return true;
-		}
-		if (feature == umaPkg.getBreakdownElement_Concepts()) {
-			return true;
-		}
-		if (feature == umaPkg.getBreakdownElement_Examples()) {
-			return true;
-		}
-		if (feature == umaPkg.getBreakdownElement_Guidelines()) {
-			return true;
-		}	
-		if (feature == umaPkg.getBreakdownElement_ReusableAssets()) {
-			return true;
-		}	
-		if (feature == umaPkg.getBreakdownElement_SupportingMaterials()) {
-			return true;
-		}		
-		
-		return false;
-	}
-
-	protected ElementLayoutExtender getExtender() {
-		if (extender == null) {
-			extender = ConfigurationHelper.getDelegate().newElementLayoutExtender(this);
-		}
-		return extender;
-	}
-	
-	protected List<MethodElement> getTagQualifiedList(MethodConfiguration config, List<MethodElement> items) {
-		ElementLayoutExtender extender = getExtender();
-		if (extender == null) {
-			return items;
-		}
-		
-		return extender.getTagQualifiedList(config, items);
-	}
-	
-	protected List addBreakdownElementsToContentElements(List contentElements, List breakdownElements) {
-		if ( !getLayoutMgr().getValidator().showRelatedDescriptors() ) {
-			return contentElements;
-		}
-		if (breakdownElements == null || breakdownElements.isEmpty()) {
-			return contentElements;
-		} else if (contentElements == null || contentElements.isEmpty()) {
-			return breakdownElements;
-		}		
-		Set set = new HashSet(contentElements);
-		for (Object obj : breakdownElements) {
-			boolean toAdd = true;
-			if (obj instanceof Descriptor) {
-				MethodElement element = ProcessUtil.getAssociatedElement((Descriptor) obj);
-				element = ConfigurationHelper.getCalculatedElement(element, layoutManager.getElementRealizer());
-				if (set.contains(element) || set.contains(obj)) {
-					toAdd = false;
-				}
-			}
-			
-			if (toAdd) {
-				contentElements.add(obj);
-				set.add(obj);
-			}
-		}
-		
-		return contentElements;
-	}
-	
-	
-	
 }

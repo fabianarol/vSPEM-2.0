@@ -15,6 +15,8 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.eclipse.emf.common.ui.viewer.IViewerProvider;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.edit.command.CommandParameter;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.emf.edit.domain.IEditingDomainProvider;
 import org.eclipse.emf.edit.ui.action.CopyAction;
@@ -28,11 +30,24 @@ import org.eclipse.emf.edit.ui.action.PasteAction;
 import org.eclipse.emf.edit.ui.action.RedoAction;
 import org.eclipse.emf.edit.ui.action.UndoAction;
 import org.eclipse.epf.authoring.ui.AuthoringUIPlugin;
+import org.eclipse.epf.library.edit.util.ModelStructure;
+import org.eclipse.epf.uma.Activity;
+import org.eclipse.epf.uma.CapabilityPattern;
+import org.eclipse.epf.uma.CoreProcessPackage;
+import org.eclipse.epf.uma.DeliveryProcess;
+import org.eclipse.epf.uma.MethodElement;
+import org.eclipse.epf.uma.MethodPlugin;
+import org.eclipse.epf.uma.ProcessComponent;
+import org.eclipse.epf.uma.ProcessPackage;
+import org.eclipse.epf.uma.VarActivity;
+import org.eclipse.epf.uma.VarPoint;
+import org.eclipse.epf.uma.Variant;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IContributionManager;
+import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
@@ -43,18 +58,13 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ISharedImages;
-import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
-import org.eclipse.ui.forms.editor.FormEditor;
-import org.eclipse.ui.forms.editor.IFormPage;
-import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 
 /**
  * The contributor for a Method editor.
@@ -66,6 +76,9 @@ import org.eclipse.ui.texteditor.ITextEditorActionConstants;
  */
 public class MethodLibraryActionBarContributor extends
 		EditingDomainActionBarContributor implements ISelectionChangedListener {
+	
+	// Keep track of the active editor.
+	protected IEditorPart activeEditorPart;
 
 	// Keep track of the current selection provider.
 	protected ISelectionProvider selectionProvider;
@@ -89,7 +102,7 @@ public class MethodLibraryActionBarContributor extends
 	protected IAction refreshViewerAction = new Action(
 			getString("_UI_RefreshViewer_menu_item")) { //$NON-NLS-1$
 		public boolean isEnabled() {
-			return activeEditor instanceof IViewerProvider;
+			return activeEditorPart instanceof IViewerProvider;
 		}
 
 		public void run() {
@@ -103,6 +116,8 @@ public class MethodLibraryActionBarContributor extends
 	 * each descriptor generated for the current selection by the item provider.
 	 */
 	protected Collection createChildActions;
+	
+	protected Collection createChildActionsVarPoints;
 
 	/**
 	 * This is the menu manager into which menu contribution items should be
@@ -117,6 +132,8 @@ public class MethodLibraryActionBarContributor extends
 	 * provider.
 	 */
 	protected Collection createSiblingActions;
+	
+	protected Collection createSiblingActionsVarPoints;
 
 	/**
 	 * This is the menu manager into which menu contribution items should be
@@ -126,14 +143,8 @@ public class MethodLibraryActionBarContributor extends
 
 	protected String name;
 
-	protected boolean enabled = true;
+	protected boolean enabled;
 
-	public MethodLibraryActionBarContributor() {
-		loadResourceAction = new LoadResourceAction();
-		validateAction = new LibraryValidateAction();
-		this.name = "MethodElementEditor";  	//$NON-NLS-1$
-	}
-	
 	/**
 	 * This creates an instance of the contributor.
 	 */
@@ -148,7 +159,7 @@ public class MethodLibraryActionBarContributor extends
 	 * @return Action
 	 */
 	protected DeleteAction createDeleteAction() {
-		return new DeleteAction(removeAllReferencesOnDelete());
+		return new DeleteAction();
 	}
 
 	 /**
@@ -156,8 +167,6 @@ public class MethodLibraryActionBarContributor extends
 	 * @see org.eclipse.emf.edit.ui.action.EditingDomainActionBarContributor#init(org.eclipse.ui.IActionBars)
 	 */
 	public void init(IActionBars actionBars) {
-		super.init(actionBars);
-		
 		ISharedImages sharedImages = PlatformUI.getWorkbench()
 				.getSharedImages();
 
@@ -242,38 +251,33 @@ public class MethodLibraryActionBarContributor extends
 	 * additions, as well as the sub-menus for object creation items.
 	 */
 	public void contributeToMenu(IMenuManager menuManager) {
-//		super.contributeToMenu(menuManager);
-//		IMenuManager submenuManager = new MenuManager(
-//				getString("_UI_" + name + "_menu"), "org.eclipse.epf.authoring." + name + "MenuID"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-//		menuManager.insertAfter("additions", submenuManager); //$NON-NLS-1$
-//		submenuManager.add(new Separator("settings")); //$NON-NLS-1$
-//		submenuManager.add(new Separator("actions")); //$NON-NLS-1$
-//		submenuManager.add(new Separator("additions")); //$NON-NLS-1$
-//		submenuManager.add(new Separator("additions-end")); //$NON-NLS-1$
-//
-//		// Prepare for CreateChild item addition or removal.
-//		createChildMenuManager = new MenuManager(
-//				getString("_UI_CreateChild_menu_item")); //$NON-NLS-1$
-//		submenuManager.insertBefore("additions", createChildMenuManager); //$NON-NLS-1$
-//
-//		// Prepare for CreateSibling item addition or removal.
-//		createSiblingMenuManager = new MenuManager(
-//				getString("_UI_CreateSibling_menu_item")); //$NON-NLS-1$
-//		submenuManager.insertBefore("additions", createSiblingMenuManager); //$NON-NLS-1$
-//
-//		// Force an update because Eclipse hides empty menus now.
-//		submenuManager.addMenuListener(new IMenuListener() {
-//			public void menuAboutToShow(IMenuManager menuManager) {
-//				menuManager.updateAll(true);
-//			}
-//		});
-//
-//		addGlobalActions(submenuManager);
-		
-		IMenuManager editMenu= menuManager.findMenuUsingPath(IWorkbenchActionConstants.M_EDIT);
-		if (editMenu != null) {
-			editMenu.add(new Separator(ITextEditorActionConstants.GROUP_ASSIST));
-		}
+		super.contributeToMenu(menuManager);
+		IMenuManager submenuManager = new MenuManager(
+				getString("_UI_" + name + "_menu"), "org.eclipse.epf.authoring." + name + "MenuID"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		menuManager.insertAfter("additions", submenuManager); //$NON-NLS-1$
+		submenuManager.add(new Separator("settings")); //$NON-NLS-1$
+		submenuManager.add(new Separator("actions")); //$NON-NLS-1$
+		submenuManager.add(new Separator("additions")); //$NON-NLS-1$
+		submenuManager.add(new Separator("additions-end")); //$NON-NLS-1$
+
+		// Prepare for CreateChild item addition or removal.
+		createChildMenuManager = new MenuManager(
+				getString("_UI_CreateChild_menu_item")); //$NON-NLS-1$
+		submenuManager.insertBefore("additions", createChildMenuManager); //$NON-NLS-1$
+
+		// Prepare for CreateSibling item addition or removal.
+		createSiblingMenuManager = new MenuManager(
+				getString("_UI_CreateSibling_menu_item")); //$NON-NLS-1$
+		submenuManager.insertBefore("additions", createSiblingMenuManager); //$NON-NLS-1$
+
+		// Force an update because Eclipse hides empty menus now.
+		submenuManager.addMenuListener(new IMenuListener() {
+			public void menuAboutToShow(IMenuManager menuManager) {
+				menuManager.updateAll(true);
+			}
+		});
+
+		addGlobalActions(submenuManager);
 	}
 
 	/**
@@ -282,6 +286,7 @@ public class MethodLibraryActionBarContributor extends
 	 */
 	public void setActiveEditor(IEditorPart part) {
 		super.setActiveEditor(part);
+		activeEditorPart = part;
 
 		// Switch to the new selection provider.
 		if (selectionProvider != null) {
@@ -300,31 +305,7 @@ public class MethodLibraryActionBarContributor extends
 			}
 		}
 	}
-	
-	@Override
-	public void setActivePage(IEditorPart part) {
-		if (part != null) {
-			setActiveEditor(part);
-		}
-		
-		// Switch to the new selection provider.
-		if (selectionProvider != null) {
-			selectionProvider.removeSelectionChangedListener(this);
-		}
-		if (part == null) {
-			selectionProvider = null;
-		} else {
-			selectionProvider = part.getSite().getSelectionProvider();
-			selectionProvider.addSelectionChangedListener(this);
 
-			// Fake a selection changed event to update the menus.
-			if (selectionProvider.getSelection() != null) {
-				selectionChanged(new SelectionChangedEvent(selectionProvider,
-						selectionProvider.getSelection()));
-			}
-		}
-	}
-	
 	/**
 	 * This implements
 	 * {@link org.eclipse.jface.viewers.ISelectionChangedListener}, handling
@@ -336,27 +317,65 @@ public class MethodLibraryActionBarContributor extends
 		// Remove any menu items for old selection.
 		if (createChildMenuManager != null) {
 			depopulateManager(createChildMenuManager, createChildActions);
+//			depopulateManager(createChildMenuManager, createChildActionsVarPoints);//Flucas
 		}
 		if (createSiblingMenuManager != null) {
 			depopulateManager(createSiblingMenuManager, createSiblingActions);
+//			depopulateManager(createSiblingMenuManager, createSiblingActionsVarPoints);//Flucas
 		}
+		
 
 		// Query the new selection for appropriate new child/sibling
 		// descriptors.
 		Collection newChildDescriptors = null;
 		Collection newSiblingDescriptors = null;
+		
+//		Collection newChildVarPointsDescriptors = null;
+//		Collection newSiblingVarPointsDescriptors = null;
+		
+		Boolean generateChilds = true;
+		Boolean generateSibling = true;
+		Boolean variabilityEnabled = false; //Es decir estamos en una linea de proceso
 
 		ISelection selection = event.getSelection();
 		if (selection instanceof IStructuredSelection
 				&& ((IStructuredSelection) selection).size() == 1) {
 			Object object = ((IStructuredSelection) selection)
 					.getFirstElement();
+			
+			variabilityEnabled = isVariabilityPackage(object);
+		
+			//Si Seleccionamos un VarPoint - No tiene Hijos, Pero si hermanos, y su padre puede ser otro elemento
+			if( (object instanceof VarPoint) && variabilityEnabled ){
+				generateChilds = false;
+				generateSibling = true;
+			}
+			
+			//Si Seleccionamos un Variant - No tiene hijos, No tiene hermanos, y su padre es el proceso
+			if( (object instanceof Variant) && variabilityEnabled){
+				generateChilds = false;
+				generateSibling = false;
+			}
 
-			EditingDomain domain = ((IEditingDomainProvider) activeEditor)
+			EditingDomain domain = ((IEditingDomainProvider) activeEditorPart)
 					.getEditingDomain();
-
-			newChildDescriptors = domain.getNewChildDescriptors(object, null);
-			newSiblingDescriptors = domain.getNewChildDescriptors(null, object);
+			
+			if (generateChilds == true){
+				newChildDescriptors = domain.getNewChildDescriptors(object, null);
+			}
+			if (generateSibling == true){
+				newSiblingDescriptors = domain.getNewChildDescriptors(null, object);
+			}
+			
+			/**Parseando el menu - Si es Variante***/
+			//Si no es un elemento de tipo Capability y Delivery, no podemos generar VARIANTES
+			if ( !(object instanceof CapabilityPattern)  && !(object instanceof DeliveryProcess) && variabilityEnabled){
+				disableVariants(newChildDescriptors, newSiblingDescriptors);
+			}
+			else if (!variabilityEnabled){//Si la variabilidad no esta activada quitamos las opciones Variantes y puntos de Variacion
+				disableVariants(newChildDescriptors, newSiblingDescriptors);
+				disableVarPoints(newChildDescriptors, newSiblingDescriptors);
+			}
 		}
 
 		// Generate actions for selection; populate and redraw the menus.
@@ -374,10 +393,114 @@ public class MethodLibraryActionBarContributor extends
 					null);
 			createSiblingMenuManager.update(true);
 		}
-		if (!(activeEditor instanceof FormEditor)) {
-			update();
+	}
+	/**
+	 * Metodo que desactiva las Variantes del Menu
+	 * 
+	 * @param newChildDescriptors
+	 * @param newSiblingDescriptors
+	 */
+	public void disableVariants(Collection newChildDescriptors, Collection newSiblingDescriptors){
+		//Childs
+		if(newChildDescriptors!=null){
+			for (Iterator iter = newChildDescriptors.iterator(); iter.hasNext();) {
+				CommandParameter cmd = (CommandParameter) iter.next();
+				Object element = cmd.getValue();
+				//- Si  es un elemento de tipo variante lo quito de las acciones
+				if(element instanceof Variant){
+					iter.remove();
+				}
+			}
+		}
+
+		
+		//Siblings
+		if(newSiblingDescriptors!=null){
+			for (Iterator iter = newSiblingDescriptors.iterator(); iter.hasNext();) {
+				CommandParameter cmd = (CommandParameter) iter.next();
+				Object element = cmd.getValue();
+				//- Si  es un elemento de tipo variante lo quito de las acciones
+				if(element instanceof Variant){
+					iter.remove();
+				}
+			}
 		}
 	}
+	
+	/**
+	 * Metodo que desactiva los Puntos de Variación
+	 * 
+	 * @param newChildDescriptors
+	 * @param newSiblingDescriptors
+	 */
+	public void disableVarPoints(Collection newChildDescriptors, Collection newSiblingDescriptors){
+		//Childs
+		if(newChildDescriptors!=null){
+			for (Iterator iter = newChildDescriptors.iterator(); iter.hasNext();) {
+				CommandParameter cmd = (CommandParameter) iter.next();
+				Object element = cmd.getValue();
+				//- Si  es un elemento de tipo variante lo quito de las acciones
+				if(element instanceof VarPoint){
+					iter.remove();
+				}
+			}
+		}
+		//Siblings
+		if(newSiblingDescriptors!=null){
+			for (Iterator iter = newSiblingDescriptors.iterator(); iter.hasNext();) {
+				CommandParameter cmd = (CommandParameter) iter.next();
+				Object element = cmd.getValue();
+				//- Si  es un elemento de tipo variante lo quito de las acciones
+				if(element instanceof VarPoint){
+					iter.remove();
+				}
+			}
+		}
+	}
+	/**
+	 * Método para saber si la raiz de un proceso proviene de uno corriente o de una linea de proceso
+	 * 
+	 * 
+	 */
+	protected Boolean isVariabilityPackage(Object objectTarget){
+
+		Boolean knownRoot = false;
+		Boolean variabilityEnabled = false;
+		
+		/**
+		 * Bug #013 Fix excepción al seleccionar los hijos
+		 */
+		while(!knownRoot){
+			
+			//Si el elemento donde se encuentra dentro del dominio de un CoreProcess entonces variabilidad activada (PAQUETE NO PROCESO)
+			if( (objectTarget instanceof CoreProcessPackage) && !(objectTarget instanceof ProcessComponent)){
+				knownRoot = true;
+				variabilityEnabled = true;
+			}
+			//Si el elemento se encuentra dentro del dominio de un ProcessPackage entonces variabilidad desactivada (PAQUETE NO PROCESO)
+			else if( (objectTarget instanceof ProcessPackage) && !(objectTarget instanceof ProcessComponent)){
+				knownRoot = true;
+				variabilityEnabled = false;
+			}
+			
+			//Si no es ninguna de las 2 entonces avanzamos a los padres para seguir investigando
+			else{
+				//Es un objeto contenedor
+				if(objectTarget instanceof MethodElement){
+					MethodElement element = (MethodElement) objectTarget;
+					objectTarget = element.eContainer();
+				}
+				//Si no es objeto MethodElement directamente negamos la variabilidad en ese elemento
+				else{
+					knownRoot = true;
+					variabilityEnabled = false;
+				}
+			}
+		}
+		return variabilityEnabled;
+	}
+	
+	
 
 	/**
 	 * This generates a {@link org.eclipse.emf.edit.ui.action.CreateChildAction}
@@ -389,7 +512,7 @@ public class MethodLibraryActionBarContributor extends
 		Collection actions = new ArrayList();
 		if (descriptors != null) {
 			for (Iterator i = descriptors.iterator(); i.hasNext();) {
-				actions.add(new CreateChildAction(activeEditor, selection,
+				actions.add(new CreateChildAction(activeEditorPart, selection,
 						i.next()));
 			}
 		}
@@ -407,7 +530,7 @@ public class MethodLibraryActionBarContributor extends
 		Collection actions = new ArrayList();
 		if (descriptors != null) {
 			for (Iterator i = descriptors.iterator(); i.hasNext();) {
-				actions.add(new CreateSiblingAction(activeEditor,
+				actions.add(new CreateSiblingAction(activeEditorPart,
 						selection, i.next()));
 			}
 		}
@@ -465,28 +588,11 @@ public class MethodLibraryActionBarContributor extends
 			}
 		}
 	}
-	
-	protected void updatePasteAction() {
-		ISelectionProvider selectionProvider = activeEditor instanceof ISelectionProvider ? (ISelectionProvider) activeEditor
-				: activeEditor.getEditorSite().getSelectionProvider();
-
-		if (selectionProvider != null) {
-			ISelection selection = selectionProvider.getSelection();
-			IStructuredSelection structuredSelection = selection instanceof IStructuredSelection ? (IStructuredSelection) selection
-					: StructuredSelection.EMPTY;
-
-			pasteAction.setEnabled(pasteAction.updateSelection(structuredSelection));
-		}
-	}
 
 	/**
 	 * This populates the pop-up menu before it appears.
 	 */
 	public void menuAboutToShow(IMenuManager menuManager) {
-		// This is needed to enable Paste after Copy but the selection has not been changed yet
-		//
-		updatePasteAction();
-		
 		// Add our standard marker.
 		menuManager.add(new Separator("additions")); //$NON-NLS-1$
 		menuManager.add(new Separator("edit")); //$NON-NLS-1$
@@ -509,15 +615,40 @@ public class MethodLibraryActionBarContributor extends
 
 		if (enabled) {
 			MenuManager submenuManager = null;
+			
 			submenuManager = new MenuManager(
 					getString("_UI_CreateChild_menu_item")); //$NON-NLS-1$
 			populateManager(submenuManager, createChildActions, null);
+			
+			//Puntos de variacion - Insertar Hijo
+//			submenuManager.add(new Separator("varpoints"));
+//			MenuManager subVarPoints = null;
+//			subVarPoints = new MenuManager("varpointsAux");
+//			populateManager(submenuManager, createChildActions, null);
+//			submenuManager.insertAfter("varpoints", subVarPoints);
+			
+			
 			menuManager.insertBefore("additions", submenuManager); //$NON-NLS-1$
-
+			
 			submenuManager = new MenuManager(
 					getString("_UI_CreateSibling_menu_item")); //$NON-NLS-1$
 			populateManager(submenuManager, createSiblingActions, null);
 			menuManager.insertBefore("additions", submenuManager); //$NON-NLS-1$
+			
+
+			/**Var Points**/
+			
+//			MenuManager subVarPoints = null;
+//			subVarPoints = new MenuManager("Var Points"); 
+//			populateManager(subVarPoints, createChildActions, null);
+//			menuManager.insertAfter(getString("_UI_CreateChild_menu_item"), subVarPoints);
+//			
+//			subVarPoints = new MenuManager("Var Points"); 
+//			populateManager(subVarPoints, createSiblingActions, null);
+//			menuManager.insertAfter(getString("_UI_CreateSibling_menu_item"), subVarPoints);
+			
+			
+			/**Var Points**/
 		}
 	}
 
@@ -547,57 +678,12 @@ public class MethodLibraryActionBarContributor extends
 	 *
 	 */
 	protected void doRefresh() {
-		if (activeEditor instanceof IViewerProvider) {
-			Viewer viewer = ((IViewerProvider) activeEditor).getViewer();
+		if (activeEditorPart instanceof IViewerProvider) {
+			Viewer viewer = ((IViewerProvider) activeEditorPart).getViewer();
 			if (viewer != null) {
 				viewer.refresh();
 			}
 		}
 	}
 
-	protected boolean removeAllReferencesOnDelete()
-	{
-		return false;
-	}
-	
-	@Override
-	public void activate() {
-		// fix actions -- if new page is an IFormPage, we don't want EMF actions
-		if (activeEditor != null) {
-			IActionBars actionBars = activeEditor.getEditorSite()
-				.getActionBars();
-			if (activeEditor instanceof FormEditor) {
-				IFormPage page = ((FormEditor)activeEditor).getActivePageInstance(); 
-				if (page instanceof IFormPage) {			
-					actionBars.setGlobalActionHandler(ActionFactory.DELETE.getId(),
-							null);
-					actionBars.setGlobalActionHandler(ActionFactory.CUT.getId(),
-							null);
-					actionBars.setGlobalActionHandler(ActionFactory.COPY.getId(),
-							null);
-					actionBars.setGlobalActionHandler(ActionFactory.PASTE.getId(),
-							null);
-					actionBars.setGlobalActionHandler(ActionFactory.UNDO.getId(),
-							null);
-					actionBars.setGlobalActionHandler(ActionFactory.REDO.getId(),
-							null);
-				}
-			} else {
-				actionBars.setGlobalActionHandler(ActionFactory.DELETE.getId(),
-						deleteAction);
-				actionBars.setGlobalActionHandler(ActionFactory.CUT.getId(),
-						cutAction);
-				actionBars.setGlobalActionHandler(ActionFactory.COPY.getId(),
-						copyAction);
-				actionBars.setGlobalActionHandler(ActionFactory.PASTE.getId(),
-						pasteAction);
-				actionBars.setGlobalActionHandler(ActionFactory.UNDO.getId(),
-						undoAction);
-				actionBars.setGlobalActionHandler(ActionFactory.REDO.getId(),
-						redoAction);
-			}
-			actionBars.updateActionBars();
-		}
-		super.activate();
-	}
 }

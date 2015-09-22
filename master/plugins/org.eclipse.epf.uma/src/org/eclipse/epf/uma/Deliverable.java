@@ -10,6 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.uma;
 
+import org.eclipse.emf.common.util.EList;
 import java.util.List;
 
 /**
@@ -44,9 +45,9 @@ public interface Deliverable extends WorkProduct {
 	 * <!-- end-user-doc -->
 	 * @return the value of the '<em>Delivered Work Products</em>' reference list.
 	 * @see org.eclipse.epf.uma.UmaPackage#getDeliverable_DeliveredWorkProducts()
-	 * @model ordered="false"
+	 * @model type="org.eclipse.epf.uma.WorkProduct" ordered="false"
 	 * @generated
 	 */
-	List<WorkProduct> getDeliveredWorkProducts();
+	List getDeliveredWorkProducts();
 
 } // Deliverable

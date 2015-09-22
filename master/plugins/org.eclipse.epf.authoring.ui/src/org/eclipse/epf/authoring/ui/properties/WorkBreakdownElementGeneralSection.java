@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.emf.common.notify.AdapterFactory;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
 import org.eclipse.emf.edit.provider.ItemProviderAdapter;
@@ -21,25 +22,18 @@ import org.eclipse.emf.edit.provider.WrapperItemProvider;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryContentProvider;
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
 import org.eclipse.epf.authoring.ui.AuthoringUIPlugin;
-import org.eclipse.epf.authoring.ui.dialogs.ItemsFilterDialog;
 import org.eclipse.epf.authoring.ui.editors.ColumnDescriptor;
 import org.eclipse.epf.authoring.ui.editors.ProcessEditor;
-import org.eclipse.epf.authoring.ui.filters.MdtElementFilter;
-import org.eclipse.epf.common.ui.util.MsgDialog;
+import org.eclipse.epf.common.serviceability.MsgDialog;
 import org.eclipse.epf.common.utils.StrUtil;
-import org.eclipse.epf.library.edit.IFilter;
 import org.eclipse.epf.library.edit.command.IActionManager;
-import org.eclipse.epf.library.edit.meta.TypeDefUtil;
 import org.eclipse.epf.library.edit.process.BreakdownElementWrapperItemProvider;
 import org.eclipse.epf.library.edit.process.IBSItemProvider;
 import org.eclipse.epf.library.edit.util.PredecessorList;
 import org.eclipse.epf.library.edit.util.ProcessUtil;
-import org.eclipse.epf.library.edit.util.PropUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.ui.LibraryUIText;
-import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.Milestone;
-import org.eclipse.epf.uma.TaskDescriptor;
 import org.eclipse.epf.uma.TeamProfile;
 import org.eclipse.epf.uma.UmaFactory;
 import org.eclipse.epf.uma.UmaPackage;
@@ -47,7 +41,6 @@ import org.eclipse.epf.uma.VariabilityElement;
 import org.eclipse.epf.uma.WorkBreakdownElement;
 import org.eclipse.epf.uma.WorkOrder;
 import org.eclipse.epf.uma.WorkOrderType;
-import org.eclipse.epf.uma.util.ModifiedTypeMeta;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ComboBoxCellEditor;
 import org.eclipse.jface.viewers.ICellEditorValidator;
@@ -61,7 +54,6 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
@@ -73,7 +65,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 
 
@@ -110,12 +101,6 @@ public class WorkBreakdownElementGeneralSection extends
 
 	private ComboBoxCellEditor comboBoxCellEditor;
 
-	private Text ctrl_method_element;
-
-	private Button linkButton;
-	
-	private Button clearButton;
-	
 	// predecessor map list
 	private List predMapList = new ArrayList();
 
@@ -259,30 +244,6 @@ public class WorkBreakdownElementGeneralSection extends
 	 * @see org.eclipse.epf.authoring.ui.properties.BreakdownElementGeneralSection#createGeneralSection(org.eclipse.swt.widgets.Composite)
 	 */
 	protected void createGeneralSection(Composite composite) {
-		createGeneralSection_(composite);
-		if (! accpetLink()) {
-			return;
-		}
-		// method element
-		FormUI.createLabel(toolkit, generalComposite, PropertiesResources.Linked_Element); 
-		ctrl_method_element = FormUI.createText(toolkit, generalComposite,
-				SWT.DEFAULT, 1);
-
-		ctrl_method_element.setText(getLinkedElementName(element));
-		ctrl_method_element.setEnabled(false);
-
-		Composite buttonComposite = FormUI.createComposite(toolkit,
-				generalComposite, SWT.NONE, 2, true);
-		linkButton = FormUI.createButton(toolkit, buttonComposite, SWT.PUSH, 1);
-		linkButton
-				.setText(PropertiesResources.Process_Button_LinkMethodElement); 
-
-		clearButton = FormUI.createButton(toolkit, buttonComposite, SWT.PUSH, 1);
-		clearButton
-				.setText(PropertiesResources.Process_Button_ClearMethodElement); 
-	}
-	
-	private void createGeneralSection_(Composite composite) {
 		super.createGeneralSection(composite);
 
 		// Event Driven
@@ -394,7 +355,7 @@ public class WorkBreakdownElementGeneralSection extends
 			public void widgetSelected(SelectionEvent e) {
 				// List predList = element.getLinkToPredecessor();
 				WorkOrder o = UmaFactory.eINSTANCE.createWorkOrder();
-				o.setLinkType(WorkOrderType.FINISH_TO_START);
+				o.setLinkType(WorkOrderType.FINISH_TO_START_LITERAL);
 
 				// predList.add(o);
 
@@ -475,52 +436,6 @@ public class WorkBreakdownElementGeneralSection extends
 			}
 		});
 
-		if (! accpetLink()) {
-			return;
-		}
-		
-		linkButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				ModifiedTypeMeta meta =  TypeDefUtil.getLinkedMdtMeta(element);
-				IFilter filter = new MdtElementFilter(getConfiguration(), meta);
-				List existingElements = new ArrayList();
-				ItemsFilterDialog fd = new ItemsFilterDialog(PlatformUI
-						.getWorkbench().getActiveWorkbenchWindow().getShell(),
-						filter, element, meta.getId(),
-						existingElements);
-
-				fd.setBlockOnOpen(true);
-				fd.setViewerSelectionSingle(true);
-				fd.setTitle( meta.getId());
-				fd.setEnableProcessScope(true);
-				fd.setSection(getSection());
-				fd.open();
-				if (! fd.getSelectedItems().isEmpty()) {
-					Object item = fd.getSelectedItems().get(0);
-					if (item instanceof MethodElement) {
-						PropUtil.getPropUtil(actionMgr).setLinkedElement(element, (MethodElement) item);
-					}
-				} else {
-					return;
-				}
-				ctrl_method_element.setText(getLinkedElementName(element));
-				getEditor().updateOnLinkedElementChange(element);
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e1) {
-			}
-		});
-				
-		clearButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				PropUtil.getPropUtil(actionMgr).setLinkedElement(element, null);
-				ctrl_method_element.setText("");//$NON-NLS-1$
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e1) {
-			}
-		});
-	
 	}
 
 	/**
@@ -604,11 +519,6 @@ public class WorkBreakdownElementGeneralSection extends
 				// re-initialize predList
 				predMapList = new ArrayList();
 				initializePredList();
-				
-				if (ctrl_method_element != null) {
-					String linkedString = getLinkedElementName(element);
-					ctrl_method_element.setText(linkedString);
-				}
 				viewer.refresh();
 			}
 
@@ -765,13 +675,13 @@ public class WorkBreakdownElementGeneralSection extends
 						return name;
 					}
 					if (i == 2) {
-						if (wo.getLinkType() == WorkOrderType.FINISH_TO_FINISH)
+						if (wo.getLinkType().getValue() == WorkOrderType.FINISH_TO_FINISH)
 							return FINISH_TO_FINISH;
-						else if (wo.getLinkType() == WorkOrderType.FINISH_TO_START)
+						else if (wo.getLinkType().getValue() == WorkOrderType.FINISH_TO_START)
 							return FINISH_TO_START;
-						else if (wo.getLinkType() == WorkOrderType.START_TO_START)
+						else if (wo.getLinkType().getValue() == WorkOrderType.START_TO_START)
 							return START_TO_START;
-						else if (wo.getLinkType() == WorkOrderType.START_TO_FINISH)
+						else if (wo.getLinkType().getValue() == WorkOrderType.START_TO_FINISH)
 							return START_TO_FINISH;
 						return wo.getLinkType().getName();
 					}
@@ -892,11 +802,11 @@ public class WorkBreakdownElementGeneralSection extends
 				case ColumnDescriptor.CELL_EDITOR_TYPE_COMBO_BOOLEAN:
 					int value = (((PredecessorMap) element).getWorkOrder())
 							.getLinkType().getValue();
-					if (WorkOrderType.FINISH_TO_START_VALUE == value) {
+					if (WorkOrderType.FINISH_TO_START == value) {
 						return new Integer(0);
-					} else if (WorkOrderType.FINISH_TO_FINISH_VALUE == value) {
+					} else if (WorkOrderType.FINISH_TO_FINISH == value) {
 						return new Integer(1);
-					} else if (WorkOrderType.START_TO_START_VALUE == value) {
+					} else if (WorkOrderType.START_TO_START == value) {
 						return new Integer(2);
 					} else
 						return new Integer(3);
@@ -1012,13 +922,13 @@ public class WorkBreakdownElementGeneralSection extends
 					}					
 										
 					if (index == 0) {
-						type = WorkOrderType.FINISH_TO_START;
+						type = WorkOrderType.FINISH_TO_START_LITERAL;
 					} else if (index == 1) {
-						type = WorkOrderType.FINISH_TO_FINISH;
+						type = WorkOrderType.FINISH_TO_FINISH_LITERAL;
 					} else if (index == 2) {
-						type = WorkOrderType.START_TO_START;
+						type = WorkOrderType.START_TO_START_LITERAL;
 					} else {
-						type = WorkOrderType.START_TO_FINISH;
+						type = WorkOrderType.START_TO_FINISH_LITERAL;
 					}
 					
 					if (removed && wbeCopy != null) {					
@@ -1042,7 +952,7 @@ public class WorkBreakdownElementGeneralSection extends
 					break;
 
 				default:
-					type = WorkOrderType.FINISH_TO_FINISH;
+					type = WorkOrderType.FINISH_TO_FINISH_LITERAL;
 				}
 
 				viewer.refresh();
@@ -1265,18 +1175,4 @@ public class WorkBreakdownElementGeneralSection extends
 
 		return false;
 	}
-	
-	private String getLinkedElementName(MethodElement element) {
-		MethodElement linkedElement = PropUtil.getPropUtil().getLinkedElement(element);
-		return linkedElement == null ? PropertiesResources.Process_None : TngUtil.getLabelWithPath(linkedElement);
-	}
-		
-	private boolean accpetLink() {
-		if (! ProcessUtil.isSynFree()) {
-			return false;
-		}
-		ModifiedTypeMeta linedMeta = TypeDefUtil.getLinkedMdtMeta(element);
-		return linedMeta == null ? false : true;
-	}
-		
 }

@@ -11,11 +11,8 @@
 package org.eclipse.epf.library.edit.process.command;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -27,12 +24,12 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
+import org.eclipse.epf.common.utils.StrUtil;
 import org.eclipse.epf.library.edit.IConfigurationApplicator;
 import org.eclipse.epf.library.edit.Providers;
 import org.eclipse.epf.library.edit.command.BatchCommand;
 import org.eclipse.epf.library.edit.process.BreakdownElementWrapperItemProvider;
 import org.eclipse.epf.library.edit.ui.UserInteractionHelper;
-import org.eclipse.epf.library.edit.util.LibraryEditUtil;
 import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.library.edit.util.Suppression;
 import org.eclipse.epf.library.edit.util.TngUtil;
@@ -40,7 +37,6 @@ import org.eclipse.epf.uma.Activity;
 import org.eclipse.epf.uma.Deliverable;
 import org.eclipse.epf.uma.Descriptor;
 import org.eclipse.epf.uma.MethodConfiguration;
-import org.eclipse.epf.uma.MethodElement;
 import org.eclipse.epf.uma.Process;
 import org.eclipse.epf.uma.Role;
 import org.eclipse.epf.uma.RoleDescriptor;
@@ -60,27 +56,10 @@ import org.eclipse.epf.uma.util.AssociationHelper;
  * @since 1.0
  */
 public final class ProcessCommandUtil {
-	public static final Set<EReference> CONTENT_ELEMENT_GUIDANCE_REFERENCES = Collections.unmodifiableSet(new HashSet<EReference>(Arrays.asList(new EReference[] {
-			// guidance
-			UmaPackage.eINSTANCE.getContentElement_Checklists(),
-			UmaPackage.eINSTANCE.getContentElement_ConceptsAndPapers(),
-			UmaPackage.eINSTANCE.getContentElement_Examples(),
-			UmaPackage.eINSTANCE.getContentElement_Guidelines(),
-			UmaPackage.eINSTANCE.getContentElement_Assets(),
-			UmaPackage.eINSTANCE.getContentElement_SupportingMaterials()
-	})));
-
 	public static final EStructuralFeature[] DESCRIPTOR_REFRESHABLE_FEATURES = {
 		// UmaPackage.eINSTANCE.getNamedElement_Name(),
-		// UmaPackage.eINSTANCE.getMethodElement_PresentationName(),
-		UmaPackage.eINSTANCE.getMethodElement_BriefDescription(),
-		// guidance
-//		UmaPackage.eINSTANCE.getBreakdownElement_Checklists(),
-//		UmaPackage.eINSTANCE.getBreakdownElement_Concepts(),
-//		UmaPackage.eINSTANCE.getBreakdownElement_Examples(),
-//		UmaPackage.eINSTANCE.getBreakdownElement_Guidelines(),
-//		UmaPackage.eINSTANCE.getBreakdownElement_ReusableAssets(),
-//		UmaPackage.eINSTANCE.getBreakdownElement_SupportingMaterials()
+		// UmaPackage.eINSTANCE.getDescribableElement_PresentationName(),
+		UmaPackage.eINSTANCE.getMethodElement_BriefDescription() 
 	};
 
 	public static final EStructuralFeature[] TASK_DESCRIPTOR_REFRESHABLE_FEATURES = {
@@ -250,13 +229,7 @@ public final class ProcessCommandUtil {
 			}
 
 			Object elementObj = ProcessUtil.getAssociatedElement(desc);
-			
-			if (Providers.getConfigurationApplicator() == null) {	//ConfigurationHelper.serverMode == true
-				elementObj = LibraryEditUtil.getInstance().getCalcualtedElement((MethodElement) elementObj, config);				
-			} else {	
-				elementObj = Providers.getConfigurationApplicator().resolve(elementObj, config);
-			}
-			
+			elementObj = Providers.getConfigurationApplicator().resolve(elementObj, config);
 			return element == elementObj;
 		}
 		return false;
@@ -306,36 +279,6 @@ public final class ProcessCommandUtil {
 			}
 		}
 		return null;
-	}
-	
-	/**
-	 * Gets the local descriptor, preferably unsuppressed one, of the given role, task, or workProduct.
-	 * 
-	 * @param obj
-	 * @param activity
-	 * @param config
-	 * @return
-	 */
-	public static Object getBestDescriptor(Object obj, Activity activity, MethodConfiguration config) {
-		List<?> descriptorList = activity.getBreakdownElements();
-		int size = descriptorList.size();
-		Descriptor descriptor = null;
-		for (int j = 0; j < size; j++) {
-			// iterate thru list to see whether a valid descriptor linked with the given object
-			// already exists
-			//
-			Object object = descriptorList.get(j);
-			if(isValidDescriptorOf(obj, config, object, false)) {
-				Descriptor desc = (Descriptor) object;
-				if(!desc.getSuppressed()) {
-					return desc;
-				} else if (descriptor == null) {
-					descriptor = desc;
-				}
-			}
-		}
-		return descriptor;
-
 	}
 	
 	/**
@@ -399,7 +342,7 @@ public final class ProcessCommandUtil {
 					boolean isNewDescriptor = false;
 					// check for roledescriptor whether it's present in activity
 					// breakdown elements
-					RoleDescriptor roleDesc = (RoleDescriptor) getBestDescriptor(
+					RoleDescriptor roleDesc = (RoleDescriptor) getDescriptor(
 							role, activity, config);
 					if (roleDesc == null) {
 						// check for roledescriptor whether it's present in base
@@ -493,7 +436,7 @@ public final class ProcessCommandUtil {
 					if (TngUtil.isContributor(wpObj)) {
 						wpObj = (WorkProduct) TngUtil.getBase(wpObj);
 					}
-					WorkProductDescriptor wpDesc = (WorkProductDescriptor) getBestDescriptor(wpObj, activity, config);
+					WorkProductDescriptor wpDesc = (WorkProductDescriptor) getDescriptor(wpObj, activity, config);
 					if (wpDesc == null) {
 	
 						// get inherited work product descriptors
@@ -503,7 +446,7 @@ public final class ProcessCommandUtil {
 							wpDesc = (WorkProductDescriptor) getDescriptor(wpObj, wpDescriptors, config);
 							if (wpDesc == null) {
 								wpDesc = ProcessCommandUtil.createWorkProductDescriptor(wpObj,
-										config, wpdToDeliverablePartsMap, true);
+										config, wpdToDeliverablePartsMap);
 								wpDescriptors.add(wpDesc);
 	
 								// automatic adding to the existing deliverable
@@ -572,27 +515,6 @@ public final class ProcessCommandUtil {
 			Map wpdToDeliverablePartsMap, Map wpdToDeliverableDescriptorMap,
 			Set descriptorsToRefresh, Map descriptorToNewFeatureValuesMap,
 			MethodConfiguration config, boolean useExistingDescriptor, Set synchFeatures) {
-		
-		return createTaskDescriptor(
-				task,
-				null,
-				activity, 
-				roleDescriptors, 
-				wpDescriptors,
-				wpdToDeliverablePartsMap, 
-				wpdToDeliverableDescriptorMap,
-				descriptorsToRefresh, 
-				descriptorToNewFeatureValuesMap,
-				config, 
-				useExistingDescriptor, 
-				synchFeatures);	
-	}
-	
-	public static TaskDescriptor createTaskDescriptor(Task task, TaskDescriptor taskDescriptorTosyn,
-			Activity activity, List roleDescriptors, List wpDescriptors,
-			Map wpdToDeliverablePartsMap, Map wpdToDeliverableDescriptorMap,
-			Set descriptorsToRefresh, Map descriptorToNewFeatureValuesMap,
-			MethodConfiguration config, boolean useExistingDescriptor, Set synchFeatures) {
 		if (TngUtil.isContributor(task)) {
 			task = (Task) TngUtil.getBase(task);
 		}
@@ -600,11 +522,8 @@ public final class ProcessCommandUtil {
 		// create task descriptor object
 		//
 		TaskDescriptor taskDesc = null;
-		if (useExistingDescriptor) {
-			taskDesc = taskDescriptorTosyn == null ? 
-					(TaskDescriptor) getBestDescriptor(task, activity, config) :
-						taskDescriptorTosyn;
-		}
+		if (useExistingDescriptor)
+			taskDesc = 	(TaskDescriptor) getDescriptor(task, activity, config);
 		boolean isNewTaskDescriptor = false;
 	
 		// if ( taskDesc != null )
@@ -614,7 +533,7 @@ public final class ProcessCommandUtil {
 		// taskDesc = createTaskDescriptor(task);
 	
 		if (taskDesc == null) {
-			taskDesc = ProcessCommandUtil.createTaskDescriptor(task, config);
+			taskDesc = ProcessCommandUtil.createTaskDescriptor(task);
 			isNewTaskDescriptor = true;
 		} else {
 			if (descriptorsToRefresh != null && taskDesc.getIsSynchronizedWithSource().booleanValue()) {
@@ -648,51 +567,46 @@ public final class ProcessCommandUtil {
 		// }
 	
 		if (roleDescriptors != null) {
-			// get/create role descriptor for primary performers
+			// get/create role descriptor for primary performer
 			//
 			EReference ref = UmaPackage.eINSTANCE.getTask_PerformedBy();
-			List primaryPerformers = synchFeatures.contains(ref) ? (List) configApplicator.getReference(task,
+			Role role = synchFeatures.contains(ref) ? (Role) configApplicator.getReference(task,
 					ref, config) : null;
-			if (primaryPerformers != null) {
-				for (int j = 0; j < primaryPerformers.size(); j++) {
-					Role role = (Role) primaryPerformers.get(j);
-					if (role != null) {
-						// if (TngUtil.isContributor(role)) {
-						// role = (Role) TngUtil.getBase(role);
-						// }
-			
-						// check for local descriptor
-						RoleDescriptor primaryRoleDesc = (RoleDescriptor) getBestDescriptor(
-								role, activity, config);
-						boolean isNewRoleDescriptor = false;
+			if (role != null) {
+				// if (TngUtil.isContributor(role)) {
+				// role = (Role) TngUtil.getBase(role);
+				// }
+	
+				// check for local descriptor
+				RoleDescriptor primaryRoleDesc = (RoleDescriptor) getDescriptor(
+						role, activity, config);
+				boolean isNewRoleDescriptor = false;
+				if (primaryRoleDesc == null) {
+					// check for inherited descriptor
+					primaryRoleDesc = (RoleDescriptor) ProcessCommandUtil.getInheritedDescriptor(
+							role, activity, config);
+					if (primaryRoleDesc == null) {
+						// check for descriptor in passed in descriptor list
+						primaryRoleDesc = (RoleDescriptor) getDescriptor(role,
+								roleDescriptors, config);
 						if (primaryRoleDesc == null) {
-							// check for inherited descriptor
-							primaryRoleDesc = (RoleDescriptor) ProcessCommandUtil.getInheritedDescriptor(
-									role, activity, config);
-							if (primaryRoleDesc == null) {
-								// check for descriptor in passed in descriptor list
-								primaryRoleDesc = (RoleDescriptor) getDescriptor(role,
-										roleDescriptors, config);
-								if (primaryRoleDesc == null) {
-									primaryRoleDesc = ProcessUtil.createRoleDescriptor(role, true);
-									isNewRoleDescriptor = true;
-									roleDescriptors.add(primaryRoleDesc);
-								}
-							}
-						}
-						if (descriptorsToRefresh != null && !isNewRoleDescriptor
-								&& primaryRoleDesc.getIsSynchronizedWithSource().booleanValue()) {
-							descriptorsToRefresh.add(primaryRoleDesc);
-						}
-						if (isNewTaskDescriptor && isNewRoleDescriptor) {
-							taskDesc.getPerformedPrimarilyBy().add(primaryRoleDesc);
-						} else {
-							BatchCommand.addFeatureValue(descriptorToNewFeatureValuesMap, taskDesc,
-									UmaPackage.eINSTANCE
-											.getTaskDescriptor_PerformedPrimarilyBy(),
-									primaryRoleDesc);
+							primaryRoleDesc = ProcessUtil.createRoleDescriptor(role);
+							isNewRoleDescriptor = true;
+							roleDescriptors.add(primaryRoleDesc);
 						}
 					}
+				}
+				if (descriptorsToRefresh != null && !isNewRoleDescriptor
+						&& primaryRoleDesc.getIsSynchronizedWithSource().booleanValue()) {
+					descriptorsToRefresh.add(primaryRoleDesc);
+				}
+				if (isNewTaskDescriptor && isNewRoleDescriptor) {
+					taskDesc.setPerformedPrimarilyBy(primaryRoleDesc);
+				} else {
+					BatchCommand.addFeatureValue(descriptorToNewFeatureValuesMap, taskDesc,
+							UmaPackage.eINSTANCE
+									.getTaskDescriptor_PerformedPrimarilyBy(),
+							primaryRoleDesc);
 				}
 			}
 	
@@ -705,7 +619,7 @@ public final class ProcessCommandUtil {
 				for (int j = 0; j < additionalPerformers.size(); j++) {
 					Role roleObj = (Role) additionalPerformers.get(j);
 					// check for local descriptor
-					RoleDescriptor roleDesc = (RoleDescriptor) getBestDescriptor(
+					RoleDescriptor roleDesc = (RoleDescriptor) getDescriptor(
 							roleObj, activity, config);
 					boolean isNewRoleDescriptor = false;
 					if (roleDesc == null) {
@@ -716,7 +630,7 @@ public final class ProcessCommandUtil {
 							roleDesc = (RoleDescriptor) getDescriptor(roleObj,
 									roleDescriptors, config);
 							if (roleDesc == null) {
-								roleDesc = ProcessUtil.createRoleDescriptor(roleObj, true);
+								roleDesc = ProcessUtil.createRoleDescriptor(roleObj);
 								isNewRoleDescriptor = true;
 								roleDescriptors.add(roleDesc);
 							}
@@ -785,17 +699,13 @@ public final class ProcessCommandUtil {
 		return null;
 	}
 
-	private static TaskDescriptor createTaskDescriptor(Task task, MethodConfiguration config) {
+	private static TaskDescriptor createTaskDescriptor(Task task) {
 		TaskDescriptor taskDesc = UmaFactory.eINSTANCE.createTaskDescriptor();
 		taskDesc.setTask(task);
 		taskDesc.setName(task.getName());
-//		taskDesc.setPresentationName(StrUtil
-//				.isBlank(task.getPresentationName()) ? task.getName() : task
-//				.getPresentationName());
-		
-		String pName = LibraryEditUtil.getInstance().getPresentationName(task, config);
-		taskDesc.setPresentationName(pName);
-			
+		taskDesc.setPresentationName(StrUtil
+				.isBlank(task.getPresentationName()) ? task.getName() : task
+				.getPresentationName());
 		// taskDesc.setBriefDescription(task.getBriefDescription());
 		return taskDesc;
 	}
@@ -851,12 +761,6 @@ public final class ProcessCommandUtil {
 		}
 	}
 
-	public static WorkProductDescriptor createWorkProductDescriptor(
-			WorkProduct wp, MethodConfiguration config,
-			Map wpDescToDeliverableParts) {
-		return createWorkProductDescriptor(wp, config, wpDescToDeliverableParts, false);
-	}
-	
 	/**
 	 * Creates work product descriptor for the given work product
 	 * 
@@ -870,8 +774,8 @@ public final class ProcessCommandUtil {
 	 */
 	public static WorkProductDescriptor createWorkProductDescriptor(
 			WorkProduct wp, MethodConfiguration config,
-			Map wpDescToDeliverableParts, boolean isDynamic) {
-		WorkProductDescriptor wpd = ProcessUtil.createWorkProductDescriptor(wp, isDynamic);
+			Map wpDescToDeliverableParts) {
+		WorkProductDescriptor wpd = ProcessUtil.createWorkProductDescriptor(wp);
 		if (wp instanceof Deliverable && wpDescToDeliverableParts != null) {
 			createDeliverableParts(wpd, (Deliverable) wp, config,
 					wpDescToDeliverableParts, null);
@@ -887,18 +791,15 @@ public final class ProcessCommandUtil {
 	 * @param activity
 	 * @return descriptor of the object, null if not exists
 	 */
-	public static Object getInheritedDescriptor(Object obj, Activity activity, MethodConfiguration config) {	
-//		if (ProcessUtil.isSynFree()) {
-//			return null;
-//		}
+	public static Object getInheritedDescriptor(Object obj, Activity activity, MethodConfiguration config) {
 		for (VariabilityType variabilityType = activity.getVariabilityType();
-			variabilityType == VariabilityType.EXTENDS || variabilityType == VariabilityType.LOCAL_CONTRIBUTION;
+			variabilityType == VariabilityType.EXTENDS_LITERAL || variabilityType == VariabilityType.LOCAL_CONTRIBUTION_LITERAL;
 			variabilityType = activity.getVariabilityType()) {
 			VariabilityElement element = activity.getVariabilityBasedOnElement();
 	
 			if (element instanceof Activity) {
 				Activity baseActivity = (Activity) element;
-				Object desc = getBestDescriptor(obj, baseActivity, config);
+				Object desc = getDescriptor(obj, baseActivity.getBreakdownElements(), config, false);
 				if(desc != null) {
 					return desc;
 				}
@@ -946,5 +847,4 @@ public final class ProcessCommandUtil {
 		}
 		return featuresMap;
 	}
-
 }

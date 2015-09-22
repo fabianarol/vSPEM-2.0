@@ -41,6 +41,13 @@ import org.eclipse.epf.uma.WorkProduct;
  */
 public class DomainImpl extends ContentCategoryImpl implements Domain {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The cached value of the '{@link #getWorkProducts() <em>Work Products</em>}' reference list.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -48,7 +55,7 @@ public class DomainImpl extends ContentCategoryImpl implements Domain {
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<WorkProduct> workProducts;
+	protected EList workProducts = null;
 
 	/**
 	 * The cached value of the '{@link #getSubdomains() <em>Subdomains</em>}' containment reference list.
@@ -58,7 +65,7 @@ public class DomainImpl extends ContentCategoryImpl implements Domain {
 	 * @generated
 	 * @ordered
 	 */
-	protected EList<Domain> subdomains;
+	protected EList subdomains = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -70,7 +77,7 @@ public class DomainImpl extends ContentCategoryImpl implements Domain {
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -78,7 +85,6 @@ public class DomainImpl extends ContentCategoryImpl implements Domain {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.DOMAIN;
 	}
@@ -88,10 +94,10 @@ public class DomainImpl extends ContentCategoryImpl implements Domain {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<WorkProduct> getWorkProducts() {
+	public List getWorkProducts() {
 		if (workProducts == null) {
-			workProducts = new EObjectResolvingEList<WorkProduct>(
-					WorkProduct.class, this, UmaPackage.DOMAIN__WORK_PRODUCTS);
+			workProducts = new EObjectResolvingEList(WorkProduct.class, this,
+					UmaPackage.DOMAIN__WORK_PRODUCTS);
 		}
 		return workProducts;
 	}
@@ -101,10 +107,10 @@ public class DomainImpl extends ContentCategoryImpl implements Domain {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	public List<Domain> getSubdomains() {
+	public List getSubdomains() {
 		if (subdomains == null) {
-			subdomains = new EObjectContainmentEList.Resolving<Domain>(
-					Domain.class, this, UmaPackage.DOMAIN__SUBDOMAINS);
+			subdomains = new EObjectContainmentEList.Resolving(Domain.class,
+					this, UmaPackage.DOMAIN__SUBDOMAINS);
 		}
 		return subdomains;
 	}
@@ -114,13 +120,12 @@ public class DomainImpl extends ContentCategoryImpl implements Domain {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd,
 			int featureID, NotificationChain msgs) {
 		switch (featureID) {
 		case UmaPackage.DOMAIN__SUBDOMAINS:
-			return ((InternalEList<?>) getSubdomains()).basicRemove(otherEnd,
-					msgs);
+			return ((InternalEList) getSubdomains())
+					.basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -130,7 +135,6 @@ public class DomainImpl extends ContentCategoryImpl implements Domain {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.DOMAIN__WORK_PRODUCTS:
@@ -146,18 +150,15 @@ public class DomainImpl extends ContentCategoryImpl implements Domain {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.DOMAIN__WORK_PRODUCTS:
 			getWorkProducts().clear();
-			getWorkProducts().addAll(
-					(Collection<? extends WorkProduct>) newValue);
+			getWorkProducts().addAll((Collection) newValue);
 			return;
 		case UmaPackage.DOMAIN__SUBDOMAINS:
 			getSubdomains().clear();
-			getSubdomains().addAll((Collection<? extends Domain>) newValue);
+			getSubdomains().addAll((Collection) newValue);
 			return;
 		}
 		super.eSet(featureID, newValue);
@@ -168,7 +169,6 @@ public class DomainImpl extends ContentCategoryImpl implements Domain {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.DOMAIN__WORK_PRODUCTS:
@@ -186,7 +186,6 @@ public class DomainImpl extends ContentCategoryImpl implements Domain {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);

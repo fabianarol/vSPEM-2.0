@@ -1,25 +1,14 @@
-/*******************************************************************************
- * Copyright (c) 2005, 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+/**
+ * <copyright>
+ * </copyright>
  *
- * Contributors:
- * IBM Corporation - initial implementation
- *******************************************************************************/
+ * $Id: BreakdownElementImpl.java,v 1.4 2007/06/05 21:14:59 klow Exp $
+ */
 package org.eclipse.epf.xml.uma.impl;
 
-import java.util.Collection;
 import org.eclipse.emf.common.notify.Notification;
-import org.eclipse.emf.common.notify.NotificationChain;
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EClass;
-import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
-import org.eclipse.emf.ecore.util.BasicFeatureMap;
-import org.eclipse.emf.ecore.util.FeatureMap;
-import org.eclipse.emf.ecore.util.InternalEList;
 import org.eclipse.epf.xml.uma.BreakdownElement;
 import org.eclipse.epf.xml.uma.UmaPackage;
 
@@ -34,14 +23,6 @@ import org.eclipse.epf.xml.uma.UmaPackage;
  *   <li>{@link org.eclipse.epf.xml.uma.impl.BreakdownElementImpl#getPresentedBefore <em>Presented Before</em>}</li>
  *   <li>{@link org.eclipse.epf.xml.uma.impl.BreakdownElementImpl#getPlanningData <em>Planning Data</em>}</li>
  *   <li>{@link org.eclipse.epf.xml.uma.impl.BreakdownElementImpl#getSuperActivity <em>Super Activity</em>}</li>
- *   <li>{@link org.eclipse.epf.xml.uma.impl.BreakdownElementImpl#getGroup1 <em>Group1</em>}</li>
- *   <li>{@link org.eclipse.epf.xml.uma.impl.BreakdownElementImpl#getChecklist <em>Checklist</em>}</li>
- *   <li>{@link org.eclipse.epf.xml.uma.impl.BreakdownElementImpl#getConcept <em>Concept</em>}</li>
- *   <li>{@link org.eclipse.epf.xml.uma.impl.BreakdownElementImpl#getExample <em>Example</em>}</li>
- *   <li>{@link org.eclipse.epf.xml.uma.impl.BreakdownElementImpl#getGuideline <em>Guideline</em>}</li>
- *   <li>{@link org.eclipse.epf.xml.uma.impl.BreakdownElementImpl#getReusableAsset <em>Reusable Asset</em>}</li>
- *   <li>{@link org.eclipse.epf.xml.uma.impl.BreakdownElementImpl#getSupportingMaterial <em>Supporting Material</em>}</li>
- *   <li>{@link org.eclipse.epf.xml.uma.impl.BreakdownElementImpl#getWhitepaper <em>Whitepaper</em>}</li>
  *   <li>{@link org.eclipse.epf.xml.uma.impl.BreakdownElementImpl#isHasMultipleOccurrences <em>Has Multiple Occurrences</em>}</li>
  *   <li>{@link org.eclipse.epf.xml.uma.impl.BreakdownElementImpl#isIsOptional <em>Is Optional</em>}</li>
  *   <li>{@link org.eclipse.epf.xml.uma.impl.BreakdownElementImpl#isIsPlanned <em>Is Planned</em>}</li>
@@ -131,16 +112,6 @@ public class BreakdownElementImpl extends ProcessElementImpl implements Breakdow
 	 * @ordered
 	 */
 	protected String superActivity = SUPER_ACTIVITY_EDEFAULT;
-
-	/**
-	 * The cached value of the '{@link #getGroup1() <em>Group1</em>}' attribute list.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @see #getGroup1()
-	 * @generated
-	 * @ordered
-	 */
-	protected FeatureMap group1;
 
 	/**
 	 * The default value of the '{@link #isHasMultipleOccurrences() <em>Has Multiple Occurrences</em>}' attribute.
@@ -263,7 +234,6 @@ public class BreakdownElementImpl extends ProcessElementImpl implements Breakdow
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.BREAKDOWN_ELEMENT;
 	}
@@ -350,81 +320,6 @@ public class BreakdownElementImpl extends ProcessElementImpl implements Breakdow
 		superActivity = newSuperActivity;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, UmaPackage.BREAKDOWN_ELEMENT__SUPER_ACTIVITY, oldSuperActivity, superActivity));
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public FeatureMap getGroup1() {
-		if (group1 == null) {
-			group1 = new BasicFeatureMap(this, UmaPackage.BREAKDOWN_ELEMENT__GROUP1);
-		}
-		return group1;
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<String> getChecklist() {
-		return getGroup1().list(UmaPackage.Literals.BREAKDOWN_ELEMENT__CHECKLIST);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<String> getConcept() {
-		return getGroup1().list(UmaPackage.Literals.BREAKDOWN_ELEMENT__CONCEPT);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<String> getExample() {
-		return getGroup1().list(UmaPackage.Literals.BREAKDOWN_ELEMENT__EXAMPLE);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<String> getGuideline() {
-		return getGroup1().list(UmaPackage.Literals.BREAKDOWN_ELEMENT__GUIDELINE);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<String> getReusableAsset() {
-		return getGroup1().list(UmaPackage.Literals.BREAKDOWN_ELEMENT__REUSABLE_ASSET);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<String> getSupportingMaterial() {
-		return getGroup1().list(UmaPackage.Literals.BREAKDOWN_ELEMENT__SUPPORTING_MATERIAL);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	public EList<String> getWhitepaper() {
-		return getGroup1().list(UmaPackage.Literals.BREAKDOWN_ELEMENT__WHITEPAPER);
 	}
 
 	/**
@@ -591,21 +486,6 @@ public class BreakdownElementImpl extends ProcessElementImpl implements Breakdow
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
-	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
-		switch (featureID) {
-			case UmaPackage.BREAKDOWN_ELEMENT__GROUP1:
-				return ((InternalEList<?>)getGroup1()).basicRemove(otherEnd, msgs);
-		}
-		return super.eInverseRemove(otherEnd, featureID, msgs);
-	}
-
-	/**
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 			case UmaPackage.BREAKDOWN_ELEMENT__PRESENTED_AFTER:
@@ -616,23 +496,6 @@ public class BreakdownElementImpl extends ProcessElementImpl implements Breakdow
 				return getPlanningData();
 			case UmaPackage.BREAKDOWN_ELEMENT__SUPER_ACTIVITY:
 				return getSuperActivity();
-			case UmaPackage.BREAKDOWN_ELEMENT__GROUP1:
-				if (coreType) return getGroup1();
-				return ((FeatureMap.Internal)getGroup1()).getWrapper();
-			case UmaPackage.BREAKDOWN_ELEMENT__CHECKLIST:
-				return getChecklist();
-			case UmaPackage.BREAKDOWN_ELEMENT__CONCEPT:
-				return getConcept();
-			case UmaPackage.BREAKDOWN_ELEMENT__EXAMPLE:
-				return getExample();
-			case UmaPackage.BREAKDOWN_ELEMENT__GUIDELINE:
-				return getGuideline();
-			case UmaPackage.BREAKDOWN_ELEMENT__REUSABLE_ASSET:
-				return getReusableAsset();
-			case UmaPackage.BREAKDOWN_ELEMENT__SUPPORTING_MATERIAL:
-				return getSupportingMaterial();
-			case UmaPackage.BREAKDOWN_ELEMENT__WHITEPAPER:
-				return getWhitepaper();
 			case UmaPackage.BREAKDOWN_ELEMENT__HAS_MULTIPLE_OCCURRENCES:
 				return isHasMultipleOccurrences() ? Boolean.TRUE : Boolean.FALSE;
 			case UmaPackage.BREAKDOWN_ELEMENT__IS_OPTIONAL:
@@ -650,8 +513,6 @@ public class BreakdownElementImpl extends ProcessElementImpl implements Breakdow
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@SuppressWarnings("unchecked")
-		@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 			case UmaPackage.BREAKDOWN_ELEMENT__PRESENTED_AFTER:
@@ -665,37 +526,6 @@ public class BreakdownElementImpl extends ProcessElementImpl implements Breakdow
 				return;
 			case UmaPackage.BREAKDOWN_ELEMENT__SUPER_ACTIVITY:
 				setSuperActivity((String)newValue);
-				return;
-			case UmaPackage.BREAKDOWN_ELEMENT__GROUP1:
-				((FeatureMap.Internal)getGroup1()).set(newValue);
-				return;
-			case UmaPackage.BREAKDOWN_ELEMENT__CHECKLIST:
-				getChecklist().clear();
-				getChecklist().addAll((Collection<? extends String>)newValue);
-				return;
-			case UmaPackage.BREAKDOWN_ELEMENT__CONCEPT:
-				getConcept().clear();
-				getConcept().addAll((Collection<? extends String>)newValue);
-				return;
-			case UmaPackage.BREAKDOWN_ELEMENT__EXAMPLE:
-				getExample().clear();
-				getExample().addAll((Collection<? extends String>)newValue);
-				return;
-			case UmaPackage.BREAKDOWN_ELEMENT__GUIDELINE:
-				getGuideline().clear();
-				getGuideline().addAll((Collection<? extends String>)newValue);
-				return;
-			case UmaPackage.BREAKDOWN_ELEMENT__REUSABLE_ASSET:
-				getReusableAsset().clear();
-				getReusableAsset().addAll((Collection<? extends String>)newValue);
-				return;
-			case UmaPackage.BREAKDOWN_ELEMENT__SUPPORTING_MATERIAL:
-				getSupportingMaterial().clear();
-				getSupportingMaterial().addAll((Collection<? extends String>)newValue);
-				return;
-			case UmaPackage.BREAKDOWN_ELEMENT__WHITEPAPER:
-				getWhitepaper().clear();
-				getWhitepaper().addAll((Collection<? extends String>)newValue);
 				return;
 			case UmaPackage.BREAKDOWN_ELEMENT__HAS_MULTIPLE_OCCURRENCES:
 				setHasMultipleOccurrences(((Boolean)newValue).booleanValue());
@@ -718,7 +548,6 @@ public class BreakdownElementImpl extends ProcessElementImpl implements Breakdow
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 			case UmaPackage.BREAKDOWN_ELEMENT__PRESENTED_AFTER:
@@ -732,30 +561,6 @@ public class BreakdownElementImpl extends ProcessElementImpl implements Breakdow
 				return;
 			case UmaPackage.BREAKDOWN_ELEMENT__SUPER_ACTIVITY:
 				setSuperActivity(SUPER_ACTIVITY_EDEFAULT);
-				return;
-			case UmaPackage.BREAKDOWN_ELEMENT__GROUP1:
-				getGroup1().clear();
-				return;
-			case UmaPackage.BREAKDOWN_ELEMENT__CHECKLIST:
-				getChecklist().clear();
-				return;
-			case UmaPackage.BREAKDOWN_ELEMENT__CONCEPT:
-				getConcept().clear();
-				return;
-			case UmaPackage.BREAKDOWN_ELEMENT__EXAMPLE:
-				getExample().clear();
-				return;
-			case UmaPackage.BREAKDOWN_ELEMENT__GUIDELINE:
-				getGuideline().clear();
-				return;
-			case UmaPackage.BREAKDOWN_ELEMENT__REUSABLE_ASSET:
-				getReusableAsset().clear();
-				return;
-			case UmaPackage.BREAKDOWN_ELEMENT__SUPPORTING_MATERIAL:
-				getSupportingMaterial().clear();
-				return;
-			case UmaPackage.BREAKDOWN_ELEMENT__WHITEPAPER:
-				getWhitepaper().clear();
 				return;
 			case UmaPackage.BREAKDOWN_ELEMENT__HAS_MULTIPLE_OCCURRENCES:
 				unsetHasMultipleOccurrences();
@@ -778,7 +583,6 @@ public class BreakdownElementImpl extends ProcessElementImpl implements Breakdow
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 			case UmaPackage.BREAKDOWN_ELEMENT__PRESENTED_AFTER:
@@ -789,22 +593,6 @@ public class BreakdownElementImpl extends ProcessElementImpl implements Breakdow
 				return PLANNING_DATA_EDEFAULT == null ? planningData != null : !PLANNING_DATA_EDEFAULT.equals(planningData);
 			case UmaPackage.BREAKDOWN_ELEMENT__SUPER_ACTIVITY:
 				return SUPER_ACTIVITY_EDEFAULT == null ? superActivity != null : !SUPER_ACTIVITY_EDEFAULT.equals(superActivity);
-			case UmaPackage.BREAKDOWN_ELEMENT__GROUP1:
-				return group1 != null && !group1.isEmpty();
-			case UmaPackage.BREAKDOWN_ELEMENT__CHECKLIST:
-				return !getChecklist().isEmpty();
-			case UmaPackage.BREAKDOWN_ELEMENT__CONCEPT:
-				return !getConcept().isEmpty();
-			case UmaPackage.BREAKDOWN_ELEMENT__EXAMPLE:
-				return !getExample().isEmpty();
-			case UmaPackage.BREAKDOWN_ELEMENT__GUIDELINE:
-				return !getGuideline().isEmpty();
-			case UmaPackage.BREAKDOWN_ELEMENT__REUSABLE_ASSET:
-				return !getReusableAsset().isEmpty();
-			case UmaPackage.BREAKDOWN_ELEMENT__SUPPORTING_MATERIAL:
-				return !getSupportingMaterial().isEmpty();
-			case UmaPackage.BREAKDOWN_ELEMENT__WHITEPAPER:
-				return !getWhitepaper().isEmpty();
 			case UmaPackage.BREAKDOWN_ELEMENT__HAS_MULTIPLE_OCCURRENCES:
 				return isSetHasMultipleOccurrences();
 			case UmaPackage.BREAKDOWN_ELEMENT__IS_OPTIONAL:
@@ -822,7 +610,6 @@ public class BreakdownElementImpl extends ProcessElementImpl implements Breakdow
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy()) return super.toString();
 
@@ -835,8 +622,6 @@ public class BreakdownElementImpl extends ProcessElementImpl implements Breakdow
 		result.append(planningData);
 		result.append(", superActivity: ");
 		result.append(superActivity);
-		result.append(", group1: ");
-		result.append(group1);
 		result.append(", hasMultipleOccurrences: ");
 		if (hasMultipleOccurrencesESet) result.append(hasMultipleOccurrences); else result.append("<unset>");
 		result.append(", isOptional: ");

@@ -21,7 +21,6 @@ import org.eclipse.epf.authoring.ui.AuthoringUIHelpContexts;
 import org.eclipse.epf.authoring.ui.AuthoringUIResources;
 import org.eclipse.epf.authoring.ui.AuthoringUIText;
 import org.eclipse.epf.common.utils.StrUtil;
-import org.eclipse.epf.library.layout.elements.AbstractElementLayout;
 import org.eclipse.epf.library.layout.elements.ActivityLayout;
 import org.eclipse.epf.publishing.services.PublishHTMLOptions;
 import org.eclipse.epf.publishing.services.PublishOptions;
@@ -35,12 +34,10 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -70,10 +67,6 @@ public class SelectPublishingOptionsPage extends BaseWizardPage {
 			.getName();
 
 	protected Shell shell;
-	
-	protected Composite composite;
-	
-	protected Group layoutGroup;
 
 	protected Text titleText;
 
@@ -102,16 +95,10 @@ public class SelectPublishingOptionsPage extends BaseWizardPage {
 	protected Button publishLightWeightTreeCheckbox;
 
 	protected Button extraDescriptorInfoCtr;
-	
-	protected Button showLinkedPageForDescriptorCtr;
 
 	protected Button showRelatedDescriptors;
-	
-	protected Button showRelatedDescriptorsOption;
 
 	protected Button showDescriptorsInNavigationTree;
-	
-	protected Button showRelatedLinks;
 
 	protected ComboViewer activityTabViewer;
 
@@ -119,7 +106,7 @@ public class SelectPublishingOptionsPage extends BaseWizardPage {
 
 	protected List<MethodConfiguration> selectedConfigs = new ArrayList<MethodConfiguration>();
 
-	public static Map<String, String> activityTabMap = new TreeMap<String, String>();
+	protected static Map<String, String> activityTabMap = new TreeMap<String, String>();
 
 	static {
 		activityTabMap.put(ActivityLayout.TAB_NAME_ACTIVITY_DESC,
@@ -156,13 +143,7 @@ public class SelectPublishingOptionsPage extends BaseWizardPage {
 	public void createControl(Composite parent) {
 		shell = parent.getShell();
 
-		ScrolledComposite scrolledComposite = new ScrolledComposite(
-				parent, 
-				SWT.V_SCROLL | SWT.H_SCROLL);
-		
-		composite = createGridLayoutComposite(scrolledComposite, 1);
-		
-		scrolledComposite.setContent(composite);
+		Composite composite = createGridLayoutComposite(parent, 1);
 
 		createTitleAndLinksGroup(composite);
 		createGlossaryAndIndexGroup(composite);
@@ -171,20 +152,17 @@ public class SelectPublishingOptionsPage extends BaseWizardPage {
 		createDiagramGenerationGroup(composite);
 		createLayoutGroup(composite);
 
-		Point defaultSize = composite.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		composite.setSize(defaultSize);
-		
 		initControls();
 
 		addListeners();
 
-		setControl(scrolledComposite);
+		setControl(composite);
 
 		PlatformUI
 				.getWorkbench()
 				.getHelpSystem()
 				.setHelp(
-						scrolledComposite,
+						composite,
 						AuthoringUIHelpContexts.CONFIGURATION_PUBLISH_WIZARD_ALL_PAGES_CONTEXT);
 	}
 
@@ -296,14 +274,6 @@ public class SelectPublishingOptionsPage extends BaseWizardPage {
 		return diagramGroup;
 	}
 
-	public Group getLayoutGroup() {
-		return layoutGroup;
-	}
-
-	public void setLayoutGroup(Group layoutGroup) {
-		this.layoutGroup = layoutGroup;
-	}
-
 	/**
 	 * Creates the Layout group.
 	 * 
@@ -312,30 +282,21 @@ public class SelectPublishingOptionsPage extends BaseWizardPage {
 	 * @return the group composite
 	 */
 	protected Group createLayoutGroup(Composite composite) {
-		layoutGroup = createGridLayoutGroup(composite,
+		Group layoutGroup = createGridLayoutGroup(composite,
 				PublishingUIResources.layoutGroup_text, 1);
 
 		publishLightWeightTreeCheckbox = createCheckbox(layoutGroup,
 				PublishingUIResources.publishLightWeightTreeLabel_text);
-
-		showRelatedLinks = createCheckbox(layoutGroup,
-				PublishingUIResources.showRelatedLinks_text);
 
 		showDescriptorsInNavigationTree = createCheckbox(layoutGroup,
 				PublishingUIResources.showDescriptorsInNavigationTree_text);
 
 		extraDescriptorInfoCtr = createCheckbox(layoutGroup,
 				PublishingUIResources.publishExtraDescriptorInfoLabel_text);
-		
-		showLinkedPageForDescriptorCtr = createCheckbox(layoutGroup,
-				PublishingUIResources.showLinkedPageForDescriptorLabel_text);
 
 		showRelatedDescriptors = createCheckbox(layoutGroup,
-				PublishingUIResources.showRelatedDescriptors_text);		
-		Composite descriptorComposite = createChildGridLayoutComposite(layoutGroup, 1);
-		showRelatedDescriptorsOption = createCheckbox(descriptorComposite,
-				PublishingUIResources.showRelatedDescriptors_option_text);
-		
+				PublishingUIResources.showRelatedDescriptors_text);
+
 		Composite activityTabComposite = createGridLayoutComposite(layoutGroup,
 				2);
 		((GridLayout) activityTabComposite.getLayout()).marginTop = -5;
@@ -411,24 +372,8 @@ public class SelectPublishingOptionsPage extends BaseWizardPage {
 				.getLightWeightTree(configId));
 		extraDescriptorInfoCtr.setSelection(PublishingUIPreferences
 				.getExtraDescriptorInfo(configId));
-		showLinkedPageForDescriptorCtr.setSelection(PublishingUIPreferences
-				.getShowLinkedElementForDescriptor(configId));
 		showRelatedDescriptors.setSelection(PublishingUIPreferences
 				.getShowRelatedDescriptors(configId));
-		showRelatedLinks.setSelection(PublishingUIPreferences
-				.getShowRelatedLinks(configId));
-		showRelatedDescriptorsOption.setSelection(PublishingUIPreferences
-				.getShowRelatedDescriptorsOption(configId));
-		if (showRelatedDescriptors.getSelection()) {
-			showRelatedDescriptorsOption.setEnabled(true);
-		} else {
-			showRelatedDescriptorsOption.setEnabled(false);
-		}
-		if (showRelatedDescriptorsOption.getSelection()) {
-			AbstractElementLayout.processDescritorsNewOption = true;
-		} else {
-			AbstractElementLayout.processDescritorsNewOption = false;
-		}
 		showDescriptorsInNavigationTree.setSelection(PublishingUIPreferences
 				.getShowDescriptorsInNavigationTree(configId));
 
@@ -483,28 +428,6 @@ public class SelectPublishingOptionsPage extends BaseWizardPage {
 				setPageComplete(isPageComplete());
 			}
 		});
-		
-		showRelatedDescriptors.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				if (showRelatedDescriptors.getSelection()) {
-					showRelatedDescriptorsOption.setEnabled(true);
-				} else {
-					showRelatedDescriptorsOption.setSelection(false);
-					AbstractElementLayout.processDescritorsNewOption = false;
-					showRelatedDescriptorsOption.setEnabled(false);
-				}
-			}
-		});
-		
-		showRelatedDescriptorsOption.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				if (showRelatedDescriptorsOption.getSelection()) {
-					AbstractElementLayout.processDescritorsNewOption = true;
-				} else {
-					AbstractElementLayout.processDescritorsNewOption = false;
-				}
-			}
-		});
 	}
 
 	/**
@@ -520,15 +443,6 @@ public class SelectPublishingOptionsPage extends BaseWizardPage {
 				config = selectedConfig;
 				initControls();
 			}
-		}
-		
-		//resize the content composite in the scrolled parent
-		Point size = composite.getSize();
-		Point parentSize = composite.getParent().getSize();
-		int borderWidth = composite.getParent().getBorderWidth();
-		
-		if(size.x < parentSize.x - 2 * borderWidth){
-			composite.setSize(parentSize.x - 2 * borderWidth, size.y);
 		}
 	}
 
@@ -577,12 +491,14 @@ public class SelectPublishingOptionsPage extends BaseWizardPage {
 		options.setPublishBaseAD(getPublishBaseADSelection());
 		options.setConvertBrokenLinks(getConvertBrokenLinksSelection());
 		options.setPublishLightWeightTree(getPublishLightWeightTreeSelection());
-		options.setShowMethodContentInDescriptors(getShowExtraDescriptorInfoSelection());
-		options.setShowLinkedPageForDescriptor(getShowLinkedPageForDescriptorSelection());
-		options.setShowRelatedDescriptors(showRelatedDescriptors.getSelection());
-		options.setShowRelatedDescriptorsOption(showRelatedDescriptorsOption.getSelection());		
-		options.setShowRelatedLinks(showRelatedLinks.getSelection());
-		options.setShowDescriptorsInNavigationTree(showDescriptorsInNavigationTree.getSelection());
+		options
+				.setShowMethodContentInDescriptors(getShowExtraDescriptorInfoSelection());
+		options
+				.setShowRelatedDescriptors(showRelatedDescriptors
+						.getSelection());
+		options
+				.setShowDescriptorsInNavigationTree(showDescriptorsInNavigationTree
+						.getSelection());
 
 		String defaultActivityTab = getDefaultActivityTabSelection();
 		if (defaultActivityTab != null) {
@@ -676,10 +592,6 @@ public class SelectPublishingOptionsPage extends BaseWizardPage {
 	protected boolean getShowExtraDescriptorInfoSelection() {
 		return extraDescriptorInfoCtr.getSelection();
 	}
-	
-	protected boolean getShowLinkedPageForDescriptorSelection() {
-		return showLinkedPageForDescriptorCtr.getSelection();
-	}
 
 	/**
 	 * Gets the user specified show related descriptor in content page
@@ -688,23 +600,7 @@ public class SelectPublishingOptionsPage extends BaseWizardPage {
 	protected boolean getShowRelatedDescriptorsSelection() {
 		return showRelatedDescriptors.getSelection();
 	}
-	
-	/**
-	 * Gets the user specified Show all indirect (green) occurrences 
-	 * in extended patterns
-	 */
-	protected boolean getShowRelatedDescriptorsOptionSelection() {
-		return showRelatedDescriptorsOption.getSelection();
-	}
-	
-	/**
-	 * Gets the user specified show related links in navigate page
-	 * selection.
-	 */
-	protected boolean getShowRelatedLinksSelection() {
-		return showRelatedLinks.getSelection();
-	}
-	
+
 	/**
 	 * Gets the user specified show descriptors in navigation tree selection.
 	 */
@@ -788,14 +684,8 @@ public class SelectPublishingOptionsPage extends BaseWizardPage {
 				getPublishLightWeightTreeSelection());
 		PublishingUIPreferences.setExtraDescriptorInfo(configId,
 				getShowExtraDescriptorInfoSelection());
-		PublishingUIPreferences.setShowLinkedElementForDescriptor(configId,
-				getShowLinkedPageForDescriptorSelection());
 		PublishingUIPreferences.setShowRelatedDescriptors(configId,
 				getShowRelatedDescriptorsSelection());
-		PublishingUIPreferences.setShowRelatedDescriptorsOption(configId,
-				getShowRelatedDescriptorsOptionSelection());
-		PublishingUIPreferences.setShowRelatedLinks(configId,
-				getShowRelatedLinksSelection());
 		PublishingUIPreferences.setShowDescriptorsInNavigationTree(configId,
 				getShowDescriptorsInNavigationTreeSelection());
 		PublishingUIPreferences.setDefaultActivityTab(configId,

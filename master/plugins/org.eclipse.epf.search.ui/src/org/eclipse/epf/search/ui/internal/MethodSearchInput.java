@@ -10,9 +10,6 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.search.ui.internal;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Encapsulates the search strings and options that are used as inputs to a
  * method search.
@@ -33,8 +30,6 @@ public class MethodSearchInput {
 	private boolean regExp;
 
 	private MethodSearchScope searchScope;
-
-	private Map<Object, Object> additionalInput;
 
 	/**
 	 * Creates a new instance.
@@ -117,10 +112,4 @@ public class MethodSearchInput {
 		return searchScope;
 	}
 
-	public Map<Object, Object> getAdditionalInput() {
-		if(additionalInput == null) {
-			additionalInput = new HashMap<Object, Object>();
-		}
-		return additionalInput;
-	}
 }

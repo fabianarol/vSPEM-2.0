@@ -33,6 +33,13 @@ import org.eclipse.epf.uma.UmaPackage;
 public class SimpleSemanticModelElementImpl extends SemanticModelBridgeImpl
 		implements SimpleSemanticModelElement {
 	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * The default value of the '{@link #getTypeInfo() <em>Type Info</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -62,7 +69,7 @@ public class SimpleSemanticModelElementImpl extends SemanticModelBridgeImpl
 
 		//UMA-->
 		reassignDefaultValues();
-		//UMA<--  
+		//UMA<--
 	}
 
 	/**
@@ -70,7 +77,6 @@ public class SimpleSemanticModelElementImpl extends SemanticModelBridgeImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	protected EClass eStaticClass() {
 		return UmaPackage.Literals.SIMPLE_SEMANTIC_MODEL_ELEMENT;
 	}
@@ -103,7 +109,6 @@ public class SimpleSemanticModelElementImpl extends SemanticModelBridgeImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public Object eGet(int featureID, boolean resolve, boolean coreType) {
 		switch (featureID) {
 		case UmaPackage.SIMPLE_SEMANTIC_MODEL_ELEMENT__TYPE_INFO:
@@ -117,7 +122,6 @@ public class SimpleSemanticModelElementImpl extends SemanticModelBridgeImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 		case UmaPackage.SIMPLE_SEMANTIC_MODEL_ELEMENT__TYPE_INFO:
@@ -132,7 +136,6 @@ public class SimpleSemanticModelElementImpl extends SemanticModelBridgeImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public void eUnset(int featureID) {
 		switch (featureID) {
 		case UmaPackage.SIMPLE_SEMANTIC_MODEL_ELEMENT__TYPE_INFO:
@@ -147,7 +150,6 @@ public class SimpleSemanticModelElementImpl extends SemanticModelBridgeImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public boolean eIsSet(int featureID) {
 		//UMA-->
 		EStructuralFeature feature = getFeatureWithOverridenDefaultValue(featureID);
@@ -168,7 +170,6 @@ public class SimpleSemanticModelElementImpl extends SemanticModelBridgeImpl
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
-	@Override
 	public String toString() {
 		if (eIsProxy())
 			return super.toString();

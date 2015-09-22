@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 package org.eclipse.epf.rcp.ui;
 
-import org.eclipse.epf.library.ui.LibraryUIManager;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -25,8 +25,9 @@ import org.eclipse.ui.application.IActionBarConfigurer;
 import org.eclipse.ui.application.IWorkbenchConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
+import org.eclipse.ui.internal.ActionSetContributionItem;
+import org.eclipse.ui.internal.PluginActionContributionItem;
 import org.eclipse.ui.intro.IIntroPart;
-import org.eclipse.ui.menus.CommandContributionItem;
 
 /**
  * The application specific workbench window advisor.
@@ -54,8 +55,6 @@ public class MainWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	private IPerspectiveListener perspectiveListener = new IPerspectiveListener() {
 		public void perspectiveChanged(IWorkbenchPage page,
 				IPerspectiveDescriptor perspective, String changeId) {
-			LibraryUIManager.getInstance().checkConfigurationContribution();
-			LibraryUIManager.getInstance().startupOpenLibrary();
 		}
 		
 		public void perspectiveActivated(IWorkbenchPage page,
@@ -64,7 +63,7 @@ public class MainWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 			page.hideActionSet(WORKINGSETACTIONSET_ID); 
 			// do not show the External Tools button on the toolbar
 //			page.hideActionSet(EXTERNALTOOLSSET_ID);
-			page.hideActionSet(ANNOTATIONNAVIGATION_ID);
+			page.hideActionSet(ANNOTATIONNAVIGATION_ID);	
 		}
 	};
 	
@@ -128,25 +127,31 @@ public class MainWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 				fileMmenu.remove(items[i]);
 		}
 
+		// this is a hack to change the Help | Software Updates | Manage
+		// Configurations to Manage Software Configuration...
 		MenuManager helpMmenu = mainActionBar.getHelpMenuManager();
 		items = helpMmenu.getItems();
 		for (int i = 0; i < items.length; i++) {
-			//hide the classic update menu
-			if (items[i] instanceof MenuManager) {
-				MenuManager item = (MenuManager) items[i];
-				if (item.getId().equals("org.eclipse.update.ui.updateMenu")) { //$NON-NLS-1$
-					item.setVisible(false);
+			if (items[i] instanceof ActionSetContributionItem) {
+				ActionSetContributionItem element = (ActionSetContributionItem) items[i];
+				if (element.getId().equals("org.eclipse.update.ui.updateMenu")) { //$NON-NLS-1$
+					IContributionItem contribMenuMgr = element.getInnerItem();
+					IContributionItem[] subMenuItems = ((MenuManager) contribMenuMgr)
+							.getItems();
+					for (int j = 0; j < subMenuItems.length; j++) {
+						IContributionItem innerItem = ((ActionSetContributionItem) subMenuItems[j])
+								.getInnerItem();
+						if (innerItem instanceof PluginActionContributionItem
+								&& innerItem.getId().equals(
+										"org.eclipse.update.ui.configManager")) { //$NON-NLS-1$
+							IAction action = ((PluginActionContributionItem) innerItem)
+									.getAction();
+							action
+									.setText(RCPUIResources.menu_help_software_updates_manage_software_config_text); 
+						}
+					}
 				}
 			}
-			
-			//hide the p2 update menu
-			if (items[i] instanceof CommandContributionItem) {
-				CommandContributionItem item = (CommandContributionItem) items[i];
-				if (item.getId().equals("org.eclipse.equinox.p2.ui.sdk.update") //$NON-NLS-1$
-						|| item.getId().equals("org.eclipse.equinox.p2.ui.sdk.install")) { //$NON-NLS-1$
-					item.setVisible(false);
-				}				
-			}			
 		}
 		
 		PlatformUI.getWorkbench().getActiveWorkbenchWindow().addPerspectiveListener(perspectiveListener);

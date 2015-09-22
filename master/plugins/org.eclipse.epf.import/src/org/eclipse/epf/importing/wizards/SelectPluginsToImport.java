@@ -13,7 +13,6 @@ package org.eclipse.epf.importing.wizards;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.epf.authoring.ui.AuthoringUIResources;
 import org.eclipse.epf.importing.ImportPlugin;
 import org.eclipse.epf.importing.ImportResources;
 import org.eclipse.epf.importing.services.PluginImportData;
@@ -32,12 +31,9 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
@@ -92,10 +88,6 @@ public class SelectPluginsToImport extends BaseWizardPage implements
 	private PluginImportData data;
 
 	private PluginImportingService service;
-	
-	private Button selectAllButton;
-	
-	private Button deselectAllButton;
 
 	/**
 	 * Creates a new instance.
@@ -124,18 +116,9 @@ public class SelectPluginsToImport extends BaseWizardPage implements
 		gridData.horizontalSpan = 2;
 		tableContainer.setLayoutData(gridData);
 
-		Composite container1 = new Composite(tableContainer, SWT.NONE);
-		container1.setLayout(new GridLayout(3, false));
-		createLabel(container1,
-				ImportResources.SelectPluginsToImport_label_plugins);
+		createLabel(tableContainer,
+				ImportResources.SelectPluginsToImport_label_plugins, 2);
 
-		selectAllButton = createButton(
-				container1,
-				AuthoringUIResources.AuthoringUIPlugin_SaveAllEditorsPage_SelectAllButtonLabel);
-		deselectAllButton = createButton(
-				container1,
-				AuthoringUIResources.AuthoringUIPlugin_SaveAllEditorsPage_DeselectAllButtonLabel);
-				
 		ctrl_chkboxTableViewer = createCheckboxTableViewer(tableContainer, 2);
 
 		ILabelProvider labelProvider = new LabelProvider() {
@@ -207,58 +190,6 @@ public class SelectPluginsToImport extends BaseWizardPage implements
 	private void addListeners() {
 		ctrl_chkboxTableViewer.addSelectionChangedListener(this);
 		ctrl_chkboxTableViewer.addCheckStateListener(this);
-		
-		selectAllButton.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent e) {
-				ctrl_chkboxTableViewer.setAllChecked(true);
-				ImportPluginWizard wizard = (ImportPluginWizard) getWizard();
-				if (! wizard.data.getPlugins().isEmpty()) {
-					checkedPluginList.clear();
-					checkedPluginList.addAll(wizard.data.getPlugins());
-					checkedCount = checkedPluginList.size();
-					setAllSelected(wizard.data, true);
-					String message = service.validateSelection();
-					if (message != null && message.length() > 0) {
-						setErrorMessage(message);
-					} else {
-						setErrorMessage(null);
-					}
-				}
-				
-				setPageComplete(isPageComplete());
-				getWizard().getContainer().updateButtons();
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-
-		});
-
-		deselectAllButton.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent e) {
-				ctrl_chkboxTableViewer.setAllChecked(false);
-				checkedPluginList.clear();
-				checkedCount = 0;
-				ImportPluginWizard wizard = (ImportPluginWizard) getWizard();
-				setAllSelected(wizard.data, false);
-				
-				setPageComplete(isPageComplete());
-				getWizard().getContainer().updateButtons();
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-
-		});
-		
-	}
-	
-	private void setAllSelected(PluginImportData data, boolean selected) {
-		for (PluginImportData.PluginInfo info: data.getPlugins()) {
-			info.selected = selected;
-		}
 	}
 
 	/**

@@ -84,9 +84,7 @@ public class TaskDescriptorLayout extends DescriptorLayout {
 			// also load the linked element referenced information
 			for (Iterator<EStructuralFeature> iterator = getExtraFeaturesFromContentElement().iterator(); iterator.hasNext();) {
 				EStructuralFeature feature = iterator.next();
-				if (! isSynReferece(feature)) {
-					super.elementLayout.loadFeature(feature, elementXml, false);
-				}
+				super.elementLayout.loadFeature(feature, elementXml, false);
 			}
 		}
 	}
@@ -172,5 +170,4 @@ public class TaskDescriptorLayout extends DescriptorLayout {
 			return super.isSuppressed(sup, feature, element);
 		}
 	}
-	
 }

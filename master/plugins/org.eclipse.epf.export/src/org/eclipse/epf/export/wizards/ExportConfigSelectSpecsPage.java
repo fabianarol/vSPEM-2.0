@@ -11,21 +11,17 @@
 package org.eclipse.epf.export.wizards;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
-import org.eclipse.epf.authoring.ui.AuthoringUIResources;
 import org.eclipse.epf.authoring.ui.AuthoringUIText;
 import org.eclipse.epf.export.ExportPlugin;
 import org.eclipse.epf.export.ExportResources;
 import org.eclipse.epf.export.services.ConfigurationExportData;
 import org.eclipse.epf.library.LibraryService;
-import org.eclipse.epf.library.edit.PresentationContext;
+import org.eclipse.epf.library.LibraryServiceUtil;
 import org.eclipse.epf.library.ui.LibraryUIImages;
 import org.eclipse.epf.ui.wizards.BaseWizardPage;
 import org.eclipse.epf.uma.MethodConfiguration;
-import org.eclipse.epf.uma.MethodLibrary;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
@@ -37,11 +33,8 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -72,11 +65,7 @@ public class ExportConfigSelectSpecsPage extends BaseWizardPage implements
 
 	private List checkedConfigList = new ArrayList();
 
-	private ConfigurationExportData data;	
-	
-	private Button selectAllButton;
-	
-	private Button deselectAllButton;
+	private ConfigurationExportData data;
 
 	/**
 	 * Creates a new instance.
@@ -97,36 +86,15 @@ public class ExportConfigSelectSpecsPage extends BaseWizardPage implements
 		Composite container = new Composite(parent, SWT.NONE);
 		container.setLayout(new GridLayout());
 
-		Composite container1 = new Composite(container, SWT.NONE);
-		container1.setLayout(new GridLayout(3, false));
-		createLabel(container1,
+		createLabel(container,
 				ExportResources.selectConfigSpecsPage_configsLabel_text);
-
-		selectAllButton = createButton(
-				container1,
-				AuthoringUIResources.AuthoringUIPlugin_SaveAllEditorsPage_SelectAllButtonLabel);
-		deselectAllButton = createButton(
-				container1,
-				AuthoringUIResources.AuthoringUIPlugin_SaveAllEditorsPage_DeselectAllButtonLabel);
 
 		ctrl_chkboxTableViewer = createCheckboxTableViewer(container, 1);
 		table = ctrl_chkboxTableViewer.getTable();
 
-/*		MethodConfiguration[] configs = LibraryServiceUtil
+		MethodConfiguration[] configs = LibraryServiceUtil
 				.getMethodConfigurations(LibraryService.getInstance()
-						.getCurrentMethodLibrary());*/
-		
-		List<MethodConfiguration> configList = new ArrayList<MethodConfiguration>(
-				LibraryService.getInstance().getCurrentMethodLibrary()
-						.getPredefinedConfigurations());
-		if (configList.size() > 1) {
-			Comparator comparator = PresentationContext.INSTANCE
-					.getComparator();
-			Collections.<MethodConfiguration> sort(configList, comparator);
-		}
-		
-		MethodConfiguration[] a = new MethodConfiguration[configList.size()];
-		MethodConfiguration[] configs = configList.toArray(a);
+						.getCurrentMethodLibrary());
 
 		ILabelProvider labelProvider = new LabelProvider() {
 			public Image getImage(Object element) {
@@ -163,45 +131,6 @@ public class ExportConfigSelectSpecsPage extends BaseWizardPage implements
 	private void addListeners() {
 		ctrl_chkboxTableViewer.addSelectionChangedListener(this);
 		ctrl_chkboxTableViewer.addCheckStateListener(this);
-
-		final MethodLibrary lib = LibraryService.getInstance()
-				.getCurrentMethodLibrary();
-		selectAllButton.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent e) {
-				ctrl_chkboxTableViewer.setAllChecked(true);
-				if (lib != null) {
-					checkedConfigList.clear();
-					checkedConfigList.addAll(lib.getPredefinedConfigurations());
-					checkedCount = checkedConfigList.size();
-				}
-
-				setPageComplete(isPageComplete());
-				getWizard().getContainer().updateButtons();
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-
-		});
-
-		deselectAllButton.addSelectionListener(new SelectionListener() {
-			public void widgetSelected(SelectionEvent e) {
-				ctrl_chkboxTableViewer.setAllChecked(false);
-				if (lib != null) {
-					checkedConfigList.clear();
-					checkedCount = 0;
-				}
-
-				setPageComplete(isPageComplete());
-				getWizard().getContainer().updateButtons();
-			}
-
-			public void widgetDefaultSelected(SelectionEvent e) {
-				widgetSelected(e);
-			}
-
-		});
 	}
 
 	/**

@@ -14,7 +14,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.epf.common.service.utils.CommandLineRunUtil;
+import org.eclipse.epf.common.utils.CommandLineRunUtil;
 import org.eclipse.epf.library.ui.LibraryUIManager;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
@@ -60,12 +60,10 @@ public class MainApplication implements IApplication {
 						LibraryUIManager.setCommandLineLibrary(location);
 					}
 				} else if (appArgs[i].equalsIgnoreCase("-defaultlibrary") && i < (appArgs.length - 1)) { //$NON-NLS-1$
-					if (! CommandLineRunUtil.getInstance().isNeedToRun()) {
-						String location = appArgs[i + 1];
-						location = buildLocation(location);
-						if (location != null) {
-							LibraryUIManager.setCommandLineDefaultLibrary(location);
-						}
+					String location = appArgs[i + 1];
+					location = buildLocation(location);
+					if (location != null) {
+						LibraryUIManager.setCommandLineDefaultLibrary(location);
 					}
 				} else if (appArgs[i].equalsIgnoreCase("-nolock")) { //$NON-NLS-1$
 					noLock = true;

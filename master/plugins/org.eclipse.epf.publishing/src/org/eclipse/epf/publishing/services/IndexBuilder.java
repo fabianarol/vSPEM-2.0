@@ -78,7 +78,7 @@ public class IndexBuilder {
 	public void execute(MethodConfiguration config, String pubDir,
 			String title, IProgressMonitor monitor) {
 		indexItems.clear();
-		IFilter configFilter = new ConfigurationFilter(config);
+		IFilter configFilter = new ConfigurationFilter(config, null);
 		adapterFactory = TngAdapterFactory.INSTANCE
 				.getConfigurationView_AdapterFactory(configFilter);
 		// iterate thru configuration to get all glossary items

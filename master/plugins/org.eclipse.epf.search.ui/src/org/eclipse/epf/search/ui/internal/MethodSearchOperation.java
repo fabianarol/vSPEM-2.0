@@ -12,7 +12,6 @@ package org.eclipse.epf.search.ui.internal;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -26,6 +25,7 @@ import org.eclipse.epf.library.edit.util.ModelStructure;
 import org.eclipse.epf.library.util.LibraryUtil;
 import org.eclipse.epf.search.ui.SearchUIPlugin;
 import org.eclipse.epf.search.ui.SearchUIResources;
+import org.eclipse.epf.uma.Activity;
 import org.eclipse.epf.uma.Artifact;
 import org.eclipse.epf.uma.ContentDescription;
 import org.eclipse.epf.uma.ContentElement;
@@ -34,6 +34,7 @@ import org.eclipse.epf.uma.DescribableElement;
 import org.eclipse.epf.uma.Discipline;
 import org.eclipse.epf.uma.Domain;
 import org.eclipse.epf.uma.MethodElement;
+import org.eclipse.epf.uma.MethodLibrary;
 import org.eclipse.epf.uma.MethodPackage;
 import org.eclipse.epf.uma.MethodPlugin;
 import org.eclipse.epf.uma.Practice;
@@ -48,10 +49,9 @@ import org.xml.sax.Attributes;
  * the content element XMI files where necessary.
  * 
  * @author Kelvin Low
- * @author Phong Nguyen Le
  * @since 1.0
  */
-public class MethodSearchOperation implements IMethodSearchOperation {
+public class MethodSearchOperation {
 
 	private static final String SCAN_LIBRARY_TEXT = SearchUIResources.scanLibraryTask_name; 
 
@@ -59,7 +59,7 @@ public class MethodSearchOperation implements IMethodSearchOperation {
 
 	private boolean debug;
 
-	protected MethodSearchInput searchInput;
+	private MethodSearchInput searchInput;
 
 	private ISearchResultCollector result;
 
@@ -155,14 +155,6 @@ public class MethodSearchOperation implements IMethodSearchOperation {
 	 */
 	public MethodSearchOperation(MethodSearchInput searchInput,
 			ISearchResultCollector result) {
-		initialize(searchInput, result);
-	}
-
-	public MethodSearchOperation() {
-	}
-
-	private void initialize(MethodSearchInput searchInput,
-			ISearchResultCollector result) {
 		this.searchInput = searchInput;
 		this.result = result;
 
@@ -176,7 +168,7 @@ public class MethodSearchOperation implements IMethodSearchOperation {
 		searchString = searchInput.getSearchString();
 		if (searchString == null)
 			searchString = ""; //$NON-NLS-1$
-		if (searchString.length() > 0 && !searchString.equals("*")) { //$NON-NLS-1$
+		if (searchString.length() > 0) {
 			elementScanner = new MethodElementScanner();
 			searchStringPattern = MethodSearchPattern.createPattern(
 					searchString, caseSensitive, regExp);
@@ -191,11 +183,7 @@ public class MethodSearchOperation implements IMethodSearchOperation {
 							+ ", caseSensitive=" + caseSensitive); //$NON-NLS-1$
 		}
 	}
-	
-	protected Collection<MethodPlugin> getSearchableMethodPlugins() {
-		return LibraryUtil.getMethodPlugins(LibraryService.getInstance().getCurrentMethodLibrary());
-	}
-	
+
 	/**
 	 * Executes the search operation.
 	 * 
@@ -206,10 +194,12 @@ public class MethodSearchOperation implements IMethodSearchOperation {
 		this.progressMonitor = progressMonitor;
 		this.progressMonitor.beginTask(SCAN_LIBRARY_TEXT, 7500);
 
-		// Iterate the Method Plugin to look for elements that match the name
+		// Iterate the Method Library to look for elements that match the name
 		// pattern.
-		Collection<MethodPlugin> methodPlugins = getSearchableMethodPlugins();
-		for (Iterator<MethodPlugin> i = methodPlugins.iterator(); i.hasNext()
+		MethodLibrary library = LibraryService.getInstance()
+				.getCurrentMethodLibrary();
+		List methodPlugins = LibraryUtil.getMethodPlugins(library);
+		for (Iterator i = methodPlugins.iterator(); i.hasNext()
 				&& !progressMonitor.isCanceled();) {
 			MethodPlugin methodPlugin = (MethodPlugin) i.next();
 			matchPattern(methodPlugin);
@@ -312,9 +302,9 @@ public class MethodSearchOperation implements IMethodSearchOperation {
 			for (Iterator j = processElements.iterator(); j.hasNext()
 					&& !progressMonitor.isCanceled();) {
 				ProcessElement processElement = (ProcessElement) j.next();
-//				if (!(processElement instanceof Activity)) {
+				if (!(processElement instanceof Activity)) {
 					matchPattern(processElement);
-//				}
+				}
 			}
 		}
 	}
@@ -435,7 +425,7 @@ public class MethodSearchOperation implements IMethodSearchOperation {
 							name).matches());
 				}
 				if (foundMatch) {
-					if (searchString.length() == 0 || searchString.equals("*")) { //$NON-NLS-1$
+					if (searchString.length() == 0) {
 						result.accept(element);
 					} else {
 						try {
@@ -476,12 +466,6 @@ public class MethodSearchOperation implements IMethodSearchOperation {
 			}
 		}
 		return null;
-	}
-
-	public void execute(MethodSearchInput searchInput,
-			ISearchResultCollector result, IProgressMonitor monitor) {
-		initialize(searchInput, result);
-		execute(monitor);
 	}
 
 }

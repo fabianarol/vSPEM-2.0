@@ -141,7 +141,7 @@ public class Suppression {
 		return null;
 	}
 
-	public Set getSuppressedExternalElementPaths() {
+	private Set getSuppressedExternalElementPaths() {
 		if (suppressedExternalElementPaths == null) {
 			suppressedExternalElementPaths = loadSuppressedElementPaths();
 			if (suppressedExternalElementPaths == null) {
@@ -318,8 +318,8 @@ public class Suppression {
 		if (e instanceof VariabilityElement) {
 			VariabilityElement ve = (VariabilityElement) e;
 			VariabilityType variabilityType = ve.getVariabilityType();
-			if (variabilityType == VariabilityType.EXTENDS
-					|| variabilityType == VariabilityType.CONTRIBUTES) {
+			if (variabilityType == VariabilityType.EXTENDS_LITERAL
+					|| variabilityType == VariabilityType.CONTRIBUTES_LITERAL) {
 				if (ve.getVariabilityBasedOnElement() != null) {
 					return isDirectlySuppressed(ve
 							.getVariabilityBasedOnElement());
@@ -785,7 +785,7 @@ public class Suppression {
 		doSetSuppressed(selection, false);
 	}
 
-	public static String getViewType(
+	private static String getViewType(
 			BreakdownElementWrapperItemProvider wrapper) {
 		// no need to store separate path for CBS, reuse WBS/TBS/WPBS paths
 		//		

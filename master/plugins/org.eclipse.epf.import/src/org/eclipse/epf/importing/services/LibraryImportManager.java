@@ -29,16 +29,12 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.epf.authoring.ui.views.LibraryView;
-import org.eclipse.epf.common.ui.util.MsgDialog;
+import org.eclipse.epf.common.serviceability.MsgDialog;
 import org.eclipse.epf.export.services.DiagramHandler;
 import org.eclipse.epf.importing.ImportPlugin;
 import org.eclipse.epf.importing.ImportResources;
 import org.eclipse.epf.library.ILibraryResourceManager;
 import org.eclipse.epf.library.LibraryService;
-import org.eclipse.epf.library.edit.meta.IMetaDef;
-import org.eclipse.epf.library.edit.meta.TypeDefUtil;
-import org.eclipse.epf.library.edit.util.MethodPluginPropUtil;
-import org.eclipse.epf.library.edit.util.ProcessUtil;
 import org.eclipse.epf.library.edit.util.TngUtil;
 import org.eclipse.epf.library.services.SafeUpdateController;
 import org.eclipse.epf.library.util.LibraryUtil;
@@ -62,7 +58,6 @@ import org.eclipse.epf.uma.Process;
 import org.eclipse.epf.uma.ProcessComponent;
 import org.eclipse.epf.uma.ProcessPackage;
 import org.eclipse.epf.uma.UmaPackage;
-import org.eclipse.epf.uma.util.ExtendedAttribute;
 import org.eclipse.epf.uma.util.UmaUtil;
 
 
@@ -889,7 +884,7 @@ public class LibraryImportManager {
 			return;
 		}
 		
-		List features = LibraryUtil.getStructuralFeatures(element, true);
+		List features = LibraryUtil.getStructuralFeatures(element);
 //		List properties = element.getInstanceProperties();
 		if (features != null) {
 			for (int i = 0; i < features.size(); i++) {
@@ -898,8 +893,7 @@ public class LibraryImportManager {
 					continue;
 				}
 
-//				Object value = element.eGet(feature);
-				Object value = TypeDefUtil.getInstance().eGet(element, feature);
+				Object value = element.eGet(feature);
 				scanResources(element, feature, value);
 			}
 		}
@@ -927,12 +921,8 @@ public class LibraryImportManager {
 	private void scanResources(MethodElement element, EStructuralFeature feature, Object newValue) {
 		diagramHandler.registerElement(element);
 		
-		ExtendedAttribute eAtt = TypeDefUtil.getInstance().getAssociatedExtendedAttribute(feature);
-		
 		// scan the resources
-		if ( feature == UmaPackage.eINSTANCE.getGuidanceDescription_Attachments() ||
-				(eAtt != null && eAtt.getValueType().equalsIgnoreCase(IMetaDef.attachment))) {
-			
+		if ( feature == UmaPackage.eINSTANCE.getGuidanceDescription_Attachments() ) {
 			// process the attachments
 			String urls = (String)newValue;
 			if ( (urls != null) && urls.length() != 0 ) {
@@ -968,12 +958,7 @@ public class LibraryImportManager {
 		if (owner instanceof MethodLibrary) {			
 			// can be configuration or plugin
 			if (newObj instanceof MethodPlugin) {
-				MethodPlugin plugin = (MethodPlugin)newObj;
-				
-				MethodPluginPropUtil propUtil = MethodPluginPropUtil.getMethodPluginPropUtil();				
-				if (ProcessUtil.isSynFree() && ! propUtil.isSynFree(plugin)) {
-					propUtil.setSynFree(plugin, true);
-				}
+				MethodPlugin plugin = (MethodPlugin)newObj;				
 				
 				checkModifiedFiles();				
 				error = ! fileCheckedOutStatus.isOK();				
@@ -998,7 +983,7 @@ public class LibraryImportManager {
 				error = configFolderError || ! fileCheckedOutStatus.isOK();
 				if (!error) {
 					MethodLibrary lib = (MethodLibrary)owner;
-					lib.getPredefinedConfigurations().add((MethodConfiguration)newObj);
+					lib.getPredefinedConfigurations().add(newObj);
 					ILibraryPersister persister = ((MultiFileResourceSetImpl) lib.eResource().getResourceSet()).getPersister();
 					if (persister instanceof IFileBasedLibraryPersister) {
 						IFileBasedLibraryPersister ip = (IFileBasedLibraryPersister) persister;
@@ -1025,7 +1010,7 @@ public class LibraryImportManager {
 		} else if ( (owner instanceof MethodPackage) 
 				&& (owner.eContainer() != null) 
 				&& (newObj instanceof MethodPackage) ) {
-			((MethodPackage)owner).getChildPackages().add((MethodPackage)newObj);
+			((MethodPackage)owner).getChildPackages().add(newObj);
 		} else {
 			error = true;
 		}

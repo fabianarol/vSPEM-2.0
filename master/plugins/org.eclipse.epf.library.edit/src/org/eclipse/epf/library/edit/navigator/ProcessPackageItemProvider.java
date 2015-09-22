@@ -24,6 +24,7 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.edit.command.AddCommand;
+import org.eclipse.emf.edit.command.CopyCommand.Helper;
 import org.eclipse.emf.edit.domain.EditingDomain;
 import org.eclipse.emf.edit.provider.ITreeItemContentProvider;
 import org.eclipse.epf.library.edit.IStatefulItemProvider;
@@ -40,6 +41,8 @@ import org.eclipse.epf.uma.ProcessComponent;
 import org.eclipse.epf.uma.ProcessPackage;
 import org.eclipse.epf.uma.UmaFactory;
 import org.eclipse.epf.uma.UmaPackage;
+import org.eclipse.epf.uma.edit.command.MethodElementCreateCopyCommand;
+import org.eclipse.epf.uma.edit.command.MethodElementInitializeCopyCommand;
 import org.eclipse.epf.uma.provider.UmaEditPlugin;
 
 /**
@@ -217,7 +220,9 @@ public class ProcessPackageItemProvider extends
 						.getProcessPlanningTemplate()) {
 					return UmaEditPlugin.INSTANCE
 							.getImage("full/obj16/ProcessPlanningTemplate"); //$NON-NLS-1$
+					//*Linea de proceso*//
 				}
+				
 			}
 		}
 
@@ -266,6 +271,23 @@ public class ProcessPackageItemProvider extends
 				}
 			}
 		};
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.eclipse.emf.edit.provider.ItemProviderAdapter#createInitializeCopyCommand(org.eclipse.emf.edit.domain.EditingDomain,
+	 *      org.eclipse.emf.ecore.EObject,
+	 *      org.eclipse.emf.edit.command.CopyCommand.Helper)
+	 */
+	protected Command createInitializeCopyCommand(EditingDomain domain,
+			EObject owner, Helper helper) {
+		return new MethodElementInitializeCopyCommand(domain, owner, helper);
+	}
+
+	protected Command createCreateCopyCommand(EditingDomain domain,
+			EObject owner, Helper helper) {
+		return new MethodElementCreateCopyCommand(domain, owner, helper);
 	}
 
 	public void setParent(Object parent) {

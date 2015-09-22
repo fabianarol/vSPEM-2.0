@@ -20,7 +20,6 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.transaction.RunnableWithResult;
-import org.eclipse.epf.diagram.core.providers.DiagramIconProviderManager;
 import org.eclipse.epf.diagram.core.util.DiagramConstants;
 import org.eclipse.epf.diagram.core.util.DiagramCoreUtil;
 import org.eclipse.epf.diagram.core.util.ValidatingTextDirectEditManager;
@@ -221,12 +220,8 @@ public class WorkProductNodeNameEditPart extends CompartmentEditPart implements
 		//			descriptor = ImageDescriptor.getMissingImageDescriptor();
 		//		}
 		//		return descriptor.createImage();
-		Image image = DiagramIconProviderManager.getInstance().getIcon(resolveSemanticElement(), true);
-		if (image == null) {
-			image =  WPDDiagramEditorPlugin.getInstance().getSharedImage(
-					"full/obj16/WorkProductDescriptor.gif");	//$NON-NLS-1$
-		}
-		return image;
+		return WPDDiagramEditorPlugin.getInstance().getSharedImage(
+				"full/obj16/WorkProductDescriptor.gif");	//$NON-NLS-1$
 	}
 
 	/**

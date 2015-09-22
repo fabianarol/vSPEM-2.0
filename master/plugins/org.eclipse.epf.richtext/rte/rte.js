@@ -1,13 +1,13 @@
-/*******************************************************************************
- * Copyright (c) 2009 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
- *******************************************************************************/
+//------------------------------------------------------------------------------
+// Copyright (c) 2005, 2006 IBM Corporation and others.
+// All rights reserved. This program and the accompanying materials
+// are made available under the terms of the Eclipse Public License v1.0
+// which accompanies this distribution, and is available at
+// http://www.eclipse.org/legal/epl-v10.html
+//------------------------------------------------------------------------------
+// @author Kelvin Low
+// @since 1.0
+//------------------------------------------------------------------------------
 // Note: Mozilla/Firefox does not allow unprivileged scripts to invoke the cut,
 // copy and paste commands. The Javascript must either be signed
 // (see http://www.mozilla.org/projects/security/components/signed-scripts.html),
@@ -15,10 +15,7 @@
 // (see http://www.mozilla.org/editor/midasdemo/securityprefs.html).
 // Alternatively, the users can use the ctrl-x, ctrl-c and ctrl-v keys.
 //------------------------------------------------------------------------------
-// Note: The SWT component in eclipse 3.4.X and above has a bug that 
-// keyReleased event can't be notified to listener. See (https://bugs.eclipse.org/bugs/show_bug.cgi?id=280146).
-// This issue has blocked EPF upgrade to 1.5.0.5. As a workaround, capture keyReleased event in 
-// Javascript. Once this issue is resolved in SWT, we need to resume it  
+
 var STATUS_NOP = 0;
 var STATUS_INITIALIZED = 1;
 var STATUS_MODIFIED = 2;
@@ -41,10 +38,6 @@ var KEY_HOME = 36;
 var KEY_PAGE_DOWN = 34;
 var KEY_PAGE_UP = 33;
 var KEY_TAB = 9;
-
-var KEY_B = 66;
-var KEY_U = 85;
-var KEY_I = 73;
 var KEY_C = 67;
 var KEY_F = 70;
 var KEY_S = 83;
@@ -82,11 +75,6 @@ var readOnly = false;
 var initialized = false;
 var modified = false;
 var checkResizeElement;
-var selectionInfo = null;
-
-//BinBinLi&ShiJin	2013-12-03	 Enhancement42506 Add or delete rows/columns to existing table in RTE
-var STATUS_SELECT_TABLE = 51;
-var currentSelectedTable = null;
 
 // Initializes the editor.
 function initEditor(id, css, baseURL) {
@@ -103,86 +91,21 @@ function initEditor(id, css, baseURL) {
 	}
 }
 
-var excludeModify = new Array(16, KEY_ARROW_DOWN, KEY_ARROW_LEFT,
-		KEY_ARROW_RIGHT, KEY_ARROW_UP, KEY_END, KEY_HOME, KEY_PAGE_DOWN,
-		KEY_PAGE_UP, KEY_TAB);
-
-function keyReleased(event) {
-	var keyCode = event.keyCode;
-	if (keyCode == 0 && !document.all) {
-		keyCode = event.charCode;
-		switch (keyCode) {
-		    case 98:
-		     	keyCode = KEY_B;
-				break;
-			case 99:
-				keyCode = KEY_C;
-				break;
-			case 102:
-				keyCode = KEY_F;
-				break;
-		    case 105:
-		        keyCode = KEY_I;
-		        break;
-			case 115:
-				keyCode = KEY_S;
-				break;
-		    case 117:
-		        keyCode = KEY_U;
-		        break;
-			case 118:
-				keyCode = KEY_V;
-				break;
-			case 120:
-				keyCode = KEY_X;
-				break;
-			case 122:
-				keyCode = KEY_Z;
-				break;
-		}
-	}
-	var ctrlKey = event.ctrlKey;
-	var shiftKey = event.shiftKey;
-	var altKey = event.altKey;
-
-	if ( !ctrlKey && !altKey ) {
-       var modified = true;
-	   for (var i = 0; i < excludeModify.length; i++ ) {
-	     if ( keyCode == excludeModify[i] ) {
-	       modified = false;
-	       break;
-	     }
-	   }
-	   if ( modified == true ) {
-		   setTimeout("setStatus(STATUS_MODIFIED, null);", 10);
-	   }
-	}
-}
-
 // Handles the key events.
 function keyPressed(event) {
 	var keyCode = event.keyCode;
 	if (keyCode == 0 && !document.all) {
 		keyCode = event.charCode;
 		switch (keyCode) {
-		    case 98:
-		     	keyCode = KEY_B;
-				break;
 			case 99:
 				keyCode = KEY_C;
 				break;
 			case 102:
 				keyCode = KEY_F;
 				break;
-		    case 105:
-		        keyCode = KEY_I;
-		        break;
 			case 115:
 				keyCode = KEY_S;
 				break;
-		    case 117:
-		        keyCode = KEY_U;
-		        break;
 			case 118:
 				keyCode = KEY_V;
 				break;
@@ -206,39 +129,13 @@ function keyPressed(event) {
 		case KEY_HOME:
 		case KEY_PAGE_DOWN:
 		case KEY_PAGE_UP:
-		    break;
 		case KEY_TAB:
-	        if ( readOnly || !ctrlKey)
-			  break;
-			
-	        var editorWindow = document.getElementById(editorId).contentWindow;
-          	var editorDocument = editorWindow.document;
-          	var tabText = "&nbsp;&nbsp;&nbsp;&nbsp;";
-			  
-		    if(document.all ){
-		        event.keyCode = -1;
-			    event.returnValue=false; //IE: cancel the default behavior
-			    var rng=editorDocument.selection.createRange();
-			    rng.pasteHTML(tabText);  //insert 4 spaces for one tab key 
-		    } else  {
-				event.preventDefault();
-			    editorDoc.execCommand("insertHTML","",tabText);
-			}
-	        
-			setTimeout("setStatus(STATUS_MODIFIED, null);", 10);
 			break;
 		case KEY_BACKSPACE:
 			if (!readOnly) {
 				setTimeout("setStatus(STATUS_MODIFIED, null);", 10);
 			}
 			break;
-		case KEY_B:
-		case KEY_U:
-		case KEY_I:
-		   if (!readOnly && ctrlKey) {
-		      setTimeout("setStatus(STATUS_MODIFIED, null);",10);
-		   }
-		   break;
 		case KEY_C:
 			if (ctrlKey) {
 				setStatus(STATUS_KEY_DOWN, CMD_COPY);
@@ -363,7 +260,6 @@ function enableRichTextEditing(html) {
 
 	if ("attachEvent" in doc) {
 		doc.attachEvent("onkeydown", keyPressed);
-		doc.attachEvent("onkeyup", keyReleased); 
 		doc.attachEvent("onselectionchange", selChanged);
 		// for DnD (internal)
 		doc.body.attachEvent("ondrop", checkModified);
@@ -372,7 +268,6 @@ function enableRichTextEditing(html) {
 	}	
 	if ("addEventListener" in doc) {
 		doc.addEventListener("keypress", keyPressed, true);
-		doc.addEventListener("keyrelease", keyReleased, true);
 		doc.addEventListener("keypress", selChanged, false);
 		doc.addEventListener("mouseup", selChanged, false);
 		doc.addEventListener("dragdrop", checkModified, false);
@@ -462,93 +357,9 @@ function setInnerHTML(html) {
 function setText(html) {
 	if (supportRichTextEditing) {
 		html = decodeString(html);
-		selectionInfo = getSelectionInfo();
 		setInnerHTML(html);
-		if (selectionInfo != null) {
-			setTimeout("setSelection(selectionInfo);", 10);
-		}
 		modified = false;
 		setStatus(STATUS_EXEC_CMD, 1);
-	}
-}
-
-function setSelection(selectionInfo) {
-	if (!supportRichTextEditing) {
-		return;
-	}
-	
-	contentWindow = document.getElementById(editorId).contentWindow;
-	editorDoc = contentWindow.document;
-	
-	try {
-		if (document.all) {
-			var startOffset = selectionInfo.start;
-			var len = selectionInfo.len;
-			if (startOffset == 0 && len == 0) {
-				return;
-			}
-			var tempRange = editorDoc.body.createTextRange();
-			tempRange.moveStart('character', startOffset);
-			tempRange.collapse();
-			tempRange.moveEnd('character', len);
-			tempRange.select();
-			tempRange.scrollIntoView();
-		} else {
-			selection = this.window.getSelection();
-			var startContainer = selectionInfo.startContainer;
-			var start = selectionInfo.start;
-			var endContainer = selectionInfo.endContainer;
-			var end = selectionInfo.end;
-			var tempRange = document.createRange();
-			tempRange.setStart(startContainer, start);
-			tempRange.setEnd(endContainer, end);
-			selection.removeAllRanges();
-			selection.addRange(tempRange);
-			contentWindow.focus();
-		}
-	} catch (e) {
-	}
-}
-
-function getSelectionInfo() {
-	if (!supportRichTextEditing) {
-		return null;
-	}	
-	
-	contentWindow = document.getElementById(editorId).contentWindow;
-	editorDoc = contentWindow.document;
-	
-	var tempSelRange;
-	try {
-	    if (document.all) {
-			selection = editorDoc.selection;
-			if (selection != null) {
-				tempSelRange = selection.createRange();
-			}
-			// length of selection
-			var tempSelLen = tempSelRange.text.length;
-			// create new range
-			var tempRange = editorDoc.body.createTextRange();
-			// set end of new range to start of selection
-			// this will throw an exception if tempSelRange is not in editor.doc.body (ie, at the start of the RTE).
-			tempRange.setEndPoint("EndToStart", tempSelRange);
-			// length of new range is the start offset
-			var tempText = tempRange.text;
-			// IE counts newlines as 2 characters for length property, but they count as 1 when using moveStart so remove the \r to make the count the same
-			tempText = tempText.replace(/\r/g, "");
-			var startOffset = tempText.length;
-			
-			return {start:startOffset, len:tempSelLen};
-	    } else {
-			selection = contentWindow.getSelection();
-			if (selection != null) {
-				tempSelRange = selection.getRangeAt(selection.rangeCount - 1).cloneRange();
-			}
-			return {startContainer: tempSelRange.startContainer, start:tempSelRange.startOffset, 
-				endContainer: tempSelRange.endContainer, end:tempSelRange.endOffset};
-	    }
-	} catch (e) {
-		return null;
 	}
 }
 
@@ -622,17 +433,8 @@ function updateSelection() {
 		selection = editorDoc.selection;
 		if (selection != null) {
 			selectionRange = selection.createRange();
-			if (selectionRange != null)
-			{
-				if(selection.type != "Control") {
-					tempSelRange = selectionRange.duplicate();
-				} else {
-					setStatus(STATUS_SELECT_CONTROL, null);
-					if (selectionRange(0).tagName == "TABLE") {
-						currentSelectedTable = selectionRange(0);
-						setStatus(STATUS_SELECT_TABLE, null);
-					}
-				}
+			if (selectionRange != null && selection.type != "Control") {
+				tempSelRange = selectionRange.duplicate();
 			}
 			reformatElementLinks();
 		}
@@ -641,27 +443,7 @@ function updateSelection() {
 		selection = contentWindow.getSelection();
 		if (selection != null) {
 			selectionRange = selection.getRangeAt(selection.rangeCount - 1).cloneRange();
-			var tableNode = null;
-			if (selectionRange.startContainer && selectionRange.endContainer &&
-              selectionRange.startContainer == selectionRange.endContainer &&
-              selectionRange.startContainer.nodeType == 1) 
-		    {
-		    	setStatus(STATUS_SELECT_CONTROL, null);
-				if (selectionRange.startContainer.tagName == "TD") {
-					tableNode = selectionRange.startContainer;
-				} else if (selectionRange.endOffset - selectionRange.startOffset == 1 && selectionRange.startContainer.childNodes[selectionRange.startOffset].tagName == "TD") {
-					tableNode = selectionRange.startContainer.childNodes[selectionRange.startOffset];
-				}
-			}
-			if (tableNode != null){
-				currentSelectedTable = tableNode;
-				while(currentSelectedTable.nodeName != "TABLE") {
-					currentSelectedTable = currentSelectedTable.parentNode;
-				}
-				setStatus(STATUS_SELECT_TABLE, null);
-			} else {
-			  tempSelRange = selectionRange.cloneRange();
-			} 
+			tempSelRange = selectionRange.cloneRange();
 		}
 	}
 	if (tempSelRange != null) {
@@ -775,13 +557,8 @@ function setFocus() {
 	if (!supportRichTextEditing) {
 		return;
 	}	
-	if (document.all) {
-		iframe = document.getElementById(editorId);
-		iframe.focus();
-	} else {
-		contentWindow = document.getElementById(editorId).contentWindow;
-		contentWindow.focus();
-	}
+	contentWindow = document.getElementById(editorId).contentWindow;
+	contentWindow.focus();
 	setStatus(STATUS_EXEC_CMD, 1);	
 }
 
@@ -1045,7 +822,7 @@ function deleteText() {
 
 // Finds text.
 function findText(text, dir, options) {
-    if (text == null || text == "") {
+	if (text == null || text == "") {
 		return;
 	}
 	else {
@@ -1070,30 +847,8 @@ function findText(text, dir, options) {
 			if ((options & 4) == 0) caseSensitive = false;
 			if (dir == -1) backwards = true;
 			if ((options & 2) == 0) wholeWord = false;
-			
-			if ( wholeWord ) 
-			{
-				while ( contentWindow.find(text, caseSensitive, backwards, false, wholeWord, false, false) )
-				{
-	        		var ffSelection = contentWindow.getSelection();
-	        		selectionRange = ffSelection.getRangeAt(0).cloneRange();
-					if (selectionRange.startOffset > 0 )
-						selectionRange.setStart(selectionRange.startContainer, selectionRange.startOffset -1);
-					if (selectionRange.endOffset < selectionRange.endContainer.length )
-					{
-						selectionRange.setEnd(selectionRange.endContainer, selectionRange.endOffset+1);
-					}
-					var newText = selectionRange.toString();
-					var	regex = new RegExp("\\b"+text+"\\b");
-	
-					if ( newText.match(regex))
-					{				 	
-					   setStatus(STATUS_EXEC_CMD, 1);
-					   break;
-					}
-				 } 
-			} else if ( contentWindow.find(text, caseSensitive, backwards, false, wholeWord, false, false) ) {
-			       setStatus(STATUS_EXEC_CMD, 1);
+			if (contentWindow.find(text, caseSensitive, backwards, false, wholeWord, false, false)) {
+				setStatus(STATUS_EXEC_CMD, 1);
 			}
 		}
 	}
@@ -1391,10 +1146,6 @@ function replaceText(replaceText, dir, options) {
 function selectAll() {
 	if (internalUpdateSelection()) {
 		if (editorDoc.execCommand('selectall', false, null)) {
-		   if ( !document.all )
-		   {
-		      updateSelection();
-		   }
 			setStatus(STATUS_EXEC_CMD, 1);
 		}
 	}
@@ -1512,73 +1263,4 @@ function underline() {
 // Converts a link to normal text.
 function unlink() {
 	formatText('unlink', null);
-}
-
-function ObjToString(object) {
-	var ret = "Object " + object.name + " is [\n";
-	for (var prop in object) {
-		ret += "  " + prop + " is " + object[prop] + ";\n";
-	}
-	return ret + "]";
-}
-
-
-function addRow() {
-	if (currentSelectedTable != null) {
-		rowNums = currentSelectedTable.rows.length;
-		cellNums = currentSelectedTable.rows[0].cells.length;
-		var newRow = currentSelectedTable.insertRow(rowNums);
-		for ( i = 0; i < cellNums; i++) {
-			var newCell = newRow.insertCell(i);
-			if (!document.all) {
-				newCell.innerHTML = "<br/>";
-			}
-		}
-		setStatus(STATUS_MODIFIED, null);
-	}
-}
-
-function addColumn() {
-	if (currentSelectedTable != null) {
-		rowNums = currentSelectedTable.rows.length;
-		cellNums = currentSelectedTable.rows[0].cells.length;
-		for (var i = 0; i < rowNums; i++) {
-			var newCell = currentSelectedTable.rows[i].insertCell(cellNums);
-			if (!document.all) {
-				newCell.innerHTML = "<br/>";
-			}
-		}
-		setStatus(STATUS_MODIFIED, null);
-	}
-}
-
-function deleteLastRow() {
-	if (currentSelectedTable != null) {
-		rowNums = currentSelectedTable.rows.length;
-		if (rowNums == 1) {
-			var parent = currentSelectedTable.parentNode;
-			parent.removeChild(currentSelectedTable);
-			currentSelectedTable = null;
-		} else {
-			currentSelectedTable.deleteRow(rowNums - 1);
-		}
-		setStatus(STATUS_MODIFIED, null);
-	}
-}
-
-function deleteLastColumn() {
-	if (currentSelectedTable != null) {
-		rowNums = currentSelectedTable.rows.length;
-		cellNums = currentSelectedTable.rows[0].cells.length;
-		if (cellNums == 1) {
-			var parent = currentSelectedTable.parentNode;
-			parent.removeChild(currentSelectedTable);
-			currentSelectedTable = null;
-		} else {
-			for (var i = 0; i < rowNums; i++) {
-				currentSelectedTable.rows[i].deleteCell(cellNums - 1);
-			}
-		}
-		setStatus(STATUS_MODIFIED, null);
-	}
 }
