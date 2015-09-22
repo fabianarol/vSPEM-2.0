@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+   
+         <extension
+               point="org.eclipse.epf.common.service.commandLineRunners">
+            <commandLineRunner
+                  class="org.eclipse.epf.toolbox.batch.EpfBatchRunner"
+                  runnerId="epfBatchRunner">
+            </commandLineRunner>
+         </extension>
+         <extension
+               point="org.eclipse.ui.actionSets">
+            <actionSet
+                  description="Library tools"
+                  id="org.eclipse.epf.toolbox.actionSet.LibraryTools"
+                  label="Library Tools">
+               <menu
+                     id="epfToolboxMenu"
+                     label="Library-tools">
+                  <separator
+                        name="LibraryToolsGroup">
+                  </separator>
+               </menu>
+               
+<!-- Utlity used for clean up duplicate AD diagram data    
+               <action
+                     class="org.eclipse.epf.toolbox.actions.DiagramDoctor"
+                     id="ogr.eclipse.epf.toolbox.actions.DiagramDoctorAction"
+                     label="Clean up process diagram duplicate data"
+                     menubarPath="epfToolboxMenu/LibraryToolsGroup"
+                     tooltip="Clean up process diagram duplicate data">
+               </action>
+-->
+               
+               <action
+                     class="org.eclipse.epf.toolbox.actions.RemoveLocalDescriptors"
+                     id="ogr.eclipse.epf.toolbox.actions.RemoveLocalDesciporAction"
+                     label="Remove local role/workproduct descriptors for configuration-free processes"
+                     menubarPath="epfToolboxMenu/LibraryToolsGroup"
+                     tooltip="Remove local role/workproduct descriptors for configuration-free processes">
+               </action>
+               
+               <action
+                     class="org.eclipse.epf.toolbox.actions.ConvertToConfigFree"
+                     id="ogr.eclipse.epf.toolbox.actions.ConvertToConfigFreeAction"
+                     label="Convert all processes to configuration-free"
+                     menubarPath="epfToolboxMenu/LibraryToolsGroup"
+                     tooltip="Convert all processes to configuration-free">
+               </action>
+            </actionSet>
+         </extension>
+   
+   
+</plugin>

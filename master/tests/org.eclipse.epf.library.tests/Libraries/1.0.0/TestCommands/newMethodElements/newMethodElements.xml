@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TesterOutput>
+<MethodLibrary authors="" briefDescription="" changeDescription="" guid="_5BZaYNBVEdyfaLaJYvW4Qg" name="newLib" orderingGuide="" path="" presentationName="" suppressed="false" version="">
+<MethodPlugin changeDescription="" guid="_5HOVkNBVEdyfaLaJYvW4Qg" name="PlugTest" orderingGuide="" presentationName="" suppressed="false" userChangeable="true" version="">
+<ContentPackage briefDescription="" global="false" guid="_5HOVkdBVEdyfaLaJYvW4Qg" name="Content" orderingGuide="" presentationName="" suppressed="false">
+<ContentPackage briefDescription="" global="false" guid="_5HOVktBVEdyfaLaJYvW4Qg" name="Categories" orderingGuide="" presentationName="" suppressed="false">
+<ContentPackage briefDescription="" global="false" guid="_5HOVk9BVEdyfaLaJYvW4Qg" name="Domains" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_5HOVlNBVEdyfaLaJYvW4Qg" name="Disciplines" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_5HOVldBVEdyfaLaJYvW4Qg" name="RoleSets" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_5HOVltBVEdyfaLaJYvW4Qg" name="WP Types" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_5HOVl9BVEdyfaLaJYvW4Qg" name="Tools" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_5HOVmNBVEdyfaLaJYvW4Qg" name="StandardCategories" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_5HOVmdBVEdyfaLaJYvW4Qg" name="CustomCategories" orderingGuide="" presentationName="" suppressed="false">
+<ContentPackage briefDescription="" global="false" guid="_5HOVmtBVEdyfaLaJYvW4Qg" name="Hidden" orderingGuide="" presentationName="" suppressed="false">
+<CustomCategory briefDescription="" guid="_5HOVm9BVEdyfaLaJYvW4Qg" isAbstract="false" name="Custom Categories" orderingGuide="" presentationName="" suppressed="false" variabilityType="na">
+<ContentDescription authors="" briefDescription="" changeDescription="" externalId="" guid="-6H_cDQM_QAbzG6yfPIJxVA" keyConsiderations="" mainDescription="" name="Custom Categories,_5HOVm9BVEdyfaLaJYvW4Qg" orderingGuide="" presentationName="" suppressed="false" version="">
+</ContentDescription>
+</CustomCategory>
+</ContentPackage>
+</ContentPackage>
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_5HOVnNBVEdyfaLaJYvW4Qg" name="CoreContent" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ProcessPackage briefDescription="" global="false" guid="_5HOVndBVEdyfaLaJYvW4Qg" name="CapabilityPatterns" orderingGuide="" presentationName="" suppressed="false">
+</ProcessPackage>
+</ContentPackage>
+<ProcessPackage briefDescription="" global="false" guid="_5HOVntBVEdyfaLaJYvW4Qg" name="DeliveryProcesses" orderingGuide="" presentationName="" suppressed="false">
+</ProcessPackage>
+<ProcessPackage briefDescription="" global="false" guid="_5HOVn9BVEdyfaLaJYvW4Qg" name="ProcessContributions" orderingGuide="" presentationName="" suppressed="false">
+</ProcessPackage>
+</MethodPlugin>
+<MethodPlugin authors="RMC team member A" briefDescription="Brief desciption of Plug_A" changeDescription="" guid="_5O9VQdBVEdyfaLaJYvW4Qg" name="Plug_A" orderingGuide="" presentationName="" suppressed="false" userChangeable="true" version="">
+<ContentPackage briefDescription="" global="false" guid="_5O9VQtBVEdyfaLaJYvW4Qg" name="Content" orderingGuide="" presentationName="" suppressed="false">
+<ContentPackage briefDescription="" global="false" guid="_5O9VQ9BVEdyfaLaJYvW4Qg" name="Categories" orderingGuide="" presentationName="" suppressed="false">
+<ContentPackage briefDescription="" global="false" guid="_5O9VRNBVEdyfaLaJYvW4Qg" name="Domains" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_5O9VRdBVEdyfaLaJYvW4Qg" name="Disciplines" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_5O9VRtBVEdyfaLaJYvW4Qg" name="RoleSets" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_5O9VR9BVEdyfaLaJYvW4Qg" name="WP Types" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_5O9VSNBVEdyfaLaJYvW4Qg" name="Tools" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_5O9VSdBVEdyfaLaJYvW4Qg" name="StandardCategories" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_5O9VStBVEdyfaLaJYvW4Qg" name="CustomCategories" orderingGuide="" presentationName="" suppressed="false">
+<ContentPackage briefDescription="" global="false" guid="_5O9VS9BVEdyfaLaJYvW4Qg" name="Hidden" orderingGuide="" presentationName="" suppressed="false">
+<CustomCategory briefDescription="" guid="_5O9VTNBVEdyfaLaJYvW4Qg" isAbstract="false" name="Custom Categories" orderingGuide="" presentationName="" suppressed="false" variabilityType="na">
+<ContentDescription authors="" briefDescription="" changeDescription="" externalId="" guid="-aZBSPpakUInrW50qtGjHkQ" keyConsiderations="" mainDescription="" name="Custom Categories,_5O9VTNBVEdyfaLaJYvW4Qg" orderingGuide="" presentationName="" suppressed="false" version="">
+</ContentDescription>
+</CustomCategory>
+</ContentPackage>
+</ContentPackage>
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_5O9VTdBVEdyfaLaJYvW4Qg" name="CoreContent" orderingGuide="" presentationName="" suppressed="false">
+<ContentPackage briefDescription="" global="false" guid="_5TczsNBVEdyfaLaJYvW4Qg" name="ContentPackage_1" orderingGuide="" presentationName="" suppressed="false">
+<Role briefDescription="This is a brief dsescription of Role 1" guid="_5TpA8NBVEdyfaLaJYvW4Qg" isAbstract="false" name="role_1" orderingGuide="" presentationName="Role 1" suppressed="false" variabilityType="na">
+<RoleDescription assignmentApproaches="" authors="" briefDescription="" changeDate="Thu Jan 31 15:40:25 PST 2008" changeDescription="" externalId="" guid="-yZP_q9R-HYR3i_ghCrNIgA" keyConsiderations="" mainDescription="This is the main description of Role 1" name="role_1,_5TpA8NBVEdyfaLaJYvW4Qg" orderingGuide="" presentationName="" skills="" suppressed="false" synonyms="" version="">
+</RoleDescription>
+</Role>
+</ContentPackage>
+</ContentPackage>
+<ProcessPackage briefDescription="" global="false" guid="_5O9VTtBVEdyfaLaJYvW4Qg" name="CapabilityPatterns" orderingGuide="" presentationName="" suppressed="false">
+</ProcessPackage>
+</ContentPackage>
+<ProcessPackage briefDescription="" global="false" guid="_5O9VT9BVEdyfaLaJYvW4Qg" name="DeliveryProcesses" orderingGuide="" presentationName="" suppressed="false">
+</ProcessPackage>
+<ProcessPackage briefDescription="" global="false" guid="_5O9VUNBVEdyfaLaJYvW4Qg" name="ProcessContributions" orderingGuide="" presentationName="" suppressed="false">
+</ProcessPackage>
+</MethodPlugin>
+<MethodPlugin authors="RMC team member B" briefDescription="Brief desciption of Plug_B" changeDate="Thu Jan 31 15:40:24 PST 2008" changeDescription="" guid="_5PVvwNBVEdyfaLaJYvW4Qg" name="Plug_B" orderingGuide="" presentationName="" suppressed="false" userChangeable="true" version="">
+<ContentPackage briefDescription="" global="false" guid="_5PVvwdBVEdyfaLaJYvW4Qg" name="Content" orderingGuide="" presentationName="" suppressed="false">
+<ContentPackage briefDescription="" global="false" guid="_5PVvwtBVEdyfaLaJYvW4Qg" name="Categories" orderingGuide="" presentationName="" suppressed="false">
+<ContentPackage briefDescription="" global="false" guid="_5PVvw9BVEdyfaLaJYvW4Qg" name="Domains" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_5PVvxNBVEdyfaLaJYvW4Qg" name="Disciplines" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_5PVvxdBVEdyfaLaJYvW4Qg" name="RoleSets" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_5PVvxtBVEdyfaLaJYvW4Qg" name="WP Types" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_5PVvx9BVEdyfaLaJYvW4Qg" name="Tools" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_5PVvyNBVEdyfaLaJYvW4Qg" name="StandardCategories" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_5PVvydBVEdyfaLaJYvW4Qg" name="CustomCategories" orderingGuide="" presentationName="" suppressed="false">
+<ContentPackage briefDescription="" global="false" guid="_5PVvytBVEdyfaLaJYvW4Qg" name="Hidden" orderingGuide="" presentationName="" suppressed="false">
+<CustomCategory briefDescription="" guid="_5PVvy9BVEdyfaLaJYvW4Qg" isAbstract="false" name="Custom Categories" orderingGuide="" presentationName="" suppressed="false" variabilityType="na">
+<ContentDescription authors="" briefDescription="" changeDescription="" externalId="" guid="-qsQJ--rJOaVIa9Pc6md6jA" keyConsiderations="" mainDescription="" name="Custom Categories,_5PVvy9BVEdyfaLaJYvW4Qg" orderingGuide="" presentationName="" suppressed="false" version="">
+</ContentDescription>
+</CustomCategory>
+</ContentPackage>
+</ContentPackage>
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_5PVvzNBVEdyfaLaJYvW4Qg" name="CoreContent" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ProcessPackage briefDescription="" global="false" guid="_5PVvzdBVEdyfaLaJYvW4Qg" name="CapabilityPatterns" orderingGuide="" presentationName="" suppressed="false">
+</ProcessPackage>
+</ContentPackage>
+<ProcessPackage briefDescription="" global="false" guid="_5PVvztBVEdyfaLaJYvW4Qg" name="DeliveryProcesses" orderingGuide="" presentationName="" suppressed="false">
+</ProcessPackage>
+<ProcessPackage briefDescription="" global="false" guid="_5PVvz9BVEdyfaLaJYvW4Qg" name="ProcessContributions" orderingGuide="" presentationName="" suppressed="false">
+</ProcessPackage>
+<bases path="Plug_A">
+</bases>
+</MethodPlugin>
+<MethodConfiguration authors="" briefDescription="" changeDate="Thu Jan 31 15:40:24 PST 2008" changeDescription="" guid="_5Oe0INBVEdyfaLaJYvW4Qg" name="Config_Test" orderingGuide="" presentationName="" suppressed="false" version="">
+</MethodConfiguration>
+<MethodConfiguration authors="" briefDescription="Brief desciption of Config_A" changeDescription="" guid="_5P0Q4NBVEdyfaLaJYvW4Qg" name="Config_A" orderingGuide="" presentationName="" suppressed="false" version="">
+</MethodConfiguration>
+</MethodLibrary>
+<MethodPlugin authors="RMC team member A" briefDescription="Brief desciption of Plug_A" changeDescription="" guid="_5O9VQdBVEdyfaLaJYvW4Qg" name="Plug_A" orderingGuide="" path="Plug_A" presentationName="" suppressed="false" userChangeable="true" version="">
+<ContentPackage briefDescription="" global="false" guid="_5O9VQtBVEdyfaLaJYvW4Qg" name="Content" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ProcessPackage briefDescription="" global="false" guid="_5O9VT9BVEdyfaLaJYvW4Qg" name="DeliveryProcesses" orderingGuide="" presentationName="" suppressed="false">
+</ProcessPackage>
+<ProcessPackage briefDescription="" global="false" guid="_5O9VUNBVEdyfaLaJYvW4Qg" name="ProcessContributions" orderingGuide="" presentationName="" suppressed="false">
+</ProcessPackage>
+</MethodPlugin>
+<MethodConfiguration authors="" briefDescription="Brief desciption of Config_A" changeDescription="" guid="_5P0Q4NBVEdyfaLaJYvW4Qg" name="Config_A" orderingGuide="" path="Config_A" presentationName="" suppressed="false" version="">
+</MethodConfiguration>
+</TesterOutput>

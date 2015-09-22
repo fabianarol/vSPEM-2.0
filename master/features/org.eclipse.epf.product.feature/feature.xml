@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.epf.product.feature"
+      label="EPF Product feature"
+      version="1.5.0.qualifier">
+
+   <description>
+      %description
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <includes
+         id="org.eclipse.epf.platform.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.epf.richtext.feature"
+         version="0.0.0"/>
+         
+   <includes
+         id="org.eclipse.epf.common.html.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.epf.base.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.epf.rcp.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.epf.doc.feature"
+         version="0.0.0"/>
+
+   <includes
+         id="org.eclipse.equinox.executable"
+         version="0.0.0"/>
+
+   <plugin
+         id="org.eclipse.epf.common.win32.win32.x86"
+         os="win32"
+         ws="win32"
+         arch="x86"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>

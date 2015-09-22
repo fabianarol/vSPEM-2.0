@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TesterOutput>
+<MethodLibrary authors="" briefDescription="" changeDescription="" guid="_eb9-cNBWEdySKOcCLLtTZQ" name="kelvinCase" orderingGuide="" path="" presentationName="" suppressed="false" version="">
+<MethodPlugin authors="Kelvin" briefDescription="Brief desciption of plugin_1" changeDescription="" guid="_ehf-sNBWEdySKOcCLLtTZQ" name="plugin_1" orderingGuide="" presentationName="" suppressed="false" userChangeable="true" version="">
+<ContentPackage briefDescription="" global="false" guid="_ehf-sdBWEdySKOcCLLtTZQ" name="Content" orderingGuide="" presentationName="" suppressed="false">
+<ContentPackage briefDescription="" global="false" guid="_ehf-stBWEdySKOcCLLtTZQ" name="Categories" orderingGuide="" presentationName="" suppressed="false">
+<ContentPackage briefDescription="" global="false" guid="_ehf-s9BWEdySKOcCLLtTZQ" name="Domains" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_ehf-tNBWEdySKOcCLLtTZQ" name="Disciplines" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_ehf-tdBWEdySKOcCLLtTZQ" name="RoleSets" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_ehf-ttBWEdySKOcCLLtTZQ" name="WP Types" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_ehf-t9BWEdySKOcCLLtTZQ" name="Tools" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_ehf-uNBWEdySKOcCLLtTZQ" name="StandardCategories" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_ehf-udBWEdySKOcCLLtTZQ" name="CustomCategories" orderingGuide="" presentationName="" suppressed="false">
+<ContentPackage briefDescription="" global="false" guid="_ehf-utBWEdySKOcCLLtTZQ" name="Hidden" orderingGuide="" presentationName="" suppressed="false">
+<CustomCategory briefDescription="" guid="_ehf-u9BWEdySKOcCLLtTZQ" isAbstract="false" name="Custom Categories" orderingGuide="" presentationName="" suppressed="false" variabilityType="na">
+<ContentDescription authors="" briefDescription="" changeDescription="" externalId="" guid="-PlCFE4xo5o3XO5flErYjNQ" keyConsiderations="" mainDescription="" name="Custom Categories,_ehf-u9BWEdySKOcCLLtTZQ" orderingGuide="" presentationName="" suppressed="false" version="">
+</ContentDescription>
+</CustomCategory>
+</ContentPackage>
+</ContentPackage>
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_ehf-vNBWEdySKOcCLLtTZQ" name="CoreContent" orderingGuide="" presentationName="" suppressed="false">
+<ContentPackage briefDescription="" global="false" guid="_emd-QNBWEdySKOcCLLtTZQ" name="contentPackage_1" orderingGuide="" presentationName="" suppressed="false">
+<Task briefDescription="" guid="_em2YwNBWEdySKOcCLLtTZQ" isAbstract="false" name="task_1" orderingGuide="" presentationName="" suppressed="false" variabilityType="na">
+<TaskDescription alternatives="" authors="" briefDescription="" changeDate="Thu Jan 31 15:44:35 PST 2008" changeDescription="" externalId="" guid="--7kjyUjRfmtOjkQpsCzHWQ" keyConsiderations="" mainDescription="This is the main description of task_1" name="task_1,_em2YwNBWEdySKOcCLLtTZQ" orderingGuide="" presentationName="" purpose="" suppressed="false" version="">
+</TaskDescription>
+</Task>
+</ContentPackage>
+</ContentPackage>
+<ProcessPackage briefDescription="" global="false" guid="_ehf-vdBWEdySKOcCLLtTZQ" name="CapabilityPatterns" orderingGuide="" presentationName="" suppressed="false">
+<ProcessComponent authors="" briefDescription="" changeDescription="" global="false" guid="_erJp8NBWEdySKOcCLLtTZQ" name="cp_1" orderingGuide="" presentationName="" suppressed="false" version="">
+<ProcessPackage briefDescription="" global="false" guid="_esxakdBWEdySKOcCLLtTZQ" name="td_1" orderingGuide="" presentationName="" suppressed="false">
+<TaskDescriptor briefDescription="" guid="_esxakNBWEdySKOcCLLtTZQ" hasMultipleOccurrences="false" isAbstract="false" isEventDriven="false" isOngoing="false" isOptional="false" isPlanned="true" isRepeatable="false" isSynchronizedWithSource="true" name="td_1" orderingGuide="" prefix="" presentationName="" suppressed="true">
+<DescriptorDescription authors="" briefDescription="" changeDescription="" externalId="" guid="-GPYMn58Xeza98eLASnBwTw" keyConsiderations="" mainDescription="" name="td_1,_esxakNBWEdySKOcCLLtTZQ" orderingGuide="" presentationName="" refinedDescription="" suppressed="false" usageGuidance="" version="">
+</DescriptorDescription>
+<superActivities path="plugin_1/Content/CapabilityPatterns/cp_1/cp_1">
+</superActivities>
+<Task path="plugin_1/Content/CoreContent/contentPackage_1/task_1">
+</Task>
+</TaskDescriptor>
+</ProcessPackage>
+<CapabilityPattern briefDescription="Brief desciption of cp_1" guid="_eq9csdBWEdySKOcCLLtTZQ" hasMultipleOccurrences="false" isAbstract="false" isEventDriven="false" isOngoing="false" isOptional="false" isPlanned="true" isRepeatable="false" name="cp_1" orderingGuide="" prefix="" presentationName="" suppressed="false" variabilityType="na">
+<ProcessDescription alternatives="" authors="" briefDescription="" changeDate="Thu Jan 31 15:44:35 PST 2008" changeDescription="" externalId="" guid="-LJSWIpoTI-k8nNiTkcpgzg" howtoStaff="" keyConsiderations="" mainDescription="This is the main description of cp_1" name="cp_1,_eq9csdBWEdySKOcCLLtTZQ" orderingGuide="" presentationName="" purpose="" scope="" suppressed="false" usageGuidance="" usageNotes="" version="">
+</ProcessDescription>
+<breakdownElements path="plugin_1/Content/CapabilityPatterns/cp_1/td_1/td_1">
+</breakdownElements>
+<defaultContext path="config_1">
+</defaultContext>
+</CapabilityPattern>
+</ProcessComponent>
+</ProcessPackage>
+</ContentPackage>
+<ProcessPackage briefDescription="" global="false" guid="_ehf-vtBWEdySKOcCLLtTZQ" name="DeliveryProcesses" orderingGuide="" presentationName="" suppressed="false">
+</ProcessPackage>
+<ProcessPackage briefDescription="" global="false" guid="_ehf-v9BWEdySKOcCLLtTZQ" name="ProcessContributions" orderingGuide="" presentationName="" suppressed="false">
+</ProcessPackage>
+</MethodPlugin>
+<MethodConfiguration authors="" briefDescription="Brief desciption of config_1" changeDate="Thu Jan 31 15:44:35 PST 2008" changeDescription="" guid="_eqlCMNBWEdySKOcCLLtTZQ" name="config_1" orderingGuide="" presentationName="" suppressed="false" version="">
+<methodPluginSelection path="plugin_1">
+</methodPluginSelection>
+<methodPackageSelection path="plugin_1/Content/CoreContent/contentPackage_1">
+</methodPackageSelection>
+</MethodConfiguration>
+</MethodLibrary>
+</TesterOutput>

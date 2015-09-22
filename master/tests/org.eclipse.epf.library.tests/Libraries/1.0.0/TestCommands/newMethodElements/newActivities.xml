@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TesterOutput>
+<MethodLibrary authors="" briefDescription="" changeDescription="" guid="_oOs10NDwEdyM7Py1msSaWg" name="newLib" orderingGuide="" path="" presentationName="" suppressed="false" version="">
+<MethodPlugin authors="Somebody" briefDescription="Brief desciption of Plug_A" changeDescription="" guid="_oUU8sNDwEdyM7Py1msSaWg" name="Plug_A" orderingGuide="" presentationName="" suppressed="false" userChangeable="true" version="">
+<ContentPackage briefDescription="" global="false" guid="_oUU8sdDwEdyM7Py1msSaWg" name="Content" orderingGuide="" presentationName="" suppressed="false">
+<ContentPackage briefDescription="" global="false" guid="_oUU8stDwEdyM7Py1msSaWg" name="Categories" orderingGuide="" presentationName="" suppressed="false">
+<ContentPackage briefDescription="" global="false" guid="_oUU8s9DwEdyM7Py1msSaWg" name="Domains" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_oUU8tNDwEdyM7Py1msSaWg" name="Disciplines" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_oUU8tdDwEdyM7Py1msSaWg" name="RoleSets" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_oUU8ttDwEdyM7Py1msSaWg" name="WP Types" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_oUU8t9DwEdyM7Py1msSaWg" name="Tools" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_oUU8uNDwEdyM7Py1msSaWg" name="StandardCategories" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_oUU8udDwEdyM7Py1msSaWg" name="CustomCategories" orderingGuide="" presentationName="" suppressed="false">
+<ContentPackage briefDescription="" global="false" guid="_oUU8utDwEdyM7Py1msSaWg" name="Hidden" orderingGuide="" presentationName="" suppressed="false">
+<CustomCategory briefDescription="" guid="_oUU8u9DwEdyM7Py1msSaWg" isAbstract="false" name="Custom Categories" orderingGuide="" presentationName="" suppressed="false" variabilityType="na">
+<ContentDescription authors="" briefDescription="" changeDescription="" externalId="" guid="-sMWQbs63QdM6BAyEBXoPdQ" keyConsiderations="" mainDescription="" name="Custom Categories,_oUU8u9DwEdyM7Py1msSaWg" orderingGuide="" presentationName="" suppressed="false" version="">
+</ContentDescription>
+</CustomCategory>
+</ContentPackage>
+</ContentPackage>
+</ContentPackage>
+<ContentPackage briefDescription="" global="false" guid="_oUU8vNDwEdyM7Py1msSaWg" name="CoreContent" orderingGuide="" presentationName="" suppressed="false">
+</ContentPackage>
+<ProcessPackage briefDescription="" global="false" guid="_oUU8vdDwEdyM7Py1msSaWg" name="CapabilityPatterns" orderingGuide="" presentationName="" suppressed="false">
+<ProcessComponent authors="" briefDescription="" changeDescription="" global="false" guid="_oXwEIdDwEdyM7Py1msSaWg" name="cp_1" orderingGuide="" presentationName="" suppressed="false" version="">
+<ProcessPackage briefDescription="" global="false" guid="_oaIpwdDwEdyM7Py1msSaWg" name="act_1" orderingGuide="" presentationName="" suppressed="false">
+<ProcessPackage briefDescription="" global="false" guid="_oanK4dDwEdyM7Py1msSaWg" name="phase_1" orderingGuide="" presentationName="" suppressed="false">
+<Phase briefDescription="Brief desciption of phase_1" guid="_oanK4NDwEdyM7Py1msSaWg" hasMultipleOccurrences="false" isAbstract="false" isEventDriven="false" isOngoing="false" isOptional="false" isPlanned="true" isRepeatable="false" name="phase_1" orderingGuide="" prefix="" presentationName="" suppressed="false" variabilityType="na">
+<ActivityDescription alternatives="" authors="" briefDescription="" changeDescription="" externalId="" guid="-MGFjaKEJwowOtC66bsD35w" howtoStaff="" keyConsiderations="" mainDescription="" name="phase_1,_oanK4NDwEdyM7Py1msSaWg" orderingGuide="" presentationName="" purpose="" suppressed="false" usageGuidance="" version="">
+</ActivityDescription>
+<superActivities path="Plug_A/Content/CapabilityPatterns/cp_1/act_1/act_1">
+</superActivities>
+</Phase>
+</ProcessPackage>
+<Activity briefDescription="Brief desciption of act_1" guid="_oaIpwNDwEdyM7Py1msSaWg" hasMultipleOccurrences="false" isAbstract="false" isEventDriven="false" isOngoing="false" isOptional="false" isPlanned="true" isRepeatable="false" name="act_1" orderingGuide="" prefix="" presentationName="" suppressed="false" variabilityType="na">
+<ActivityDescription alternatives="" authors="" briefDescription="" changeDate="Fri Feb 01 10:08:03 PST 2008" changeDescription="" externalId="" guid="-TrVftyHQrG5g8TNIV3hO2w" howtoStaff="" keyConsiderations="" mainDescription="This is the main description of act_1" name="act_1,_oaIpwNDwEdyM7Py1msSaWg" orderingGuide="" presentationName="" purpose="" suppressed="false" usageGuidance="" version="">
+</ActivityDescription>
+<superActivities path="Plug_A/Content/CapabilityPatterns/cp_1/cp_1">
+</superActivities>
+<breakdownElements path="Plug_A/Content/CapabilityPatterns/cp_1/act_1/phase_1/phase_1">
+</breakdownElements>
+</Activity>
+</ProcessPackage>
+<CapabilityPattern briefDescription="Brief desciption of cp_1" guid="_oXwEINDwEdyM7Py1msSaWg" hasMultipleOccurrences="false" isAbstract="false" isEventDriven="false" isOngoing="false" isOptional="false" isPlanned="true" isRepeatable="false" name="cp_1" orderingGuide="" prefix="" presentationName="" suppressed="false" variabilityType="na">
+<ProcessDescription alternatives="" authors="" briefDescription="" changeDate="Fri Feb 01 10:08:03 PST 2008" changeDescription="" externalId="" guid="-_Xa6q4SeUtTr4d8P7eoqAg" howtoStaff="" keyConsiderations="" mainDescription="This is the main description of cp_1" name="cp_1,_oXwEINDwEdyM7Py1msSaWg" orderingGuide="" presentationName="" purpose="" scope="" suppressed="false" usageGuidance="" usageNotes="" version="">
+</ProcessDescription>
+<breakdownElements path="Plug_A/Content/CapabilityPatterns/cp_1/act_1/act_1">
+</breakdownElements>
+<defaultContext path="Config_A">
+</defaultContext>
+</CapabilityPattern>
+</ProcessComponent>
+</ProcessPackage>
+</ContentPackage>
+<ProcessPackage briefDescription="" global="false" guid="_oUU8vtDwEdyM7Py1msSaWg" name="DeliveryProcesses" orderingGuide="" presentationName="" suppressed="false">
+</ProcessPackage>
+<ProcessPackage briefDescription="" global="false" guid="_oUU8v9DwEdyM7Py1msSaWg" name="ProcessContributions" orderingGuide="" presentationName="" suppressed="false">
+</ProcessPackage>
+</MethodPlugin>
+<MethodConfiguration authors="" briefDescription="" changeDate="Fri Feb 01 10:08:03 PST 2008" changeDescription="" guid="_oW_PINDwEdyM7Py1msSaWg" name="Config_A" orderingGuide="" presentationName="" suppressed="false" version="">
+</MethodConfiguration>
+</MethodLibrary>
+</TesterOutput>
